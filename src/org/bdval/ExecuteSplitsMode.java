@@ -26,7 +26,6 @@ import com.martiansoftware.jsap.Parameter;
 import com.martiansoftware.jsap.Switch;
 import edu.cornell.med.icb.cli.UseModality;
 import edu.cornell.med.icb.iterators.IteratorIterable;
-import edu.cornell.med.icb.util.ShortHash;
 import edu.mssm.crover.cli.CLI;
 import edu.rit.pj.IntegerForLoop;
 import edu.rit.pj.ParallelRegion;
@@ -38,6 +37,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.bdval.util.ShortHash;
 
 import java.io.File;
 import java.io.FileWriter;
