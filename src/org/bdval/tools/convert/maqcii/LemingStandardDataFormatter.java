@@ -16,10 +16,10 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package edu.cornell.med.icb.biomarkers.tools.convert.maqcii;
+package org.bdval.tools.convert.maqcii;
 
-import edu.cornell.med.icb.biomarkers.tools.convert.IDataFormatter;
-import edu.cornell.med.icb.biomarkers.tools.convert.OptionsSupport;
+import org.bdval.tools.convert.IDataFormatter;
+import org.bdval.tools.convert.OptionsSupport;
 import edu.cornell.med.icb.io.TsvToFromMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;

@@ -16,7 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package edu.cornell.med.icb.biomarkers.pathways;
+package org.bdval.pathways;
 
 import edu.cornell.med.icb.learning.MinMaxScalingRowProcessor;
 import edu.cornell.med.icb.pca.PrincipalComponentAnalysisWithR;

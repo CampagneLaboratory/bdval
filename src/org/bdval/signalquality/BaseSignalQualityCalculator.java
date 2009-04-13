@@ -16,10 +16,10 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package edu.cornell.med.icb.biomarkers.signalquality;
+package org.bdval.signalquality;
 
 import com.martiansoftware.jsap.JSAPResult;
-import edu.cornell.med.icb.biomarkers.BDVModel;
+import org.bdval.BDVModel;
 import edu.cornell.med.icb.io.TsvToFromMap;
 import edu.cornell.med.icb.maps.LinkedHashToMultiTypeMap;
 import it.unimi.dsi.fastutil.doubles.DoubleList;
@@ -138,7 +138,7 @@ public class BaseSignalQualityCalculator implements Closeable {
 
     /**
      * Configure the quality calculator.
-     * @param config the configuration and/or 
+     * @param config the configuration and/or
      * @param headerEnum which header to write
      * @param extendedOutput if extended output should be written
      * @param maxNumClasses the maximum number of classes

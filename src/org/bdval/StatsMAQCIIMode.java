@@ -16,14 +16,14 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package edu.cornell.med.icb.biomarkers;
+package org.bdval;
 
 import com.martiansoftware.jsap.FlaggedOption;
 import com.martiansoftware.jsap.JSAP;
 import com.martiansoftware.jsap.JSAPException;
 import com.martiansoftware.jsap.JSAPResult;
 import com.martiansoftware.jsap.Parameter;
-import edu.cornell.med.icb.biomarkers.tools.convert.maqcii.TsvToFromMapMaqciiFactory;
+import org.bdval.tools.convert.maqcii.TsvToFromMapMaqciiFactory;
 import edu.cornell.med.icb.io.TSVReader;
 import edu.cornell.med.icb.io.TsvToFromMap;
 import edu.cornell.med.icb.iterators.TextFileLineIterator;

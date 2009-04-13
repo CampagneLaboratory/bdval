@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="bdval" default="jar" basedir=".">
+    <import file="buildsupport/build.xml"/>
+
+    <property name="jarfile" value="bdval.jar"/>
+
+    <!-- compiler and javadoc settings -->
+    <property name="debug" value="on"/>
+    <property name="optimize" value="on"/>
+    <property name="deprecation" value="false"/>
+    <property name="ant.build.javac.source" value="1.6"/>
+    <property name="ant.build.javac.target" value="1.6"/>
+
+    <!-- this property controls the output of the internal log4j configuration initialization -->
+    <property name="log4j.debug" value="true"/>
+
+    <!-- this property sets the memory size for unit tests -->
+    <property name="test.max.memory" value="999m"/>
+
+    <path id="compile.classpath">
+        <fileset dir="${lib}">
+            <include name="*.jar"/>
+            <include name="Rserve/*.jar"/>
+            <include name="jlapack/*.jar"/>
+            <include name="tct/*.jar"/>
+        </fileset>
+    </path>
+
+    <path id="classpath">
+        <pathelement location="${classes}"/>
+        <pathelement location="${config}"/>
+        <pathelement location="${src}"/>  <!-- required for rscripts -->
+        <path refid="compile.classpath"/>
+    </path>
+
+    <import file="testsupport/build.xml"/>
+
+    <target name="init" depends="buildsupport.init, testsupport.init"/>
+
+    <target name="compile" depends="init" description="Compile Source code">
+        <javac srcdir="${src}" destdir="${classes}" debug="${debug}" deprecation="${deprecation}">
+            <compilerarg value="-Xlint"/>
+            <classpath refid="compile.classpath"/>
+        </javac>
+    </target>
+
+    <target name="jar" depends="compile">
+        <copy file="${config}/log4j.properties.sample" tofile="${classes}/log4j.properties"
+              overwrite="true" failonerror="false"/>
+        <copy file="${config}/RConnectionPool.xml.sample" tofile="${classes}/RConnectionPool.xml"
+              overwrite="true" failonerror="false"/>
+        <replace file="${classes}/log4j.properties" summary="true" token="tissueinfo.log" value="bdval.log"/>
+        <jar jarfile="${jarfile}" basedir="${classes}">
+            <manifest>
+                <attribute name="Main-Class" value="org.bdval.DiscoverAndValidate"/>
+                <attribute name="Specification-Title" value="BDVal"/>
+                <attribute name="Specification-Vendor"
+                           value="Institute for Computational Biomedicine (ICB), Weill Medical College of Cornell University"/>
+                <attribute name="Implementation-Version" value="${label} ${buildstamp}"/>
+                <attribute name="Implementation-Vendor"
+                           value="Institute for Computational Biomedicine (ICB), Weill Medical College of Cornell University"/>
+                <attribute name="Built-By" value="${user.name}"/>
+            </manifest>
+            <fileset dir="${src}">
+                <include name="rscripts/**"/>
+            </fileset>
+            <zipgroupfileset dir="${lib}">
+                <include name="colt.jar"/>
+                <include name="commons-cli-1.2.jar"/>
+                <include name="commons-collections-3.2.jar"/>
+                <include name="commons-configuration-1.5.jar"/>
+                <include name="commons-io-1.4.jar"/>
+                <include name="commons-lang-2.3.jar"/>
+                <include name="commons-logging-1.1.1.jar"/>
+                <include name="commons-math-1.2.jar"/>
+                <include name="dsiutils-1.0.5.jar"/>
+                <include name="edu.mssm.crover.cli.jar"/>
+                <include name="edu.mssm.crover.tables.jar"/>
+                <include name="fastutil-5.0.9.jar"/>
+                <include name="icb-utils.jar"/>
+                <include name="JSAP-2.1.jar"/>
+                <include name="libsvm.jar"/>
+                <include name="log4j-1.2.15.jar"/>
+                <include name="optimization.jar"/>
+                <include name="pj20071021.jar"/>
+
+<!--
+                <include name="mg4j-2.1.2.jar"/>
+                <include name="Rserve/*.jar"/>
+                <include name="jgap.jar"/>
+                <include name="weka-3.5.6.jar"/>
+                <include name="jakarta-oro-2.0.8.jar"/>
+                <include name="jsc.jar"/>
+                <include name="ant/*.jar"/>
+-->
+            </zipgroupfileset>
+        </jar>
+        <delete file="${classes}/log4j.properties" failonerror="false"/>
+    </target>
+
+    <target name="javadoc" description="Run Javadoc on all source code files">
+        <!--  Create the Java doc directory -->
+        <mkdir dir="${javadocs}"/>
+        <javadoc packagenames="edu.*" sourcepath="${src}"
+                 destdir="${javadocs}" author="true" version="true"
+                 windowtitle="BDVal API ${buildstamp}"
+                 header="BDVal API ${buildstamp}">
+            <link href="http://java.sun.com/javase/6/docs/api/"/>
+            <link href="http://castor.codehaus.org/javadoc/"/>
+            <link href="http://mg4j.dsi.unimi.it/docs/"/>
+            <link href="http://fastutil.dsi.unimi.it/docs/"/>
+            <link href="http://dsiutils.dsi.unimi.it/docs/"/>
+            <link href="http://jakarta.apache.org/commons/cli/api-release/"/>
+            <link href="http://jakarta.apache.org/commons/collections/api-release/"/>
+            <link href="http://jakarta.apache.org/commons/configuration/apidocs/"/>
+            <link href="http://jakarta.apache.org/commons/io/apidocs/"/>
+            <link href="http://jakarta.apache.org/commons/logging/apidocs/"/>
+            <link href="http://dsd.lbl.gov/~hoschek/colt/api/"/>
+            <link href="http://junit.sourceforge.net/javadoc_40/"/>
+            <link href="http://www.cs.rit.edu/~ark/pj/doc/"/>
+            <link href="http://icbtools.med.cornell.edu/javadocs/qtclustering/"/>
+            <link href="http://icbtools.med.cornell.edu/javadocs/icb-utils/"/>
+            <classpath refid="classpath"/>
+            <bottom>
+                <![CDATA[<i>Copyright &#169; 2007-${year} Institute for Computational Biomedicine, All Rights Reserved.</i>]]></bottom>
+        </javadoc>
+    </target>
+
+    <target name="clean" depends="buildsupport.clean, testsupport.clean" description="Cleans up the directory">
+        <delete dir="${javadocs}"/>
+        <delete file="${jarfile}"/>
+    </target>
+
+    <target name="cruisecontrol"
+            depends="clean, cobertura-setup, jar, test, javadoc, pmd, findbugs, cobertura-report"
+            description="Run CruiseControl Build and Tests"/>
+</project>
+

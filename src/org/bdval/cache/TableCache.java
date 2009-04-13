@@ -16,7 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package edu.cornell.med.icb.biomarkers.cache;
+package org.bdval.cache;
 
 import edu.cornell.med.icb.geo.tools.FullGeneList;
 import edu.cornell.med.icb.geo.tools.GeneList;

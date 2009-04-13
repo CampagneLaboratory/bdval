@@ -16,7 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package edu.cornell.med.icb.biomarkers;
+package org.bdval;
 
 import edu.cornell.med.icb.R.script.RScript;
 import edu.cornell.med.icb.R.script.RDataObjectType;
@@ -94,7 +94,7 @@ double logpval= s.logRankP;
     private final DoubleList timeList=new DoubleArrayList() ;
     private final List <DoubleList> covariateList=new ArrayList <DoubleList>();
     private int nCov;
-    
+
     public SurvivalMeasures(){};
     public SurvivalMeasures(String survivalFilename, final DoubleList decisions,
                             final DoubleList trueLabels, final String [] sampleID) throws IOException {
@@ -161,7 +161,7 @@ double logpval= s.logRankP;
      //     coxRegressionByRScript(time, censor, covariateWithScore);
 
            logRankByRscript(time, censor, group);
-            
+
         } catch (Exception e) {
             LOG.warn(String.format(
                     "Cannot calculate stats for time=%s, censor=%s,group=%s, size=%d, size=%d, size=%d",

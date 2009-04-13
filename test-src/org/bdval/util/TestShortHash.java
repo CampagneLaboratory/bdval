@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package edu.cornell.med.icb.biomarkers.util;
+package org.bdval.util;
 
 import static junit.framework.Assert.assertEquals;
 import org.junit.Test;

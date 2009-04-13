@@ -1,4 +1,4 @@
-package edu.cornell.med.icb.biomarkers;
+package org.bdval;
 
 /**
  * Created by IntelliJ IDEA.
@@ -13,7 +13,7 @@ public class SurvivalMeasureResult {
     public double lowCI;
     public double upCI;
     public double logRankP;
-    
+
     public void assignValue(final double c, final double h, final double lo, final double up, final double logr)
     {
         this.coxP=c;

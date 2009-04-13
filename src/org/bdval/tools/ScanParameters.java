@@ -16,16 +16,16 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package edu.cornell.med.icb.biomarkers.tools;
+package org.bdval.tools;
 
 import com.martiansoftware.jsap.FlaggedOption;
 import com.martiansoftware.jsap.JSAP;
 import com.martiansoftware.jsap.JSAPException;
 import com.martiansoftware.jsap.JSAPResult;
 import com.martiansoftware.jsap.Parameter;
-import edu.cornell.med.icb.biomarkers.DAVOptions;
-import edu.cornell.med.icb.biomarkers.DiscoverAndValidate;
-import edu.cornell.med.icb.biomarkers.WithProcessMethod;
+import org.bdval.DAVOptions;
+import org.bdval.DiscoverAndValidate;
+import org.bdval.WithProcessMethod;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.PrintWriter;

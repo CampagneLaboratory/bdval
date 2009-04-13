@@ -16,7 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package edu.cornell.med.icb.biomarkers;
+package org.bdval;
 
 /**
  * Information about the prediction results for an item/sample.

@@ -16,7 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package edu.cornell.med.icb.biomarkers.tools.convert.maqcii;
+package org.bdval.tools.convert.maqcii;
 
 import edu.cornell.med.icb.io.TsvToFromMap;
 

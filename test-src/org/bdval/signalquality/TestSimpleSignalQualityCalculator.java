@@ -16,7 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package edu.cornell.med.icb.biomarkers.signalquality;
+package org.bdval.signalquality;
 
 import edu.cornell.med.icb.io.TsvToFromMap;
 import edu.cornell.med.icb.iterators.TextFileLineIterator;

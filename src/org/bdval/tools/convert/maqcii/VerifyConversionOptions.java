@@ -16,15 +16,15 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package edu.cornell.med.icb.biomarkers.tools.convert.maqcii;
+package org.bdval.tools.convert.maqcii;
 
 import com.martiansoftware.jsap.FlaggedOption;
 import com.martiansoftware.jsap.JSAP;
 import com.martiansoftware.jsap.JSAPException;
 import com.martiansoftware.jsap.JSAPResult;
 import com.martiansoftware.jsap.Parameter;
-import edu.cornell.med.icb.biomarkers.tools.convert.OptionsConfigurationException;
-import edu.cornell.med.icb.biomarkers.tools.convert.OptionsSupport;
+import org.bdval.tools.convert.OptionsConfigurationException;
+import org.bdval.tools.convert.OptionsSupport;
 import edu.cornell.med.icb.iterators.RecursiveFileListIterator;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
@@ -61,7 +61,7 @@ public class VerifyConversionOptions {
      *
      * @param args the comand line args
      * @throws com.martiansoftware.jsap.JSAPException                 jsap error parsing.
-     * @throws edu.cornell.med.icb.biomarkers.tools.convert.OptionsConfigurationException error reading the options
+     * @throws org.bdval.tools.convert.OptionsConfigurationException error reading the options
      * @throws java.io.IOException                   error reading from a file
      */
     public VerifyConversionOptions(final String[] args)

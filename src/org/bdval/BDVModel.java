@@ -16,7 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package edu.cornell.med.icb.biomarkers;
+package org.bdval;
 
 import edu.cornell.med.icb.geo.GEOPlatformIndexed;
 import edu.cornell.med.icb.geo.tools.ClassificationTask;
@@ -288,7 +288,7 @@ public class BDVModel {
 
     /**
      * Loads a BDVal model from disk. BDVal models are generated with the
-     * {@link edu.cornell.med.icb.biomarkers.DiscoverAndValidate} tools (BDVal).
+     * {@link org.bdval.DiscoverAndValidate} tools (BDVal).
      * @param options specific options to use when loading the model
      * @throws IOException if there is a problem accessing the model
      * @throws ClassNotFoundException if the type of the model is not recognized

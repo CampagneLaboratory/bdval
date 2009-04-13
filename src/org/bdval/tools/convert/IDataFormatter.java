@@ -16,7 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package edu.cornell.med.icb.biomarkers.tools.convert;
+package org.bdval.tools.convert;
 
 import java.io.IOException;
 import java.util.Map;

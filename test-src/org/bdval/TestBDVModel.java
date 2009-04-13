@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package edu.cornell.med.icb.biomarkers;
+package org.bdval;
 
 import edu.mssm.crover.tables.ArrayTable;
 import edu.mssm.crover.tables.InvalidColumnException;
@@ -29,7 +29,7 @@ import org.junit.Test;
 import java.io.IOException;
 
 /**
- * Validates the functionality of the {@link edu.cornell.med.icb.biomarkers.BDVModel} class.
+ * Validates the functionality of the {@link org.bdval.BDVModel} class.
  */
 public class TestBDVModel {
     /**

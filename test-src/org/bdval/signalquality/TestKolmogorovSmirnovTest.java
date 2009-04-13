@@ -16,7 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package edu.cornell.med.icb.biomarkers.signalquality;
+package org.bdval.signalquality;
 
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;

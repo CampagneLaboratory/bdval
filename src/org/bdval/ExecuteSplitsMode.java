@@ -16,7 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package edu.cornell.med.icb.biomarkers;
+package org.bdval;
 
 import com.martiansoftware.jsap.FlaggedOption;
 import com.martiansoftware.jsap.JSAP;
@@ -24,7 +24,7 @@ import com.martiansoftware.jsap.JSAPException;
 import com.martiansoftware.jsap.JSAPResult;
 import com.martiansoftware.jsap.Parameter;
 import com.martiansoftware.jsap.Switch;
-import edu.cornell.med.icb.biomarkers.util.ShortHash;
+import org.bdval.util.ShortHash;
 import edu.cornell.med.icb.cli.UseModality;
 import edu.cornell.med.icb.iterators.IteratorIterable;
 import edu.mssm.crover.cli.CLI;

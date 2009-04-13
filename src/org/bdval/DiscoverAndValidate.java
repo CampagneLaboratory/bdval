@@ -16,7 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package edu.cornell.med.icb.biomarkers;
+package org.bdval;
 
 import com.martiansoftware.jsap.JSAPException;
 import edu.cornell.med.icb.util.VersionUtils;
@@ -62,8 +62,8 @@ public class DiscoverAndValidate implements WithProcessMethod {
      * @throws JSAPException if there is a problem parsing the command line.
      * @throws IllegalAccessException if a registered mode cannot be accessed
      * @throws InstantiationException if a registerd mode cannot be instantiated
-     * @see edu.cornell.med.icb.biomarkers.DAVMode
-     * @see edu.cornell.med.icb.biomarkers.DAVOptions
+     * @see org.bdval.DAVMode
+     * @see org.bdval.DAVOptions
      */
     public void process(final String[] args) throws JSAPException,
             IllegalAccessException, InstantiationException {
@@ -78,8 +78,8 @@ public class DiscoverAndValidate implements WithProcessMethod {
      * @throws IllegalAccessException if a registered mode cannot be accessed
      * @throws InstantiationException if a registerd mode cannot be instantiated
      * @return The DAVMode object created during this session.
-     * @see edu.cornell.med.icb.biomarkers.DAVMode
-     * @see edu.cornell.med.icb.biomarkers.DAVOptions
+     * @see org.bdval.DAVMode
+     * @see org.bdval.DAVOptions
      */
     public DAVMode processReturnDavMode(final String[] args) throws JSAPException,
             IllegalAccessException, InstantiationException {

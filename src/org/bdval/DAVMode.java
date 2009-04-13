@@ -16,7 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package edu.cornell.med.icb.biomarkers;
+package org.bdval;
 
 import cern.jet.random.engine.MersenneTwister;
 import com.martiansoftware.jsap.FlaggedOption;
@@ -27,11 +27,11 @@ import com.martiansoftware.jsap.Parameter;
 import com.martiansoftware.jsap.Switch;
 import edu.cornell.med.icb.R.RConnectionPool;
 import edu.cornell.med.icb.R.RUtils;
-import edu.cornell.med.icb.biomarkers.cache.TableCache;
-import edu.cornell.med.icb.biomarkers.pathways.AverageAcrossPathwayFeatureAggregator;
-import edu.cornell.med.icb.biomarkers.pathways.PCAFeatureAggregator;
-import edu.cornell.med.icb.biomarkers.pathways.PathwayFeatureAggregator;
-import edu.cornell.med.icb.biomarkers.pathways.PathwayInfo;
+import org.bdval.cache.TableCache;
+import org.bdval.pathways.AverageAcrossPathwayFeatureAggregator;
+import org.bdval.pathways.PCAFeatureAggregator;
+import org.bdval.pathways.PathwayFeatureAggregator;
+import org.bdval.pathways.PathwayInfo;
 import edu.cornell.med.icb.cli.UseModality;
 import edu.cornell.med.icb.geo.AffymetrixSampleData;
 import edu.cornell.med.icb.geo.DefaultSignalAdapter;
@@ -118,7 +118,7 @@ import java.util.zip.GZIPInputStream;
 
 /**
  * Main class used to define and process modes for
- * {@link edu.cornell.med.icb.biomarkers.DiscoverAndValidate}.
+ * {@link org.bdval.DiscoverAndValidate}.
  * New modes should override this class.  See the
  * <a href="http://icb.med.cornell.edu/wiki/index.php/BDVAL">BDVal Wiki</a>
  * for more details.
@@ -132,7 +132,7 @@ public class DAVMode extends UseModality<DAVOptions> {
     private static final Log LOG = LogFactory.getLog(DAVMode.class);
 
     /**
-     * Container for options common to {@link edu.cornell.med.icb.biomarkers.DiscoverAndValidate}
+     * Container for options common to {@link org.bdval.DiscoverAndValidate}
      * modes.
      */
     private DAVOptions davOptions;

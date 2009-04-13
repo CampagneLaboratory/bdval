@@ -16,12 +16,12 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package edu.cornell.med.icb.biomarkers;
+package org.bdval;
 
 import com.martiansoftware.jsap.JSAP;
 import com.martiansoftware.jsap.JSAPException;
 import com.martiansoftware.jsap.JSAPResult;
-import edu.cornell.med.icb.biomarkers.cache.TableCache;
+import org.bdval.cache.TableCache;
 import edu.cornell.med.icb.geo.tools.FullGeneList;
 import edu.mssm.crover.tables.ColumnTypeException;
 import edu.mssm.crover.tables.InvalidColumnException;

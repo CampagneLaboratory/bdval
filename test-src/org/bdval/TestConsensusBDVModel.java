@@ -16,7 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package edu.cornell.med.icb.biomarkers;
+package org.bdval;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -25,7 +25,7 @@ import org.junit.Test;
 import java.io.IOException;
 
 /**
- * Validates the functionality of the {@link edu.cornell.med.icb.biomarkers.ConsensusBDVModel}
+ * Validates the functionality of the {@link org.bdval.ConsensusBDVModel}
  * class.
  */
 public class TestConsensusBDVModel {

@@ -16,7 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package edu.cornell.med.icb.biomarkers.util;
+package org.bdval.util;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;

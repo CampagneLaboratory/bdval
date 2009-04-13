@@ -16,10 +16,10 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package edu.cornell.med.icb.biomarkers;
+package org.bdval;
 
 import cern.jet.random.engine.MersenneTwister;
-import edu.cornell.med.icb.biomarkers.tools.convert.OptionsSupport;
+import org.bdval.tools.convert.OptionsSupport;
 import edu.cornell.med.icb.geo.DoubleIndexedIdentifier;
 import edu.cornell.med.icb.geo.IndexedIdentifier;
 import edu.cornell.med.icb.io.TSVReader;

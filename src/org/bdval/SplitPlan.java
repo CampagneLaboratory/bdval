@@ -16,7 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package edu.cornell.med.icb.biomarkers;
+package org.bdval;
 
 import edu.cornell.med.icb.io.TSVReader;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;

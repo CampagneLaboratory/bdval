@@ -16,11 +16,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package edu.cornell.med.icb.biomarkers.signalquality;
+package org.bdval.signalquality;
 
 import edu.cornell.med.icb.R.script.RDataObjectType;
 import edu.cornell.med.icb.R.script.RScript;
-import edu.cornell.med.icb.biomarkers.BDVModel;
+import org.bdval.BDVModel;
 import edu.cornell.med.icb.maps.LinkedHashToMultiTypeMap;
 import it.unimi.dsi.fastutil.doubles.DoubleList;
 import it.unimi.dsi.fastutil.objects.ObjectArraySet;
