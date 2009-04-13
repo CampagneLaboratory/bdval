@@ -36,7 +36,7 @@ public class TestConsensusBDVModel {
      */
     @Test
     public void loadBinaryModel() throws ClassNotFoundException, IOException {
-        final BDVModel model = new ConsensusBDVModel("data/test/bdval/models/binary/libSVM_Cologne_EFS_MO-baseline-global-svm-weights-final-model-LDPSS", "libSVM_Cologne_EFS_MO-baseline-global-svm-weights-final-model-LDPSS");
+        final BDVModel model = new ConsensusBDVModel("test-data/models/binary/libSVM_Cologne_EFS_MO-baseline-global-svm-weights-final-model-LDPSS", "libSVM_Cologne_EFS_MO-baseline-global-svm-weights-final-model-LDPSS");
         model.load(new DAVOptions());
 
         assertEquals("Number of features is incorrect", 10, model.getNumberOfFeatures());
@@ -50,7 +50,7 @@ public class TestConsensusBDVModel {
      */
     @Test
     public void loadPropertyModel() throws ClassNotFoundException, IOException {
-        final BDVModel model = new ConsensusBDVModel("data/test/bdval/models/properties/libSVM_Cologne_EFS_MO-baseline-global-svm-weights-final-model-LDPSS", "libSVM_Cologne_EFS_MO-baseline-global-svm-weights-final-model-LDPSS");
+        final BDVModel model = new ConsensusBDVModel("test-data/models/properties/libSVM_Cologne_EFS_MO-baseline-global-svm-weights-final-model-LDPSS", "libSVM_Cologne_EFS_MO-baseline-global-svm-weights-final-model-LDPSS");
         model.load(new DAVOptions());
 
         assertEquals("Number of features is incorrect", 10, model.getNumberOfFeatures());

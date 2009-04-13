@@ -39,7 +39,7 @@ public class TestBDVModel {
      */
     @Test
     public void loadBinaryModel() throws ClassNotFoundException, IOException {
-        final BDVModel model = new BDVModel("data/test/bdval/models/binary/libSVM_Cologne_EFS_MO-baseline-global-svm-weights-final-model-LDPSS");
+        final BDVModel model = new BDVModel("test-data/models/binary/libSVM_Cologne_EFS_MO-baseline-global-svm-weights-final-model-LDPSS");
         model.load(new DAVOptions());
         assertEquals("The dataset name does not match", "Cologne_EFS_MO_data.cologne", model.getDatasetName());
 
@@ -67,7 +67,7 @@ public class TestBDVModel {
      */
     @Test
     public void loadPropertyModel() throws ClassNotFoundException, IOException {
-        final BDVModel model = new BDVModel("data/test/bdval/models/properties/libSVM_Cologne_EFS_MO-baseline-global-svm-weights-final-model-LDPSS");
+        final BDVModel model = new BDVModel("test-data/models/properties/libSVM_Cologne_EFS_MO-baseline-global-svm-weights-final-model-LDPSS");
         model.load(new DAVOptions());
         assertEquals("The dataset name does not match", "Cologne_EFS_MO_data.cologne", model.getDatasetName());
 
@@ -113,7 +113,7 @@ public class TestBDVModel {
 
         // NOTE: removing any column (except for ID_REF) from the testSet table above will cause
         // the same exception listed in http://icbtools.med.cornell.edu/mantis/view.php?id=1301
-        final BDVModel model = new BDVModel("data/test/bdval/models/properties/libSVM_Cologne_EFS_MO-baseline-global-svm-weights-final-model-LDPSS");
+        final BDVModel model = new BDVModel("test-data/models/properties/libSVM_Cologne_EFS_MO-baseline-global-svm-weights-final-model-LDPSS");
         model.load(new DAVOptions());
         model.checkReOrderTestSet(testSet);
     }

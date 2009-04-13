@@ -106,7 +106,7 @@ public class TestDAVMode {
     public void testReadTMMInputFile()
             throws SyntaxErrorException, IOException, UnsupportedFormatException {
         final DAVMode davMode = new DAVMode();
-        final Table table = davMode.readInputFile("data/test/bdval/test.tmm");
+        final Table table = davMode.readInputFile("test-data/test.tmm");
         assertNotNull("Table should not be null", table);
         assertEquals("There should be 3 columns", 3, table.getColumnNumber());
         assertEquals("There should be 5 rows", 5, table.getRowNumber());
@@ -122,7 +122,7 @@ public class TestDAVMode {
     public void testReadCompressedTMMInputFile()
             throws SyntaxErrorException, IOException, UnsupportedFormatException {
         final DAVMode davMode = new DAVMode();
-        final Table table = davMode.readInputFile("data/test/bdval/test.tmm.gz");
+        final Table table = davMode.readInputFile("test-data/test.tmm.gz");
         assertNotNull("Table should not be null", table);
         assertEquals("There should be 3 columns", 3, table.getColumnNumber());
         assertEquals("There should be 5 rows", 5, table.getRowNumber());
@@ -149,7 +149,7 @@ public class TestDAVMode {
     @Test
     public void testTableCacheDisabled() throws IOException, JSAPException {
         final String cacheDirectoryName = getTempCacheDirectory();
-        final String inputFileName = "data/test/bdval/test.tmm.gz";
+        final String inputFileName = "test-data/test.tmm.gz";
 
         final String[] args = { "--cache-dir", cacheDirectoryName,
                 "--input", inputFileName};
@@ -182,7 +182,7 @@ public class TestDAVMode {
     public void testTableCacheEnabled() throws IOException, JSAPException, InvalidColumnException,
             ColumnTypeException, TypeMismatchException {
         final String cacheDirectoryName = getTempCacheDirectory();
-        final String inputFileName = "data/test/bdval/test.tmm.gz";
+        final String inputFileName = "test-data/test.tmm.gz";
 
         final String[] args = { "--enable-cache", "--cache-dir", cacheDirectoryName,
             "--input", inputFileName};
