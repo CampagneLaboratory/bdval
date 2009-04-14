@@ -4,7 +4,7 @@
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 3 of the License, or
+ *  the Free Software Foundation; either version 2 of the License, or
  *  (at your option) any later version.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -12,8 +12,9 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *  You should have received a copy of the GNU General Public License along
+ *  with this program; if not, write to the Free Software Foundation, Inc.,
+ *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 package org.bdval.tools.convert.maqcii;
@@ -41,18 +42,18 @@ public class VerifyConversion {
     private VerifyConversionOptions options;
 
     /** cornell_model_id + cornell_sample_id (key) to decision value map. */
-    private Object2DoubleOpenHashMap<String> modelSampleToDecisionMap =
+    private final Object2DoubleOpenHashMap<String> modelSampleToDecisionMap =
             new Object2DoubleOpenHashMap<String>();
 
     /**
      * leming_model_id + leming_sample_id (key) to
      * cornell_model_id + cornell_sample_id (value) translation map.
      **/
-    private Map<String, String> lemingKeyToCornellKeyMap =
+    private final Map<String, String> lemingKeyToCornellKeyMap =
             new Object2ObjectOpenHashMap<String, String>();
 
     /** The fromPredictions TSV reader. */
-    private TsvToFromMap predctionsTsv = TsvToFromMapMaqciiFactory.getMapForType(
+    private final TsvToFromMap predctionsTsv = TsvToFromMapMaqciiFactory.getMapForType(
             TsvToFromMapMaqciiFactory.TsvToFromMapType.PREDICTION_FORMAT);
 
     /**
@@ -84,7 +85,7 @@ public class VerifyConversion {
      * @throws IOException error reading files for the options
      */
     public VerifyConversion(final String[] args)
-            throws OptionsConfigurationException, JSAPException, IOException {
+            throws OptionsConfigurationException, JSAPException {
         super();
         options = new VerifyConversionOptions(args);
         System.out.println(options.toString());

@@ -4,7 +4,7 @@
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 3 of the License, or
+ *  the Free Software Foundation; either version 2 of the License, or
  *  (at your option) any later version.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -12,8 +12,9 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *  You should have received a copy of the GNU General Public License along
+ *  with this program; if not, write to the Free Software Foundation, Inc.,
+ *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 package org.bdval.signalquality;
@@ -42,14 +43,14 @@ import java.util.Map;
 public class BaseSignalQualityCalculator implements Closeable {
 
     /** The output writer. */
-    private PrintWriter outputWriter = null;
+    private PrintWriter outputWriter;
 
     /** Translation from 0/1, LT/NLT, etc. to a specified value. */
     public static final String[] CLASS_TRANSLATION = new String[] {
         "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P"};
 
     /** The output filename. */
-    private String outputFilename = null;
+    private String outputFilename;
 
     /** Object to assist with writing the TSV file. */
     private TsvToFromMap tsvOutput;
@@ -99,7 +100,7 @@ public class BaseSignalQualityCalculator implements Closeable {
         public List<String> getColumns(final boolean extendedMode, final int maxNumClasses) {
             final List<String> result = new LinkedList<String>();
             for (int classNum = 0; classNum < maxNumClasses; classNum++) {
-                for (String headerColumnName : headerColumns) {
+                for (final String headerColumnName : headerColumns) {
                     if (!headerColumnName.contains("[_X_]")) {
                         if (classNum == 0) {
                             result.add(headerColumnName);
@@ -112,7 +113,7 @@ public class BaseSignalQualityCalculator implements Closeable {
             }
             if (extendedMode) {
                 for (int classNum = 0; classNum < maxNumClasses; classNum++) {
-                    for (String headerColumnName : extendedColumns) {
+                    for (final String headerColumnName : extendedColumns) {
                         if (!headerColumnName.contains("[_X_]")) {
                             if (classNum == 0) {
                                 result.add(headerColumnName);
@@ -153,7 +154,7 @@ public class BaseSignalQualityCalculator implements Closeable {
 
         outputFilename = config.getString("output");
         tsvOutput = new TsvToFromMap();
-        for (String column : headerEnum.getColumns(extendedOutput, maxNumClasses)) {
+        for (final String column : headerEnum.getColumns(extendedOutput, maxNumClasses)) {
             tsvOutput.addColumn(column);
         }
 
@@ -244,7 +245,7 @@ public class BaseSignalQualityCalculator implements Closeable {
      * Get the comment regarding the class mapping.
      * @param newClassMapComment the comment regarding the class mapping.
      */
-    public void setClassMapComment(String newClassMapComment) {
+    public void setClassMapComment(final String newClassMapComment) {
         if (this.classMapComment == null || !classMapComment.equals(newClassMapComment)) {
             // Only write the class map comment if it is different from the last one
             this.classMapComment = newClassMapComment;

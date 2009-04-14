@@ -17,6 +17,9 @@
     <!-- this property sets the memory size for unit tests -->
     <property name="test.max.memory" value="999m"/>
 
+    <!-- this property sets the configuration to use for checkstyle -->
+    <property name="checkstyle-config" location="testsupport/checkstyle/config/icb_gpl2_checks.xml"/>
+
     <path id="compile.classpath">
         <fileset dir="${lib}">
             <include name="*.jar"/>

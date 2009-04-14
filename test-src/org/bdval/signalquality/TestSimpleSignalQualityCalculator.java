@@ -4,7 +4,7 @@
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 3 of the License, or
+ *  the Free Software Foundation; either version 2 of the License, or
  *  (at your option) any later version.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -12,8 +12,9 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *  You should have received a copy of the GNU General Public License along
+ *  with this program; if not, write to the Free Software Foundation, Inc.,
+ *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 package org.bdval.signalquality;
@@ -117,7 +118,7 @@ public class TestSimpleSignalQualityCalculator {
         data.put("0-t2", t2sList);
         int lineNo = 1;
         for (final LinkedHashToMultiTypeMap<String> line : ratioData) {
-            int count = line.getInt("count");
+            final int count = line.getInt("count");
             final double expectedStoufferZ =  line.getDouble("Stouffer z");
             final double expectedStoufferPZ =  line.getDouble("Stouffer pz");
             final double expectedRatioRank =  line.getDouble("ratio_rank");
@@ -156,7 +157,7 @@ public class TestSimpleSignalQualityCalculator {
     public static void loadData() throws IOException {
         rawData = new ArrayList<LinkedHashToMultiTypeMap<String>>();
         final File inputFile = new File(INPUT_ROOT + "quality-pvalues.tsv");
-        TsvToFromMap tsvReader = TsvToFromMap.createFromTsvFile(inputFile);
+        final TsvToFromMap tsvReader = TsvToFromMap.createFromTsvFile(inputFile);
         int lineNo = 0;
         for (final String fileLine : new TextFileLineIterator(inputFile)) {
             if (lineNo == 0 || fileLine.startsWith("#") || StringUtils.isBlank(fileLine)) {
@@ -184,7 +185,7 @@ public class TestSimpleSignalQualityCalculator {
     public static void loadRatioData() throws IOException {
         ratioData = new ArrayList<LinkedHashToMultiTypeMap<String>>();
         final File inputFile = new File(INPUT_ROOT + "ratio.tsv");
-        TsvToFromMap tsvReader = TsvToFromMap.createFromTsvFile(inputFile);
+        final TsvToFromMap tsvReader = TsvToFromMap.createFromTsvFile(inputFile);
         int lineNo = 0;
         for (final String fileLine : new TextFileLineIterator(inputFile)) {
             if (lineNo == 0 || fileLine.startsWith("#") || StringUtils.isBlank(fileLine)) {

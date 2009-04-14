@@ -4,7 +4,7 @@
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 3 of the License, or
+ *  the Free Software Foundation; either version 2 of the License, or
  *  (at your option) any later version.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -12,8 +12,9 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *  You should have received a copy of the GNU General Public License along
+ *  with this program; if not, write to the Free Software Foundation, Inc.,
+ *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 package org.bdval.tools.convert.maqcii;
@@ -57,15 +58,15 @@ public class CornellToLemingOptions {
     private final JSAP jsap;
 
     /** Map of cologne sample id's to patient id's. From the cologne sample multimap. */
-    private Map<String, String> cologneSampleToPatientIdMap =
+    private final Map<String, String> cologneSampleToPatientIdMap =
             new Object2ObjectOpenHashMap<String, String>();
 
     /** Map of cologne sample id's to array01 filenames. From the cologne sample multimap. */
-    private Map<String, String> cologneSampleToArray01FilenameMap =
+    private final Map<String, String> cologneSampleToArray01FilenameMap =
             new Object2ObjectOpenHashMap<String, String>();
 
     /** Map of cologne sample id's to array02 filenames. From the cologne sample multimap. */
-    private Map<String, String> cologneSampleToArray02FilenameMap =
+    private final Map<String, String> cologneSampleToArray02FilenameMap =
             new Object2ObjectOpenHashMap<String, String>();
 
 
@@ -303,6 +304,7 @@ public class CornellToLemingOptions {
      * Human readable string of how this options object is configured.
      * @return the human readable options
      */
+    @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();
         sb.append("inputFile:");

@@ -4,7 +4,7 @@
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 3 of the License, or
+ *  the Free Software Foundation; either version 2 of the License, or
  *  (at your option) any later version.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -12,8 +12,9 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *  You should have received a copy of the GNU General Public License along
+ *  with this program; if not, write to the Free Software Foundation, Inc.,
+ *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 package org.bdval;
@@ -131,7 +132,7 @@ public class DistributionDifferenceByFeatureMode extends DAVMode {
     /**
      * If true classes will be merged, otherwise the classes will be written separately.
      */
-    private boolean mergeClasses = false;
+    private boolean mergeClasses;
 
     /**
      * The maximum number of classes, important for the output file header to be correct.
@@ -660,8 +661,8 @@ public class DistributionDifferenceByFeatureMode extends DAVMode {
         final ClassificationTask vClassTasks = loadCachedTaskAndConditions(
                 tasksFilename, validationTrueLabelsFilename);
 
-        ConditionIdentifiers tConditionIdentifiers = tClassTasks.getConditionsIdentifiers();
-        ConditionIdentifiers vConditionIdentifiers = vClassTasks.getConditionsIdentifiers();
+        final ConditionIdentifiers tConditionIdentifiers = tClassTasks.getConditionsIdentifiers();
+        final ConditionIdentifiers vConditionIdentifiers = vClassTasks.getConditionsIdentifiers();
 
         final String[] allClasses = tClassTasks.getConditionNames();
         final String[] vClasses = vClassTasks.getConditionNames();
@@ -1129,7 +1130,7 @@ public class DistributionDifferenceByFeatureMode extends DAVMode {
     private Map<String, String> localizeDatasetDetailsMap(
             final Map<String, String> details, final String datasetRoot) {
         final Map<String, String> results = new Object2ObjectOpenHashMap<String, String>();
-        for (Map.Entry<String, String> entry : details.entrySet()) {
+        for (final Map.Entry<String, String> entry : details.entrySet()) {
             results.put(entry.getKey(),
                     entry.getValue().replace("${eval-dataset-root}", datasetRoot));
         }

@@ -4,7 +4,7 @@
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 3 of the License, or
+ *  the Free Software Foundation; either version 2 of the License, or
  *  (at your option) any later version.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -12,8 +12,9 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *  You should have received a copy of the GNU General Public License along
+ *  with this program; if not, write to the Free Software Foundation, Inc.,
+ *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 package org.bdval.tools.convert.maqcii;
@@ -30,7 +31,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -65,7 +65,7 @@ public class VerifyConversionOptions {
      * @throws java.io.IOException                   error reading from a file
      */
     public VerifyConversionOptions(final String[] args)
-            throws JSAPException, OptionsConfigurationException, IOException {
+            throws JSAPException, OptionsConfigurationException {
         super();
         jsap = new JSAP();
         defineOptions();
@@ -225,6 +225,7 @@ public class VerifyConversionOptions {
      * Human readable string of how this options object is configured.
      * @return the human readable options
      */
+    @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();
         sb.append("predictionsDirectory:");

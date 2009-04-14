@@ -4,7 +4,7 @@
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 3 of the License, or
+ *  the Free Software Foundation; either version 2 of the License, or
  *  (at your option) any later version.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -12,8 +12,9 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *  You should have received a copy of the GNU General Public License along
+ *  with this program; if not, write to the Free Software Foundation, Inc.,
+ *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 package org.bdval.pathways;
@@ -75,15 +76,16 @@ public class PCAFeatureAggregator extends PathwayFeatureAggregator {
      * @param splitType
      * @param splitId
      */
+    @Override
     protected void aggregate(final Table source, final String datasetEndpointName, final ArrayTable aggregated,
                              final List<CharSequence> sampleIdList, final IntSet usedProbesetIndices,
                              final PathwayInfo pi, final IntList probeIndices, final int numProbeIndices,
                              final double[][] slice, final List<CharSequence> colIds,
                              final MutableString[] probeIds, final String splitType, final int splitId) {
         final PrincipalComponentAnalysisWithR calc = new PrincipalComponentAnalysisWithR();
-        List<CharSequence> rowIds;
-        Object2DoubleOpenHashMap<MutableString> meanMap = new Object2DoubleOpenHashMap<MutableString>();
-        Object2DoubleOpenHashMap<MutableString> rangeMap = new Object2DoubleOpenHashMap<MutableString>();
+        final List<CharSequence> rowIds;
+        final Object2DoubleOpenHashMap<MutableString> meanMap = new Object2DoubleOpenHashMap<MutableString>();
+        final Object2DoubleOpenHashMap<MutableString> rangeMap = new Object2DoubleOpenHashMap<MutableString>();
 
         scaler = new MinMaxScalingRowProcessor() {
             @Override
@@ -100,8 +102,8 @@ public class PCAFeatureAggregator extends PathwayFeatureAggregator {
 
     }
 
-    private void aggregateFeatureNotSynchronized(Table source, String datasetEndpointName, ArrayTable aggregated, List<CharSequence> sampleIdList, IntSet usedProbesetIndices, PathwayInfo pi, IntList probeIndices, int numProbeIndices, double[][] slice, List<CharSequence> colIds, MutableString[] probeIds, PrincipalComponentAnalysisWithR calc, Object2DoubleOpenHashMap<MutableString> meanMap, Object2DoubleOpenHashMap<MutableString> rangeMap) {
-        List<CharSequence> rowIds;
+    private void aggregateFeatureNotSynchronized(final Table source, final String datasetEndpointName, final ArrayTable aggregated, final List<CharSequence> sampleIdList, final IntSet usedProbesetIndices, final PathwayInfo pi, final IntList probeIndices, final int numProbeIndices, final double[][] slice, final List<CharSequence> colIds, final MutableString[] probeIds, final PrincipalComponentAnalysisWithR calc, Object2DoubleOpenHashMap<MutableString> meanMap, Object2DoubleOpenHashMap<MutableString> rangeMap) {
+        final List<CharSequence> rowIds;
         if (!hasCachedRotation(datasetEndpointName, pi.pathwayId)) {
             //scale and compute PCA.
             scaler.setTrainingMode(meanMap, rangeMap);

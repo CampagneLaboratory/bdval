@@ -4,7 +4,7 @@
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 3 of the License, or
+ *  the Free Software Foundation; either version 2 of the License, or
  *  (at your option) any later version.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -12,8 +12,9 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *  You should have received a copy of the GNU General Public License along
+ *  with this program; if not, write to the Free Software Foundation, Inc.,
+ *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 package org.bdval;
@@ -121,7 +122,7 @@ public class CandidateModelSelection implements WithProcessMethod {
 
     private static final Logger LOG = Logger.getLogger(CandidateModelSelection.class);
 
-    public static void main(final String[] args) throws FileNotFoundException {
+    public static void main(final String[] args) {
         final CandidateModelSelection tool = new CandidateModelSelection();
         tool.process(args);
     }
@@ -277,7 +278,7 @@ public class CandidateModelSelection implements WithProcessMethod {
         try {
             // load everything, irrespective of endpoint:
             load(toolsArgs, false);
-            computeNormalizationFactors(toolsArgs);
+            computeNormalizationFactors();
             reverseIndex = new DoubleIndexedIdentifier(modelIdIndices);
             readeModelConditions(toolsArgs);
             filterGeneLists(toolsArgs);
@@ -367,8 +368,12 @@ public class CandidateModelSelection implements WithProcessMethod {
                 }
             }
             toolsArgs.output.close();
-            if (toolsArgs.pValuesOutputCreated) toolsArgs.pValuesOutput.close();
-            if (toolsArgs.rankOutputCreated) toolsArgs.rankOutput.close();
+            if (toolsArgs.pValuesOutputCreated) {
+                toolsArgs.pValuesOutput.close();
+            }
+            if (toolsArgs.rankOutputCreated) {
+                toolsArgs.rankOutput.close();
+            }
             System.exit(0);
 
         }   catch (FileNotFoundException e) {
@@ -376,10 +381,10 @@ public class CandidateModelSelection implements WithProcessMethod {
             System.exit(1);
         }
     }
-    private void filterGeneLists(arguments toolsArgs) {
+    private void filterGeneLists(final arguments toolsArgs) {
         if (toolsArgs.excludeGeneLists) {
             // remove models built with gene lists..
-            for (ModelPerformance model : cvResults.values()) {
+            for (final ModelPerformance model : cvResults.values()) {
                 final String whichGeneList = toolsArgs.modelConditions.get(model.modelId).get("which-gene-list");
                 if (whichGeneList == null || "N/A".equals(whichGeneList)) {
 
@@ -394,8 +399,8 @@ public class CandidateModelSelection implements WithProcessMethod {
     }
 
 
-    private void readeModelConditions(arguments toolsArgs) {
-        Map<String, Map<String, String>> modelConditions = null;
+    private void readeModelConditions(final arguments toolsArgs) {
+        final Map<String, Map<String, String>> modelConditions = null;
         if (toolsArgs.modelConditionsFilename != null) {
             System.out.println("Reading model condition file: " + toolsArgs.modelConditionsFilename);
             toolsArgs.modelConditions = DistributionDifferenceByFeatureMode.readModelConditionsFile(toolsArgs.modelConditionsFilename, modelIds);
@@ -407,11 +412,13 @@ public class CandidateModelSelection implements WithProcessMethod {
         }
     }
 
-    private void addFeatureClassifierTypeColumn(Map<String, Map<String, String>> modelConditions) {
-        if (modelConditions == null) return;
-        for (Map<String, String> modelCondition : modelConditions.values()) {
-            String wekaClassifier = modelCondition.get("weka-class");
-            String classifierType;
+    private void addFeatureClassifierTypeColumn(final Map<String, Map<String, String>> modelConditions) {
+        if (modelConditions == null) {
+            return;
+        }
+        for (final Map<String, String> modelCondition : modelConditions.values()) {
+            final String wekaClassifier = modelCondition.get("weka-class");
+            final String classifierType;
             if (wekaClassifier == null || "N/A".equals(wekaClassifier)) {
                 classifierType = "LibSVM";
             } else {
@@ -421,18 +428,19 @@ public class CandidateModelSelection implements WithProcessMethod {
 
             modelCondition.put("classifier-type", classifierType);
 
-            String svmParameters = modelCondition.get("classifier-parameters");
-            String svmDefaultCParameter;
-            if (svmParameters.contains("C=")) svmDefaultCParameter = "false";
-            else svmDefaultCParameter = "true";
+            final String svmParameters = modelCondition.get("classifier-parameters");
+            final String svmDefaultCParameter;
+            if (svmParameters.contains("C=")) {
+                svmDefaultCParameter = "false";
+            } else {
+                svmDefaultCParameter = "true";
+            }
             modelCondition.put("svm-default-C-parameter", svmDefaultCParameter);
 
         }
     }
 
-    private void computeNormalizationFactors
-            (
-                    final arguments toolsArgs) {
+    private void computeNormalizationFactors() {
         cvNormFactorPerfs = new Object2ObjectOpenHashMap<String, Map<String, ZScoreCalculator>>();
         for (final CandidateModelSelection.ModelPerformance cvPerf : cvResults.values()) {
             pushValue(cvNormFactorPerfs, cvPerf);
@@ -454,11 +462,11 @@ public class CandidateModelSelection implements WithProcessMethod {
     }
 
     private void calculateStats
-            (Map<String, Map<String, ZScoreCalculator>> perfs) {
-        for (Map<String, ZScoreCalculator> calculatorMap : perfs.values()) {
-            String[] measures = {MCC, ACC, SENS, SPEC, AUC};
+            (final Map<String, Map<String, ZScoreCalculator>> perfs) {
+        for (final Map<String, ZScoreCalculator> calculatorMap : perfs.values()) {
+            final String[] measures = {MCC, ACC, SENS, SPEC, AUC};
 
-            for (String measure : measures) {
+            for (final String measure : measures) {
                 calculatorMap.get(measure).calculateStats();
             }
         }
@@ -506,7 +514,7 @@ public class CandidateModelSelection implements WithProcessMethod {
             try {
 
 
-                PrintWriter writer = new PrintWriter(new FileWriter(toolsArgs.dumpFilename));
+                final PrintWriter writer = new PrintWriter(new FileWriter(toolsArgs.dumpFilename));
                 final ObjectList<String> modelConditionColumnNames = getModelConditionColumnNames(toolsArgs.modelConditions);
                 writer.append(
                         String.format(
@@ -535,11 +543,11 @@ public class CandidateModelSelection implements WithProcessMethod {
                         numActualFeatures = this.cvcfResults.get(modelId).actualNumberOfFeaturesInModel;
                     }
                     // modelId CV(MCC, Sens, Spec, AUC) CVCF() validation()
-                    double deltaCVCF_CV_mcc = getNormalizedMeasure(modelId, cvcfResults, cvcfNormFactorPerfs, MeasureName.MCC) - getNormalizedMeasure(modelId, cvResults, cvNormFactorPerfs, MeasureName.MCC);
-                    double deltaCVCF_CV_acc = getNormalizedMeasure(modelId, cvcfResults, cvcfNormFactorPerfs, MeasureName.ACC) - getNormalizedMeasure(modelId, cvResults, cvNormFactorPerfs, MeasureName.ACC);
-                    double deltaCVCF_CV_sens = getNormalizedMeasure(modelId, cvcfResults, cvcfNormFactorPerfs, MeasureName.SENS) - getNormalizedMeasure(modelId, cvResults, cvNormFactorPerfs, MeasureName.SENS);
-                    double deltaCVCF_CV_spec = getNormalizedMeasure(modelId, cvcfResults, cvcfNormFactorPerfs, MeasureName.SPEC) - getNormalizedMeasure(modelId, cvResults, cvNormFactorPerfs, MeasureName.SPEC);
-                    double deltaCVCF_CV_auc = getNormalizedMeasure(modelId, cvcfResults, cvcfNormFactorPerfs, MeasureName.AUC) - getNormalizedMeasure(modelId, cvResults, cvNormFactorPerfs, MeasureName.AUC);
+                    final double deltaCVCF_CV_mcc = getNormalizedMeasure(modelId, cvcfResults, cvcfNormFactorPerfs, MeasureName.MCC) - getNormalizedMeasure(modelId, cvResults, cvNormFactorPerfs, MeasureName.MCC);
+                    final double deltaCVCF_CV_acc = getNormalizedMeasure(modelId, cvcfResults, cvcfNormFactorPerfs, MeasureName.ACC) - getNormalizedMeasure(modelId, cvResults, cvNormFactorPerfs, MeasureName.ACC);
+                    final double deltaCVCF_CV_sens = getNormalizedMeasure(modelId, cvcfResults, cvcfNormFactorPerfs, MeasureName.SENS) - getNormalizedMeasure(modelId, cvResults, cvNormFactorPerfs, MeasureName.SENS);
+                    final double deltaCVCF_CV_spec = getNormalizedMeasure(modelId, cvcfResults, cvcfNormFactorPerfs, MeasureName.SPEC) - getNormalizedMeasure(modelId, cvResults, cvNormFactorPerfs, MeasureName.SPEC);
+                    final double deltaCVCF_CV_auc = getNormalizedMeasure(modelId, cvcfResults, cvcfNormFactorPerfs, MeasureName.AUC) - getNormalizedMeasure(modelId, cvResults, cvNormFactorPerfs, MeasureName.AUC);
 
                     writer.append(String.format("%s\t%s\t%s\t%d\t%s\t%s\t%s\t%f\t%f\t%f\t%f\t%f\t%s%s\n",
                             datasetName, endpointCode, modelId,
@@ -563,10 +571,12 @@ public class CandidateModelSelection implements WithProcessMethod {
     }
 
     private void addFeatureSelectionFoldColumn
-            (Map<String, Map<String, String>> modelConditions) {
-        if (modelConditions == null) return;
-        for (Map<String, String> modelCondition : modelConditions.values()) {
-            String cacheDir = modelCondition.get("cache-dir");
+            (final Map<String, Map<String, String>> modelConditions) {
+        if (modelConditions == null) {
+            return;
+        }
+        for (final Map<String, String> modelCondition : modelConditions.values()) {
+            final String cacheDir = modelCondition.get("cache-dir");
             if (cacheDir.contains("fs=true")) {
                 modelCondition.put("feature-selection-fold", "true");
 
@@ -577,10 +587,12 @@ public class CandidateModelSelection implements WithProcessMethod {
     }
 
     private void addFeatureSelectionStatTypeColumn
-            (Map<String, Map<String, String>> modelConditions) {
-        if (modelConditions == null) return;
-        for (Map<String, String> modelCondition : modelConditions.values()) {
-            String seqFile = modelCondition.get("sequence-file");
+            (final Map<String, Map<String, String>> modelConditions) {
+        if (modelConditions == null) {
+            return;
+        }
+        for (final Map<String, String> modelCondition : modelConditions.values()) {
+            final String seqFile = modelCondition.get("sequence-file");
             if (seqFile.contains("ttest")) {
                 modelCondition.put("feature-selection-type", "t-test");
             }
@@ -606,17 +618,21 @@ public class CandidateModelSelection implements WithProcessMethod {
     }
 
     private MutableString getModelConditionColumns
-            (String
+            (final String
                     modelId,
-             ObjectList<String> modelConditionColumnNames,
-             Map<String, Map<String, String>> modelConditions) {
+             final ObjectList<String> modelConditionColumnNames,
+             final Map<String, Map<String, String>> modelConditions) {
 
-        MutableString columnValues = new MutableString();
-        if (modelConditions == null) return columnValues;
+        final MutableString columnValues = new MutableString();
+        if (modelConditions == null) {
+            return columnValues;
+        }
 
-        Map<String, String> modelCondition = modelConditions.get(modelId);
-        if (modelCondition == null) return columnValues;
-        for (String columnName : modelConditionColumnNames) {
+        final Map<String, String> modelCondition = modelConditions.get(modelId);
+        if (modelCondition == null) {
+            return columnValues;
+        }
+        for (final String columnName : modelConditionColumnNames) {
 
             columnValues.append('\t');
             final String string = normalizeConditionValue(columnName, modelCondition.get(columnName));
@@ -626,22 +642,28 @@ public class CandidateModelSelection implements WithProcessMethod {
     }
 
     private String normalizeConditionValue
-            (String
-                    columnName, String
+            (final String
+                    columnName, final String
                     value) {
-        if (value == null || columnName == null) return null;
+        if (value == null || columnName == null) {
+            return null;
+        }
         if ("sequence-file".equals(columnName)) {
             // remove the path to the sequence file. The path is not useful for downstream analyses
             final String toReplace = value.replaceAll("fs=true", "fs").replaceAll("fs=false", "fs");
             return FilenameUtils.getBaseName(toReplace) + ".sequence";
-        } else return value;
+        } else {
+            return value;
+        }
     }
 
     private MutableString getModelConditionHeaders
-            (Map<String, Map<String, String>> modelConditions, ObjectList<String> columnNames) {
-        MutableString result = new MutableString();
-        if (modelConditions == null) return result;
-        for (String columnName : columnNames) {
+            (final Map<String, Map<String, String>> modelConditions, final ObjectList<String> columnNames) {
+        final MutableString result = new MutableString();
+        if (modelConditions == null) {
+            return result;
+        }
+        for (final String columnName : columnNames) {
             result.append('\t');
             result.append(columnName);
 
@@ -650,12 +672,16 @@ public class CandidateModelSelection implements WithProcessMethod {
     }
 
     private ObjectList<String> getModelConditionColumnNames
-            (Map<String, Map<String, String>> modelConditions) {
-        ObjectList<String> columnNames = new ObjectArrayList<String>();
-        if (modelConditions == null) return columnNames;
-        for (Map<String, String> modelCondition : modelConditions.values()) {
-            for (String columnName : modelCondition.keySet()) {
-                if (!columnNames.contains(columnName)) columnNames.add(columnName);
+            (final Map<String, Map<String, String>> modelConditions) {
+        final ObjectList<String> columnNames = new ObjectArrayList<String>();
+        if (modelConditions == null) {
+            return columnNames;
+        }
+        for (final Map<String, String> modelCondition : modelConditions.values()) {
+            for (final String columnName : modelCondition.keySet()) {
+                if (!columnNames.contains(columnName)) {
+                    columnNames.add(columnName);
+                }
 
             }
         }
@@ -664,18 +690,18 @@ public class CandidateModelSelection implements WithProcessMethod {
     }
 
     private MutableString formatStats
-            (String
-                    modelId, Object2ObjectMap<String, ModelPerformance> resultsMap,
-             Object2ObjectMap<String, Map<String, ZScoreCalculator>> maxPerfs) {
-        MutableString result = new MutableString();
-        ModelPerformance perfs = resultsMap.get(modelId);
+            (final String
+                    modelId, final Object2ObjectMap<String, ModelPerformance> resultsMap,
+             final Object2ObjectMap<String, Map<String, ZScoreCalculator>> maxPerfs) {
+        final MutableString result = new MutableString();
+        final ModelPerformance perfs = resultsMap.get(modelId);
         final MutableString defaultValue = new MutableString("NaN\tNaN\tNaN\tNaN\tNaN\tNaN\tNaN\tNaN\tNaN\tNaN"
                 //+"\tNaN\tNaN\tNaN\tNaN\tNaN"
         );
 
 
         if (perfs != null) {
-            Map<String, ZScoreCalculator> calculators = maxPerfs.get(perfs.endpoint);
+            final Map<String, ZScoreCalculator> calculators = maxPerfs.get(perfs.endpoint);
             final ModelPerformance maxPerf = calculateNormalizationFactor(calculators);
             if (maxPerf != null) {
                 result.append(String.format("%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f",
@@ -696,11 +722,11 @@ public class CandidateModelSelection implements WithProcessMethod {
         }
     }
 
-    private MutableString formatStdev(String
-            modelId, Object2ObjectMap<String, ModelPerformance> resultsMap
+    private MutableString formatStdev(final String
+            modelId, final Object2ObjectMap<String, ModelPerformance> resultsMap
     ) {
-        MutableString result = new MutableString();
-        ModelPerformance perfs = resultsMap.get(modelId);
+        final MutableString result = new MutableString();
+        final ModelPerformance perfs = resultsMap.get(modelId);
         final MutableString defaultValue = new MutableString("NaN\tNaN\tNaN\tNaN\tNaN\tNaN\tNaN\tNaN\tNaN\tNaN"
                 //+"\tNaN\tNaN\tNaN\tNaN\tNaN"
         );
@@ -729,15 +755,15 @@ public class CandidateModelSelection implements WithProcessMethod {
 
 
     public double getNormalizedMeasure
-            (String
-                    modelId, Object2ObjectMap<String, ModelPerformance> resultsMap,
-             Object2ObjectMap<String, Map<String, ZScoreCalculator>> normPerfs, MeasureName
+            (final String
+                    modelId, final Object2ObjectMap<String, ModelPerformance> resultsMap,
+             final Object2ObjectMap<String, Map<String, ZScoreCalculator>> normPerfs, final MeasureName
                     measure) {
-        ModelPerformance cvPerf = resultsMap.get(modelId);
+        final ModelPerformance cvPerf = resultsMap.get(modelId);
         double result = Double.NaN;
         if (cvPerf != null) {
             final Map<String, ZScoreCalculator> calculators = normPerfs.get(cvPerf.endpoint);
-            ModelPerformance normPerf = calculateNormalizationFactor(calculators);
+            final ModelPerformance normPerf = calculateNormalizationFactor(calculators);
             if (normPerf != null) {
                 switch (measure) {
                     case MCC:
@@ -762,8 +788,8 @@ public class CandidateModelSelection implements WithProcessMethod {
     }
 
     private ModelPerformance calculateNormalizationFactor
-            (Map<String, ZScoreCalculator> calculators) {
-        ModelPerformance result = new ModelPerformance();
+            (final Map<String, ZScoreCalculator> calculators) {
+        final ModelPerformance result = new ModelPerformance();
         if (evaluateNormFactorAsMean) {
             // normalized value of 1 indicates mean performance.
             result.mcc = calculators.get(MCC).mean();
@@ -805,7 +831,7 @@ public class CandidateModelSelection implements WithProcessMethod {
 
             verbose = false;
             final double scoreActual = evaluateScore(rankedList, upToRank, toolsArgs) / Math.min(upToRank, rankedList.size());
-            ZScoreCalculator averageScoreRandom = new ZScoreCalculator();
+            final ZScoreCalculator averageScoreRandom = new ZScoreCalculator();
             verbose = false;
             for (int i = 0; i < maxCouter; i++) {
                 final ObjectList<String> randomModelPicks = pickModels(randomGenerator, numModels, Math.min(toolsArgs.k, upToRank));
@@ -899,8 +925,11 @@ public class CandidateModelSelection implements WithProcessMethod {
             assert testPerf != null : "performance in test set must exist for model id: " + modelId;
 
             final double rewardPerformance = getRewardPerformanceMeasure(toolsArgs, testPerf);
-            if (verbose)
-                System.out.println("Rank " + rank + " Observing model-id: " + modelId + " actual performance: " + rewardPerformance);
+            if (verbose) {
+                System.out.println(
+                        "Rank " + rank + " Observing model-id: " + modelId + " actual performance: "
+                                + rewardPerformance);
+            }
             value += rewardPerformance;
 
         }
@@ -1084,7 +1113,7 @@ public class CandidateModelSelection implements WithProcessMethod {
         for (final String modelId : rankedList) {
             final ModelPerformance cvcfPerf = cvcfResults.get(modelId);
             final ModelPerformance cvPerf = cvResults.get(modelId);
-            Map<String, ZScoreCalculator> calculators = cvNormFactorPerfs.get(cvPerf.endpoint);
+            final Map<String, ZScoreCalculator> calculators = cvNormFactorPerfs.get(cvPerf.endpoint);
             final ModelPerformance maxPerf = calculateNormalizationFactor(calculators);
             final CandidateModelSelection.ModelPerformance testPerf = testResults != null ? testResults.get(modelId) : null;
 
@@ -1123,7 +1152,7 @@ public class CandidateModelSelection implements WithProcessMethod {
             final ModelPerformance cvcfPerf = cvcfResults.get(modelId);
 
             if (cvPerf != null && cvPerf.dataset.equals(dataset) && cvPerf.endpoint.equals(endpoint)) {
-                double score = getModelRankingPerformance(toolsArgs, cvPerf, cvcfPerf);
+                final double score = getModelRankingPerformance(toolsArgs, cvPerf, cvcfPerf);
 
                 if (testResults != null && testResults.get(modelId) == null) {
                     // if test set is provided, skip models which have no test perfs.
@@ -1144,10 +1173,10 @@ public class CandidateModelSelection implements WithProcessMethod {
         dequeue(queue, rankedList);
     }
 
-    public double getPerformanceByChosenStrategy(CandidateModelSelection.arguments toolsArgs, CandidateModelSelection.ModelPerformance cvPerf,
-                                                 CandidateModelSelection.ModelPerformance cvcfPerf) {
+    public double getPerformanceByChosenStrategy(final CandidateModelSelection.arguments toolsArgs, final CandidateModelSelection.ModelPerformance cvPerf,
+                                                 final CandidateModelSelection.ModelPerformance cvcfPerf) {
 
-        double score = Double.NaN;
+        final double score = Double.NaN;
         switch (toolsArgs.rankStrategy) {
             case MODEL:
                 return getModelRankingPerformance(toolsArgs, cvPerf, cvcfPerf);
@@ -1165,14 +1194,14 @@ public class CandidateModelSelection implements WithProcessMethod {
                     final ModelPerformance cvPerf,
                     final ModelPerformance cvcfPerf) {
         final String modelId = cvPerf.modelId;
-        double norm_AUC_CV = cvPerf.auc;
+        final double norm_AUC_CV = cvPerf.auc;
 // if model has no associated model condition, not much we can do:
         if (toolsArgs.modelConditions.get(modelId) == null) {
             System.err.println("Warning: model id is not found in model conditions: " + modelId);
             return Double.NaN;
         }
 
-        double delta_AUC_CVCF_CV = (cvcfPerf == null || cvcfPerf == null) ? 0 : cvcfPerf.auc - cvPerf.auc;
+        final double delta_AUC_CVCF_CV = (cvcfPerf == null || cvcfPerf == null) ? 0 : cvcfPerf.auc - cvPerf.auc;
 // model trained on Hamner endpoint A:
 
         double predictedPerformance = Double.NaN;
@@ -1196,8 +1225,8 @@ public class CandidateModelSelection implements WithProcessMethod {
         return predictedPerformance;
     }
 
-    private double modelTrainedOnABCDEGJKZ(arguments toolsArgs, int actualNumberOfFeaturesInModel,
-                                           String modelId, double norm_auc_cv, double delta_auc_cvcf_cv) {
+    private double modelTrainedOnABCDEGJKZ(final arguments toolsArgs, final int actualNumberOfFeaturesInModel,
+                                           final String modelId, final double norm_auc_cv, final double delta_auc_cvcf_cv) {
 
         return 0.521295622557999 + -0.000461029909413533 * actualNumberOfFeaturesInModel +
                 0.30633208149121 * delta_auc_cvcf_cv + 0.460738859272386 *
@@ -1229,9 +1258,9 @@ public class CandidateModelSelection implements WithProcessMethod {
     }
 
     private double modelTrainedOnACZ
-            (arguments toolsArgs, int numFeaturesInModel,
-             String modelId, double norm_auc_cv,
-             double delta_auc_cvcf_cv) {
+            (final arguments toolsArgs, final int numFeaturesInModel,
+             final String modelId, final double norm_auc_cv,
+             final double delta_auc_cvcf_cv) {
 
         return 0.459989454833173 +
                 -0.00083173460079395 * numFeaturesInModel +
@@ -1262,11 +1291,11 @@ public class CandidateModelSelection implements WithProcessMethod {
     }
 
     private double modelTrainedOnA
-            (arguments
-                    toolsArgs, String
-                    modelId, double norm_AUC_CV,
-             double delta_AUC_CVCF_CV) {
-        double predictedPerformance =
+            (final arguments
+                    toolsArgs, final String
+                    modelId, final double norm_AUC_CV,
+             final double delta_AUC_CVCF_CV) {
+        final double predictedPerformance =
                 0.767927506304831 + 0.181936624689305 *
 
                         norm_AUC_CV +
@@ -1305,11 +1334,11 @@ public class CandidateModelSelection implements WithProcessMethod {
     }
 
     private double modelTrainedOnZ
-            (arguments
-                    toolsArgs, String
-                    modelId, double norm_AUC_CV,
-             double delta_AUC_CVCF_CV) {
-        double predictedPerformance = 0.470987343174626 +
+            (final arguments
+                    toolsArgs, final String
+                    modelId, final double norm_AUC_CV,
+             final double delta_AUC_CVCF_CV) {
+        final double predictedPerformance = 0.470987343174626 +
                 match(value(toolsArgs, modelId, "num-features"),
                         5, 0,
                         10, 0.00184503480230022,
@@ -1351,15 +1380,15 @@ public class CandidateModelSelection implements WithProcessMethod {
     }
 
     private double match
-            (String
-                    variableValue, Object... values) {
+            (final String
+                    variableValue, final Object... values) {
 
         for (int i = 0; i < values.length; i += 2) {
 
             final Object key = values[i];
             final String keyAsString = key.toString();
             if (keyAsString.equals(variableValue)) {
-                Object d = values[i + 1];
+                final Object d = values[i + 1];
                 if (d instanceof Double) {
                     final Double value = (Double) d;
                     return value;
@@ -1375,9 +1404,9 @@ public class CandidateModelSelection implements WithProcessMethod {
     }
 
     private String value
-            (arguments
-                    toolsArgs, String
-                    modelId, String
+            (final arguments
+                    toolsArgs, final String
+                    modelId, final String
                     variableName) {
         final String value = toolsArgs.modelConditions.get(modelId).get(variableName);
         return normalizeConditionValue(variableName, value);
