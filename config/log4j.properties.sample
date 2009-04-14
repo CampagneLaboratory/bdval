@@ -10,7 +10,7 @@ log4j.appender.CHAINSAW_CLIENT.Port=4445
 #################################################################
 # Appender file writes all statements by default
 log4j.appender.file=org.apache.log4j.RollingFileAppender
-log4j.appender.file.File=logs/tissueinfo.log
+log4j.appender.file.File=logs/bdval.log
 log4j.appender.file.Append=true
 
 # Appender file uses the PatternLayout.
