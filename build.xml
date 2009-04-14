@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<project name="bdval" default="jar" basedir=".">
+<project name="bdval-build" default="jar" basedir=".">
     <import file="buildsupport/build.xml"/>
 
     <property name="jarfile" value="bdval.jar"/>
@@ -104,7 +104,7 @@
     <target name="javadoc" description="Run Javadoc on all source code files">
         <!--  Create the Java doc directory -->
         <mkdir dir="${javadocs}"/>
-        <javadoc packagenames="edu.*" sourcepath="${src}"
+        <javadoc packagenames="org.bdval" sourcepath="${src}"
                  destdir="${javadocs}" author="true" version="true"
                  windowtitle="BDVal API ${buildstamp}"
                  header="BDVal API ${buildstamp}">
