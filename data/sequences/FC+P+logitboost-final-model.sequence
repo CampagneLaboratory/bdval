@@ -1,0 +1,14 @@
+#Writes a final model, applying the FC+P+logitboost feature selection strategy to the full training set.
+def label=FC+P+logitboost-%model-id%
+def survival=%survival%
+#
+addoption required:model-final-features-filename:Path and filename where to write the final features for the model
+addoption required:model-prefix:Path and filename where to write the final model
+addoption required:num-features:Number of features in the generated model
+addoption required:alpha:confidence level threshold for T-test (P part of FC+P)
+addoption required:phi:fold change cutoff (FC part of FC+P)
+addoption required:survival:survival data file
+#
+-m t-test --overwrite-output true -o %dataset-name%-%label%-ttest-intermediate-features.txt --alpha %alpha% --gene-list full --gene-features-dir %gene-features-dir% --output-gene-list
+-m fold-change --overwrite-output true -o %model-final-features-filename%  --gene-list %label%|%dataset-name%-%label%-ttest-intermediate-features.txt --gene-features-dir %gene-features-dir% --ratio %phi% --output-gene-list --report-max-probes %num-features%
+-m write-model --overwrite-output true --gene-list %label%|%model-final-features-filename% --model-prefix %model-prefix%

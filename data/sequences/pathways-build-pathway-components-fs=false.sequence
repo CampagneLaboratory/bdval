@@ -1,0 +1,9 @@
+# This sequence builds pathway components for the endpoint, but does not generate any statistics.
+def label=pathways-global-svm-weights-%model-id%
+#
+addoption required:other-options:Other DAVMode options can be provided here
+addoption required:split-id:id of split being processed
+addoption required:num-features:Number of features in the generated model
+#
+-m t-test --overwrite-output true -o - --alpha -1 --output-gene-list  --gene-list full --gene-features-dir %gene-features-dir% %other-options% --split-type training
+-m t-test --overwrite-output true -o - --alpha -1 --output-gene-list  --gene-list full --gene-features-dir %gene-features-dir% %other-options% --split-type test

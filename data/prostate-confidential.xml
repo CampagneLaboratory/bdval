@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="prostate-confidential" default="all" basedir=".">
+    <!-- This build file processes confidential data that are not to be distributed, but the content
+    of this file is not confidential per se and thus can be stored in subversion. -->
+
+    <!--
+        "bdval-project.basedir" is the directory where this project file is located
+        as opposed to "bdval.basedir" which is where "bdval.xml" is located.
+        These should typically be the same directory
+     -->
+    <dirname property="bdval-project.basedir" file="${ant.file.prostate-confidential}"/>
+    <import file="${bdval-project.basedir}/../buildsupport/build.xml"/>
+
+    <!-- be sure to load the "local" property file first to override any global values -->
+    <property file="${config}/${ant.project.name}-local.properties"/>
+    <property file="${bdval-project.basedir}/${ant.project.name}.properties"/>
+    <!--<property name="continue-after-fail" value="true"/>-->
+
+    <property name="do-specific-gene-lists-only" value="false"/>
+    <property name="enable-flooring" value="true"/>
+
+    <property name="ga-wrapper-population-size" value="20"/>
+    <property name="ga-wrapper-number-of-iterations" value="20"/>
+    <property name="performance-measure-maximized-by-GA" value="MCC"/>
+
+    <property name="internal-CV-repeats" value="--cv-repeats 5"/>
+    <property name="internal-CV-folds" value="3"/>
+
+    <property name="external-CV-repeats-number" value="1"/>
+    <property name="external-CV-repeats" value="--cv-repeats ${external-CV-repeats-number} "/>
+    <property name="external-CV-folds" value="5"/>
+    <!-- Number of features to generate models with. This can be a single integer, or a list
+    or integers separated by commas. When it is a list, models a generated with each number of
+    feature indicated. -->
+    <!--roperty name="num-features" value="5,10,20,30,40,50,60,70,80,90,100"/-->
+    <property name="num-features" value="50"/>
+    <property name="max-intermediate-features" value="400"/>
+
+    <property name="use-probability" value="false"/>
+    <property name="fold-change-phi" value="1.5"/>
+    <property name="ttest-alpha" value="0.05"/>
+    <property name="pathway-aggregation-method" value="PCA"/>
+
+    <!--  - - roc -->
+
+    <property name="human-pathways-file" value="human-IntAct-KEGG-TEPSS-pathways.txt"/>
+    <property name="mouse-pathways-file" value="mouse-IntAct-KEGG-TEPSS-pathways.txt"/>
+    <property name="rat-pathways-file" value="rat-IntAct-KEGG-TEPSS-pathways.txt"/>
+
+    <property name="run-java" value="true"/>
+    <property name="svm-parameters" value="--classifier-parameters probability=${use-probability}"/>
+    <!-- - -classifier-parameters probability=${use-probability} -->
+    <property name="svm-classifier" value=""/>
+    <property name="feature-option"
+              value="--normalize-features false --scale-features true --percentile-scaling false"/>
+
+     <!-- other performance measures to evaluate and report as extra columns in the MAQCII submission file. -->
+    <property name="other-performance-measures" value="prec,rec,F-1"/>
+
+    <!-- endpoint definitions -->
+    <!--
+         By convention we set a property for each endpoint in the form "do.ENDPOINT"
+         When set to true, this endpoint will be executed, when false, it will be skipped
+
+         Then a property called "all-endpoints" should be defined with all the endpoints
+         separated by a single space
+         (i.e., all the "do.ENDPOINT properties" without the "do.").
+
+         These endpoints then map to the property file associated with this run (in this
+         case "prostate-confidential.properities"
+    -->
+    <!-- Normal targets (non-pathways) -->
+    <property name="do.GSE8402_FusionYesNo_TrainingSplit" value="false"/>
+    <property name="do.GSE8402_GleasonScore_6_vs_78_TrainingSplit" value="true"/>
+    <property name="do.GSE8402_GleasonScore_67_vs_8_TrainingSplit" value="true"/>
+
+    <property name="all-endpoints"
+              value="GSE8402_FusionYesNo_TrainingSplit GSE8402_GleasonScore_6_vs_78_TrainingSplit GSE8402_GleasonScore_67_vs_8_TrainingSplit"/>
+    <!-- end of the endpoint definitions -->    
+
+    <import file="bdval.xml"/>
+
+    <target name="all" description="Run a complete evaluation." depends="prepare-bdval, tag-output-directory">
+        <delete file="${statistics-output}"/>
+
+        <echo message="Executing with ${num-threads} threads"/>
+        <sequential>
+            <property name="do.baseline" value="true"/>
+            <property name="do.naive-bayes" value="false"/>
+            <property name="do.logit-boost" value="false"/>
+            <property name="do.logistic" value="false"/>
+            <property name="do.random-forest" value="false"/>
+            <property name="do.k-star" value="false"/>
+            <property name="do.whole-chip" value="false"/>
+            <property name="do.baseline-tune-C" value="false"/>
+            <property name="do.foldchange-genetic-algorithm" value="false"/>
+            <property name="do.foldchange-svmglobal" value="false"/>
+            <property name="do.foldchange-svmiterative" value="false"/>
+            <property name="do.full-genetic-algorithm" value="false"/>
+            <property name="do.genelist-genetic-algorithm" value="false"/>
+            <property name="do.genelist-svmglobal" value="false"/>
+            <property name="do.genelist-svmglobal-tune-C" value="false"/>
+            <property name="do.minmax-svmglobal" value="false"/>
+            <property name="do.pathways-ttest-svmglobal" value="false"/>
+            <property name="do.pathways-tune-C" value="false"/>
+            <property name="do.pathways.baseline" value="false"/>
+            <property name="do.svmiterative" value="false"/>
+            <property name="do.ttest-genetic-algorithm" value="false"/>
+            <property name="do.ttest-svmglobal" value="false"/>
+            <property name="do.ttest-svmiterative" value="false"/>
+
+            <execute-all-endpoints/>
+
+        </sequential>
+        <antcall target="process-model-conditions"/>
+        <antcall target="zip-results"/>
+    </target>
+
+
+    <target name="pathways" description="Run pathways." depends="prepare-bdval, tag-output-directory">
+        <delete file="${statistics-output}"/>
+
+        <echo message="Executing with ${num-threads} threads"/>
+        <sequential>
+            <property name="do.baseline" value="false"/>
+            <property name="do.baseline-tune-C" value="false"/>
+            <property name="do.foldchange-genetic-algorithm" value="false"/>
+            <property name="do.foldchange-svmglobal" value="false"/>
+            <property name="do.foldchange-svmiterative" value="false"/>
+            <property name="do.full-genetic-algorithm" value="false"/>
+            <property name="do.genelist-genetic-algorithm" value="false"/>
+            <property name="do.genelist-svmglobal" value="false"/>
+            <property name="do.genelist-svmglobal-tune-C" value="false"/>
+            <property name="do.minmax-svmglobal" value="false"/>
+            <property name="do.pathways-build-pathway-components" value="false"/>
+            <property name="do.pathways-ttest-svmglobal" value="true"/>
+            <property name="do.pathways-tune-C" value="false"/>
+            <property name="do.pathways.baseline" value="false"/>
+            <property name="do.svmiterative" value="false"/>
+            <property name="do.ttest-genetic-algorithm" value="false"/>
+            <property name="do.ttest-svmglobal" value="false"/>
+            <property name="do.ttest-svmiterative" value="false"/>
+
+            <execute-all-endpoints/>
+
+        </sequential>
+        <antcall target="process-model-conditions"/>
+        <antcall target="zip-results"/>
+    </target>
+
+    <target name="genetic-algorithm" description="Run Genetic Algorithm."
+            depends="prepare-bdval, tag-output-directory">
+        <delete file="${statistics-output}"/>
+
+        <echo message="Executing with ${num-threads} threads"/>
+        <sequential>
+            <property name="do.baseline" value="false"/>
+            <property name="do.whole-chip" value="false"/>
+            <property name="do.baseline-tune-C" value="false"/>
+            <property name="do.foldchange-svmglobal" value="false"/>
+            <property name="do.foldchange-svmiterative" value="false"/>
+
+            <property name="do.genelist-svmglobal" value="false"/>
+            <property name="do.genelist-svmglobal-tune-C" value="false"/>
+            <property name="do.minmax-svmglobal" value="false"/>
+            <property name="do.pathways-ttest-svmglobal" value="false"/>
+            <property name="do.pathways-tune-C" value="false"/>
+            <property name="do.pathways.baseline" value="false"/>
+            <property name="do.svmiterative" value="false"/>
+            <property name="do.ttest-svmglobal" value="false"/>
+            <property name="do.ttest-svmiterative" value="false"/>
+
+            <property name="do.full-genetic-algorithm" value="true"/>
+            <property name="do.ttest-genetic-algorithm" value="true"/>
+            <property name="do.foldchange-genetic-algorithm" value="true"/>
+            <property name="do.genelist-genetic-algorithm" value="true"/>
+
+            <execute-all-endpoints/>
+
+        </sequential>
+        <antcall target="process-model-conditions"/>
+        <antcall target="zip-results"/>
+    </target>
+
+    <target name="tune-C" description="Try a few values of cost parameter C with baseline and gene lists"
+            depends="prepare-bdval, tag-output-directory">
+        <delete file="${statistics-output}"/>
+
+        <echo message="Executing with ${num-threads} threads"/>
+        <sequential>
+            <property name="do.baseline" value="false"/>
+            <property name="do.whole-chip" value="false"/>
+            <property name="do.foldchange-genetic-algorithm" value="false"/>
+            <property name="do.foldchange-svmglobal" value="false"/>
+            <property name="do.foldchange-svmiterative" value="false"/>
+            <property name="do.full-genetic-algorithm" value="false"/>
+            <property name="do.genelist-genetic-algorithm" value="false"/>
+            <property name="do.genelist-svmglobal" value="false"/>
+            <property name="do.minmax-svmglobal" value="false"/>
+            <property name="do.pathways-ttest-svmglobal" value="false"/>
+            <property name="do.pathways.baseline" value="false"/>
+            <property name="do.svmiterative" value="false"/>
+            <property name="do.ttest-genetic-algorithm" value="false"/>
+            <property name="do.ttest-svmglobal" value="false"/>
+            <property name="do.ttest-svmiterative" value="false"/>
+
+            <property name="do.pathways-tune-C" value="false"/>
+            <property name="do.baseline-tune-C" value="true"/>
+            <property name="do.genelist-svmglobal-tune-C" value="false"/>
+            <execute-all-endpoints/>
+
+        </sequential>
+        <antcall target="process-model-conditions"/>
+        <antcall target="zip-results"/>
+    </target>
+
+    <target name="generate-list-final-models"
+            description="Calculate feature consensus across multiple feature selection strategies and generate models with consensus features on the whole training set.">
+        <generate-final-models-from-list results-list="20080420-1649-results 20080423-0837-results 20080423-2226-results 20080423-2228-results 20080424-1910-results 20080425-0812-results 20080425-1413-results 20080426-0913-results 20080426-1358-results 20080427-1228-results 20080428-1151-results 20080429-1052-results 20080430-0911-results 20080430-1350-results"/>
+    </target>
+</project>

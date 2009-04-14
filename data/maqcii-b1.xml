@@ -1,0 +1,572 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="MAQC-II phase B1" default="all" basedir=".">
+    <dirname property="maqcii.basedir" file="${ant.file.MAQC-II phase B1}"/>
+
+    <property file="${maqcii.basedir}/maqcii-b.properties"/>
+    <property name="bdval.property.file" location="${config}/maqcii-local.properties"/>
+    <!--<property name="continue-after-fail" value="true"/>-->
+    <import file="bdval.xml"/>
+
+    <property name="do-specific-gene-lists-only" value="true"/>
+    <property name="enable-flooring" value="true"/>
+
+    <property name="ga-wrapper-population-size" value="20"/>
+    <property name="ga-wrapper-number-of-iterations" value="20"/>
+    <property name="performance-measure-maximized-by-GA" value="MCC"/>
+    <property name="internal-CV-repeats" value="--cv-repeats 10"/>
+    <property name="internal-CV-folds" value="3"/>
+
+    <property name="external-CV-repeats" value="--cv-repeats 10"/>
+    <property name="external-CV-folds" value="5"/>
+
+    <property name="num-features" value="50"/>
+    <property name="max-intermediate-features" value="400"/>
+
+    <property name="use-probability" value="false"/>
+    <property name="fold-change-phi" value="1.5"/>
+    <property name="ttest-alpha" value="0.05"/>
+    <property name="pathway-aggregation-method" value="PCA"/>
+
+    <!--  - - roc -->
+
+    <property name="human-pathways-file" value="human-IntAct-KEGG-TEPSS-pathways.txt"/>
+    <property name="mouse-pathways-file" value="mouse-IntAct-KEGG-TEPSS-pathways.txt"/>
+    <property name="rat-pathways-file" value="rat-IntAct-KEGG-TEPSS-pathways.txt"/>
+
+    <property name="run-java" value="true"/>
+    <property name="svm-parameters" value="--classifier-parameters probability=${use-probability}"/>
+    <!-- - -classifier-parameters probability=${use-probability} -->
+    <property name="svm-classifier" value=""/>
+    <property name="feature-option"
+              value="--normalize-features false --scale-features true --percentile-scaling false"/>
+
+    <target name="zip-results" description="Zip result files">
+        <sequential>
+            <concat destfile="${save-data-dir}/${save-data-tag}-all-maqcii-submission.txt">
+                <fileset dir="${save-data-dir}" file="*maqcii-submission*.txt"/>
+            </concat>
+            <concat destfile="${save-data-dir}/${save-data-tag}-all-stats.txt">
+                <fileset dir="${save-data-dir}" file="*stats*.txt"/>
+            </concat>
+            <delete>
+                <fileset dir="${save-data-dir}">
+                    <include name="*maqcii-submission*.txt"/>
+                    <include name="*stats*.txt"/>
+                    <exclude name="${save-data-tag}-all-maqcii-submission.txt"/>
+                    <exclude name="${save-data-tag}-all-stats.txt"/>
+                </fileset>
+            </delete>
+            <echo message="Zipping results ${save-data-tag}.zip"/>
+            <zip zipfile="${maqcii.basedir}/${save-data-tag}.zip">
+                <fileset dir="${save-data-dir}">
+                    <include name="**"/>
+                </fileset>
+            </zip>
+        </sequential>
+    </target>
+
+    <target name="delete-results" description="Delete previous result files">
+        <delete verbose="true" includeemptydirs="">
+            <fileset dir="${maqcii.basedir}">
+                <include name="200*-results/**/*"/>
+                <include name="200*-results"/>
+                <include name="200*-results.zip"/>
+            </fileset>
+        </delete>
+    </target>
+
+    <macrodef name="copy-tune-parameters-files" description="Copy the output files to the results dir">
+        <sequential>
+            <echo message="Moving output files to ${save-data-dir}"/>
+            <move todir="${save-data-dir}">
+                <fileset dir="${maqcii.basedir}" casesensitive="false">
+                    <include name="maqcii-submission.file.txt"/>
+                </fileset>
+            </move>
+        </sequential>
+    </macrodef>
+
+    <!-- Normal targets (non-pathways) -->
+    <macrodef name="define-endpoints">
+        <sequential>
+            <property name="do.HamnerWithControl" value="true"/>
+            <property name="do.Iconix" value="true"/>
+            <property name="do.NIEHS" value="true"/>
+
+            <property name="do.MDACC_PCR" value="true"/>
+            <property name="do.MDACC_ERPOS" value="true"/>
+
+            <property name="do.Cologne_OS_MO" value="true"/>
+            <property name="do.Cologne_EFS_MO" value="true"/>
+
+            <property name="do.UAMS_EFS_MO" value="true"/>
+            <property name="do.UAMS_OS_MO" value="true"/>
+
+            <!-- less used endpoints -->
+            <property name="do.CologneTraining" value="false"/>
+            <property name="do.UAMS_CPS1" value="true"/>
+            <property name="do.UAMS_CPR1" value="true"/>
+            <property name="do.Cologne_NEP_S" value="true"/>
+            <property name="do.Cologne_NEP_R" value="true"/>
+            <property name="do.NIEHSTraining" value="false"/>
+            <property name="do.UAMS_CPR1Training" value="false"/>
+
+            <echo message="Executing all endpoints..."/>
+
+            <property name="all-endpoints" value="
+                HamnerWithControl Iconix NIEHS MDACC_PCR MDACC_ERPOS Cologne_OS_MO
+                Cologne_EFS_MO UAMS_EFS_MO UAMS_OS_MO CologneTraining UAMS_CPS1 UAMS_CPR1
+                Cologne_NEP_S Cologne_NEP_R NIEHSTraining UAMS_CPR1Training"/>
+        </sequential>
+    </macrodef>
+    <macrodef name="execute-all-endpoints" description="Run do-one-splits-all for each target">
+        <sequential>
+
+            <define-endpoints/>
+
+            <for param="current-endpoint" delimiter=" " list="${all-endpoints}">
+                <sequential>
+                    <if>
+                        <istrue value="${do.@{current-endpoint}}"/>
+                        <then>
+                            <do-one-splits-all dataset-name="@{current-endpoint}"/>
+                        </then>
+                    </if>
+                </sequential>
+            </for>
+        </sequential>
+    </macrodef>
+
+
+    <target name="all" description="Run a complete evaluation." depends="compile, tag-output-directory">
+        <delete file="${statistics-output}"/>
+
+        <echo message="Executing with ${num-threads} threads"/>
+        <sequential>
+            <property name="do.baseline" value="true"/>
+            <property name="do.whole-chip" value="false"/>
+            <property name="do.baseline-tune-C" value="true"/>
+            <property name="do.foldchange-genetic-algorithm" value="true"/>
+            <property name="do.foldchange-svmglobal" value="true"/>
+            <property name="do.foldchange-svmiterative" value="true"/>
+            <property name="do.full-genetic-algorithm" value="false"/>
+            <property name="do.genelist-genetic-algorithm" value="true"/>
+            <property name="do.genelist-svmglobal" value="true"/>
+            <property name="do.genelist-svmglobal-tune-C" value="true"/>
+            <property name="do.minmax-svmglobal" value="true"/>
+            <property name="do.pathways-ttest-svmglobal" value="true"/>
+            <property name="do.pathways-tune-C" value="true"/>
+            <property name="do.pathways.baseline" value="true"/>
+            <property name="do.svmiterative" value="true"/>
+            <property name="do.ttest-genetic-algorithm" value="true"/>
+            <property name="do.ttest-svmglobal" value="true"/>
+            <property name="do.ttest-svmiterative" value="true"/>
+
+            <execute-all-endpoints/>
+
+        </sequential>
+        <antcall target="process-model-conditions"/>
+        <antcall target="zip-results"/>
+    </target>
+
+
+    <target name="pathways" description="Run pathways." depends="compile, tag-output-directory">
+        <delete file="${statistics-output}"/>
+
+        <echo message="Executing with ${num-threads} threads"/>
+        <sequential>
+            <property name="do.baseline" value="false"/>
+            <property name="do.baseline-tune-C" value="false"/>
+            <property name="do.foldchange-genetic-algorithm" value="false"/>
+            <property name="do.foldchange-svmglobal" value="false"/>
+            <property name="do.foldchange-svmiterative" value="false"/>
+            <property name="do.full-genetic-algorithm" value="false"/>
+            <property name="do.genelist-genetic-algorithm" value="false"/>
+            <property name="do.genelist-svmglobal" value="false"/>
+            <property name="do.genelist-svmglobal-tune-C" value="false"/>
+            <property name="do.minmax-svmglobal" value="false"/>
+            <property name="do.pathways-build-pathway-components" value="true"/>
+            <property name="do.pathways-ttest-svmglobal" value="false"/>
+            <property name="do.pathways-tune-C" value="false"/>
+            <property name="do.pathways.baseline" value="false"/>
+            <property name="do.svmiterative" value="false"/>
+            <property name="do.ttest-genetic-algorithm" value="false"/>
+            <property name="do.ttest-svmglobal" value="false"/>
+            <property name="do.ttest-svmiterative" value="false"/>
+
+            <execute-all-endpoints/>
+
+        </sequential>
+        <antcall target="process-model-conditions"/>
+        <antcall target="zip-results"/>
+    </target>
+
+    <target name="genetic-algorithm" description="Run Genetic Algorithm."
+            depends="compile, tag-output-directory">
+        <delete file="${statistics-output}"/>
+
+        <echo message="Executing with ${num-threads} threads"/>
+        <sequential>
+            <property name="do.baseline" value="false"/>
+            <property name="do.whole-chip" value="false"/>
+            <property name="do.baseline-tune-C" value="false"/>
+            <property name="do.foldchange-svmglobal" value="false"/>
+            <property name="do.foldchange-svmiterative" value="false"/>
+
+            <property name="do.genelist-svmglobal" value="false"/>
+            <property name="do.genelist-svmglobal-tune-C" value="false"/>
+            <property name="do.minmax-svmglobal" value="false"/>
+            <property name="do.pathways-ttest-svmglobal" value="false"/>
+            <property name="do.pathways-tune-C" value="false"/>
+            <property name="do.pathways.baseline" value="false"/>
+            <property name="do.svmiterative" value="false"/>
+            <property name="do.ttest-svmglobal" value="false"/>
+            <property name="do.ttest-svmiterative" value="false"/>
+
+            <property name="do.full-genetic-algorithm" value="true"/>
+            <property name="do.ttest-genetic-algorithm" value="true"/>
+            <property name="do.foldchange-genetic-algorithm" value="true"/>
+            <property name="do.genelist-genetic-algorithm" value="true"/>
+
+            <execute-all-endpoints/>
+
+        </sequential>
+        <antcall target="process-model-conditions"/>
+        <antcall target="zip-results"/>
+    </target>
+
+    <target name="tune-C" description="Try a few values of cost parameter C with baseline and gene lists"
+            depends="compile, tag-output-directory">
+        <delete file="${statistics-output}"/>
+
+        <echo message="Executing with ${num-threads} threads"/>
+        <sequential>
+            <property name="do.baseline" value="false"/>
+            <property name="do.whole-chip" value="false"/>
+            <property name="do.foldchange-genetic-algorithm" value="false"/>
+            <property name="do.foldchange-svmglobal" value="false"/>
+            <property name="do.foldchange-svmiterative" value="false"/>
+            <property name="do.full-genetic-algorithm" value="false"/>
+            <property name="do.genelist-genetic-algorithm" value="false"/>
+            <property name="do.genelist-svmglobal" value="false"/>
+            <property name="do.minmax-svmglobal" value="false"/>
+            <property name="do.pathways-ttest-svmglobal" value="false"/>
+            <property name="do.pathways.baseline" value="false"/>
+            <property name="do.svmiterative" value="false"/>
+            <property name="do.ttest-genetic-algorithm" value="false"/>
+            <property name="do.ttest-svmglobal" value="false"/>
+            <property name="do.ttest-svmiterative" value="false"/>
+
+            <property name="do.pathways-tune-C" value="false"/>
+            <property name="do.baseline-tune-C" value="true"/>
+            <property name="do.genelist-svmglobal-tune-C" value="false"/>
+            <execute-all-endpoints/>
+
+        </sequential>
+        <antcall target="process-model-conditions"/>
+        <antcall target="zip-results"/>
+    </target>
+
+
+    <target name="restat" description="Recalculate statistics for prediction table files in a given directory"
+            depends="compile, tag-output-directory">
+        <delete file="${statistics-output}"/>
+        <input addproperty="directory" message="Enter the directory where prediction table are stored."/>
+        <for param="prediction-table-filename" trim="yes">
+            <fileset dir="${directory}">
+                <include name="*prediction-table.txt"/>
+            </fileset>
+            <sequential>
+                <java classname="edu.cornell.med.icb.biomarkers.DiscoverAndValidate" dir="${maqcii.basedir}"
+                      classpathref="classpath" fork="true" failonerror="true">
+                    <jvmarg value="-ea"/>
+                    <jvmarg value="${memory-flag}"/>
+                    <sysproperty key="log4j.debug" value="true"/>
+                    <sysproperty key="log4j.configuration" value="file:///${config}/log4j.properties"/>
+                    <sysproperty key="pj.nt" value="${num-threads}"/>
+                    <arg value="-m"/>
+                    <arg value="stats"/>
+                    <arg value="--predictions"/>
+                    <arg value="@{prediction-table-filename}"/>
+                    <arg value="--label"/>
+                    <arg value="auto"/>
+                    <arg value="--binary"/>
+                    <arg value="true"/>
+                    <arg value="--dataset-name"/>
+                    <arg value="auto"/>
+                    <arg value="--folds"/>
+                    <arg value="${external-CV-folds}"/>
+                    <arg value="--submission-file"/>
+                    <arg value="restat-maqcii-submission.txt"/>
+                </java>
+            </sequential>
+        </for>
+    </target>
+    <target name="generate-all-final-models"
+            description="Calculatate feature consensus across multiple feature selection strategies and generate models with consensus features on the whole training set."
+            depends="compile">
+
+        <input addproperty="model-conditions" message="Enter the model condition filename."
+               defaultvalue="model-conditions.txt"/>
+
+        <input addproperty="inspect-directory"
+               message="Enter the directory where results directory will be found (each results directory must include features and models subdirectories)."/>
+
+        <for param="results-directory">
+            <dirset dir="${inspect-directory}">
+                <depth max="0"/>
+                <filename name="20*-*-results"/>
+
+            </dirset>
+            <sequential>
+                <echo message="Processing directory @{results-directory}"/>
+                <property name="results-directory" value="@{results-directory}"/>
+
+                <antcall target="generate-final-models" inheritall="true"/>
+
+            </sequential>
+        </for>
+    </target>
+
+    <target name="generate-list-final-models"
+            description="Calculatate feature consensus across multiple feature selection strategies and generate models with consensus features on the whole training set."
+            depends="compile">
+
+        <input addproperty="model-conditions" message="Enter the model condition filename."
+               defaultvalue="model-conditions.txt"/>
+
+        <input addproperty="inspect-directory"
+               message="Enter the directory where results directory will be found (each results directory must include features and models subdirectories)."/>
+
+        <for param="results-directory" delimiter=" " trim="yes"
+             list="20080420-1649-results 20080423-0837-results 20080423-2226-results 20080423-2228-results 20080424-1910-results 20080425-0812-results 20080425-1413-results 20080426-0913-results 20080426-1358-results 20080427-1228-results 20080428-1151-results 20080429-1052-results 20080430-0911-results 20080430-1350-results">
+
+            <!--dirset dir="${inspect-directory}">
+                <depth max="0"/>
+                <filename name="20*-*-results"/>
+
+            </dirset-->
+
+            <sequential>
+                <echo message="Processing directory @{results-directory}"/>
+                <var name="results-directory" value="${inspect-directory}/@{results-directory}"/>
+
+                <antcall target="generate-final-models" inheritall="true"/>
+
+            </sequential>
+        </for>
+    </target>
+
+    <target name="generate-final-models"
+            description="Calculatate feature consensus across multiple feature selection strategies and generate models with consensus features on the whole training set.">
+        <define-endpoints/>
+        <delete file="${statistics-output}"/>
+        <input addproperty="model-conditions" message="Enter the model condition filename."
+               defaultvalue="model-conditions.txt"/>
+        <input addproperty="results-directory"
+               message="Enter the directory where results are stored (features subdirectory must exist in the results directory)."/>
+
+        <java classname="edu.cornell.med.icb.biomarkers.GenerateFinalModels" dir="${maqcii.basedir}"
+              classpathref="classpath" fork="true" failonerror="true">
+            <jvmarg value="-ea"/>
+            <jvmarg value="${memory-flag}"/>
+            <sysproperty key="log4j.debug" value="true"/>
+            <sysproperty key="log4j.configuration" value="file:///${config}/log4j.properties"/>
+            <sysproperty key="pj.nt" value="${num-threads}"/>
+            <arg value="--model-conditions"/>
+            <arg value="${model-conditions}"/>
+            <arg value="--results-directory"/>
+            <arg value="${results-directory}"/>
+        </java>
+    </target>
+
+    <macrodef name="do-one-splits-all" description="Running process-splits-all for one dataset.">
+        <attribute name="dataset-name"/>
+        <sequential>
+            <trycatch>
+                <try>
+                    <if>
+                        <equals arg1="${do-specific-gene-lists-only}" arg2="true"/>
+
+                        <then>
+                            <!-- Will process the endpoint specific gene lists (see maqcii-b.properties) -->
+                            <var name="endpoint-specific-genelist-names" value="${@{dataset-name}.genelists}"/>
+                        </then>
+                        <else>
+                            <!-- Will process all the gene lists. -->
+                            <var name="endpoint-specific-genelist-names"
+                                 value="Merged HM200 NC01-2000 GDS1070 GDS183 GDS232 NuttAO NuttGBM POMEROY-0 POMEROY-1 POMEROY-2 POMEROY-3 POMEROY-4 POMEROY-400 Rhodes2004"/>
+                        </else>
+                    </if>
+                    <var name="floor-param" value=""/>
+                    <var name="floor-val" value="${@{dataset-name}.floor}"/>
+                    <if>
+                        <not>
+                            <equals arg1="${floor-val}" arg2=""/>
+                        </not>
+                        <then>
+                            <!-- we HAVE a floor value -->
+                            <if>
+                                <equals arg1="${enable-flooring}" arg2="true"/>
+                                <then>
+                                    <!-- and enable-flooring is true -->
+                                    <var name="floor-param" value="--floor ${floor-val}"/>
+                                </then>
+                            </if>
+                        </then>
+                    </if>
+                    <echo message="Running process-splits-all with the following parameters..."/>
+                    <echo message="-------------------------------------------------------"/>
+                    <echo message="dataset-name=@{dataset-name}"/>
+                    <echo message="platform=${@{dataset-name}.platform}"/>
+                    <echo message="do-process-gene-lists=${@{dataset-name}.do-process-gene-lists}"/>
+                    <echo message="endpoint-specific-genelist-names: ${endpoint-specific-genelist-names}"/>
+                    <echo message="floor-param=${floor-param}"/>
+
+                    <process-splits-all
+                            dataset-name="@{dataset-name}"
+                            dataset-root="${eval-dataset-root}"
+                            type="tmm"
+                            tasks="@{dataset-name}-full.tasks"
+                            platform="${@{dataset-name}.platform}"
+                            pathway-options="--pathways ${@{dataset-name}.pathways-file} --gene-to-probes ${@{dataset-name}.gene-to-probes-file} --pathway-aggregation-method ${pathway-aggregation-method}"
+                            do-process-gene-lists="${@{dataset-name}.do-process-gene-lists}"
+                            endpoint-specific-genelist-names="${endpoint-specific-genelist-names}"
+                            floor-param="${floor-param}"/>
+                </try>
+                <catch>
+                    <echo message="CAUGHT FAILED BUILD"/>
+                    <fail unless="continue-after-fail"/>
+                </catch>
+                <finally>
+                    <copy-output-files dataset-name="@{dataset-name}"/>
+                </finally>
+            </trycatch>
+        </sequential>
+    </macrodef>
+
+    <target name="process-model-conditions" description="Handle the model-conditions.txt file">
+        <copy todir="${save-data-dir}">
+            <fileset dir="${maqcii.basedir}">
+                <include name="model-conditions.txt"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="rewrite-model-conditions-no-prompt" depends="compile"
+            description="Read a model-conditions.txt file, write a model-conditions-columns.txt file">
+        <java classname="edu.cornell.med.icb.biomarkers.util.RewriteModelConditionslConditions" dir="${maqcii.basedir}"
+              classpathref="classpath" fork="true" failonerror="true">
+            <jvmarg value="-ea"/>
+            <jvmarg value="${memory-flag}"/>
+            <sysproperty key="log4j.debug" value="true"/>
+            <sysproperty key="log4j.configuration" value="file:///${config}/log4j.properties"/>
+            <arg value="-i"/>
+            <arg value="model-conditions.txt"/>
+            <arg value="-o"/>
+            <arg value="model-conditions-columns.txt"/>
+        </java>
+    </target>
+
+    <target name="rewrite-model-conditions" depends="compile"
+            description="Read a model-conditions.txt file, write a model-conditions-columns.txt file">
+
+        <input addproperty="model-conditions-input-file"
+               message="Name of INPUT model conditions file?"
+               defaultvalue="model-conditions.txt"/>
+        <input addproperty="model-conditions-output-file"
+               message="Name of OUTPUT model conditions file (in columns)?"
+               defaultvalue="model-conditions-columns.txt"/>
+
+        <java classname="edu.cornell.med.icb.biomarkers.util.RewriteModelConditionslConditions" dir="${maqcii.basedir}"
+              classpathref="classpath" fork="true" failonerror="true">
+            <jvmarg value="-ea"/>
+            <jvmarg value="${memory-flag}"/>
+            <sysproperty key="log4j.debug" value="true"/>
+            <sysproperty key="log4j.configuration" value="file:///${config}/log4j.properties"/>
+            <arg value="-i"/>
+            <arg value="${model-conditions-input-file}"/>
+            <arg value="-o"/>
+            <arg value="${model-conditions-output-file}"/>
+        </java>
+    </target>
+
+    <target name="tag-output-directory">
+        <tstamp/>
+        <property name="save-data-dir" location="${maqcii.basedir}/${DSTAMP}-${TSTAMP}-results/"/>
+        <property name="save-data-tag" value="${DSTAMP}-${TSTAMP}-results"/>
+        <mkdir dir="${save-data-dir}"/>
+        <copy todir="${save-data-dir}">
+            <fileset dir="${maqcii.basedir}">
+                <include name="maqcii-b.xml"/>
+                <include name="maqcii-b.properties"/>
+            </fileset>
+        </copy>
+        <copy file="${config}/RConnectionPool.xml" todir="${classes}"/>
+        <delete verbose="true" includeemptydirs="true">
+            <fileset dir="${maqcii.basedir}">
+                <include name="*-maqcii-submission*.txt"/>
+                <include name="*-stats.txt"/>
+            </fileset>
+        </delete>
+        <define-endpoints/>
+        <input addproperty="tag-description"
+               message="Please provide a short description for this run (i.e., condition tested, summary of parameters)."/>
+        <echo file="${save-data-dir}/${save-data-tag}-README.txt">${tag-description}
+
+            -----
+            Parameters used in this run were:
+            default-eval-dataset-root: ${default-eval-dataset-root}
+            do-specific-gene-lists-only: ${do-specific-gene-lists-only}
+            enable-flooring: ${enable-flooring}
+
+            num-features: ${num-features}
+            max-intermediate-features: ${max-intermediate-features}
+            feature-option: ${feature-option}
+
+            external-CV-repeats: ${external-CV-repeats}
+            external-CV-folds: ${external-CV-folds}
+            internal-CV-repeats: ${internal-CV-repeats}
+            internal-CV-folds: ${internal-CV-folds}
+
+            fold-change-phi: ${fold-change-phi}
+            ttest-alpha: ${ttest-alpha}
+
+            svm-classifier: ${svm-classifier}
+            svm-parameters: ${svm-parameters}
+            use-probability: ${use-probability}
+
+            performance-measure-maximized-by-GA: ${performance-measure-maximized-by-GA}
+            ga-wrapper-population-size: ${ga-wrapper-population-size}
+            ga-wrapper-number-of-iterations: ${ga-wrapper-number-of-iterations}
+            ga-wrapper-roc-str: ${ga-wrapper-roc-str}
+
+            pathway-aggregation-method: ${pathway-aggregation-method}
+            human-pathways-file: ${human-pathways-file}
+            mouse-pathways-file: ${mouse-pathways-file}
+            rat-pathways-file: ${rat-pathways-file}
+
+            A value of true in the following properties indicates that the dataset/endpoint was processed in this run:
+            do.HamnerWithControl: ${do.HamnerWithControl}
+            do.Iconix: ${do.Iconix}
+            do.NIEHS: ${do.NIEHS}
+
+            do.MDACC_PCR: ${do.MDACC_PCR}
+            do.MDACC_ERPOS: ${do.MDACC_ERPOS}
+
+            do.Cologne_OS_MO: ${do.Cologne_OS_MO}
+            do.Cologne_EFS_MO: ${do.Cologne_EFS_MO}
+
+            do.UAMS_EFS_MO: ${do.UAMS_EFS_MO}
+            do.UAMS_OS_MO: ${do.UAMS_OS_MO}
+
+            do.CologneTraining: ${do.CologneTraining}
+            do.UAMS_CPS1: ${do.UAMS_CPS1}
+            do.UAMS_CPR1: ${do.UAMS_CPR1}
+            do.Cologne_NEP_S: ${do.Cologne_NEP_S}
+            do.Cologne_NEP_R: ${do.Cologne_NEP_R}
+            do.NIEHSTraining: ${do.NIEHSTraining}
+            do.UAMS_CPR1Training: ${do.UAMS_CPR1Training}
+        </echo>
+    </target>
+</project>

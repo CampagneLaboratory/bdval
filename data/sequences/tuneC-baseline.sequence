@@ -1,0 +1,12 @@
+def label=tuneC-global-svm-weights-%model-id%
+def predictions-filename=%dataset-name%-%label%-prediction-table.txt
+def survival=%survival%
+#
+addoption required:other-options:Other DAVMode options can be provided here
+addoption required:split-id:id of split being processed
+addoption required:num-features:Number of features in the generated model
+addoption required:survival:survival data file
+#
+-m svm-weights --overwrite-output true -o %dataset-name%-%split-id%-%label%-features.txt  --output-gene-list  --gene-list full --gene-features-dir %gene-features-dir% --num-features %num-features% %other-options% --split-type training
+-m write-model --overwrite-output true --gene-list %label%|%dataset-name%-%split-id%-%label%-features.txt %other-options% --split-type training --model-prefix libSVM_%dataset-name%-%split-id%-%label%
+-m predict --overwrite-output false --model libSVM_%dataset-name%-%split-id%-%label%.model -o %predictions-filename% %other-options% --split-type test --true-labels %conditions%
