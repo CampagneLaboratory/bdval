@@ -88,13 +88,12 @@
                     <include name="*.jar"/>
                     <include name="Rserve/*.jar"/>
                     <include name="ant/*.jar"/>
-                    <exclude name="tissueinfo.jar"/>
                 </fileset>
             </path>
         </else>
     </if>
 
-    <taskdef name="version-info" classname="edu.cornell.med.icb.ant.VersionInfoTask"
+    <taskdef resource="edu/cornell/med/icb/ant/antlib.xml" onerror="fail"
              classpathref="bdval.classpath"/>
 
     <target name="compile">
