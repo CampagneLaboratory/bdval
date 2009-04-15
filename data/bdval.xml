@@ -177,7 +177,7 @@
             <if>
                 <equals arg1="${run-java}" arg2="true"/>
                 <then>
-                    <java classname="edu.cornell.med.icb.biomarkers.DiscoverAndValidate"
+                    <java classname="org.bdval.DiscoverAndValidate"
                           classpathref="bdval.classpath" fork="true" failonerror="true"
                           dir="@{workingdir}">
                         <jvmarg value="-ea"/>
@@ -280,7 +280,7 @@
             <if>
                 <equals arg1="${run-java}" arg2="true"/>
                 <then>
-                    <java classname="edu.cornell.med.icb.biomarkers.DiscoverAndValidate"
+                    <java classname="org.bdval.DiscoverAndValidate"
                           classpathref="bdval.classpath" fork="true" failonerror="true">
                         <jvmarg value="-ea"/>
                         <jvmarg value="${memory-flag}"/>
@@ -340,7 +340,7 @@
             <if>
                 <equals arg1="${run-java}" arg2="true"/>
                 <then>
-                    <java classname="edu.cornell.med.icb.biomarkers.DiscoverAndValidate"
+                    <java classname="org.bdval.DiscoverAndValidate"
                           classpathref="bdval.classpath" fork="true" failonerror="true"
                           dir="@{workingdir}">
 
@@ -1290,7 +1290,7 @@
         <input addproperty="results-directory"
                message="Enter the directory where results are stored (features subdirectory must exist in the results directory)."/>
 
-        <java classname="edu.cornell.med.icb.biomarkers.CrossValidateConsensusFeatures" dir="${bdval.basedir}"
+        <java classname="org.bdval.CrossValidateConsensusFeatures" dir="${bdval.basedir}"
               classpathref="bdval.classpath" fork="true" failonerror="true">
             <jvmarg value="-ea"/>
             <jvmarg value="${memory-flag}"/>
@@ -1327,7 +1327,7 @@
 
         <sequential>
 
-            <java classname="edu.cornell.med.icb.biomarkers.CandidateModelSelection" fork="true"
+            <java classname="org.bdval.modelselection.CandidateModelSelection" fork="true"
                   failonerror="true">
                 <jvmarg value="-ea"/>
                 <jvmarg value="${memory-flag}"/>
@@ -1400,7 +1400,7 @@
         <input addproperty="results-directory"
                message="Enter the directory where results are stored (features subdirectory must exist in the results directory)."/>
 
-        <java classname="edu.cornell.med.icb.biomarkers.GenerateFinalModels" dir="${bdval.basedir}"
+        <java classname="org.bdval.GenerateFinalModels" dir="${bdval.basedir}"
               classpathref="bdval.classpath" fork="true" failonerror="true">
             <jvmarg value="-ea"/>
             <jvmarg value="${memory-flag}"/>
@@ -1426,7 +1426,7 @@
         <input addproperty="results-directory"
                message="Enter the directory where results are stored (features subdirectory must exist in the results directory)."/>
 
-        <java classname="edu.cornell.med.icb.biomarkers.GenerateFinalModels" dir="${bdval.basedir}"
+        <java classname="org.bdval.GenerateFinalModels" dir="${bdval.basedir}"
               classpathref="bdval.classpath" fork="true" failonerror="true">
             <jvmarg value="-ea"/>
             <jvmarg value="${memory-flag}"/>
@@ -1562,7 +1562,7 @@
                 <include name="*/*prediction-table.txt"/>
             </fileset>
             <sequential>
-                <java classname="edu.cornell.med.icb.biomarkers.DiscoverAndValidate" dir="${bdval.basedir}"
+                <java classname="org.bdval.DiscoverAndValidate" dir="${bdval.basedir}"
                       classpathref="bdval.classpath" fork="true" failonerror="true">
                     <jvmarg value="-ea"/>
                     <jvmarg value="${memory-flag}"/>
@@ -1635,7 +1635,7 @@
 
     <target name="rewrite-model-conditions-no-prompt" depends="prepare-bdval"
             description="Read a model-conditions.txt file, write a model-conditions-columns.txt file">
-        <java classname="edu.cornell.med.icb.biomarkers.util.RewriteModelConditionslConditions" dir="${bdval.basedir}"
+        <java classname="org.bdval.util.RewriteModelConditionslConditions" dir="${bdval.basedir}"
               classpathref="bdval.classpath" fork="true" failonerror="true">
             <jvmarg value="-ea"/>
             <jvmarg value="${memory-flag}"/>
@@ -1651,7 +1651,7 @@
 
     <target name="make-synthetic-dataset" depends="prepare-bdval"
             description="Produce a synthetic dataset">
-        <java classname="edu.cornell.med.icb.biomarkers.MakeSyntheticDataset" dir="${bdval.basedir}"
+        <java classname="org.bdval.MakeSyntheticDataset" dir="${bdval.basedir}"
               classpathref="bdval.classpath" fork="true" failonerror="true">
             <jvmarg value="-ea"/>
             <jvmarg value="${memory-flag}"/>
@@ -1681,7 +1681,7 @@
                message="Name of OUTPUT model conditions file (in columns)?"
                defaultvalue="model-conditions-columns.txt"/>
 
-        <java classname="edu.cornell.med.icb.biomarkers.util.RewriteModelConditionslConditions" dir="${bdval.basedir}"
+        <java classname="org.bdval.util.RewriteModelConditionslConditions" dir="${bdval.basedir}"
               classpathref="bdval.classpath" fork="true" failonerror="true">
             <jvmarg value="-ea"/>
             <jvmarg value="${memory-flag}"/>
