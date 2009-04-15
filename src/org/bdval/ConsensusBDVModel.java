@@ -53,7 +53,7 @@ import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 /**
- * A model that is created bases on the consensus of other "juror" models.
+ * A model that is created based on the consensus of other "juror" models.
  * @author Fabien Campagne
  *         Date: Jun 8, 2008
  *         Time: 11:59:53 AM

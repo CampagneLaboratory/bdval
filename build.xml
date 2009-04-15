@@ -47,6 +47,7 @@
         </javac>
     </target>
 
+    <property name="label" value="BDVal"/>
     <target name="jar" depends="compile">
         <copy file="${config}/log4j.properties.sample" tofile="${classes}/log4j.properties"
               overwrite="true" failonerror="false"/>
