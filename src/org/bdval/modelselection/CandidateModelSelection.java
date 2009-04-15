@@ -1,26 +1,15 @@
 /*
  * Copyright (C) 2008-2009 Institute for Computational Biomedicine,
  *                         Weill Medical College of Cornell University
- *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License along
- *  with this program; if not, write to the Free Software Foundation, Inc.,
- *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ *                         All rights reserved. 
  */
 
-package org.bdval;
+package org.bdval.modelselection;
 
 import cern.jet.random.engine.MersenneTwister;
 import org.bdval.tools.convert.OptionsSupport;
+import org.bdval.WithProcessMethod;
+import org.bdval.DistributionDifferenceByFeatureMode;
 import edu.cornell.med.icb.geo.DoubleIndexedIdentifier;
 import edu.cornell.med.icb.geo.IndexedIdentifier;
 import edu.cornell.med.icb.io.TSVReader;
@@ -92,14 +81,6 @@ public class CandidateModelSelection implements WithProcessMethod {
      * Maximum performance (value) for each endpoint (key) for results obtained on the test set.
      */
     private Object2ObjectMap<String, Map<String, ZScoreCalculator>> testNormFactorPerfs;
-    /**
-     * Test results from all groups, to evaluate a null distribution of test performance. There are issues
-     * with estimating this distribution in this way. One issue is that a top performing model in the validation dataset
-     * submitted by another group does not have corresponding performance data by CV and CVCF and therefore cannot
-     * ever be picked by any model selection strategy. This issue will artificially increase P-values for all candidate
-     * model selection strategies.
-     */
-    private Object2ObjectMap<String, ModelPerformance> backgroundTestResults;
     private ObjectSet<String> modelIds;
     private ObjectSet<String> datasetNames;
     private ObjectSet<String> endpointNames;

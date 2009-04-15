@@ -17,10 +17,12 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package org.bdval;
+package org.bdval.modelselection;
 
 import cern.jet.random.engine.MersenneTwister;
 import org.bdval.tools.convert.OptionsSupport;
+import org.bdval.WithProcessMethod;
+import org.bdval.DistributionDifferenceByFeatureMode;
 import edu.cornell.med.icb.geo.DoubleIndexedIdentifier;
 import edu.cornell.med.icb.geo.IndexedIdentifier;
 import edu.cornell.med.icb.io.TSVReader;
