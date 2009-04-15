@@ -17,12 +17,7 @@ import edu.cornell.med.icb.stat.ZScoreCalculator;
 import edu.cornell.med.icb.tissueinfo.similarity.ScoredTranscriptBoundedSizeQueue;
 import edu.cornell.med.icb.tissueinfo.similarity.TranscriptScore;
 import edu.mssm.crover.cli.CLI;
-import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import it.unimi.dsi.fastutil.objects.ObjectList;
-import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import it.unimi.dsi.fastutil.objects.ObjectSet;
+import it.unimi.dsi.fastutil.objects.*;
 import it.unimi.dsi.lang.MutableString;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.LineIterator;
@@ -108,54 +103,6 @@ public class CandidateModelSelection implements WithProcessMethod {
         tool.process(args);
     }
 
-    class arguments {
-        String cvResultsFilename;
-        String cvcfResultsFilename;
-        String testFilename;
-
-        public String rankStrategyName;
-        public RankStrategy rankStrategy;
-        public int k;
-        public String endpointName;
-        public String datasetName;
-        public RankBy rankBy;
-        public RankBy rewardPerformance;
-        public String outputFilename;
-        public PrintWriter output;
-        public boolean outputCreated;
-        public String customRanking;
-        public String modelIdMapFile;
-        public ObjectList<CustomRanking> customRankings;
-        public String dumpFilename;
-        public PrintWriter pValuesOutput;
-        public boolean pValuesOutputCreated;
-        public String pValueFilename;
-        public String modelConditionsFilename;
-        public Map<String, Map<String, String>> modelConditions;
-        public boolean excludeGeneLists;
-        public String rankFilename;
-        public boolean rankOutputCreated;
-        public PrintWriter rankOutput;
-        public String modelNameString;
-        public ModelName modelName;
-        //      public boolean useAllModelsForNull;
-
-        public ObjectList<String> getCustomModelRankingList(final String dataset, final String endpoint) {
-            if (customRankings.size() > 0) {
-                for (final CustomRanking ranking : customRankings) {
-                    if (ranking.datasetName.equals(dataset) && ranking.endpointCode.equals(endpoint)) {
-                        return ranking.modelIds;
-                    }
-                }
-            }
-            return (customRanking != null ? new ObjectArrayList<String>(customRanking.split("[,]")) : null);
-        }
-
-        public boolean hasTestSet() {
-            return testFilename != null;
-        }
-    }
-
     enum RewardPerformanceBy {
         MCC_AUC,
         AUC_MCC,
@@ -191,7 +138,7 @@ public class CandidateModelSelection implements WithProcessMethod {
     }
 
     public void process(final String[] args) {
-        final arguments toolsArgs = new arguments();
+        final ModelSelectionArguments toolsArgs = new ModelSelectionArguments();
         toolsArgs.k = CLI.getIntOption(args, "-k", 10);
         toolsArgs.cvResultsFilename = CLI.getOption(args, "--cv", "maqcii-submission-cv.txt");
         toolsArgs.cvcfResultsFilename = CLI.getOption(args, "--cvcf", "maqcii-consensus-features-cv.txt");
@@ -255,7 +202,7 @@ public class CandidateModelSelection implements WithProcessMethod {
         MODEL,
     }
 
-    private void process(final arguments toolsArgs) {
+    private void process(final ModelSelectionArguments toolsArgs) {
         try {
             // load everything, irrespective of endpoint:
             load(toolsArgs, false);
@@ -362,7 +309,7 @@ public class CandidateModelSelection implements WithProcessMethod {
             System.exit(1);
         }
     }
-    private void filterGeneLists(final arguments toolsArgs) {
+    private void filterGeneLists(final ModelSelectionArguments toolsArgs) {
         if (toolsArgs.excludeGeneLists) {
             // remove models built with gene lists..
             for (final ModelPerformance model : cvResults.values()) {
@@ -380,7 +327,7 @@ public class CandidateModelSelection implements WithProcessMethod {
     }
 
 
-    private void readeModelConditions(final arguments toolsArgs) {
+    private void readeModelConditions(final ModelSelectionArguments toolsArgs) {
         final Map<String, Map<String, String>> modelConditions = null;
         if (toolsArgs.modelConditionsFilename != null) {
             System.out.println("Reading model condition file: " + toolsArgs.modelConditionsFilename);
@@ -489,7 +436,7 @@ public class CandidateModelSelection implements WithProcessMethod {
 
     private void dump
             (
-                    final arguments toolsArgs) {
+                    final ModelSelectionArguments toolsArgs) {
         if (toolsArgs.dumpFilename != null) {
             System.out.println("Writing integrated dataset to " + toolsArgs.dumpFilename);
             try {
@@ -794,7 +741,7 @@ public class CandidateModelSelection implements WithProcessMethod {
 
     private void pValueEstimation
             (
-                    final CandidateModelSelection.arguments toolsArgs,
+                    final ModelSelectionArguments toolsArgs,
                     final ObjectList<String> rankedList) {
         final int numModels = modelIds.size();
         final MersenneTwister randomGenerator = new MersenneTwister();
@@ -853,7 +800,7 @@ public class CandidateModelSelection implements WithProcessMethod {
                     final ObjectList<String> randomModelPicks,
                     final ObjectList<String> actualModelList,
                     final int upToRank,
-                    final CandidateModelSelection.arguments toolsArgs) {
+                    final ModelSelectionArguments toolsArgs) {
         final double scoreRandom = evaluateScore(randomModelPicks, upToRank, toolsArgs) / randomModelPicks.size();
         final double scoreActual = evaluateScore(actualModelList, upToRank, toolsArgs) / actualModelList.size();
         return scoreRandom >= scoreActual;
@@ -864,7 +811,7 @@ public class CandidateModelSelection implements WithProcessMethod {
                     final ObjectList<String> randomModelPicks,
                     final ObjectList<String> actualModelList,
                     final int upToRank,
-                    final CandidateModelSelection.arguments toolsArgs) {
+                    final ModelSelectionArguments toolsArgs) {
         boolean value = true;
         for (int rank = 0; rank < upToRank; rank++) {
             if (rank >= actualModelList.size()) {
@@ -898,7 +845,7 @@ public class CandidateModelSelection implements WithProcessMethod {
             (
                     final ObjectList<String> randomModelPicks,
                     final int upToRank,
-                    final CandidateModelSelection.arguments toolsArgs) {
+                    final ModelSelectionArguments toolsArgs) {
         double value = 0;
         for (int rank = 0; rank < upToRank; rank++) {
             final String modelId = randomModelPicks.get(rank);
@@ -941,7 +888,7 @@ public class CandidateModelSelection implements WithProcessMethod {
 
     private ObjectList<String> rankModels
             (
-                    final arguments toolsArgs,
+                    final ModelSelectionArguments toolsArgs,
                     final String dataset,
                     final String endpoint) {
         final ObjectList<String> rankedList = new ObjectArrayList<String>();
@@ -1123,7 +1070,7 @@ public class CandidateModelSelection implements WithProcessMethod {
 
     private void model
             (
-                    final arguments toolsArgs,
+                    final ModelSelectionArguments toolsArgs,
                     final String dataset,
                     final String endpoint,
                     final ObjectList<String> rankedList) {
@@ -1154,7 +1101,7 @@ public class CandidateModelSelection implements WithProcessMethod {
         dequeue(queue, rankedList);
     }
 
-    public double getPerformanceByChosenStrategy(final CandidateModelSelection.arguments toolsArgs, final CandidateModelSelection.ModelPerformance cvPerf,
+    public double getPerformanceByChosenStrategy(final ModelSelectionArguments toolsArgs, final CandidateModelSelection.ModelPerformance cvPerf,
                                                  final CandidateModelSelection.ModelPerformance cvcfPerf) {
 
         final double score = Double.NaN;
@@ -1171,7 +1118,7 @@ public class CandidateModelSelection implements WithProcessMethod {
 
     private double getModelRankingPerformance
             (
-                    final arguments toolsArgs,
+                    final ModelSelectionArguments toolsArgs,
                     final ModelPerformance cvPerf,
                     final ModelPerformance cvcfPerf) {
         final String modelId = cvPerf.modelId;
@@ -1186,18 +1133,20 @@ public class CandidateModelSelection implements WithProcessMethod {
 // model trained on Hamner endpoint A:
 
         double predictedPerformance = Double.NaN;
+        BMFCalibrationModel bmfModel = BMFCalibrationModel.load(toolsArgs.modelNameString);
+        Object2DoubleMap<String> map=new Object2DoubleOpenHashMap<String>();
+        map.put("actualNumberOfFeaturesInModel",cvPerf.actualNumberOfFeaturesInModel);
+        map.put("norm_auc",norm_AUC_CV);
+        map.put("delta_auc_cvcf_cv",delta_AUC_CVCF_CV);
+
+      predictedPerformance=  bmfModel.calibrateEstimate(toolsArgs, modelId, map);
         switch (toolsArgs.modelName) {
-            case TrainedOnA:
-                predictedPerformance = modelTrainedOnA(toolsArgs, modelId, norm_AUC_CV, delta_AUC_CVCF_CV);
-                break;
+
             case TrainedOnACZ:
                 predictedPerformance = modelTrainedOnACZ(toolsArgs, cvPerf.actualNumberOfFeaturesInModel,
                         modelId, norm_AUC_CV, delta_AUC_CVCF_CV);
                 break;
-            case TrainedOnABCDEGJKZ:
-                predictedPerformance = modelTrainedOnABCDEGJKZ(toolsArgs, cvPerf.actualNumberOfFeaturesInModel,
-                        modelId, norm_AUC_CV, delta_AUC_CVCF_CV);
-                break;
+
             default:
                 System.err.println("Model name must be specified.");
                 System.exit(1);
@@ -1206,40 +1155,10 @@ public class CandidateModelSelection implements WithProcessMethod {
         return predictedPerformance;
     }
 
-    private double modelTrainedOnABCDEGJKZ(final arguments toolsArgs, final int actualNumberOfFeaturesInModel,
-                                           final String modelId, final double norm_auc_cv, final double delta_auc_cvcf_cv) {
 
-        return 0.521295622557999 + -0.000461029909413533 * actualNumberOfFeaturesInModel +
-                0.30633208149121 * delta_auc_cvcf_cv + 0.460738859272386 *
-                norm_auc_cv + match(value(toolsArgs, modelId, "classifier-type"),
-                "KStar", -0.0281258372274131,
-                "LibSVM", 0.0353014891511363,
-                "Logistic", -0.0615956594513561,
-                "LogitBoost", 0.0667057072484948,
-                "NaiveBayesUpdateable", -0.0608964002308641,
-                "RandomForest", 0.0486107005100022
-
-        ) + match(value(toolsArgs, modelId, "feature-selection-fold"),
-                "false", -0.00625464874139557,
-                "true", 0.00625464874139557
-
-        ) + match(value(toolsArgs, modelId, "feature-selection-type"),
-                "fold-change", 0.0518121246849801,
-                "ga-wrapper", -0.0340570440558859,
-                "pathways", -0.0256477119679852,
-                "RFE", -0.0269193446496901,
-                "SVM-weights", 0.0112289119698472,
-                "t-test", 0.0235830640187339
-
-        ) + match(value(toolsArgs, modelId, "svm-default-C-parameter"),
-                "false", -0.0299635958352018,
-                "true", 0.0299635958352018
-
-        );
-    }
 
     private double modelTrainedOnACZ
-            (final arguments toolsArgs, final int numFeaturesInModel,
+            (final ModelSelectionArguments toolsArgs, final int numFeaturesInModel,
              final String modelId, final double norm_auc_cv,
              final double delta_auc_cvcf_cv) {
 
@@ -1271,51 +1190,10 @@ public class CandidateModelSelection implements WithProcessMethod {
                 + 0.614443519922211 * delta_auc_cvcf_cv;
     }
 
-    private double modelTrainedOnA
-            (final arguments
-                    toolsArgs, final String
-                    modelId, final double norm_AUC_CV,
-             final double delta_AUC_CVCF_CV) {
-        final double predictedPerformance =
-                0.767927506304831 + 0.181936624689305 *
 
-                        norm_AUC_CV +
-                        match(value(toolsArgs, modelId, "num-features"),
-                                "10", 0,
-                                "100", -0.0473561020046038,
-                                "20", -0.0123113279593483,
-                                "25", (-0.0123113279593483 + -0.0163080380584613) / 2, // interpolation 20-30
-                                "30", -0.0163080380584613,
-                                "40", -0.0214867084942386,
-                                "5", -0.0357679053833812,
-                                "50", -0.0442070722823977,
-                                "60", -0.0404108150384205,
-                                "70", -0.0413638663144752,
-                                "80", -0.0483091727091295,
-                                "90", -0.0424415575819764
-                        ) + match(value(toolsArgs, modelId, "sequence-file"),
-                        "baseline.sequence", -0.0302242788384328,
-                        "foldchange-genetic-algorithm.sequence", 0.0374926767655907,
-                        "foldchange-svmglobal.sequence", 0.0274883784897423,
-                        "foldchange-svmiterative.sequence", 0.0344998499588745,
-                        "genetic-algorithm.sequence", -0.0540407956129042,
-                        "minmax-svmglobal.sequence", 0.00742958932280811,
-                        "svmiterative.sequence", -0.0379254012191334,
-                        "ttest-genetic-algorithm.sequence", 0.0773731693501089,
-                        "ttest-svmglobal.sequence", 0.0522108551145124,
-                        "ttest-svmiterative.sequence", 0.0598489166105302,
-                        "ttest-weka-classifier-fs=false.sequence", -0.0721306589138169,
-                        "ttest-weka-classifier-fs=true.sequence", -0.0567160544813172,
-                        "tuneC-baseline.sequence", -0.0453062465465625) +
-                        match(value(toolsArgs, modelId, "feature-selection-fold"),
-                                "false", 0,
-                                "true", 0)
-                        + -0.0414908150437834 * delta_AUC_CVCF_CV;
-        return predictedPerformance;
-    }
 
     private double modelTrainedOnZ
-            (final arguments
+            (final ModelSelectionArguments
                     toolsArgs, final String
                     modelId, final double norm_AUC_CV,
              final double delta_AUC_CVCF_CV) {
@@ -1360,7 +1238,7 @@ public class CandidateModelSelection implements WithProcessMethod {
         return predictedPerformance;
     }
 
-    private double match
+    public static double match
             (final String
                     variableValue, final Object... values) {
 
@@ -1385,7 +1263,7 @@ public class CandidateModelSelection implements WithProcessMethod {
     }
 
     private String value
-            (final arguments
+            (final ModelSelectionArguments
                     toolsArgs, final String
                     modelId, final String
                     variableName) {
@@ -1396,14 +1274,14 @@ public class CandidateModelSelection implements WithProcessMethod {
 
     private double getCandidateRankingPerformanceMeasure
             (
-                    final arguments toolsArgs,
+                    final ModelSelectionArguments toolsArgs,
                     final ModelPerformance cvPerf) {
         return getPerformanceMeasure(toolsArgs, cvPerf, toolsArgs.rankBy);
     }
 
     private double getRewardPerformanceMeasure
             (
-                    final arguments toolsArgs,
+                    final ModelSelectionArguments toolsArgs,
                     final ModelPerformance cvPerf) {
 
         return getPerformanceMeasure(toolsArgs, cvPerf, toolsArgs.rewardPerformance);
@@ -1411,7 +1289,7 @@ public class CandidateModelSelection implements WithProcessMethod {
 
     private double getPerformanceMeasure
             (
-                    final arguments toolsArgs,
+                    final ModelSelectionArguments toolsArgs,
                     final ModelPerformance cvPerf,
                     final RankBy evaluationMeasure) {
         assert cvPerf != null : "CV performance must not be null";
@@ -1449,7 +1327,7 @@ public class CandidateModelSelection implements WithProcessMethod {
 
     private void colorPicking
             (
-                    final arguments toolsArgs,
+                    final ModelSelectionArguments toolsArgs,
                     final String
                             dataset, final String
                     endpoint, final ObjectList<String> rankedList) {
@@ -1533,7 +1411,7 @@ AUC of CV + 0.0190346231277872 * :Name( "MCC of CV-CF" ) +
                             modelId, final ObjectSet<String> selectedModels,
                     final ModelPerformance
                             cvcfPerf, final ModelPerformance
-                    cvPerf, final CandidateModelSelection.arguments toolsArgs) {
+                    cvPerf, final ModelSelectionArguments toolsArgs) {
         final ObjectList<String> closeByModels = new ObjectArrayList<String>();
         findCloseByModels(cvcfPerf, closeByModels);
         closeByModels.retainAll(selectedModels);
@@ -1558,7 +1436,7 @@ AUC of CV + 0.0190346231277872 * :Name( "MCC of CV-CF" ) +
             (
                     final ModelPerformance
                             cvcfPerf, final ModelPerformance
-                    cvPerf, final CandidateModelSelection.arguments toolsArgs) {
+                    cvPerf, final ModelSelectionArguments toolsArgs) {
         return cvcfPerf.auc + cvcfPerf.mcc - 1 * ((getColor(cvcfPerf, cvPerf, toolsArgs)));
     }
 
@@ -1566,7 +1444,7 @@ AUC of CV + 0.0190346231277872 * :Name( "MCC of CV-CF" ) +
             (
                     final ModelPerformance cvcfPerf,
                     final ModelPerformance cvPerf,
-                    final CandidateModelSelection.arguments toolsArgs) {
+                    final ModelSelectionArguments toolsArgs) {
         switch (toolsArgs.rewardPerformance) {
             case MCC:
                 return cvcfPerf.mcc;
@@ -1593,7 +1471,7 @@ AUC of CV + 0.0190346231277872 * :Name( "MCC of CV-CF" ) +
             (
                     final ModelPerformance
                             cvcfPerf, final ModelPerformance
-                    cvPerf, final arguments toolsArgs) {
+                    cvPerf, final ModelSelectionArguments toolsArgs) {
 
         if (cvcfPerf == null || cvPerf == null) {
             return Double.NaN;
@@ -1666,7 +1544,7 @@ AUC of CV + 0.0190346231277872 * :Name( "MCC of CV-CF" ) +
     }
 
     private void load(
-            final arguments toolsArgs, final boolean filterByEndpoint) throws FileNotFoundException {
+            final ModelSelectionArguments toolsArgs, final boolean filterByEndpoint) throws FileNotFoundException {
         if (filterByEndpoint) {
 
             modelIds.clear();
@@ -1696,7 +1574,7 @@ AUC of CV + 0.0190346231277872 * :Name( "MCC of CV-CF" ) +
                     final String modelIdMapFile,
                     final boolean readDatasetEndpoint,
                     final boolean filterByEndpoint,
-                    final arguments toolsArgs,
+                    final ModelSelectionArguments toolsArgs,
                     final boolean loadAllModels) throws FileNotFoundException {
 
         Map<String, String> modelIdMap = null;
@@ -1803,7 +1681,7 @@ AUC of CV + 0.0190346231277872 * :Name( "MCC of CV-CF" ) +
                     final String filename,
                     final boolean readDatasetEndpoint,
                     final boolean filterByEndpoint,
-                    final arguments toolsArgs) throws FileNotFoundException {
+                    final ModelSelectionArguments toolsArgs) throws FileNotFoundException {
         if (modelIds == null) {
             modelIds = new ObjectOpenHashSet<String>();
         }

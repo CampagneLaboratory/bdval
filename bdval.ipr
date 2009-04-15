@@ -247,6 +247,13 @@
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_5" assert-keyword="true" jdk-15="true" project-jdk-name="1.6" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
+  <component name="ResourceManagerContainer">
+    <option name="myResourceBundles">
+      <value>
+        <list size="0" />
+      </value>
+    </option>
+  </component>
   <component name="RmicSettings">
     <option name="IS_EANABLED" value="false" />
     <option name="DEBUGGING_INFO" value="true" />
@@ -346,16 +353,12 @@
       </map>
     </option>
     <option name="myVersion" value="124" />
-    <option name="mySupportsUserInfoFilter" value="true" />
   </component>
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="" />
     <mapping directory="$PROJECT_DIR$" vcs="svn" />
   </component>
-  <component name="XPathView.XPathProjectComponent">
-    <history />
-    <find-history />
-  </component>
+  <component name="WebServicesPlugin" addRequiredLibraries="true" />
   <component name="copyright">
     <Base>
       <setting name="state" value="2" />
