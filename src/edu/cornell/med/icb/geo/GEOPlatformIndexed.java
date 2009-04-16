@@ -31,6 +31,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import edu.cornell.med.icb.identifier.IndexedIdentifier;
+
 /**
  * @author Fabien Campagne Date: Aug 15, 2007 Time: 4:36:10 PM
  */

@@ -18,9 +18,9 @@
 
 package edu.cornell.med.icb.geo.mpss;
 
-import edu.cornell.med.icb.geo.IndexedIdentifier;
 import edu.cornell.med.icb.io.TSVReader;
 import edu.cornell.med.icb.tissueinfo.similarity.GeneTranscriptRelationships;
+import edu.cornell.med.icb.identifier.IndexedIdentifier;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntSet;

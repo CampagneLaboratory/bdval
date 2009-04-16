@@ -20,6 +20,7 @@ package edu.cornell.med.icb.geo;
 
 import edu.cornell.med.icb.geo.binaryarray.ArrayReader;
 import edu.cornell.med.icb.geo.binaryarray.ArrayWriter;
+import edu.cornell.med.icb.identifier.IndexedIdentifier;
 import edu.mssm.crover.cli.CLI;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import it.unimi.dsi.lang.MutableString;

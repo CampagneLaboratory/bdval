@@ -264,6 +264,24 @@
   <component name="SvnBranchConfigurationManager">
     <option name="myConfigurationMap">
       <map>
+        <entry key="$PROJECT_DIR$">
+          <value>
+            <SvnBranchConfiguration>
+              <option name="branchUrls">
+                <list>
+                  <option value="https://pbtech-vc.med.cornell.edu/public/svn/icb/3rdparty" />
+                  <option value="https://pbtech-vc.med.cornell.edu/public/svn/icb/branches" />
+                  <option value="https://pbtech-vc.med.cornell.edu/public/svn/icb/buildsupport" />
+                  <option value="https://pbtech-vc.med.cornell.edu/public/svn/icb/data" />
+                  <option value="https://pbtech-vc.med.cornell.edu/public/svn/icb/scripts" />
+                  <option value="https://pbtech-vc.med.cornell.edu/public/svn/icb/tags" />
+                  <option value="https://pbtech-vc.med.cornell.edu/public/svn/icb/testsupport" />
+                </list>
+              </option>
+              <option name="trunkUrl" value="https://pbtech-vc.med.cornell.edu/public/svn/icb/trunk" />
+            </SvnBranchConfiguration>
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/buildsupport">
           <value>
             <SvnBranchConfiguration>

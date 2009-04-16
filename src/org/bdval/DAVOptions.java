@@ -22,7 +22,7 @@ package org.bdval;
 import cern.jet.random.engine.MersenneTwister;
 import cern.jet.random.engine.RandomEngine;
 import org.bdval.pathways.PathwayInfo;
-import edu.cornell.med.icb.geo.DoubleIndexedIdentifier;
+import edu.cornell.med.icb.identifier.DoubleIndexedIdentifier;
 import edu.cornell.med.icb.geo.GEOPlatformIndexed;
 import edu.cornell.med.icb.geo.tools.ClassificationTask;
 import edu.cornell.med.icb.geo.tools.GEOPlatform;

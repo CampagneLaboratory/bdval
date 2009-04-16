@@ -18,7 +18,6 @@
 
 package edu.cornell.med.icb.geo.binaryarray;
 
-import edu.cornell.med.icb.geo.IndexedIdentifier;
 import it.unimi.dsi.fastutil.floats.FloatIterator;
 import it.unimi.dsi.fastutil.io.BinIO;
 import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
@@ -34,6 +33,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+
+import edu.cornell.med.icb.identifier.IndexedIdentifier;
 
 /**
  * Reads signals from an array, stored in binary format.

@@ -23,6 +23,7 @@ import edu.cornell.med.icb.tissueinfo.annotations.AnnotationParser;
 import edu.cornell.med.icb.tissueinfo.annotations.AnnotationSet;
 import edu.cornell.med.icb.tissueinfo.annotations.Projection;
 import edu.cornell.med.icb.tissueinfo.similarity.TissueESTCountsWriter;
+import edu.cornell.med.icb.identifier.IndexedIdentifier;
 import edu.mssm.crover.cli.CLI;
 import it.unimi.dsi.fastutil.ints.IntArraySet;
 import it.unimi.dsi.fastutil.ints.IntSet;

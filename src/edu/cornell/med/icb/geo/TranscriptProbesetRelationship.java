@@ -19,6 +19,7 @@
 package edu.cornell.med.icb.geo;
 
 import edu.cornell.med.icb.tissueinfo.similarity.GeneTranscriptRelationships;
+import edu.cornell.med.icb.identifier.IndexedIdentifier;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import it.unimi.dsi.lang.MutableString;
 

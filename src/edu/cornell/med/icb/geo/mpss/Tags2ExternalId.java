@@ -21,8 +21,8 @@ package edu.cornell.med.icb.geo.mpss;
 import edu.cornell.med.icb.geo.FormatAdapter;
 import edu.cornell.med.icb.geo.GEOPlatformIndexed;
 import edu.cornell.med.icb.geo.GeoScanOptions;
-import edu.cornell.med.icb.geo.IndexedIdentifier;
 import edu.cornell.med.icb.geo.SampleDataCallback;
+import edu.cornell.med.icb.identifier.IndexedIdentifier;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import it.unimi.dsi.lang.MutableString;
 

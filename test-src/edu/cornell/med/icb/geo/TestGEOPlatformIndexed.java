@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * Validates the functionality of the {@link edu.cornell.med.icb.geo.IndexedIdentifier}
+ * Validates the functionality of the {@link edu.cornell.med.icb.identifier.IndexedIdentifier}
  * class.
  */
 public class TestGEOPlatformIndexed {

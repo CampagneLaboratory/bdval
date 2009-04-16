@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2008-2009 Institute for Computational Biomedicine,
  *                         Weill Medical College of Cornell University
- *                         All rights reserved. 
+ *                         All rights reserved.
  */
 
 package org.bdval.modelselection;
@@ -10,8 +10,8 @@ import cern.jet.random.engine.MersenneTwister;
 import org.bdval.tools.convert.OptionsSupport;
 import org.bdval.WithProcessMethod;
 import org.bdval.DistributionDifferenceByFeatureMode;
-import edu.cornell.med.icb.geo.DoubleIndexedIdentifier;
-import edu.cornell.med.icb.geo.IndexedIdentifier;
+import edu.cornell.med.icb.identifier.DoubleIndexedIdentifier;
+import edu.cornell.med.icb.identifier.IndexedIdentifier;
 import edu.cornell.med.icb.io.TSVReader;
 import edu.cornell.med.icb.stat.ZScoreCalculator;
 import edu.cornell.med.icb.tissueinfo.similarity.ScoredTranscriptBoundedSizeQueue;

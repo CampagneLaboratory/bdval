@@ -21,6 +21,7 @@ package edu.cornell.med.icb.geo;
 import cern.jet.random.engine.MersenneTwister;
 import cern.jet.random.engine.RandomEngine;
 import edu.cornell.med.icb.geo.binaryarray.ArrayReader;
+import edu.cornell.med.icb.identifier.IndexedIdentifier;
 import edu.mssm.crover.cli.CLI;
 import it.unimi.dsi.fastutil.ints.IntArraySet;
 import it.unimi.dsi.fastutil.ints.IntSet;

@@ -30,13 +30,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import edu.cornell.med.icb.identifier.IndexedIdentifier;
+
 /**
- * Validates the functionality of the {@link edu.cornell.med.icb.geo.IndexedIdentifier}
+ * Validates the functionality of the {@link edu.cornell.med.icb.identifier.IndexedIdentifier}
  * class.
  */
 public class TestIndexedIdentifier {
     /**
-     * Validates that an empty {@link edu.cornell.med.icb.geo.IndexedIdentifier} object
+     * Validates that an empty {@link edu.cornell.med.icb.identifier.IndexedIdentifier} object
      * is transformed to properties properly.
      */
     @Test
@@ -68,7 +70,7 @@ public class TestIndexedIdentifier {
     }
 
     /**
-     * Validates that a populated {@link edu.cornell.med.icb.geo.IndexedIdentifier} object
+     * Validates that a populated {@link edu.cornell.med.icb.identifier.IndexedIdentifier} object
      * is transformed to properties properly.
      */
     @Test
@@ -109,7 +111,7 @@ public class TestIndexedIdentifier {
 
     /**
      * Validates that a set of properties populates an
-     * {@link edu.cornell.med.icb.geo.IndexedIdentifier} object properly.
+     * {@link edu.cornell.med.icb.identifier.IndexedIdentifier} object properly.
      */
     @Test
     public void fromPropertyMap() {

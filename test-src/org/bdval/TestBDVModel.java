@@ -38,7 +38,8 @@ public class TestBDVModel {
      * @throws ClassNotFoundException if the model cannot be loaded properly
      * @throws IOException if the model cannot be loaded properly
      */
-    @Test
+    // @Test
+    // TODO: The old binary format is no longer supported
     public void loadBinaryModel() throws ClassNotFoundException, IOException {
         final BDVModel model = new BDVModel("test-data/models/binary/libSVM_Cologne_EFS_MO-baseline-global-svm-weights-final-model-LDPSS");
         model.load(new DAVOptions());

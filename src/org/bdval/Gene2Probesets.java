@@ -19,8 +19,8 @@
 
 package org.bdval;
 
-import edu.cornell.med.icb.geo.DoubleIndexedIdentifier;
-import edu.cornell.med.icb.geo.IndexedIdentifier;
+import edu.cornell.med.icb.identifier.DoubleIndexedIdentifier;
+import edu.cornell.med.icb.identifier.IndexedIdentifier;
 import edu.cornell.med.icb.tissueinfo.similarity.GeneTranscriptRelationships;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import it.unimi.dsi.lang.MutableString;
