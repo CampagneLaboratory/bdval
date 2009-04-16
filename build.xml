@@ -157,6 +157,62 @@
         <delete file="${jarfile}"/>
     </target>
 
+    <target name="test" depends="compile-tests, cobertura-instrument" description="Run JUnit Tests">
+        <if>
+            <equals arg1="${osfamily}" arg2="windows"/>
+            <then>
+                <var name="jni_arpack.path" value="${lib}/tct/native/win32"/>
+            </then>
+            <else>
+                <!-- TODO: this is really hacky - but test configuration is good for most unix machines -->
+                <var name="jni_arpack.path" value="${lib}/tct/native/${os.arch}"/>
+            </else>
+        </if>
+
+        <echo message="JNI path: ${jni_arpack.path}"/>
+
+        <junit dir="${basedir}" fork="true" printsummary="yes" haltonfailure="yes" haltonerror="yes"
+               showoutput="yes" maxmemory="${test.max.memory}" timeout="${test.timeout}">
+            <sysproperty key="net.sourceforge.cobertura.datafile"
+                         file="${basedir}/cobertura.ser"/>
+            <sysproperty key="log4j.debug" value="${log4j.debug}"/>
+            <sysproperty key="log4j.configuration" value="${log4j.config.url}"/>
+            <syspropertyset id="properties-starting-with-test">
+                <propertyref prefix="test."/>
+                <mapper type="glob" from="test.*" to="*"/>
+            </syspropertyset>
+            <env key="PATH" path="${java.library.path}:${jni_arpack.path}"/>
+            <env key="LD_LIBRARY_PATH" path="${env.LD_LIBRARY_PATH}:${jni_arpack.path}"/>
+            <assertions>
+                <enable/>
+            </assertions>
+            <classpath refid="test.classpath"/>
+
+            <batchtest haltonfailure="no" haltonerror="no" todir="${test-results}"
+                       failureproperty="test-failure" errorproperty="test-error">
+                <formatter type="plain" usefile="false"/>
+                <formatter type="xml"/>
+                <fileset dir="${test-src}">
+                    <include name="**/Test*.java"/>
+                    <include name="**/*Test.java"/>
+                </fileset>
+            </batchtest>
+        </junit>
+        <junitreport todir="${logs}">
+            <fileset dir="${test-results}">
+                <include name="TEST-*.xml"/>
+            </fileset>
+            <report format="frames" todir="${test-results}/html/junit"/>
+        </junitreport>
+        <condition property="tests-failed">
+            <or>
+                <isset property="test-error"/>
+                <isset property="test-failure"/>
+            </or>
+        </condition>
+        <fail message="One or more of the tests failed" if="tests-failed"/>
+    </target>
+
     <target name="cruisecontrol"
             depends="clean, cobertura-setup, jar, test, javadoc, pmd, findbugs, cobertura-report"
             description="Run CruiseControl Build and Tests"/>
