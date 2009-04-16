@@ -43,7 +43,6 @@ import edu.mssm.crover.tables.readers.WhiteheadResReader;
 import edu.mssm.crover.tables.treatments.AggregateClusters;
 import edu.mssm.crover.tables.writers.LibSVMWriter;
 import edu.mssm.crover.tables.writers.SVMLightWriter;
-import edu.mssm.crover.tools.CommandNotInstalled;
 import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
 import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectList;
@@ -699,10 +698,8 @@ public class MicroarrayTrainEvaluate {
         svm.setTimeout(timeout);
         try {
             measure = svm.run(svmTrainingSetFileName);
-
-
-        } catch (CommandNotInstalled commandNotInstalled) {
-            System.out.println("\nsvmlight does not seem to be installed properly." + commandNotInstalled);
+        } catch (IllegalStateException e) {
+            System.out.println("\nsvmlight does not seem to be installed properly." + e);
             System.exit(1);
         } catch (InterruptedException e) {
             System.out.println("\nsvmlight was interupted abnormally." + e);
