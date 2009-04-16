@@ -104,7 +104,7 @@
         <if>
             <istrue value="${use-bdval-jar}"/>
             <then>
-                <ant antfile="${bdval.basedir}/../build.xml" target="bdval-jar" inheritall="false"/>
+                <ant antfile="${bdval.basedir}/../build.xml" target="jar-bdval" inheritall="false"/>
             </then>
             <else>
                 <antcall target="compile"/>

@@ -3,7 +3,8 @@
     <import file="buildsupport/build.xml"/>
 
     <property name="jarfile" value="bdval.jar"/>
-    <property name="jarfile-bmf-calibration-models" value="bmf-calibration.jar"/>
+    <property name="bmf-calibration-models-jarfile" value="bmf-calibration.jar"/>
+    <property name="compound-file-tool-jarfile" value="compound-file-tool.jar"/>
 
     <!-- compiler and javadoc settings -->
     <property name="debug" value="on"/>
@@ -11,6 +12,9 @@
     <property name="deprecation" value="false"/>
     <property name="ant.build.javac.source" value="1.6"/>
     <property name="ant.build.javac.target" value="1.6"/>
+
+    <!-- the label gets overridden by CruiseControl and/or during a release -->
+    <property name="label" value="development"/>
 
     <!-- this property controls the output of the internal log4j configuration initialization -->
     <property name="log4j.debug" value="true"/>
@@ -49,8 +53,9 @@
         </javac>
     </target>
 
-    <property name="label" value="BDVal"/>
-    <target name="jar" depends="compile">
+    <target name="jar" depends="jar-bdval, jar-bmf-calibration, jar-compound-file-tool" description="Create project jar files"/>
+
+    <target name="jar-bdval" depends="compile" description="Create bdval.jar">
         <copy file="${config}/log4j.properties.sample" tofile="${classes}/log4j.properties"
               overwrite="true" failonerror="false"/>
         <copy file="${config}/RConnectionPool.xml.sample" tofile="${classes}/RConnectionPool.xml"
@@ -104,24 +109,20 @@
         <delete file="${classes}/log4j.properties" failonerror="false"/>
     </target>
 
-    <target name="jar-bmf-calibration" depends="clean,compile"
+    <target name="jar-bmf-calibration" depends="compile"
             description="Jar BMF calibration models (not open source, all rights reserved).">
-        <jar jarfile="${jarfile-bmf-calibration-models}" basedir="${classes}">
+        <jar jarfile="${bmf-calibration-models-jarfile}" basedir="${classes}">
             <manifest>
                 <attribute name="Implementation-Title" value="BMF calibration model plugin"/>
                 <attribute name="Specification-Vendor"
                            value="Institute for Computational Biomedicine (ICB), Weill Medical College of Cornell University"/>
-                <attribute name="Implementation-Version" value="BMF calibration model plugin ${buildstamp}"/>
+                <attribute name="Implementation-Version" value="${label} ${buildstamp}"/>
                 <attribute name="Implementation-Vendor"
                            value="Institute for Computational Biomedicine (ICB), Weill Medical College of Cornell University"/>
                 <attribute name="Built-By" value="${user.name}"/>
             </manifest>
-
             <include name="org/bdval/modelselection/bmf/*"/>
-
-
         </jar>
-        <delete file="${classes}/log4j.properties" failonerror="false"/>
     </target>
 
     <target name="javadoc" description="Run Javadoc on all source code files">
@@ -155,6 +156,8 @@
     <target name="clean" depends="buildsupport.clean, testsupport.clean" description="Cleans up the directory">
         <delete dir="${javadocs}"/>
         <delete file="${jarfile}"/>
+        <delete file="${bmf-calibration-models-jarfile}"/>
+        <delete file="${compound-file-tool-jarfile}"/>
     </target>
 
     <target name="test" depends="compile-tests, cobertura-instrument" description="Run JUnit Tests">
@@ -214,7 +217,33 @@
     </target>
 
     <target name="cruisecontrol"
-            depends="clean, cobertura-setup, jar, test, javadoc, pmd, findbugs, cobertura-report"
+            depends="clean, cobertura-setup, jar, jar-compound-file-tool, test, javadoc, pmd, findbugs, cobertura-report"
             description="Run CruiseControl Build and Tests"/>
+
+    <target name="jar-compound-file-tool" description="creates compound-file-tool.jar" depends="compile">
+        <copy file="${config}/log4j.properties.sample" tofile="${classes}/log4j.properties"
+              overwrite="true" failonerror="false"/>
+        <jar jarfile="${compound-file-tool-jarfile}">
+            <fileset dir="${classes}">
+                <include name="org/bdval/io/compound/**.class"/>
+            </fileset>
+            <zipgroupfileset dir="${lib}">
+                <include name="log4j-1.2.15.jar"/>
+                <include name="commons-logging-1.1.1.jar"/>
+                <include name="JSAP-2.1.jar"/>
+            </zipgroupfileset>
+            <manifest>
+                <attribute name="Specification-Title" value="BDVal CompoundFileTool"/>
+                <attribute name="Specification-Vendor"
+                           value="Institute for Computational Biomedicine (ICB), Weill Medical College of Cornell University"/>
+                <attribute name="Implementation-Version" value="${label} (${buildstamp})"/>
+                <attribute name="Implementation-Vendor"
+                           value="Institute for Computational Biomedicine (ICB), Weill Medical College of Cornell University"/>
+                <attribute name="Main-Class" value="org.bdval.io.compound.CompoundFileTool"/>
+                <attribute name="Built-By" value="${user.name}"/>
+            </manifest>
+        </jar>
+        <delete file="${classes}/log4j.properties" failonerror="false"/>
+    </target>
 </project>
 
