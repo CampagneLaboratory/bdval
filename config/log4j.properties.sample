@@ -34,4 +34,4 @@ log4j.appender.generatemodels.Append=true
 log4j.appender.generatemodels.layout=org.apache.log4j.PatternLayout
 log4j.appender.generatemodels.layout.ConversionPattern=%-5p %-20c{1} - %m%n
 
-log4j.logger.edu.cornell.med.icb.biomarkers.GenerateFinalModels=INFO, generatemodels, console
+log4j.logger.org.bdval.GenerateFinalModels=INFO, generatemodels, console

@@ -55,7 +55,6 @@
               overwrite="true" failonerror="false"/>
         <copy file="${config}/RConnectionPool.xml.sample" tofile="${classes}/RConnectionPool.xml"
               overwrite="true" failonerror="false"/>
-        <replace file="${classes}/log4j.properties" summary="true" token="tissueinfo.log" value="bdval.log"/>
         <jar jarfile="${jarfile}" basedir="${classes}">
             <manifest>
                 <attribute name="Main-Class" value="org.bdval.DiscoverAndValidate"/>
