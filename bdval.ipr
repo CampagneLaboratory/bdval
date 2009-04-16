@@ -392,6 +392,17 @@
       <SOURCES />
       <jarDirectory url="file://$PROJECT_DIR$/lib/Rserve" recursive="false" />
     </library>
+    <library name="SVD">
+      <CLASSES>
+        <root url="file://$PROJECT_DIR$/lib/tct" />
+        <root url="file://$PROJECT_DIR$/lib/jlapack" />
+        <root url="jar://$PROJECT_DIR$/lib/mtj.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+      <jarDirectory url="file://$PROJECT_DIR$/lib/jlapack" recursive="false" />
+      <jarDirectory url="file://$PROJECT_DIR$/lib/tct" recursive="false" />
+    </library>
   </component>
 </project>
 
