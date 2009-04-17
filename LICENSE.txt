@@ -1,10 +1,11 @@
-BDVal is distributed under the GPL3 open-source license to help scientists freely inspect and extend the source code
-of the project.
+BDVal is distributed under the GNU General Public License (GPL) 3
+open-source license to help scientists freely inspect and extend the
+source code of the project.
 
-Source code distributed in the src/org/bdval/modelselection/bmf is not part of BDVal and is not distributed under an
-open-source license. This source files have a different header, which indicate that all rights to the software are
-reserved by the Weill Medical College of Cornell University (http://weill.cornell.edu).
-Source code in this package is not distributed with BDVal sources. Please email fac2003@med.cornell.edu for licensing
-information.
-
-
+Source code distributed in the src/org/bdval/modelselection/bmf is not part
+of BDVal and is not distributed under an open-source license. This source
+files have a different header, which indicate that all rights to the
+software are reserved by the Weill Medical College of Cornell University
+(http://weill.cornell.edu).  Source code in this package is not
+distributed with BDVal sources. Please email fac2003@med.cornell.edu
+for licensing information.
