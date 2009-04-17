@@ -105,6 +105,7 @@
         <zip destfile="${datafile}" comment="BDVal version: ${tag}">
         	<fileset dir="${exportdir}">
         		<include name="${tag}/data/**"/>
+                <exclude name="${tag}/data/*confidential*"/>
         	</fileset>
         </zip>
 	</target>
