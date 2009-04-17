@@ -28,18 +28,11 @@ import com.martiansoftware.jsap.Parameter;
 import com.martiansoftware.jsap.Switch;
 import edu.cornell.med.icb.R.RConnectionPool;
 import edu.cornell.med.icb.R.RUtils;
-import org.bdval.cache.TableCache;
-import org.bdval.pathways.AverageAcrossPathwayFeatureAggregator;
-import org.bdval.pathways.PCAFeatureAggregator;
-import org.bdval.pathways.PathwayFeatureAggregator;
-import org.bdval.pathways.PathwayInfo;
 import edu.cornell.med.icb.cli.UseModality;
 import edu.cornell.med.icb.geo.AffymetrixSampleData;
 import edu.cornell.med.icb.geo.DefaultSignalAdapter;
 import edu.cornell.med.icb.geo.GEOPlatformIndexed;
 import edu.cornell.med.icb.geo.GeoSoftFamilyParser;
-import edu.cornell.med.icb.identifier.IndexedIdentifier;
-import edu.cornell.med.icb.identifier.DoubleIndexedIdentifier;
 import edu.cornell.med.icb.geo.SampleDataCallback;
 import edu.cornell.med.icb.geo.tools.ClassificationTask;
 import edu.cornell.med.icb.geo.tools.ConditionIdentifiers;
@@ -49,6 +42,8 @@ import edu.cornell.med.icb.geo.tools.FullGeneList;
 import edu.cornell.med.icb.geo.tools.GEOPlatform;
 import edu.cornell.med.icb.geo.tools.GeneList;
 import edu.cornell.med.icb.geo.tools.MicroarrayTrainEvaluate;
+import edu.cornell.med.icb.identifier.DoubleIndexedIdentifier;
+import edu.cornell.med.icb.identifier.IndexedIdentifier;
 import edu.cornell.med.icb.learning.ClassificationHelper;
 import edu.cornell.med.icb.learning.ClassificationProblem;
 import edu.cornell.med.icb.learning.Classifier;
@@ -99,6 +94,11 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.SystemUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.bdval.cache.TableCache;
+import org.bdval.pathways.AverageAcrossPathwayFeatureAggregator;
+import org.bdval.pathways.PCAFeatureAggregator;
+import org.bdval.pathways.PathwayFeatureAggregator;
+import org.bdval.pathways.PathwayInfo;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -121,8 +121,7 @@ import java.util.zip.GZIPInputStream;
  * Main class used to define and process modes for
  * {@link org.bdval.DiscoverAndValidate}.
  * New modes should override this class.  See the
- * <a href="http://icb.med.cornell.edu/wiki/index.php/BDVAL">BDVal Wiki</a>
- * for more details.
+ * <a href="http://bdval.org">BDVal</a> page for more details.
  *
  * @author Fabien Campagne Date: Oct 19, 2007 Time: 2:14:46 PM
  */

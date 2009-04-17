@@ -8,4 +8,4 @@ training.classifier.parameters = probability=false,
 scaling.use.percentiles = false
 scaling.enabled = true
 feature-normalization.enabled = false
-scaling.implementation.classname = edu.cornell.med.icb.tools.geo.MinMaxScalingRowProcessor
+scaling.implementation.classname = edu.cornell.med.icb.learning.MinMaxScalingRowProcessor
