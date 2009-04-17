@@ -25,6 +25,7 @@ import org.bdval.modelselection.ModelSelectionArguments;
  */
 public class TrainedOnABCDEGJKZ extends BMFCalibrationModel {
 
+    @Override
     public double calibrateEstimate(final ModelSelectionArguments toolsArgs, final String modelId,
 
                                     final Object2DoubleMap modelAttributes) {

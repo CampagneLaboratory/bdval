@@ -4,7 +4,7 @@
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
+ *  the Free Software Foundation; either version 3 of the License, or
  *  (at your option) any later version.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -12,21 +12,19 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License along
- *  with this program; if not, write to the Free Software Foundation, Inc.,
- *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.bdval;
 
 import cern.jet.random.engine.MersenneTwister;
 import cern.jet.random.engine.RandomEngine;
-import org.bdval.pathways.PathwayInfo;
-import edu.cornell.med.icb.identifier.DoubleIndexedIdentifier;
 import edu.cornell.med.icb.geo.GEOPlatformIndexed;
 import edu.cornell.med.icb.geo.tools.ClassificationTask;
 import edu.cornell.med.icb.geo.tools.GEOPlatform;
 import edu.cornell.med.icb.geo.tools.GeneList;
+import edu.cornell.med.icb.identifier.DoubleIndexedIdentifier;
 import edu.cornell.med.icb.learning.FeatureScaler;
 import edu.mssm.crover.tables.Table;
 import it.unimi.dsi.fastutil.objects.Object2DoubleLinkedOpenHashMap;
@@ -34,6 +32,7 @@ import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
 import it.unimi.dsi.fastutil.objects.ObjectSet;
 import it.unimi.dsi.lang.MutableString;
 import org.apache.commons.lang.StringUtils;
+import org.bdval.pathways.PathwayInfo;
 
 import java.io.PrintWriter;
 import java.util.Vector;

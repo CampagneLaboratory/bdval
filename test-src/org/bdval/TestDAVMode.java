@@ -4,7 +4,7 @@
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
+ *  the Free Software Foundation; either version 3 of the License, or
  *  (at your option) any later version.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -12,9 +12,8 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License along
- *  with this program; if not, write to the Free Software Foundation, Inc.,
- *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.bdval;
@@ -22,7 +21,6 @@ package org.bdval;
 import com.martiansoftware.jsap.JSAP;
 import com.martiansoftware.jsap.JSAPException;
 import com.martiansoftware.jsap.JSAPResult;
-import org.bdval.cache.TableCache;
 import edu.cornell.med.icb.geo.tools.FullGeneList;
 import edu.mssm.crover.tables.ColumnTypeException;
 import edu.mssm.crover.tables.InvalidColumnException;
@@ -32,6 +30,7 @@ import edu.mssm.crover.tables.readers.SyntaxErrorException;
 import edu.mssm.crover.tables.readers.UnsupportedFormatException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.SystemUtils;
+import org.bdval.cache.TableCache;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
