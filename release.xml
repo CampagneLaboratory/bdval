@@ -151,7 +151,7 @@
         <concat destfile="${exportdir}/${tag}/data/bdval.properties" append="true" fixlastline="true">nocompile=true</concat>
 
         <!-- dataset configuration for the prostate example -->
-        <copy file="${exportdir}/${tag}/data/templates/bdval/bdval-template-local.properties" tofile="${exportdir}/${tag}/config/prostate-example-local.properties">
+        <copy file="${exportdir}/${tag}/data/templates/bdval-template-local.properties" tofile="${exportdir}/${tag}/config/prostate-example-local.properties">
             <filterset begintoken="&lt;" endtoken="&gt;">
                 <filter token="dataset-root" value="bdval/GSE8402"/>
                 <filter token="bdval" value="prostate example"/>
@@ -159,7 +159,7 @@
         </copy>
 
         <!-- dataset configuration for the synthetic example -->
-        <copy file="${exportdir}/${tag}/data/templates/bdval/bdval-template-local.properties" tofile="${exportdir}/${tag}/config/synthetic-local.properties">
+        <copy file="${exportdir}/${tag}/data/templates/bdval-template-local.properties" tofile="${exportdir}/${tag}/config/synthetic-local.properties">
             <filterset begintoken="&lt;" endtoken="&gt;">
                 <filter token="dataset-root" value="synthetic"/>
                 <filter token="bdval" value="synthetic"/>
@@ -179,6 +179,7 @@
                 <include name="${tag}/README-BDVal.txt"/>
                 <include name="${tag}/data/bdval/**"/>
                 <include name="${tag}/data/sequences/**"/>
+                <include name="${tag}/data/templates/**"/>
                 <include name="${tag}/data/bdval.*"/>
                 <include name="${tag}/data/gene-lists/**"/>
                 <include name="${tag}/data/prostate-example.*"/>
@@ -190,7 +191,6 @@
                 <include name="${tag}/config/synthetic-local.properties"/>
                 <include name="${tag}/config/RConnectionPool.xml"/>
             </fileset>
-            <zipfileset dir="${exportdir}/${tag}/data/templates/bdval" prefix="${tag}/data/templates"/>
         </zip>
     </target>
 </project>
