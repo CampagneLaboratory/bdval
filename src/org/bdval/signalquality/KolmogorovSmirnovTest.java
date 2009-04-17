@@ -35,6 +35,9 @@ public class KolmogorovSmirnovTest {
      */
     private static final Log LOG = LogFactory.getLog(KolmogorovSmirnovTest.class);
 
+    private KolmogorovSmirnovTest() {
+    }
+
     /**
      * Calculates Kolmogorov-Smirnov for the given doubles[]'s xA and xB.
      * @param x the first double[]

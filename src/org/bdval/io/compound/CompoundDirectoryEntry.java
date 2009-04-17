@@ -111,6 +111,7 @@ public class CompoundDirectoryEntry {
      * String representation of this object.
      * @return String representation of this object
      */
+    @Override
     public String toString() {
         return String.format("Name:%s, startPosition=%d, dataPosition=%d, fileSize=%d",
                 name, startPosition, dataPosition, fileSize);

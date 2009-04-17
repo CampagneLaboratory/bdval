@@ -155,7 +155,7 @@ public class CombineDataMode extends DAVMode {
             variables = result.getStringArray("select");
             //TODO: include all thevaraibles
         } else {
-            ;//TODO: include variables
+            //TODO: include variables
         }
 
 

@@ -218,7 +218,7 @@ public class ClassificationTask {
      * @return the condition names.
      */
     public String[] getConditionNames() {
-        int length = getNumberOfConditions();
+        final int length = getNumberOfConditions();
         final String[] names = new String[length];
         for (int i = 0; i < length; i++) {
             names[i] = getConditionName(i);

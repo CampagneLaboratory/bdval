@@ -69,11 +69,11 @@ public class TranscriptProbesetRelationship extends GeneTranscriptRelationships 
     }
 
     public int getTranscriptNumber() {
-        return super.geneId2Index.size();
+        return geneId2Index.size();
     }
 
     public IndexedIdentifier getTranscripts() {
-        return super.geneId2Index;
+        return geneId2Index;
     }
 
 }

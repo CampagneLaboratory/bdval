@@ -105,7 +105,7 @@ public class SimpleSignalQualityCalculator extends BaseSignalQualityCalculator {
                 for (int classIndex = 0; classIndex < allClasses.length; classIndex++) {
                     final String classId = allClasses[classIndex];
                     final String classIdAppend = "["
-                            + BaseSignalQualityCalculator.CLASS_TRANSLATION[classIndex] + "]";
+                            + CLASS_TRANSLATION[classIndex] + "]";
                     trainingData = classToDataMapMap.get(classId + "-training").get(featureId);
                     if (trainingData == null) {
                         trainingData = ArrayUtils.EMPTY_DOUBLE_ARRAY;

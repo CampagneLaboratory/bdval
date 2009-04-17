@@ -40,6 +40,9 @@ import java.io.PrintWriter;
 public class MpssMegablast {
     static final GeneTranscriptRelationships gene2TranscriptRelationships = new GeneTranscriptRelationships();
 
+    private MpssMegablast() {
+    }
+
     public static void main(final String[] args) throws IOException {
         final String inputFilename = args[0];
         final String geneTranscriptFilename = args[1];

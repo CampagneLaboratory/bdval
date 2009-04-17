@@ -87,7 +87,7 @@ public class DiscoverWithSvmWeightsIterative extends DiscoverWithSvmWeights {
 
     @Override
     public void process(final DAVOptions options) {
-        super.process(options, false);
+        process(options, false);
         int reducedNumProbeset;
         for (final ClassificationTask task : options.classificationTasks) {
             for (GeneList geneList : options.geneLists) {

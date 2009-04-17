@@ -501,20 +501,20 @@ public class CandidateModelSelectionAllTeams implements WithProcessMethod {
             (
                     final arguments toolsArgs) {
         cvNormFactorPerfs = new Object2ObjectOpenHashMap<String, Map<String, ZScoreCalculator>>();
-        for (final CandidateModelSelectionAllTeams.ModelPerformance cvPerf : allCvResults.values()) {
+        for (final ModelPerformance cvPerf : allCvResults.values()) {
             pushValue(cvNormFactorPerfs, cvPerf);
         }
         calculateStats(cvNormFactorPerfs);
         if (cvcfResults != null) {
             cvcfNormFactorPerfs = new Object2ObjectOpenHashMap<String, Map<String, ZScoreCalculator>>();
-            for (final CandidateModelSelectionAllTeams.ModelPerformance cvcfPerf : cvcfResults.values()) {
+            for (final ModelPerformance cvcfPerf : cvcfResults.values()) {
                 pushValue(cvcfNormFactorPerfs, cvcfPerf);
             }
             calculateStats(cvcfNormFactorPerfs);
         }
         testNormFactorPerfs = new Object2ObjectOpenHashMap<String, Map<String, ZScoreCalculator>>();
         if (testResults != null) {
-            for (final CandidateModelSelectionAllTeams.ModelPerformance testPerf : allTestResults.values()) {
+            for (final ModelPerformance testPerf : allTestResults.values()) {
                 pushValue(testNormFactorPerfs, testPerf);
             }
             calculateStats(testNormFactorPerfs);
@@ -596,8 +596,8 @@ public class CandidateModelSelectionAllTeams implements WithProcessMethod {
                                         getModelConditionHeaders(toolsArgs.modelConditions, modelConditionColumnNames) + "\n"
                         ));
                 for (final String modelId : modelIds) {
-                    final CandidateModelSelectionAllTeams.ModelPerformance cvPerf = this.cvResults.get(modelId);
-                    final CandidateModelSelectionAllTeams.ModelPerformance cvcfPerf = this.cvcfResults.get(modelId);
+                    final ModelPerformance cvPerf = this.cvResults.get(modelId);
+                    final ModelPerformance cvcfPerf = this.cvcfResults.get(modelId);
                     final String datasetName = cvPerf == null ? "unknown" : cvPerf.dataset;
                     final String endpointCode = cvPerf == null ? "unknown" : cvPerf.endpoint;
                     int numActualFeatures = cvPerf == null ? 0 : cvPerf.actualNumberOfFeaturesInModel;
@@ -885,11 +885,11 @@ public class CandidateModelSelectionAllTeams implements WithProcessMethod {
             (
                     final ObjectList<String> randomModelPicks,
                     final int upToRank,
-                    final CandidateModelSelectionAllTeams.arguments toolsArgs) {
+                    final arguments toolsArgs) {
         double value = 0;
         for (int rank = 0; rank < upToRank; rank++) {
             final String modelId = randomModelPicks.get(rank);
-            final CandidateModelSelectionAllTeams.ModelPerformance testPerf = testResults.get(modelId);
+            final ModelPerformance testPerf = testResults.get(modelId);
             assert testPerf != null : "performance in test set must exist for model id: " + modelId;
 
             final double rewardPerformance = getRewardPerformanceMeasure(toolsArgs, testPerf);
@@ -1109,7 +1109,7 @@ public class CandidateModelSelectionAllTeams implements WithProcessMethod {
             final ModelPerformance cvPerf = cvResults.get(modelId);
             final Map<String, ZScoreCalculator> calculators = cvNormFactorPerfs.get(cvPerf.endpoint);
             final ModelPerformance maxPerf = calculateNormalizationFactor(calculators);
-            final CandidateModelSelectionAllTeams.ModelPerformance testPerf = testResults != null ? testResults.get(modelId) : null;
+            final ModelPerformance testPerf = testResults != null ? testResults.get(modelId) : null;
             //       "RANK\torganizationCode\tdataset\tendpoint\tmodelId\trankStrategy\tIfRankByModel:ModelName\trankBy\treward\trank\tScoreUsedForRanking\tAUC_CV\tnormAUC_CV\tnormMCC_CV\ttestAUC\ttestMCC\tCandidateModel\tTop5Candidate"));
 
             toolsArgs.rankOutput.println(String.format("RANK\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%s\t%s",
@@ -1170,9 +1170,9 @@ public class CandidateModelSelectionAllTeams implements WithProcessMethod {
         dequeue(queue, rankedList);
     }
 
-    public double getPerformanceByChosenStrategy(final CandidateModelSelectionAllTeams.arguments toolsArgs,
-                                                 final CandidateModelSelectionAllTeams.ModelPerformance cvPerf,
-                                                 final CandidateModelSelectionAllTeams.ModelPerformance cvcfPerf) {
+    public double getPerformanceByChosenStrategy(final arguments toolsArgs,
+                                                 final ModelPerformance cvPerf,
+                                                 final ModelPerformance cvcfPerf) {
 
         final double score = Double.NaN;
         switch (toolsArgs.rankStrategy) {

@@ -45,7 +45,7 @@ public class CompoundFileTool {
     private String[] filenames;
 
     public static void main(final String[] args) throws Exception {
-        CompoundFileTool tool = new CompoundFileTool();
+        final CompoundFileTool tool = new CompoundFileTool();
         tool.run(args);
     }
 
@@ -92,9 +92,9 @@ public class CompoundFileTool {
         return jsap;
     }
 
-    private void run(final String args[]) throws JSAPException, IOException {
-        JSAP jsap = configureJsap();
-        JSAPResult config = jsap.parse(args);
+    private void run(final String[] args) throws JSAPException, IOException {
+        final JSAP jsap = configureJsap();
+        final JSAPResult config = jsap.parse(args);
         if (!config.success()) {
             helpMode(jsap, config);
             System.exit(1);
@@ -106,14 +106,14 @@ public class CompoundFileTool {
         System.out.println("Compound file: " + compoundFilename);
         System.out.print("Filenames: (");
         int i = 0;
-        for (String filename : filenames) {
+        for (final String filename : filenames) {
             if (i++ > 0) {
                 System.out.print(",");
             }
             System.out.print(filename);
         }
         System.out.println(")");
-        PROGRAM_MODE mode = programMode(config);
+        final PROGRAM_MODE mode = programMode(config);
 
         if (mode == PROGRAM_MODE.HELP) {
             helpMode(jsap, config);
@@ -127,7 +127,7 @@ public class CompoundFileTool {
         }
     }
 
-    private PROGRAM_MODE programMode(JSAPResult config) {
+    private PROGRAM_MODE programMode(final JSAPResult config) {
         if (config.getBoolean("help")) {
             return PROGRAM_MODE.HELP;
         } else if (config.getBoolean("list")) {
@@ -141,7 +141,7 @@ public class CompoundFileTool {
         }
     }
 
-    private void helpMode(final JSAP jsap, JSAPResult config) {
+    private void helpMode(final JSAP jsap, final JSAPResult config) {
         System.err.println();
 
         if (config != null) {
@@ -167,9 +167,9 @@ public class CompoundFileTool {
                 return;
             }
 
-            Collection<CompoundDirectoryEntry> files = compoundFileReader.getDirectory();
+            final Collection<CompoundDirectoryEntry> files = compoundFileReader.getDirectory();
             System.out.println("Directory of compound file");
-            for (CompoundDirectoryEntry file : files) {
+            for (final CompoundDirectoryEntry file : files) {
                 System.out.println(file.getName() + "\t\t" + file.getFileSize());
             }
         } finally {

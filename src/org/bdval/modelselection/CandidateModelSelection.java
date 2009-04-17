@@ -389,18 +389,18 @@ public class CandidateModelSelection implements WithProcessMethod {
 
     private void computeNormalizationFactors() {
         cvNormFactorPerfs = new Object2ObjectOpenHashMap<String, Map<String, ZScoreCalculator>>();
-        for (final CandidateModelSelection.ModelPerformance cvPerf : cvResults.values()) {
+        for (final ModelPerformance cvPerf : cvResults.values()) {
             pushValue(cvNormFactorPerfs, cvPerf);
         }
         calculateStats(cvNormFactorPerfs);
         cvcfNormFactorPerfs = new Object2ObjectOpenHashMap<String, Map<String, ZScoreCalculator>>();
-        for (final CandidateModelSelection.ModelPerformance cvcfPerf : cvcfResults.values()) {
+        for (final ModelPerformance cvcfPerf : cvcfResults.values()) {
             pushValue(cvcfNormFactorPerfs, cvcfPerf);
         }
         calculateStats(cvcfNormFactorPerfs);
         testNormFactorPerfs = new Object2ObjectOpenHashMap<String, Map<String, ZScoreCalculator>>();
         if (testResults != null) {
-            for (final CandidateModelSelection.ModelPerformance testPerf : testResults.values()) {
+            for (final ModelPerformance testPerf : testResults.values()) {
                 pushValue(testNormFactorPerfs, testPerf);
             }
             calculateStats(testNormFactorPerfs);
@@ -480,8 +480,8 @@ public class CandidateModelSelection implements WithProcessMethod {
                                         getModelConditionHeaders(toolsArgs.modelConditions, modelConditionColumnNames) + "\n"
                         ));
                 for (final String modelId : modelIds) {
-                    final CandidateModelSelection.ModelPerformance cvPerf = this.cvResults.get(modelId);
-                    final CandidateModelSelection.ModelPerformance cvcfPerf = this.cvcfResults.get(modelId);
+                    final ModelPerformance cvPerf = this.cvResults.get(modelId);
+                    final ModelPerformance cvcfPerf = this.cvcfResults.get(modelId);
                     final String datasetName = cvPerf == null ? "unknown" : cvPerf.dataset;
                     final String endpointCode = cvPerf == null ? "unknown" : cvPerf.endpoint;
                     int numActualFeatures = cvPerf == null ? 0 : cvPerf.actualNumberOfFeaturesInModel;
@@ -841,8 +841,8 @@ public class CandidateModelSelection implements WithProcessMethod {
             final String randomModelIdAtRank = randomModelPicks.get(rank);
             final String actualModelIdAtRank = actualModelList.get(rank);
 
-            final CandidateModelSelection.ModelPerformance randomPerf = testResults.get(randomModelIdAtRank);
-            final CandidateModelSelection.ModelPerformance actualPerf = testResults.get(actualModelIdAtRank);
+            final ModelPerformance randomPerf = testResults.get(randomModelIdAtRank);
+            final ModelPerformance actualPerf = testResults.get(actualModelIdAtRank);
             if (actualPerf != null) {
                 {
                     if (randomPerf == null) {
@@ -868,7 +868,7 @@ public class CandidateModelSelection implements WithProcessMethod {
         double value = 0;
         for (int rank = 0; rank < upToRank; rank++) {
             final String modelId = randomModelPicks.get(rank);
-            final CandidateModelSelection.ModelPerformance testPerf = testResults.get(modelId);
+            final ModelPerformance testPerf = testResults.get(modelId);
             assert testPerf != null : "performance in test set must exist for model id: " + modelId;
 
             final double rewardPerformance = getRewardPerformanceMeasure(toolsArgs, testPerf);
@@ -1062,7 +1062,7 @@ public class CandidateModelSelection implements WithProcessMethod {
             final ModelPerformance cvPerf = cvResults.get(modelId);
             final Map<String, ZScoreCalculator> calculators = cvNormFactorPerfs.get(cvPerf.endpoint);
             final ModelPerformance maxPerf = calculateNormalizationFactor(calculators);
-            final CandidateModelSelection.ModelPerformance testPerf = testResults != null ? testResults.get(modelId) : null;
+            final ModelPerformance testPerf = testResults != null ? testResults.get(modelId) : null;
 
             toolsArgs.rankOutput.println(String.format("RANK\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%s\t%s",
                     toolsArgs.datasetName,
@@ -1120,8 +1120,8 @@ public class CandidateModelSelection implements WithProcessMethod {
         dequeue(queue, rankedList);
     }
 
-    public double getPerformanceByChosenStrategy(final ModelSelectionArguments toolsArgs, final CandidateModelSelection.ModelPerformance cvPerf,
-                                                 final CandidateModelSelection.ModelPerformance cvcfPerf) {
+    public double getPerformanceByChosenStrategy(final ModelSelectionArguments toolsArgs, final ModelPerformance cvPerf,
+                                                 final ModelPerformance cvcfPerf) {
 
         final double score = Double.NaN;
         switch (toolsArgs.rankStrategy) {
@@ -1152,8 +1152,8 @@ public class CandidateModelSelection implements WithProcessMethod {
 // model trained on Hamner endpoint A:
 
         double predictedPerformance = Double.NaN;
-        BMFCalibrationModel bmfModel = BMFCalibrationModel.load(toolsArgs.modelNameString);
-        Object2DoubleMap<String> map=new Object2DoubleOpenHashMap<String>();
+        final BMFCalibrationModel bmfModel = BMFCalibrationModel.load(toolsArgs.modelNameString);
+        final Object2DoubleMap<String> map=new Object2DoubleOpenHashMap<String>();
         map.put("actualNumberOfFeaturesInModel",cvPerf.actualNumberOfFeaturesInModel);
         map.put("norm_auc",norm_AUC_CV);
         map.put("delta_auc_cvcf_cv",delta_AUC_CVCF_CV);

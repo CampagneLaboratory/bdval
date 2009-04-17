@@ -60,7 +60,7 @@ public class ConditionIdentifiers {
      * @return the condition or null if the identifier wasn't found
      */
     public String conditionForIdentifier(final String identifier) {
-        for (Map.Entry<String, Set<String>> entry : conditionToIdentifiers.entrySet()) {
+        for (final Map.Entry<String, Set<String>> entry : conditionToIdentifiers.entrySet()) {
             if (entry.getValue().contains(identifier.intern())) {
                 return entry.getKey();
             }
