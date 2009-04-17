@@ -99,10 +99,8 @@
                 <include name="pj20071021.jar"/>
                 <include name="tisim-api.jar"/>
                 <include name="weka-3.5.6.jar"/>
+                <include name="ant/*.jar"/>
                 <include name="Rserve/*.jar"/>
-                <!--
-                                <include name="jsc.jar"/>
-                -->
             </zipgroupfileset>
         </jar>
         <delete file="${classes}/log4j.properties" failonerror="false"/>
