@@ -1,31 +1,33 @@
 /*
+ * Copyright (C) 2009 Institute for Computational Biomedicine,
+ *                    Weill Medical College of Cornell University
+ *                    All rights reserved.
  *
- * Copyright (C) 2003-2009 Institute for Computational Biomedicine,
- *                         Weill Medical College of Cornell University
- *
- * All rights reserved.
+ * WEILL MEDICAL COLLEGE OF CORNELL UNIVERSITY MAKES NO REPRESENTATIONS
+ * ABOUT THE SUITABILITY OF THIS SOFTWARE FOR ANY PURPOSE. IT IS PROVIDED
+ * "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY. THE WEILL MEDICAL COLLEGE
+ * OF CORNELL UNIVERSITY SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY
+ * THE USERS OF THIS SOFTWARE.
  */
 
 package org.bdval.modelselection.bmf;
 
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
 import org.bdval.modelselection.BMFCalibrationModel;
-import org.bdval.modelselection.CandidateModelSelection;
 import org.bdval.modelselection.ModelSelectionArguments;
 
-
 /**
- * Model trained with MAQC-II endpoints ABCDEGJKZ
+ * Model trained with MAQC-II endpoints ABCDEGJKZ.
  *
- * @author: Fabien Campagne
+ * @author Fabien Campagne
  * Date: Apr 15, 2009
  * Time: 1:50:32 PM
  */
 public class TrainedOnABCDEGJKZ extends BMFCalibrationModel {
 
-    public double calibrateEstimate(ModelSelectionArguments toolsArgs, String modelId,
+    public double calibrateEstimate(final ModelSelectionArguments toolsArgs, final String modelId,
 
-                                    Object2DoubleMap modelAttributes) {
+                                    final Object2DoubleMap modelAttributes) {
         final int actualNumberOfFeaturesInModel = (int) modelAttributes.getDouble("actualNumberOfFeaturesInModel");
 
         final double norm_auc_cv = modelAttributes.getDouble("norm_auc");

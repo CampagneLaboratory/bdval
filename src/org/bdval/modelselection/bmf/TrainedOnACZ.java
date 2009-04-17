@@ -1,9 +1,13 @@
 /*
+ * Copyright (C) 2009 Institute for Computational Biomedicine,
+ *                    Weill Medical College of Cornell University
+ *                    All rights reserved.
  *
- * Copyright (C) 2003-2009 Institute for Computational Biomedicine,
- *                         Weill Medical College of Cornell University
- *
- * All rights reserved.
+ * WEILL MEDICAL COLLEGE OF CORNELL UNIVERSITY MAKES NO REPRESENTATIONS
+ * ABOUT THE SUITABILITY OF THIS SOFTWARE FOR ANY PURPOSE. IT IS PROVIDED
+ * "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY. THE WEILL MEDICAL COLLEGE
+ * OF CORNELL UNIVERSITY SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY
+ * THE USERS OF THIS SOFTWARE.
  */
 
 package org.bdval.modelselection.bmf;
@@ -20,7 +24,7 @@ import org.bdval.modelselection.ModelSelectionArguments;
  *         Time: 2:12:44 PM
  */
 public class TrainedOnACZ extends BMFCalibrationModel {
-    public double calibrateEstimate(ModelSelectionArguments toolsArgs, String modelId, Object2DoubleMap modelAttributes) {
+    public double calibrateEstimate(final ModelSelectionArguments toolsArgs, final String modelId, final Object2DoubleMap modelAttributes) {
         final int actualNumberOfFeaturesInModel = (int) modelAttributes.getDouble("actualNumberOfFeaturesInModel");
 
         final double norm_auc_cv = modelAttributes.getDouble("norm_auc");
