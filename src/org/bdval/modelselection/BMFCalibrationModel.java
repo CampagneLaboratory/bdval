@@ -1,36 +1,30 @@
+/*
+ * Copyright (C) 2009 Institute for Computational Biomedicine,
+ *                    Weill Medical College of Cornell University
+ *                    All rights reserved.
+ *
+ * WEILL MEDICAL COLLEGE OF CORNELL UNIVERSITY MAKES NO REPRESENTATIONS
+ * ABOUT THE SUITABILITY OF THIS SOFTWARE FOR ANY PURPOSE. IT IS PROVIDED
+ * "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY. THE WEILL MEDICAL COLLEGE
+ * OF CORNELL UNIVERSITY SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY
+ * THE USERS OF THIS SOFTWARE.
+ */
+
 package org.bdval.modelselection;
 
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
 import org.apache.commons.io.FilenameUtils;
-/*
- * Copyright (C) 2001-2002 Mount Sinai School of Medicine
- * Copyright (C) 2003-2009 Institute for Computational Biomedicine,
- *                         Weill Medical College of Cornell University
- *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 
 /**
- * @author: Fabien Campagne
+ * @author Fabien Campagne
  * Date: Apr 15, 2009
  * Time: 1:47:46 PM
  */
 public abstract class BMFCalibrationModel {
-    public static BMFCalibrationModel load(String modelName) {
+    public static BMFCalibrationModel load(final String modelName) {
         try {
-            Class clazz = Class.forName("org.bdval.modelselection.bmf." + modelName);
-            BMFCalibrationModel bmf = (BMFCalibrationModel) clazz.newInstance();
+            final Class clazz = Class.forName("org.bdval.modelselection.bmf." + modelName);
+            final BMFCalibrationModel bmf = (BMFCalibrationModel) clazz.newInstance();
             return bmf;
         } catch (ClassNotFoundException e) {
             System.err.println("Cannot load BMF calibration implementation. Class not found.");
@@ -46,15 +40,13 @@ public abstract class BMFCalibrationModel {
         return null;
     }
 
-    public abstract double calibrateEstimate(final ModelSelectionArguments toolsArgs, String modelId,
+    public abstract double calibrateEstimate(final ModelSelectionArguments toolsArgs,
+                                             String modelId,
                                              Object2DoubleMap modelAttributes);
 
-    public double match
-            (final String
-                    variableValue, final Object... values) {
+    public double match(final String variableValue, final Object... values) {
 
         for (int i = 0; i < values.length; i += 2) {
-
             final Object key = values[i];
             final String keyAsString = key.toString();
             if (keyAsString.equals(variableValue)) {

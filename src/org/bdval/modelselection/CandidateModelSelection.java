@@ -2,14 +2,17 @@
  * Copyright (C) 2008-2009 Institute for Computational Biomedicine,
  *                         Weill Medical College of Cornell University
  *                         All rights reserved.
+ *
+ * WEILL MEDICAL COLLEGE OF CORNELL UNIVERSITY MAKES NO REPRESENTATIONS
+ * ABOUT THE SUITABILITY OF THIS SOFTWARE FOR ANY PURPOSE. IT IS PROVIDED
+ * "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY. THE WEILL MEDICAL COLLEGE
+ * OF CORNELL UNIVERSITY SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY
+ * THE USERS OF THIS SOFTWARE.
  */
 
 package org.bdval.modelselection;
 
 import cern.jet.random.engine.MersenneTwister;
-import org.bdval.tools.convert.OptionsSupport;
-import org.bdval.WithProcessMethod;
-import org.bdval.DistributionDifferenceByFeatureMode;
 import edu.cornell.med.icb.identifier.DoubleIndexedIdentifier;
 import edu.cornell.med.icb.identifier.IndexedIdentifier;
 import edu.cornell.med.icb.io.TSVReader;
@@ -17,11 +20,21 @@ import edu.cornell.med.icb.stat.ZScoreCalculator;
 import edu.cornell.med.icb.tissueinfo.similarity.ScoredTranscriptBoundedSizeQueue;
 import edu.cornell.med.icb.tissueinfo.similarity.TranscriptScore;
 import edu.mssm.crover.cli.CLI;
-import it.unimi.dsi.fastutil.objects.*;
+import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
+import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectList;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import it.unimi.dsi.fastutil.objects.ObjectSet;
 import it.unimi.dsi.lang.MutableString;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.LineIterator;
 import org.apache.log4j.Logger;
+import org.bdval.DistributionDifferenceByFeatureMode;
+import org.bdval.WithProcessMethod;
+import org.bdval.tools.convert.OptionsSupport;
 
 import java.io.File;
 import java.io.FileNotFoundException;
