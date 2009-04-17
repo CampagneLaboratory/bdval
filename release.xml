@@ -67,16 +67,6 @@
         <!--<delete dir="${exportdir}"/>-->
     </target>
 
-	<target name="genSrc" depends="export">
-		<!-- create auto generated code files -->
-	    <ant target="genSrc" dir="${exportdir}/${tag}">
-            <property name="classes" location="${exportdir}/${tag}/classes"/>
-            <property name="config" location="${exportdir}/${tag}/config"/>
-            <property name="lib" location="${exportdir}/${tag}/lib"/>
-            <property name="logs" location="${exportdir}/${tag}/logs"/>
-	    </ant>
-	</target>
-
 	<target name="source" depends="export" description="Assemble a source code release">
         <!-- copy configuration files so tests run "out of the box" -->
         <copy file="${exportdir}/${tag}/config/log4j.properties.sample"
@@ -92,11 +82,12 @@
                 <exclude name="${tag}/data/**"/>
                 <exclude name="${tag}/lib/**"/>
                 <exclude name="${tag}/config/*local*"/>
+                <!-- BMF package is NOT GPL - do not include with the distribution -->
+                <exclude name="org/bdval/modelselection/bmf/*"/>
 			</fileset>
             <!-- include enough data to run the unit tests -->
             <fileset dir="${exportdir}">
-                <include name="${tag}/data/test/**"/>
-                <include name="${tag}/data/testing-material/**"/>
+                <include name="${tag}/test-data/**"/>
             </fileset>
        	</zip>
 
@@ -125,9 +116,7 @@
         </zip>
     </target>
 
-    <target name="api" depends="genSrc"/>
-
-	<target name="javadoc" depends="genSrc">
+	<target name="javadoc">
         <!-- run the java docs -->
         <ant target="javadoc" dir="${exportdir}/${tag}">
             <property name="classes" location="${exportdir}/${tag}/classes"/>
