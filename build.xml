@@ -71,7 +71,7 @@
             <fileset dir="${src}">
                 <include name="rscripts/**"/>
             </fileset>
-            <exclude name="org/bdval/modelselection/bmf/*"/>
+            <exclude name="org/bdval/modelselection/bmf/**"/>
             <zipgroupfileset dir="${lib}">
                 <include name="colt.jar"/>
                 <include name="commons-cli-1.2.jar"/>
@@ -118,7 +118,7 @@
                            value="Institute for Computational Biomedicine (ICB), Weill Medical College of Cornell University"/>
                 <attribute name="Built-By" value="${user.name}"/>
             </manifest>
-            <include name="org/bdval/modelselection/bmf/*"/>
+            <include name="org/bdval/modelselection/bmf/**"/>
         </jar>
     </target>
 
