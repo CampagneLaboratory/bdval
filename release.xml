@@ -83,7 +83,8 @@
                 <exclude name="${tag}/lib/**"/>
                 <exclude name="${tag}/config/*local*"/>
                 <!-- BMF package is NOT GPL - do not include with the distribution -->
-                <exclude name="org/bdval/modelselection/bmf/*"/>
+                <exclude name="${tag}/src/org/bdval/modelselection/bmf/**"/>
+                <exclude name="${tag}/test-src/org/bdval/modelselection/bmf/**"/>
 			</fileset>
             <!-- include enough data to run the unit tests -->
             <fileset dir="${exportdir}">
