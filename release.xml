@@ -144,6 +144,7 @@
        	</ant>
         <!-- note: the copy is important, the bdval target will look for it -->
         <copy file="${exportdir}/${tag}/bdval.jar" todir="${releasedir}"/>
+        <move file="${exportdir}/${tag}/bdval-api.jar" todir="${releasedir}"/>
 	</target>
 
     <target name="bdval" description="Create the distribtion for BDVal">
