@@ -86,7 +86,6 @@
                 <include name="edu.mssm.crover.cli.jar"/>
                 <include name="edu.mssm.crover.tables.jar"/>
                 <include name="fastutil-5.1.5.jar"/>
-                <include name="icb-learning.jar"/>
                 <include name="icb-utils.jar"/>
                 <include name="jakarta-oro-2.0.8.jar"/>
                 <include name="javastat_1.3.jar"/>
@@ -173,7 +172,7 @@
     <target name="clean" depends="buildsupport.clean, testsupport.clean" description="Cleans up the directory">
         <delete dir="${javadocs}"/>
         <delete file="${jarfile}"/>
-        <delete file="${api-jarfile}"/>        
+        <delete file="${api-jarfile}"/>
         <delete file="${bmf-calibration-models-jarfile}"/>
         <delete file="${compound-file-tool-jarfile}"/>
     </target>
