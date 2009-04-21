@@ -67,7 +67,12 @@ public class ExecuteSplitsMode extends DAVMode {
     private String modelId;
     private boolean evaluateStatistics;
     private OptionalModelId[] optionalModelIds=new OptionalModelId[0];
-
+    /*
+    TODO parse property format:
+define.modelId.column-id=modelid-noScaler
+define.modelId.modelid-noScaler.exclude.argument=scaler-name
+define.modelId.modelid-noScaler.exclude.skip=1
+     */
     @Override
     public void interpretArguments(
             final JSAP jsap, final JSAPResult result, final DAVOptions options) {
