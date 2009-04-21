@@ -30,8 +30,7 @@ import edu.mssm.crover.cli.CLI;
 import edu.rit.pj.IntegerForLoop;
 import edu.rit.pj.ParallelRegion;
 import edu.rit.pj.ParallelTeam;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import it.unimi.dsi.fastutil.objects.ObjectList;
+import it.unimi.dsi.fastutil.objects.*;
 import it.unimi.dsi.logging.ProgressLogger;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -67,6 +66,7 @@ public class ExecuteSplitsMode extends DAVMode {
     private String splitPlanFilename;
     private String modelId;
     private boolean evaluateStatistics;
+    private OptionalModelId[] optionalModelIds=new OptionalModelId[0];
 
     @Override
     public void interpretArguments(
@@ -96,8 +96,16 @@ public class ExecuteSplitsMode extends DAVMode {
         modelId = ShortHash.shortHash(getOriginalArgs());
         options.modelId = modelId;
 
+
         final Map<String, String> additionalConditionsMap = new HashMap<String, String>();
         additionalConditionsMap.put("model-id", modelId);
+
+        for (OptionalModelId optionalModelId : optionalModelIds) {
+            String optionalModelIdValue = ShortHash.shortHash(filterArgs(getOriginalArgs(), optionalModelId));
+
+            additionalConditionsMap.put(optionalModelId.columnIdentifier, optionalModelIdValue);
+        }
+
         final String modelConditionsFilename = "model-conditions.txt";
         final Set<String> skipJsapConditions = new HashSet<String>();
         skipJsapConditions.add("model-id");
@@ -109,6 +117,22 @@ public class ExecuteSplitsMode extends DAVMode {
             LOGGER.error("Error writing " + modelConditionsFilename + " file", e);
         }
     }
+
+    private String[] filterArgs(String[] originalArgs, OptionalModelId optionalModelId) {
+        ObjectList<String> filteredArgs = new ObjectArrayList<String>();
+        for (int i = 0; i < originalArgs.length; i++) {
+            if (optionalModelId.excludeArgumentNames.contains(originalArgs[i].
+                    replaceAll("--", "")))
+            {
+                i += optionalModelId.skip + 1; // skip argument name and 'skip' number of arguments.
+            }
+            else{
+                filteredArgs.add(originalArgs[i]);
+            }
+        }
+        return filteredArgs.toArray(new String[filteredArgs.size()]);
+    }
+
 
     @SuppressWarnings("unchecked")
     public void addSequenceSpecificOptions(final JSAP jsapConfig) throws JSAPException {
@@ -139,6 +163,7 @@ public class ExecuteSplitsMode extends DAVMode {
 
     /**
      * Define command line options for this mode.
+     *
      * @param jsap the JSAP command line parser
      * @throws JSAPException if there is a problem building the options
      */
@@ -194,7 +219,7 @@ public class ExecuteSplitsMode extends DAVMode {
         logger.stop();
         executed = region.getExecuted();
         if (executed != null && executed instanceof SequenceMode) {
-            // if we executed SequenceMode
+// if we executed SequenceMode
             final SequenceMode sequenceMode = (SequenceMode) executed;
             if (evaluateStatistics) {
 
@@ -250,7 +275,7 @@ public class ExecuteSplitsMode extends DAVMode {
     }
 
     private static String labelPrefix(final String label) {
-        // get the part of label before the first '-', i.e., baseline, tune, pathways, genelists
+// get the part of label before the first '-', i.e., baseline, tune, pathways, genelists
         final int indexDash = label.indexOf('-');
         if (indexDash == -1) {
             return label;
@@ -380,7 +405,7 @@ public class ExecuteSplitsMode extends DAVMode {
                     new FileWriter(conditionsFilename, true));
             boolean firstItem = true;
 
-            // Write the additional conditions
+// Write the additional conditions
             for (final String conditionKey : additionalConditionsMap.keySet()) {
                 final String value = additionalConditionsMap.get(conditionKey);
                 if (firstItem) {
@@ -408,7 +433,7 @@ public class ExecuteSplitsMode extends DAVMode {
                         modelConditionsWriter.printf("%s=enabled", id);
                     }
                 } else if (paramObj instanceof FlaggedOption) {
-                    // A flag switch exists. Pass it along.
+// A flag switch exists. Pass it along.
                     final FlaggedOption flagOpt = (FlaggedOption) paramObj;
                     if (jsapResult.contains(id)) {
                         if (firstItem) {
