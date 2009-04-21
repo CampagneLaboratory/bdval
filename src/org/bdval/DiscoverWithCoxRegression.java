@@ -50,7 +50,7 @@ import java.io.IOException;
 
 /**
  * Filter features by cox regression partial p-value (cox proportional hazard model).
- *
+ * <p/>
  * --survival &lt;survivial-datafile&gt;
  * This file contains survival data
  * In tab delimited table;
@@ -111,7 +111,7 @@ public class DiscoverWithCoxRegression extends DAVMode {
             System.exit(10);
         }
 
-        final double[][] featureWithCovariate = new double [nCov + 1][numberOfSamples]; // = {featureValues, covariateThisSplit[0]};
+        final double[][] featureWithCovariate = new double[nCov + 1][numberOfSamples]; // = {featureValues, covariateThisSplit[0]};
         System.arraycopy(featureValues, 0, featureWithCovariate[0], 0, numberOfSamples);      //the [0] is feature, the following is covariates
         for (int k = 0; k < nCov; k++) {
             System.arraycopy(covariateThisSplit[k], 0, featureWithCovariate[k + 1], 0, numberOfSamples);
@@ -216,6 +216,7 @@ public class DiscoverWithCoxRegression extends DAVMode {
 
     /**
      * Define command line options for this mode.
+     *
      * @param jsap the JSAP command line parser
      * @throws JSAPException if there is a problem building the options
      */
@@ -231,11 +232,10 @@ public class DiscoverWithCoxRegression extends DAVMode {
                         + "Default 0.05/5% confidence level.");
         jsap.registerParameter(numFeatureParam);
 
-        // TODO Xutao, How do we switch from overall survival to event free survival?
         final Parameter survivalFilenameOption = new FlaggedOption("survival")
                 .setStringParser(JSAP.STRING_PARSER)
                 .setDefault(JSAP.NO_DEFAULT)
-                .setRequired(true)
+                .setRequired(false)
                 .setLongFlag("survival")
                 .setHelp("Survival filename. This file contains survival data "
                         + "in tab delimited table; column 1: chipID has to match cids and "

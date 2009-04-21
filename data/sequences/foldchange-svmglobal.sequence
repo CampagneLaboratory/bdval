@@ -7,7 +7,7 @@ addoption required:split-id:id of split being processed
 addoption required:phi:Ratio for fold-change
 addoption required:max-intermediate-features:Maximum number of intermediate features to consider
 addoption required:num-features:Number of features in the generated model
-addoption required:survival:survival data file
+#
 #
 -m fold-change --overwrite-output true -o %dataset-name%-%split-id%-%label%-intermediate-features.txt --gene-list full --gene-features-dir %gene-features-dir% --ratio %phi% --output-gene-list --report-max-probes %max-intermediate-features% %other-options% --split-type feature-selection
 -m svm-weights --overwrite-output true -o %dataset-name%-%split-id%-%label%-features.txt --gene-list %label%|%dataset-name%-%split-id%-%label%-intermediate-features.txt  --output-gene-list --gene-features-dir %gene-features-dir% --num-features %num-features% %other-options% --split-type training

@@ -7,7 +7,7 @@ addoption required:other-options:Other DAVMode options can be provided here
 addoption required:split-id:id of split being processed
 addoption required:num-features:Number of features in the generated model
 addoption required:which-gene-list:The gene list to process, such as "NC01-2000"
-addoption required:survival:survival data file
+#
 #
 -m svm-weights --overwrite-output true -o %dataset-name%-%split-id%-%label%-features.txt --gene-lists %gene-list-file% --gene-features-dir %gene-features-dir% --num-features %num-features% %other-options% --split-type training   --output-gene-list
 -m write-model --overwrite-output true --gene-list %label%|%dataset-name%-%split-id%-%label%-features.txt %other-options%  --model-prefix libSVM_%dataset-name%-%split-id%-%label%  --split-type training

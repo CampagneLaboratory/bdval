@@ -5,7 +5,7 @@ def survival=%survival%
 addoption required:model-final-features-filename:Path and filename where to write the final model
 addoption required:model-prefix:Path and filename where to write the final model
 addoption required:num-features:Number of features in the generated model
-addoption required:survival:survival data file
+#
 #
 -m svm-weights --overwrite-output true -o %model-final-features-filename%  --output-gene-list  --gene-list full --gene-features-dir %gene-features-dir% --num-features %num-features%
 -m write-model --overwrite-output true --gene-list %label%|%model-final-features-filename%  --model-prefix %model-prefix%

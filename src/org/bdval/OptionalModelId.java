@@ -2,6 +2,9 @@ package org.bdval;
 
 import it.unimi.dsi.fastutil.objects.ObjectSet;
 import it.unimi.dsi.fastutil.objects.ObjectArraySet;
+import it.unimi.dsi.fastutil.objects.ObjectList;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
 /*
  * Copyright (C) 2007-2008 Institute for Computational Biomedicine,
  *                         Weill Medical College of Cornell University
@@ -39,17 +42,50 @@ public class OptionalModelId {
      * The name of the column that will hold this optional model id.
      */
     String columnIdentifier;
+
+
+    public OptionalModelId(String columnIdentifier) {
+        this.columnIdentifier = columnIdentifier;
+        this.excludeArgumentNames = new ObjectArrayList<String>();
+        this.skipValueForArgumentName = new IntArrayList();
+
+    }
+
+    /**
+     * Name of arguments to exclude from command line when calculating hash code modelid.
+     */
+    ObjectList<String> excludeArgumentNames;
     /**
      * The number of arguments that follow the command line arguments to ignore when creating
      * the hash key for this optional model id.
      */
-    public int skip;
+    IntArrayList skipValueForArgumentName;
 
-    public OptionalModelId(String columnIdentifier) {
-        this.columnIdentifier = columnIdentifier;
-        this.excludeArgumentNames=new ObjectArraySet();
-        this.skip=0;
+    public void addExcludeArgument(String excludeArgumentName, int skipForArgument) {
+        excludeArgumentNames.add(excludeArgumentName);
+        skipValueForArgumentName.add(skipForArgument);
     }
 
-    ObjectSet<String> excludeArgumentNames;
+    @Override
+    public String toString() {
+        StringBuffer buffer = new StringBuffer();
+        buffer.append("column-id: ");
+        buffer.append(columnIdentifier);
+        buffer.append('\n');
+        int i = 0;
+        for (String argName : excludeArgumentNames) {
+            buffer.append("skip.arg-name: ");
+            buffer.append(argName);
+            buffer.append('\n');
+            buffer.append("skip.value: ");
+            buffer.append(skipValueForArgumentName.get(i++));
+            buffer.append('\n');
+        }
+        return buffer.toString();
+    }
+
+    public int skipValue(String argumentName) {
+        int index = excludeArgumentNames.indexOf(argumentName);
+        return skipValueForArgumentName.get(index);
+    }
 }

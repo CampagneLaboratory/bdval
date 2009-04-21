@@ -23,6 +23,8 @@ import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
 import it.unimi.dsi.fastutil.doubles.DoubleList;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
+import it.unimi.dsi.fastutil.ints.IntSet;
+import it.unimi.dsi.fastutil.ints.IntArraySet;
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -74,6 +76,7 @@ public class PredictedItems extends ObjectArrayList<PredictedItem> {
      * The returned value indicates the confidence that the predicted item belongs to class 1,
      * according to the classifier. Larger positive values indicate more confidence in class 1 prediction, whereas
      * larger negative values indicate more confidence in class -1 prediction.
+     *
      * @param repeatId
      * @return
      */
@@ -91,6 +94,45 @@ public class PredictedItems extends ObjectArrayList<PredictedItem> {
         return result;
     }
 
+    /**
+     * Returns decision values for predictions with a given repeatId and splitId.
+     *
+     * @param repeatId The repeatId for predictions of interest
+     * @param splitId  The splitId for predictions of interest
+     * @return List of decision values
+     */
+    public DoubleList getDecisionsForSplit(int repeatId, int splitId) {
+        final DoubleList result = new DoubleArrayList();
+        for (final PredictedItem item : predictions) {
+            if (item.repeatId == repeatId && item.splitId == splitId) {
+                final double decisionClass1 = item.probability * item.decision;
+                // decisionClass1 becomes negative for class -1
+                // and positive for class 1, such that decisionClass1(i)>decisionClass1(j) when the classifier expects
+                // i to have greater chance to belong to class 1 than to class -1.
+                result.add(decisionClass1);
+            }
+        }
+        return result;
+    }
+
+    public int getNumberOfSplitsForRepeat(final int repeatId) {
+        int maxSplitId = -1;
+        for (final PredictedItem item : predictions) {
+            if (item.repeatId == repeatId) {
+
+                maxSplitId = Math.max(maxSplitId, item.splitId);
+            }
+        }
+        return maxSplitId;
+
+    }
+
+    /**
+     * Returns true labels for predictions with a given repeatId.
+     *
+     * @param repeatId The repeatId for predictions of interest
+     * @return List of decision values
+     */
     public DoubleList getTrueLabelsForRepeat(final int repeatId) {
         final DoubleList result = new DoubleArrayList();
         for (final PredictedItem item : predictions) {
@@ -101,10 +143,48 @@ public class PredictedItems extends ObjectArrayList<PredictedItem> {
         return result;
     }
 
-    public ObjectList <String> getSampleIDsForRepeat(final int repeatId) {
-        final ObjectList <String> result = new ObjectArrayList ();
+    /**
+     * Returns true labels for predictions with a given repeatId and splitId.
+     *
+     * @param repeatId The repeatId for predictions of interest
+     * @param splitId  The splitId for predictions of interest
+     * @return List of decision values
+     */
+    public DoubleList getTrueLabelsForSplit(int repeatId, int splitId) {
+        final DoubleList result = new DoubleArrayList();
+        for (final PredictedItem item : predictions) {
+            if (item.repeatId == repeatId && item.splitId == splitId) {
+                result.add(item.numericTrueLabel);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Return a list of sample Ids for predictions in the repeat.
+     *
+     * @param repeatId The repeatId for predictions of interest
+     * @return
+     */
+    public ObjectList<String> getSampleIDsForRepeat(final int repeatId) {
+        final ObjectList<String> result = new ObjectArrayList<String>();
         for (final PredictedItem item : predictions) {
             if (item.repeatId == repeatId) {
+                result.add(item.sampleId);
+            }
+        }
+        return result;
+        /**
+         * Return a list of sample Ids for predictions in the repeat.
+         * @param repeatId The repeatId for predictions of interest
+         * @param splitId  The splitId for predictions of interest
+         * @return
+         */}
+
+    public ObjectList<String> getSampleIDsForSplit(int repeatId, int splitId) {
+        final ObjectList<String> result = new ObjectArrayList<String>();
+        for (final PredictedItem item : predictions) {
+            if (item.repeatId == repeatId && item.splitId == splitId) {
                 result.add(item.sampleId);
             }
         }
@@ -129,4 +209,16 @@ public class PredictedItems extends ObjectArrayList<PredictedItem> {
         }
     }
 
+    /**
+     * Return the valid splidIds for the given repeatId.
+     * @param repeatId  The repeatId of interest.
+     * @return set of splidIds.
+     */
+    public IntSet splitIdsForRepeat(int repeatId) {
+        IntSet result = new IntArraySet();
+        for (final PredictedItem item : predictions) {
+            if (item.repeatId == repeatId) result.add(item.splitId);
+        }
+        return result;
+    }
 }

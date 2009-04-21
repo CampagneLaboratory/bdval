@@ -109,11 +109,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.Reader;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
-import java.util.Vector;
+import java.util.*;
 import java.util.zip.GZIPInputStream;
 
 /**
@@ -181,6 +177,10 @@ public class DAVMode extends UseModality<DAVOptions> {
      * TODO: probably should not be a String
      */
     private static final String SEMAPHORE = "global".intern();
+    /**
+     * BDVal configuration properties, from the --properties argument.
+     */
+    protected Properties configurationProperties;
 
     /**
      * Define basic command line options for this mode.  Individual modes should override
@@ -212,6 +212,15 @@ public class DAVMode extends UseModality<DAVOptions> {
                 .setHelp("Name of the output file. Output is printed to the console when this "
                         + "flag is absent or when the value \"-\" is given.");
         jsap.registerParameter(outputFlag);
+
+        final Parameter propertiesFlag = new FlaggedOption("properties")
+                .setStringParser(JSAP.STRING_PARSER)
+                .setDefault(JSAP.NO_DEFAULT)
+                .setRequired(false)
+
+                .setLongFlag("properties")
+                .setHelp("Name of the properties file. A Java properties file with bdval specific configuration properties.");
+        jsap.registerParameter(propertiesFlag);
 
         final Parameter outputOverwriteFlag = new FlaggedOption("overwrite-output")
                 .setStringParser(JSAP.BOOLEAN_PARSER)
@@ -536,14 +545,15 @@ public class DAVMode extends UseModality<DAVOptions> {
     /**
      * Interpret the command line arguments.
      *
-     * @param jsap the JSAP command line parser
-     * @param result the results of command line parsing
+     * @param jsap    the JSAP command line parser
+     * @param result  the results of command line parsing
      * @param options the options for this mode
      */
     @Override
     public void interpretArguments(final JSAP jsap, final JSAPResult result,
                                    final DAVOptions options) {
         checkArgumentsSound(jsap, result, false);
+        setupProperties(jsap, result);
         setupModelId(result, options);
         setupDatasetName(result, options);
         setupDatasetRoot(result, options);
@@ -563,9 +573,26 @@ public class DAVMode extends UseModality<DAVOptions> {
         setupScalerOptions(result, options);
     }
 
+    private void setupProperties(JSAP jsap, JSAPResult result) {
+        if (result.contains("properties")) {
+
+            String propsFilename = result.getString("properties");
+            System.out.println("Loading BDVal  properties from file " + propsFilename);
+            Properties props = new Properties();
+            try {
+                props.load(new FileReader(propsFilename));
+                this.configurationProperties = props;
+            } catch (IOException e) {
+                LOG.error("Cannot load BDVal properties file " + propsFilename, e);
+                System.exit(1);
+            }
+        }
+    }
+
     /**
      * Initialize state of the cache and the cache itself if enabled.
-     * @param result the results of command line parsing
+     *
+     * @param result  the results of command line parsing
      * @param options the options for this mode
      */
     protected void setupTableCache(final JSAPResult result, final DAVOptions options) {

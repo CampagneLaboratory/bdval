@@ -7,7 +7,7 @@ addoption required:split-id:id of split being processed
 addoption required:alpha:confidence level for T-test
 addoption required:num-features:Number of features in the generated model
 addoption required:weka-class:Classname of the weka classifier
-addoption required:survival:survival data file
+#
 #
 -m t-test --overwrite-output true -o %dataset-name%-%split-id%-%label%-features.txt --gene-list full --gene-features-dir %gene-features-dir% --alpha %alpha% --output-gene-list --report-max-probes %num-features% %other-options% --split-type training
 -m write-model --overwrite-output true --gene-list %label%|%dataset-name%-%split-id%-%label%-features.txt %other-options% --split-type training --model-prefix weka_%dataset-name%-%split-id%-%label%

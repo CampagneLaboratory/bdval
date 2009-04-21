@@ -13,7 +13,7 @@ addoption required:maximize:the performance measure to maximize
 addoption required:folds:Number of cross validation folds
 addoption required:cv-repeats:Number of cross validation repeats.
 addoption required:ratio:The ratio of new number of feature to original number of features (GA)
-addoption required:survival:survival data file
+#
 #
 -m fold-change --overwrite-output true -o %dataset-name%-%split-id%-%label%-intermediate-features.txt --gene-list full --gene-features-dir %gene-features-dir% --ratio %phi% --output-gene-list --report-max-probes %max-intermediate-features% %other-options% --split-type feature-selection
 -m ga-wrapper --overwrite-output true -o %dataset-name%-%split-id%-%label%-features.txt --optimal-parameters-out %dataset-name%-%split-id%-%label%-optimal-parameters.txt --gene-list %label%|%dataset-name%-%split-id%-%label%-intermediate-features.txt --gene-features-dir %gene-features-dir% --num-features %num-features% --population-size %population-size% --number-of-steps %number-of-steps% %other-options% --split-type training --folds %folds% --cv-repeats %cv-repeats%  --maximize %maximize% --output-gene-list --ratio %ratio%

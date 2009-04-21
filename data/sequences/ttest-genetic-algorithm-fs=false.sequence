@@ -12,7 +12,7 @@ addoption required:maximize:the performance measure to maximize
 addoption required:folds:the performance measure to maximize
 addoption required:cv-repeats:the performance measure to maximize
 addoption required:ratio:The ratio of new number of feature to original number of features (GA)
-addoption required:survival:survival data file
+#
 #
 # Warning: select features on the training set. Use at your own risks on very small datasets.
 #

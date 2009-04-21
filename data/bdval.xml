@@ -83,7 +83,8 @@
             <path id="bdval.classpath">
                 <pathelement location="${config}"/>
                 <pathelement location="${classes}"/>
-                <pathelement location="${src}"/>  <!-- required for rscripts -->
+                <pathelement location="${src}"/>
+                <!-- required for rscripts -->
                 <fileset dir="${lib}">
                     <include name="*.jar"/>
                     <include name="Rserve/*.jar"/>
@@ -153,6 +154,21 @@
                     <var name="flag-evaluate-stats" value="--evaluate-statistics @{evaluate-statistics}"/>
                 </else>
             </if>
+            <if>
+                <not>
+                    <equals arg1="${@{endpoint-name}.survival-file}" arg2="${@{endpoint-name}.survival-file}"/>
+                </not>
+
+                <then>
+                    <var name="survival-arg-1" value="--survival"/>
+                    <var name="survival-arg-2" value="${@{endpoint-name}.survival-file}"/>
+
+                </then>
+                <else>
+                    <var name="survival-arg-1" value=""/>
+                    <var name="survival-arg-2" value=""/>
+                </else>
+            </if>
 
             <if>
                 <equals arg1="@{gene-list}" arg2="N/A"/>
@@ -218,6 +234,10 @@
                         <arg line="@{floor-param}"/>
                         <arg line="@{array-params}"/>
                         <arg line="${flag-evaluate-stats}"/>
+                        <arg value="${survival-arg-1}"/>
+                        <arg value="${survival-arg-2}"/>
+                        <arg value="--properties"/>
+                        <arg value="${project-property-file}"/>
 
                         <!--redirector output="@{endpoint-name}.stdout"></redirector-->
                     </java>
@@ -225,6 +245,7 @@
             </if>
         </sequential>
     </macrodef>
+
 
     <macrodef name="predict-one-dataset" description="Predict one dataset.">
         <attribute name="test-set-name"/>
@@ -239,7 +260,7 @@
             <echo message="++ Running  @{test-set-name} : predict -> @{output}"/>
             <echo message="++"/>
 
-             <!-- define survival file, with default value of "-" -->
+            <!-- define survival file, with default value of "-" -->
             <var name="survival-file" value="-"/>
             <if>
                 <isset property="@{endpoint-name}.survival-file"/>
@@ -278,6 +299,18 @@
             </if>
 
             <if>
+                <equals arg1="${@{endpoint-name}.survival-file}" arg2=""/>
+                <then>
+                    <property name="survival-arg-1" value="--survival"/>
+                    <property name="survival-arg-2" value="${@{endpoint-name}.survival-file}"/>
+
+                </then>
+                <else>
+                    <property name="survival-arg-1" value=""/>
+                    <property name="survival-arg-2" value="${@{endpoint-name}.survival-file}"/>
+                </else>
+            </if>
+            <if>
                 <equals arg1="${run-java}" arg2="true"/>
                 <then>
                     <java classname="org.bdval.DiscoverAndValidate"
@@ -311,7 +344,8 @@
                         <arg line="--dataset-root @{dataset-root}"/>
                         <arg line="--other-measures ${other-performance-measures}"/>
                         <arg line="--estimate-with-replacement @{sample-with-replacement}"/>
-                        <arg line="--survival ${survival-file}"/>
+                        <arg value="${survival-arg-1}"/>
+                        <arg value="${survival-arg-2}"/>
                     </java>
                 </then>
             </if>
@@ -471,7 +505,18 @@
             <var name="pathway-components-dir"
                  value="pathway-components/fs=@{feature-selection-fold}/"/>
 
+            <if>
+                <equals arg1="${@{endpoint-name}.survival-file}" arg2=""/>
+                <then>
+                    <property name="survival-arg-1" value="--survival"/>
+                    <property name="survival-arg-2" value="${@{endpoint-name}.survival-file}"/>
 
+                </then>
+                <else>
+                    <property name="survival-arg-1" value=""/>
+                    <property name="survival-arg-2" value="${@{endpoint-name}.survival-file}"/>
+                </else>
+            </if>
             <if>
                 <istrue value="@{clear-cache}"/>
                 <then>
@@ -541,6 +586,7 @@
         <attribute name="weka-class"/>
         <attribute name="survival-file" default="-"/>
         <sequential>
+
             <execute-splits feature-selection-fold="true"
                             sequence-file="ttest-weka-classifier-fs=true.sequence"
                             endpoint-name="@{endpoint-name}"
@@ -548,7 +594,7 @@
                             floor-param="@{floor-param}"
                             array-params="@{array-params}"
                             all-classifier-parameters=" --classifier edu.cornell.med.icb.learning.weka.WekaClassifier  --classifier-parameters wekaClass=@{weka-class} "
-                            other-options="--alpha ${ttest-alpha} --survival ${survival-file} --weka-class @{weka-class}"/>
+                            other-options="--alpha ${ttest-alpha}  --weka-class @{weka-class}"/>
             <execute-splits feature-selection-fold="false"
                             sequence-file="ttest-weka-classifier-fs=false.sequence"
                             endpoint-name="@{endpoint-name}"
@@ -556,7 +602,7 @@
                             floor-param="@{floor-param}"
                             array-params="@{array-params}"
                             all-classifier-parameters=" --classifier edu.cornell.med.icb.learning.weka.WekaClassifier  --classifier-parameters wekaClass=@{weka-class}  "
-                            other-options="--alpha ${ttest-alpha} --survival ${survival-file} --weka-class @{weka-class}"/>
+                            other-options="--alpha ${ttest-alpha} --weka-class @{weka-class}"/>
         </sequential>
     </macrodef>
 
@@ -572,7 +618,6 @@
                    default="--pathways ${@{endpoint-name}.pathways-file} --gene-to-probes ${@{endpoint-name}.gene-to-probes-file}"/>
         <attribute name="endpoint-specific-genelist-names"
                    default="Merged HM200 NC01-2000 GDS1070 GDS183 GDS232 NuttAO NuttGBM POMEROY-0 POMEROY-1 POMEROY-2 POMEROY-3 POMEROY-4 POMEROY-400 Rhodes2004 "/>
-
 
 
         <sequential>
@@ -608,7 +653,7 @@
                                     floor-param="@{floor-param}"
                                     array-params="@{array-params}"
                                     all-classifier-parameters=" --classifier edu.cornell.med.icb.learning.weka.WekaClassifier  --classifier-parameters wekaClass=weka.classifiers.meta.LogitBoost "
-                                    other-options="--alpha ${ttest-alpha} --survival ${survival-file} --phi ${fold-change-phi} --weka-class weka.classifiers.meta.LogitBoost"/>
+                                    other-options="--alpha ${ttest-alpha} --phi ${fold-change-phi} --weka-class weka.classifiers.meta.LogitBoost"/>
                 </then>
             </if>
             <if>
@@ -679,7 +724,6 @@
                     <execute-splits feature-selection-fold="false"
                                     sequence-file="baseline.sequence"
                                     endpoint-name="@{endpoint-name}"
-                                    other-options="--survival ${survival-file}"
                                     dataset-root="@{dataset-root}"
                                     floor-param="@{floor-param}"
                                     array-params="@{array-params}"/>
@@ -693,7 +737,6 @@
                                     sequence-file="whole-chip.sequence"
                                     endpoint-name="@{endpoint-name}"
                                     dataset-root="@{dataset-root}"
-                                    other-options="--survival ${survival-file}"
                                     floor-param="@{floor-param}"
                                     array-params="@{array-params}"/>
                 </then>
@@ -708,7 +751,7 @@
                                     dataset-root="@{dataset-root}"
                                     floor-param="@{floor-param}"
                                     array-params="@{array-params}"
-                                    other-options="--survival ${survival-file}"
+
                                     extra-classifier-parameters=",C=1"/>
                     <execute-splits feature-selection-fold="false"
                                     sequence-file="tuneC-baseline.sequence"
@@ -716,7 +759,7 @@
                                     dataset-root="@{dataset-root}"
                                     floor-param="@{floor-param}"
                                     array-params="@{array-params}"
-                                    other-options="--survival ${survival-file}"
+
                                     extra-classifier-parameters=",C=10"/>
                     <execute-splits feature-selection-fold="false"
                                     sequence-file="tuneC-baseline.sequence"
@@ -724,7 +767,7 @@
                                     dataset-root="@{dataset-root}"
                                     floor-param="@{floor-param}"
                                     array-params="@{array-params}"
-                                    other-options="--survival ${survival-file}"
+
                                     extra-classifier-parameters=",C=.5"/>
                 </then>
             </if>
@@ -738,7 +781,7 @@
                                     dataset-root="@{dataset-root}"
                                     floor-param="@{floor-param}"
                                     array-params="@{array-params}"
-                                    other-options="--survival ${survival-file} --max-intermediate-features ${max-intermediate-features}"/>
+                                    other-options="--max-intermediate-features ${max-intermediate-features}"/>
                 </then>
             </if>
 
@@ -750,7 +793,6 @@
                                     endpoint-name="@{endpoint-name}"
                                     dataset-root="@{dataset-root}"
                                     floor-param="@{floor-param}"
-                                    other-options="--survival ${survival-file}"
                                     array-params="@{array-params}"/>
                 </then>
             </if>
@@ -762,7 +804,7 @@
                                     sequence-file="ttest-svmiterative.sequence"
                                     endpoint-name="@{endpoint-name}"
                                     dataset-root="@{dataset-root}"
-                                    other-options="--survival ${survival-file} --alpha ${ttest-alpha} --max-intermediate-features ${max-intermediate-features}"
+                                    other-options=" --alpha ${ttest-alpha} --max-intermediate-features ${max-intermediate-features}"
                                     floor-param="@{floor-param}"
                                     array-params="@{array-params}"/>
                 </then>
@@ -775,7 +817,7 @@
                                     sequence-file="ttest-svmglobal.sequence"
                                     endpoint-name="@{endpoint-name}"
                                     dataset-root="@{dataset-root}"
-                                    other-options="--survival ${survival-file} --alpha ${ttest-alpha} --max-intermediate-features ${max-intermediate-features}"
+                                    other-options=" --alpha ${ttest-alpha} --max-intermediate-features ${max-intermediate-features}"
                                     floor-param="@{floor-param}"
                                     array-params="@{array-params}"/>
                 </then>
@@ -788,7 +830,7 @@
                                     sequence-file="coxreg-svmglobal.sequence"
                                     endpoint-name="@{endpoint-name}"
                                     dataset-root="@{dataset-root}"
-                                    other-options="--alpha ${coxreg-alpha} --survival ${survival-file} --max-intermediate-features ${max-intermediate-features}"
+                                    other-options="--alpha ${coxreg-alpha}  --max-intermediate-features ${max-intermediate-features}"
                                     floor-param="@{floor-param}"
                                     array-params="@{array-params}"/>
                 </then>
@@ -811,7 +853,7 @@
                                                     sequence-file="genelist-svmglobal.sequence"
                                                     endpoint-name="@{endpoint-name}"
                                                     dataset-root="@{dataset-root}"
-                                                    other-options="--survival ${survival-file} --which-gene-list @{which-gene-list}"
+                                                    other-options=" --which-gene-list @{which-gene-list}"
                                                     floor-param="@{floor-param}"
                                                     array-params="@{array-params}"/>
                                 </then>
@@ -824,7 +866,7 @@
                                                     sequence-file="genelist-svmglobal.sequence"
                                                     endpoint-name="@{endpoint-name}"
                                                     dataset-root="@{dataset-root}"
-                                                    other-options="--survival ${survival-file} --which-gene-list @{which-gene-list}"
+                                                    other-options=" --which-gene-list @{which-gene-list}"
                                                     extra-classifier-parameters=",C=1"
                                                     floor-param="@{floor-param}"
                                                     array-params="@{array-params}"/>
@@ -832,7 +874,7 @@
                                                     sequence-file="genelist-svmglobal.sequence"
                                                     endpoint-name="@{endpoint-name}"
                                                     dataset-root="@{dataset-root}"
-                                                    other-options="--survival ${survival-file} --which-gene-list @{which-gene-list}"
+                                                    other-options="--which-gene-list @{which-gene-list}"
                                                     extra-classifier-parameters=",C=10"
                                                     floor-param="@{floor-param}"
                                                     array-params="@{array-params}"/>
@@ -840,7 +882,7 @@
                                                     sequence-file="genelist-svmglobal.sequence"
                                                     endpoint-name="@{endpoint-name}"
                                                     dataset-root="@{dataset-root}"
-                                                    other-options="--survival ${survival-file} --which-gene-list @{which-gene-list}"
+                                                    other-options=" --which-gene-list @{which-gene-list}"
                                                     extra-classifier-parameters=",C=.5"
                                                     floor-param="@{floor-param}"
                                                     array-params="@{array-params}"/>
@@ -854,7 +896,7 @@
                                                     sequence-file="genelist-genetic-algorithm.sequence"
                                                     endpoint-name="@{endpoint-name}"
                                                     dataset-root="@{dataset-root}"
-                                                    other-options="--survival ${survival-file} --which-gene-list @{which-gene-list} --ratio 0.5 --number-of-steps ${ga-wrapper-number-of-iterations} ${internal-CV-repeats} --population-size ${ga-wrapper-population-size} --folds ${internal-CV-folds} ${ga-wrapper-roc-str} --maximize ${performance-measure-maximized-by-GA}"
+                                                    other-options=" --which-gene-list @{which-gene-list} --ratio 0.5 --number-of-steps ${ga-wrapper-number-of-iterations} ${internal-CV-repeats} --population-size ${ga-wrapper-population-size} --folds ${internal-CV-folds} ${ga-wrapper-roc-str} --maximize ${performance-measure-maximized-by-GA}"
                                                     floor-param="@{floor-param}"
                                                     array-params="@{array-params}"/>
                                 </then>
@@ -874,7 +916,7 @@
                                     sequence-file="foldchange-svmiterative.sequence"
                                     endpoint-name="@{endpoint-name}"
                                     dataset-root="@{dataset-root}"
-                                    other-options="--survival ${survival-file} --phi ${fold-change-phi} --max-intermediate-features ${max-intermediate-features}"
+                                    other-options="--phi ${fold-change-phi} --max-intermediate-features ${max-intermediate-features}"
                                     floor-param="@{floor-param}"
                                     array-params="@{array-params}"/>
                 </then>
@@ -887,7 +929,7 @@
                                     sequence-file="foldchange-svmglobal.sequence"
                                     endpoint-name="@{endpoint-name}"
                                     dataset-root="@{dataset-root}"
-                                    other-options="--survival ${survival-file} --phi ${fold-change-phi} --max-intermediate-features ${max-intermediate-features}"
+                                    other-options="--phi ${fold-change-phi} --max-intermediate-features ${max-intermediate-features}"
                                     floor-param="@{floor-param}"
                                     array-params="@{array-params}"/>
                 </then>
@@ -900,7 +942,7 @@
                                     sequence-file="ttest-genetic-algorithm.sequence"
                                     endpoint-name="@{endpoint-name}"
                                     dataset-root="@{dataset-root}"
-                                    other-options="--survival ${survival-file} --alpha ${ttest-alpha} --max-intermediate-features ${max-intermediate-features} --ratio 0.5 --number-of-steps ${ga-wrapper-number-of-iterations} ${internal-CV-repeats} --population-size ${ga-wrapper-population-size} --folds ${internal-CV-folds} ${ga-wrapper-roc-str} --maximize ${performance-measure-maximized-by-GA}"
+                                    other-options="--alpha ${ttest-alpha} --max-intermediate-features ${max-intermediate-features} --ratio 0.5 --number-of-steps ${ga-wrapper-number-of-iterations} ${internal-CV-repeats} --population-size ${ga-wrapper-population-size} --folds ${internal-CV-folds} ${ga-wrapper-roc-str} --maximize ${performance-measure-maximized-by-GA}"
                                     floor-param="@{floor-param}"
                                     array-params="@{array-params}"/>
                 </then>
@@ -913,7 +955,7 @@
                                     sequence-file="foldchange-genetic-algorithm.sequence"
                                     endpoint-name="@{endpoint-name}"
                                     dataset-root="@{dataset-root}"
-                                    other-options="--survival ${survival-file} --phi ${fold-change-phi} --max-intermediate-features ${max-intermediate-features} --ratio 0.5 --number-of-steps ${ga-wrapper-number-of-iterations} ${internal-CV-repeats} --population-size ${ga-wrapper-population-size} --folds ${internal-CV-folds} ${ga-wrapper-roc-str} --maximize ${performance-measure-maximized-by-GA}"
+                                    other-options="--phi ${fold-change-phi} --max-intermediate-features ${max-intermediate-features} --ratio 0.5 --number-of-steps ${ga-wrapper-number-of-iterations} ${internal-CV-repeats} --population-size ${ga-wrapper-population-size} --folds ${internal-CV-folds} ${ga-wrapper-roc-str} --maximize ${performance-measure-maximized-by-GA}"
                                     floor-param="@{floor-param}"
                                     array-params="@{array-params}"/>
                 </then>
@@ -926,7 +968,7 @@
                                     sequence-file="genetic-algorithm.sequence"
                                     endpoint-name="@{endpoint-name}"
                                     dataset-root="@{dataset-root}"
-                                    other-options="--survival ${survival-file} --ratio 0.00001 --number-of-steps ${ga-wrapper-number-of-iterations} ${internal-CV-repeats} --population-size ${ga-wrapper-population-size} --folds ${internal-CV-folds} ${ga-wrapper-roc-str} --maximize ${performance-measure-maximized-by-GA}"
+                                    other-options="--ratio 0.00001 --number-of-steps ${ga-wrapper-number-of-iterations} ${internal-CV-repeats} --population-size ${ga-wrapper-population-size} --folds ${internal-CV-folds} ${ga-wrapper-roc-str} --maximize ${performance-measure-maximized-by-GA}"
                                     floor-param="@{floor-param}"
                                     array-params="@{array-params}"/>
                 </then>
@@ -941,7 +983,7 @@
                                     dataset-root="@{dataset-root}"
                                     floor-param="@{floor-param}"
                                     array-params="@{array-params}"
-                                    other-options="--survival ${survival-file} @{pathway-options} "/>
+                                    other-options="@{pathway-options} "/>
 
                     <execute-splits feature-selection-fold="false"
                                     sequence-file="pathways-build-pathway-components-fs=false.sequence"
@@ -949,7 +991,7 @@
                                     dataset-root="@{dataset-root}"
                                     floor-param="@{floor-param}"
                                     array-params="@{array-params}"
-                                    other-options="--survival ${survival-file} @{pathway-options} "/>
+                                    other-options="@{pathway-options} "/>
                 </then>
             </if>
             <if>
@@ -961,7 +1003,7 @@
                                     dataset-root="@{dataset-root}"
                                     floor-param="@{floor-param}"
                                     array-params="@{array-params}"
-                                    other-options="--survival ${survival-file} @{pathway-options} "/>
+                                    other-options="@{pathway-options} "/>
                 </then>
             </if>
 
@@ -974,7 +1016,7 @@
                                     dataset-root="@{dataset-root}"
                                     floor-param="@{floor-param}"
                                     array-params="@{array-params}"
-                                    other-options="--survival ${survival-file} @{pathway-options} --alpha  ${ttest-alpha} --max-intermediate-features ${max-intermediate-features}"/>
+                                    other-options=" @{pathway-options} --alpha  ${ttest-alpha} --max-intermediate-features ${max-intermediate-features}"/>
                 </then>
             </if>
 
@@ -987,7 +1029,7 @@
                                     dataset-root="@{dataset-root}"
                                     floor-param="@{floor-param}"
                                     array-params="@{array-params}"
-                                    other-options="@{pathway-options} --alpha ${coxreg-alpha} --survival ${survival-file} --max-intermediate-features ${max-intermediate-features}"/>
+                                    other-options="@{pathway-options} --alpha ${coxreg-alpha}  --max-intermediate-features ${max-intermediate-features}"/>
                 </then>
             </if>
 
@@ -1001,7 +1043,7 @@
                                     dataset-root="@{dataset-root}"
                                     floor-param="@{floor-param}"
                                     array-params="@{array-params}"
-                                    other-options="--survival ${survival-file} @{pathway-options}"
+                                    other-options=" @{pathway-options}"
                                     extra-classifier-parameters=",C=1"/>
 
                     <execute-splits feature-selection-fold="false"
@@ -1010,7 +1052,7 @@
                                     dataset-root="@{dataset-root}"
                                     floor-param="@{floor-param}"
                                     array-params="@{array-params}"
-                                    other-options="--survival ${survival-file} @{pathway-options}"
+                                    other-options="@{pathway-options}"
                                     extra-classifier-parameters=",C=10"/>
 
                     <execute-splits feature-selection-fold="false"
@@ -1019,7 +1061,7 @@
                                     dataset-root="@{dataset-root}"
                                     floor-param="@{floor-param}"
                                     array-params="@{array-params}"
-                                    other-options="--survival ${survival-file} @{pathway-options}"
+                                    other-options=" @{pathway-options}"
                                     extra-classifier-parameters=",C=.5"/>
 
                 </then>
@@ -1137,8 +1179,8 @@
                     <include name="@{endpoint-name}-*-tune-*"/>
                     <include name="exec-@{endpoint-name}-*"/>
                     <!--
-                    <include name="pathway-components/**/*"/>
-                     -->
+                   <include name="pathway-components/**/*"/>
+                    -->
                     <exclude name="@{endpoint-name}-maqcii-subbmission.file.txt"/>
                     <exclude name="@{endpoint-name}-*-stats.txt"/>
                 </fileset>
@@ -1580,8 +1622,7 @@
                     <arg value="true"/>
                     <arg value="--dataset-name"/>
                     <arg value="auto"/>
-                    <arg value="--survival" />
-                    <arg value="${@{endpoint-name}.survival-file}" />
+
                     <arg value="--folds"/>
                     <arg value="${external-CV-folds}"/>
                     <arg value="--submission-file"/>

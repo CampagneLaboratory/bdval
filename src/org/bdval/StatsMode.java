@@ -59,6 +59,13 @@ public class StatsMode extends Predict {
     private final MaqciiHelper maqciiHelper = new MaqciiHelper();
     private String survivalFileName;
 
+    enum StatsEvaluationType {
+        STATS_PER_REPEAT,
+        STATS_PER_SPLIT,
+    }
+
+    StatsEvaluationType statsEvalType;
+
     @Override
     public void interpretArguments(final JSAP jsap, final JSAPResult result,
                                    final DAVOptions options) {
@@ -91,13 +98,9 @@ public class StatsMode extends Predict {
 
         if (result.contains("survival")) {
             survivalFileName = result.getString("survival");
-        }
-
-        if (survivalFileName == null || survivalFileName.equals("-")) {
-            System.out.println("survival file not found!\t");
-        } else {
             System.out.println("survival File" + survivalFileName);
         }
+
 
         if ("auto".equals(result.getString("label"))) {
             final String label = guessLabel(options.datasetName, filename);
@@ -105,6 +108,24 @@ public class StatsMode extends Predict {
             maqciiHelper.setupSubmissionFile(result, options, label);
         } else {
             maqciiHelper.setupSubmissionFile(result, options);
+        }
+
+        String aggregationMethod = result.getString("aggregation-method");
+        if (aggregationMethod == null) {
+            this.statsEvalType = StatsEvaluationType.STATS_PER_REPEAT;
+        } else {
+            if ("per-repeat".equalsIgnoreCase(aggregationMethod)) {
+                {
+                    this.statsEvalType = StatsEvaluationType.STATS_PER_REPEAT;
+                }
+            } else if ("per-test-set".equalsIgnoreCase(aggregationMethod)) {
+                {
+                    this.statsEvalType = StatsEvaluationType.STATS_PER_SPLIT;
+                }
+            } else {
+                System.err.println("Cannot parse argument of option --aggregation-method");
+                System.exit(1);
+            }
         }
     }
 
@@ -129,6 +150,7 @@ public class StatsMode extends Predict {
 
     /**
      * Define command line options for this mode.
+     *
      * @param jsap the JSAP command line parser
      * @throws JSAPException if there is a problem building the options
      */
@@ -137,12 +159,12 @@ public class StatsMode extends Predict {
         final Parameter survivalFilenameOption = new FlaggedOption("survival")
                 .setStringParser(JSAP.STRING_PARSER)
                 .setDefault(JSAP.NO_DEFAULT)
-                .setRequired(false)
+                .setRequired(true)
                 .setLongFlag("survival")
                 .setHelp("Survival filename. This file contains survival data "
-                        + "in tab delimited table; column 1: chipID has to match cids and "
+                        + "in tab delimited format; column 1: chipID has to match cids and "
                         + "tmm, column 2: time to event, column 3 censor with 1 as event 0 "
-                        + "as censor, column 4 and beyond are all numerical covariates that "
+                        + "as censor, column 4 and beyond are numerical covariates that "
                         + "will be included in the regression model");
         jsap.registerParameter(survivalFilenameOption);
 
@@ -165,17 +187,102 @@ public class StatsMode extends Predict {
         jsap.getByID("input").addDefault("N/A");
         jsap.getByID("platform-filenames").addDefault("N/A");
 
+        final Parameter typeOfSplitHandling = new FlaggedOption("aggregation-method")
+                .setStringParser(JSAP.STRING_PARSER)
+                .setDefault("per-repeat")
+                .setRequired(false)
+                .setLongFlag("aggregation-method")
+                .setHelp("Type of aggregation method. Predictions can be aggregated by repeat of cross-validation " +
+                        "(per-repeat, default value of this option), or by test set (per-test-set). ");
+        jsap.registerParameter(typeOfSplitHandling);
+
         maqciiHelper.defineSubmissionFileOption(jsap);
     }
 
     @Override
     public void process(final DAVOptions options) {
+     
+        evaluateStats(options);
+    }
+
+
+
+
+    private void evaluateStats(DAVOptions options) {
         final List<SurvivalMeasures> survivalMeasuresList = new ArrayList<SurvivalMeasures>();
         LOG.info("Calculating statistics for predictions in file " + predictionsFilename);
         final int numberOfRepeats = predictions.getNumberOfRepeats();
         final ObjectSet<CharSequence> evaluationMeasureNames = new ObjectArraySet<CharSequence>();
         evaluationMeasureNames.addAll(Arrays.asList(MEASURES));
         final EvaluationMeasure repeatedEvaluationMeasure = new EvaluationMeasure();
+
+        switch (statsEvalType) {
+            case STATS_PER_REPEAT:
+                evaluatePerformanceMeasurePerRepeat(survivalMeasuresList, numberOfRepeats, evaluationMeasureNames, repeatedEvaluationMeasure);
+            case STATS_PER_SPLIT:
+                evaluatePerformanceMeasurePerTestSet(survivalMeasuresList, numberOfRepeats, evaluationMeasureNames, repeatedEvaluationMeasure);
+
+        }
+
+
+        final int numberOfFeatures = predictions.modelNumFeatures();
+        maqciiHelper.printSubmissionHeaders(options, survivalFileName != null);
+
+
+        maqciiHelper.printSubmissionResults(options, repeatedEvaluationMeasure,
+                numberOfFeatures, numberOfRepeats, survivalMeasuresList);
+        LOG.info(String.format("Overall: %s", repeatedEvaluationMeasure.toString()));
+    }
+
+    private void evaluatePerformanceMeasurePerTestSet(List<SurvivalMeasures> survivalMeasuresList, int numberOfRepeats,
+                                                    ObjectSet<CharSequence> evaluationMeasureNames, EvaluationMeasure repeatedEvaluationMeasure) {
+
+        // Collect one evaluation measure per split test set of cross-validation.
+
+        for (int repeatId = 1; repeatId <= numberOfRepeats; repeatId++) {
+            if (predictions.containsRepeat(repeatId)) {
+                int maxSplitId = predictions.getNumberOfSplitsForRepeat(repeatId);
+                for (int splitId : predictions.splitIdsForRepeat(repeatId)) {
+                    final DoubleList decisions = new DoubleArrayList();
+                    final DoubleList trueLabels = new DoubleArrayList();
+                    final ObjectList<String> sampleIDs = new ObjectArrayList<String>();
+
+                    decisions.addAll(predictions.getDecisionsForSplit(repeatId, splitId));
+                    trueLabels.addAll(predictions.getTrueLabelsForSplit(repeatId, splitId));
+                    sampleIDs.addAll(predictions.getSampleIDsForSplit(repeatId, splitId));
+                    if (decisions.size()==0) {
+                        System.out.println("cannot process empty decision list");
+                        System.exit(10);
+                    }
+                    final EvaluationMeasure allSplitsInARepeatMeasure =
+                            CrossValidation.testSetEvaluation(decisions.toDoubleArray(),
+                                    trueLabels.toDoubleArray(), evaluationMeasureNames, true);
+
+                    if (survivalFileName != null) {
+                        try {
+                            final SurvivalMeasures survivalMeasures = new SurvivalMeasures(
+                                    survivalFileName, decisions, trueLabels,
+                                    sampleIDs.toArray(new String[sampleIDs.size()]));
+                            survivalMeasuresList.add(survivalMeasures);
+                        } catch (IOException e) {
+                            LOG.fatal("Error processing input file ", e);
+                            System.exit(10);
+                        }
+                    }
+                    for (final CharSequence measure : MEASURES) {
+                        repeatedEvaluationMeasure.addValue(measure,
+                                allSplitsInARepeatMeasure.getPerformanceValueAverage(measure.toString()));
+                        final String binaryName = ("binary-" + measure).intern();
+                        repeatedEvaluationMeasure.addValue(binaryName,
+                                allSplitsInARepeatMeasure.getPerformanceValueAverage(binaryName));
+                    }
+                    LOG.info(String.format("repeatId: %d %s", repeatId, allSplitsInARepeatMeasure.toString()));
+                }
+            }
+        }
+    }
+
+    private void evaluatePerformanceMeasurePerRepeat(List<SurvivalMeasures> survivalMeasuresList, int numberOfRepeats, ObjectSet<CharSequence> evaluationMeasureNames, EvaluationMeasure repeatedEvaluationMeasure) {
         for (int repeatId = 1; repeatId <= numberOfRepeats; repeatId++) {
             if (predictions.containsRepeat(repeatId)) {
                 final DoubleList decisions = new DoubleArrayList();
@@ -189,11 +296,11 @@ public class StatsMode extends Predict {
                         CrossValidation.testSetEvaluation(decisions.toDoubleArray(),
                                 trueLabels.toDoubleArray(), evaluationMeasureNames, true);
 
-                if (survivalFileName != null && !survivalFileName.equals("-")) {
+                if (survivalFileName != null) {
                     try {
                         final SurvivalMeasures survivalMeasures = new SurvivalMeasures(
                                 survivalFileName, decisions, trueLabels,
-                                sampleIDs.toArray(new String [sampleIDs.size()]));
+                                sampleIDs.toArray(new String[sampleIDs.size()]));
                         survivalMeasuresList.add(survivalMeasures);
                     } catch (IOException e) {
                         LOG.fatal("Error processing input file ", e);
@@ -211,16 +318,5 @@ public class StatsMode extends Predict {
                 LOG.info(String.format("repeatId: %d %s", repeatId, allSplitsInARepeatMeasure.toString()));
             }
         }
-
-        final int numberOfFeatures = predictions.modelNumFeatures();
-        if (survivalFileName != null || survivalFileName.equals("-")) {
-            maqciiHelper.printSubmissionHeaders(options, true);
-        } else {
-            maqciiHelper.printSubmissionHeaders(options);
-        }
-
-        maqciiHelper.printSubmissionResults(options, repeatedEvaluationMeasure,
-                numberOfFeatures, numberOfRepeats, survivalMeasuresList);
-        LOG.info(String.format("Overall: %s", repeatedEvaluationMeasure.toString()));
     }
 }

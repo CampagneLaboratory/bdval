@@ -66,17 +66,63 @@ public class ExecuteSplitsMode extends DAVMode {
     private String splitPlanFilename;
     private String modelId;
     private boolean evaluateStatistics;
-    private OptionalModelId[] optionalModelIds=new OptionalModelId[0];
-    /*
-    TODO parse property format:
-define.modelId.column-id=modelid-noScaler
-define.modelId.modelid-noScaler.exclude.argument=scaler-name
-define.modelId.modelid-noScaler.exclude.skip=1
+    private OptionalModelId[] optionalModelIds = new OptionalModelId[0];
+
+    /**
+     * Parse properties to extract optional model id definitions. The format is as follow:
+     * <p/>
+     * <PRE>
+     * define.model-id.column-id=modelid-noScaler
+     * define.model-id.modelid-noScaler.exclude=a,b
+     * define.model-id.modelid-noScaler.exclude.a.argument=scaler-name
+     * define.model-id.modelid-noScaler.exclude.a.skip=1
+     * define.model-id.modelid-noScaler.exclude.b.argument=normalizer-name
+     * define.model-id.modelid-noScaler.exclude.b.skip=1
+     * </PRE>
+     * These properties would define one new model-id called, to be written in a column called modelid-noScaler,
+     * which excludes two arguments and one value each from the hashcode modelId calculation.
      */
+
+    private void parseOptionalModelIdProperties() {
+        ObjectList<OptionalModelId> result = new ObjectArrayList<OptionalModelId>();
+        if (configurationProperties != null) {
+            // inspect properties to figure out which optional model ids to create:
+            ObjectSet<String> optionalModelIdColumnNames = new ObjectArraySet<String>();
+
+            for (String propertyName : configurationProperties.stringPropertyNames()) {
+                if (propertyName.startsWith("define.model-id.column-id")) {
+                    optionalModelIdColumnNames.add(configurationProperties.getProperty(propertyName));
+                }
+            }
+
+            for (String optionalColumnId : optionalModelIdColumnNames) {
+                final String defineModelIdExcludePropertyName = "define.model-id." + optionalColumnId + ".exclude";
+                String argumentKeys = configurationProperties.getProperty(defineModelIdExcludePropertyName);
+                if (argumentKeys == null) {
+                    System.err.println("Error parsing properties. Cannot find key=" + defineModelIdExcludePropertyName);
+                }
+                String keys[] = argumentKeys.split(",");
+
+                OptionalModelId newOne = new OptionalModelId(optionalColumnId);
+                for (String key : keys) {
+                    key = key.trim();
+                    String excludeArgumentName = configurationProperties.getProperty(defineModelIdExcludePropertyName + "." + key + ".argument");
+                    String excludeArgumentSkip = configurationProperties.getProperty(defineModelIdExcludePropertyName + "." + key + ".skip");
+                    newOne.addExcludeArgument(excludeArgumentName, Integer.parseInt(excludeArgumentSkip));
+
+                }
+                result.add(newOne);
+                LOGGER.info("Defined  modelId: " + newOne);
+            }
+        }
+        optionalModelIds = result.toArray(new OptionalModelId[result.size()]);
+    }
+
     @Override
     public void interpretArguments(
             final JSAP jsap, final JSAPResult result, final DAVOptions options) {
         super.interpretArguments(jsap, result, options);
+        this.parseOptionalModelIdProperties();
 
         evaluateStatistics = result.getBoolean("evaluate-statistics");
         if (!evaluateStatistics) {
@@ -106,7 +152,8 @@ define.modelId.modelid-noScaler.exclude.skip=1
         additionalConditionsMap.put("model-id", modelId);
 
         for (OptionalModelId optionalModelId : optionalModelIds) {
-            String optionalModelIdValue = ShortHash.shortHash(filterArgs(getOriginalArgs(), optionalModelId));
+            final String[] filteredArgs = filterArgs(getOriginalArgs(), optionalModelId);
+            String optionalModelIdValue = ShortHash.shortHash(filteredArgs);
 
             additionalConditionsMap.put(optionalModelId.columnIdentifier, optionalModelIdValue);
         }
@@ -126,14 +173,17 @@ define.modelId.modelid-noScaler.exclude.skip=1
     private String[] filterArgs(String[] originalArgs, OptionalModelId optionalModelId) {
         ObjectList<String> filteredArgs = new ObjectArrayList<String>();
         for (int i = 0; i < originalArgs.length; i++) {
-            if (optionalModelId.excludeArgumentNames.contains(originalArgs[i].
-                    replaceAll("--", "")))
-            {
-                i += optionalModelId.skip + 1; // skip argument name and 'skip' number of arguments.
-            }
-            else{
+            final String argumentName = originalArgs[i].
+                    replaceAll("--", "");
+            if (optionalModelId.excludeArgumentNames.contains(argumentName)) {
+                final int skipNumber = optionalModelId.skipValue(argumentName) ;
+                LOGGER.info("For optional modelId: " + optionalModelId.columnIdentifier + " Filtering out argument " + argumentName + " total args skipped: " + skipNumber);
+
+                i += skipNumber; // skip argument name and 'skip' number of arguments.
+            } else {
                 filteredArgs.add(originalArgs[i]);
             }
+            if (i >= originalArgs.length) break;
         }
         return filteredArgs.toArray(new String[filteredArgs.size()]);
     }
@@ -206,6 +256,7 @@ define.modelId.modelid-noScaler.exclude.skip=1
 
     @Override
     public void process(final DAVOptions options) {
+
         final String[] args = getOriginalArgs();
         final UseModality<DAVOptions> executed;
         final int maxSplitIndex = splitPlan.getMaxSplitIndex();
@@ -227,12 +278,14 @@ define.modelId.modelid-noScaler.exclude.skip=1
 // if we executed SequenceMode
             final SequenceMode sequenceMode = (SequenceMode) executed;
             if (evaluateStatistics) {
+                final String label = sequenceMode.getValue("label");
 
                 final String statsFilename = sequenceMode.getValue("predictions-filename");
                 String survivalFileName = sequenceMode.getValue("survival");
-                final String label = sequenceMode.getValue("label");
-                if (survivalFileName == null) {
-                    survivalFileName = "-";
+                String survivaloption = "";
+
+                if (survivalFileName != null) {
+                    survivaloption = " --survival " + survivalFileName + " ";
                 }
 
                 if (statsFilename != null && label != null) {
@@ -248,7 +301,7 @@ define.modelId.modelid-noScaler.exclude.skip=1
                         final String featureSelectionCode = getFeatureSelectionCode(label);
                         final String sequenceArgs = String.format(
                                 "--mode stats --predictions %s "
-                                        + "--survival %s "
+                                        + survivaloption
                                         + "--submission-file %s-maqcii-submission.txt "
                                         + "--feature-selection-method %s "
                                         + "--label %s "
