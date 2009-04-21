@@ -11,7 +11,8 @@
 
     <!-- be sure to load the "local" property file first to override any global values -->
     <property file="${config}/${ant.project.name}-local.properties"/>
-    <property file="${bdval-project.basedir}/${ant.project.name}.properties"/>
+    <property name="project-property-file" value="${bdval-project.basedir}/${ant.project.name}.properties"/>
+    <property file="${project-property-file}"/>
     <!--<property name="continue-after-fail" value="true"/>-->
 
     <property name="do-specific-gene-lists-only" value="false"/>
