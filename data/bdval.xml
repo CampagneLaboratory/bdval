@@ -1322,6 +1322,54 @@
         </sequential>
     </macrodef>
 
+
+    <macrodef name="prepare-rank-dataset">
+        <attribute name="endpoint-name"/>
+
+        <sequential>
+            <java classname="org.bdval.DiscoverAndValidate"
+                  classpathref="bdval.classpath" fork="true" failonerror="true">
+                <jvmarg value="-ea"/>
+                <jvmarg value="${memory-flag}"/>
+                <sysproperty key="log4j.debug" value="${log4j.debug}"/>
+                <sysproperty key="log4j.configuration" value="file:///${config}/log4j.properties"/>
+                <sysproperty key="RConnectionPool.configuration" value="file:///${config}/RConnectionPool.xml"/>
+                <arg value="-m"/>
+                <arg value="to-ranks"/>
+                <arg value="--dataset-name"/>
+                <arg value="${@{endpoint-name}.dataset-name}"/>
+                <arg value="-i"/>
+                <arg value="${@{endpoint-name}.dataset-file}"/>
+
+                <arg value="-p"/>
+                <arg value="${@{endpoint-name}.platform-file}"/>
+                <arg value="-t"/>
+                <arg value="${@{endpoint-name}.tasks-file}"/>
+                <arg value="-c"/>
+                <arg value="${@{endpoint-name}.cids-file}"/>
+                <arg line="-o ${@{endpoint-name}.dataset-file.ranked} "/>
+
+
+            </java>
+
+        </sequential>
+    </macrodef>
+
+
+    <target name="prepare-rank-datasets">
+        <sequential>
+            <for param="current-endpoint" delimiter=" " list="${all-endpoints}">
+                <sequential>
+                    <if>
+                        <istrue value="${do.@{current-endpoint}}"/>
+                        <then>
+                            <prepare-rank-dataset endpoint-name="@{current-endpoint}"/>
+                        </then>
+                    </if>
+                </sequential>
+            </for>
+        </sequential>
+    </target>
     <target name="cross-validate-consensus-features"
             description="Performs cross-validation with the consensus features corresponding to each model."
             depends="prepare-bdval">

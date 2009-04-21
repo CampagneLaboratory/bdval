@@ -108,6 +108,7 @@ public class DiscoverAndValidate implements WithProcessMethod {
         davMode.registerMode("rserve-status", RserveStatusMode.class);
 // TODO:        davMode.registerMode("combine-data", CombineDataMode.class);
         davMode.registerMode("cox-regression", DiscoverWithCoxRegression.class);
+        davMode.registerMode("to-ranks", ToRanksMode.class);
 
         final DAVOptions options = new DAVOptions();
         davMode.process(args, options);

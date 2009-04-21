@@ -18,12 +18,7 @@
 
 package org.bdval;
 
-import com.martiansoftware.jsap.FlaggedOption;
-import com.martiansoftware.jsap.JSAP;
-import com.martiansoftware.jsap.JSAPException;
-import com.martiansoftware.jsap.JSAPResult;
-import com.martiansoftware.jsap.Parameter;
-import com.martiansoftware.jsap.Switch;
+import com.martiansoftware.jsap.*;
 import edu.cornell.med.icb.cli.UseModality;
 import edu.cornell.med.icb.iterators.IteratorIterable;
 import edu.mssm.crover.cli.CLI;
@@ -152,7 +147,8 @@ public class ExecuteSplitsMode extends DAVMode {
         additionalConditionsMap.put("model-id", modelId);
 
         for (OptionalModelId optionalModelId : optionalModelIds) {
-            final String[] filteredArgs = filterArgs(getOriginalArgs(), optionalModelId);
+            final String[] originalArgs1 = expandShortArgs(getOriginalArgs(), jsap);
+            final String[] filteredArgs = filterArgs(originalArgs1, optionalModelId);
             String optionalModelIdValue = ShortHash.shortHash(filteredArgs);
 
             additionalConditionsMap.put(optionalModelId.columnIdentifier, optionalModelIdValue);
@@ -170,13 +166,32 @@ public class ExecuteSplitsMode extends DAVMode {
         }
     }
 
+    /*
+   Replace short argument name, such as "-m" with long argument names (such as "--mode" )
+    */
+    private String[] expandShortArgs(String[] originalArgs, JSAP jsap) {
+        int index = 0;
+        for (String arg : originalArgs) {
+            if (!arg.startsWith("--") && arg.startsWith("-")) {
+                String argShortName = arg.substring(1);
+                if (argShortName.length() == 1) {
+                    char argShortNameCharacter = argShortName.charAt(0);
+                    Flagged param = jsap.getByShortFlag(argShortNameCharacter);
+                    originalArgs[index] = "--" + param.getLongFlag();
+                }
+            }
+            index++;
+        }
+        return originalArgs;
+    }
+
     private String[] filterArgs(String[] originalArgs, OptionalModelId optionalModelId) {
         ObjectList<String> filteredArgs = new ObjectArrayList<String>();
         for (int i = 0; i < originalArgs.length; i++) {
             final String argumentName = originalArgs[i].
                     replaceAll("--", "");
             if (optionalModelId.excludeArgumentNames.contains(argumentName)) {
-                final int skipNumber = optionalModelId.skipValue(argumentName) ;
+                final int skipNumber = optionalModelId.skipValue(argumentName);
                 LOGGER.info("For optional modelId: " + optionalModelId.columnIdentifier + " Filtering out argument " + argumentName + " total args skipped: " + skipNumber);
 
                 i += skipNumber; // skip argument name and 'skip' number of arguments.

@@ -159,7 +159,7 @@ public class StatsMode extends Predict {
         final Parameter survivalFilenameOption = new FlaggedOption("survival")
                 .setStringParser(JSAP.STRING_PARSER)
                 .setDefault(JSAP.NO_DEFAULT)
-                .setRequired(true)
+                .setRequired(false)
                 .setLongFlag("survival")
                 .setHelp("Survival filename. This file contains survival data "
                         + "in tab delimited format; column 1: chipID has to match cids and "
