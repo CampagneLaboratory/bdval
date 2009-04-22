@@ -501,7 +501,7 @@
             <var name="split-plan-file"
                  value="@{dataset-root}/splits/@{endpoint-name}-split-plan-fs=@{feature-selection-fold}-CV-${external-CV-folds}-R-${external-CV-repeats-number}.txt"/>
             <var name="cache-dir"
-                 value="@{dataset-root}/cache/fs=@{feature-selection-fold}"/>
+                 value="cache/fs=@{feature-selection-fold}"/>
             <var name="pathway-components-dir"
                  value="pathway-components/fs=@{feature-selection-fold}/"/>
 
