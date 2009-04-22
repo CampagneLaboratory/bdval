@@ -234,8 +234,8 @@
                         <arg line="@{floor-param}"/>
                         <arg line="@{array-params}"/>
                         <arg line="${flag-evaluate-stats}"/>
-                        <arg value="${survival-arg-1}"/>
-                        <arg value="${survival-arg-2}"/>
+                        <arg line="${survival-arg-1}"/>
+                        <arg line="${survival-arg-2}"/>
                         <arg value="--properties"/>
                         <arg value="${project-property-file}"/>
 
