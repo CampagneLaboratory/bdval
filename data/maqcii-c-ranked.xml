@@ -8,6 +8,9 @@
     <dirname property="bdval-project.basedir" file="${ant.file.maqcii-c-ranked}"/>
     <import file="${bdval-project.basedir}/../buildsupport/build.xml"/>
 
+    <!-- Determine in which directory the cache directory should be located. -->
+    <property name="cache-dir-location" value="."/>
+
     <!-- be sure to load the "local" property file first to override any global values -->
     <property file="${config}/${ant.project.name}-local.properties"/>
     <property name="project-property-file" value="${bdval-project.basedir}/${ant.project.name}.properties"/>
