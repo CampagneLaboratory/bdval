@@ -116,7 +116,7 @@
     <target name="clean-cache" description="Remove the contents of the cache directory">
         <!-- note the cache directory itself will remain -->
         <delete includeemptydirs="true" failonerror="false" verbose="true">
-            <fileset dir="${eval-dataset-root}/cache" includes="**/*"/>
+            <fileset dir="${cache-dir-location}/cache" includes="**/*"/>
         </delete>
     </target>
 
@@ -501,7 +501,7 @@
             <var name="split-plan-file"
                  value="@{dataset-root}/splits/@{endpoint-name}-split-plan-fs=@{feature-selection-fold}-CV-${external-CV-folds}-R-${external-CV-repeats-number}.txt"/>
             <var name="cache-dir"
-                 value="cache/fs=@{feature-selection-fold}"/>
+                 value="${cache-dir-location}/cache/fs=@{feature-selection-fold}"/>
             <var name="pathway-components-dir"
                  value="pathway-components/fs=@{feature-selection-fold}/"/>
 

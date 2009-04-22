@@ -12,6 +12,9 @@
     <property file="${config}/${ant.project.name}-local.properties"/>
     <property name="project-property-file" value="${bdval-project.basedir}/${ant.project.name}.properties"/>
     <property file="${project-property-file}"/>
+
+    <!-- Determine in which directory the cache directory should be located. -->
+    <property name="cache-dir-location" value="."/>
     <!--<property name="continue-after-fail" value="true"/>-->
 
     <!-- Indicate whether statistics should be evaluated as part of model split processing. -->
