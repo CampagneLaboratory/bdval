@@ -115,5 +115,6 @@ public class ToRanksMode extends DAVMode {
         }
         System.out.println("Writing ranked dataset to output file.");
         InsightfulMinerTableWriter.writeData(destinationTable, options.output);
+        options.output.flush();
     }
 }
