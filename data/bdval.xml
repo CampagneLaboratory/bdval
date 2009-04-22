@@ -1583,6 +1583,7 @@
 
 
     </target>
+
     <target name="generate-final-models-direct-method"
             description="Calculate feature consensus across multiple feature selection strategies and generate models with consensus features on the whole training set."
             depends="prepare-bdval">
@@ -1592,23 +1593,10 @@
         <input addproperty="results-directory"
                message="Enter the directory where results are stored (features subdirectory must exist in the results directory)."/>
 
-        <java classname="org.bdval.GenerateFinalModels" dir="${bdval.basedir}"
-              classpathref="bdval.classpath" fork="true" failonerror="true">
-            <jvmarg value="-ea"/>
-            <jvmarg value="${memory-flag}"/>
-            <sysproperty key="log4j.debug" value="${log4j.debug}"/>
-            <sysproperty key="log4j.configuration" value="file:///${config}/log4j.properties"/>
-            <sysproperty key="RConnectionPool.configuration" value="file:///${config}/RConnectionPool.xml"/>
-            <sysproperty key="pj.nt" value="${num-threads}"/>
-            <arg value="--model-conditions"/>
-            <arg value="${model-conditions}"/>
-            <arg value="--results-directory"/>
-            <arg value="${results-directory}"/>
-            <arg value="--consensus"/>
-            <!-- Apply direct method: use the -final-model version of the .sequence file used for evaluation. This applies
- the feature selection strategy evaluated directly on the entire training set. -->
-            <arg value="direct"/>
-        </java>
+        <generate-final-models results-directory="${results-directory}"
+                               model-conditions="${model-conditions}"
+                               consensus-type="direct"/>
+
     </target>
 
     <target name="generate-all-final-models"
@@ -2041,8 +2029,12 @@
                     output="${save-data-dir}/CV.txt"/>
             <generate-final-models
                     model-conditions="model-conditions.txt"
-                    results-directory="${save-data-dir}"
-                    />
+                    results-directory="${save-data-dir}"                    />
+
+            <generate-final-models results-directory="${save-data-dir}"
+                                   model-conditions="model-conditions.txt"
+                                   consensus-type="direct"/>
+
             <cross-validation-consensus-features
                     model-conditions="model-conditions.txt"
                     results-directory="${save-data-dir}"
@@ -2053,6 +2045,11 @@
                     test-set-name="validation"
                     evaluate-stats="false"
                     model-directory="${save-data-dir}/final-models"
+                    />
+             <predict-dataset
+                    test-set-name="validation"
+                    evaluate-stats="false"
+                    model-directory="${save-data-dir}/final-models-direct"
                     />
             <!--antcall target="process-model-conditions"/-->
             <!--antcall target="zip-results"/-->

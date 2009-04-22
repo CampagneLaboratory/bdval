@@ -527,9 +527,7 @@ public class GenerateFinalModels {
             if ("evaluate-statistics".equals(key)) {
                 continue;
             }
-            if ("alpha".equals(key)) {
-                continue;
-            }
+           
             if ("survival".equals(key)) {
                 continue;
             }
