@@ -37,11 +37,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Runs a sequence of biomarker discovery operations against a list of dataset splits.
@@ -78,7 +74,7 @@ public class ExecuteSplitsMode extends DAVMode {
      * which excludes two arguments and one value each from the hashcode modelId calculation.
      */
 
-    private void parseOptionalModelIdProperties() {
+    public static OptionalModelId[] parseOptionalModelIdProperties(Properties configurationProperties) {
         ObjectList<OptionalModelId> result = new ObjectArrayList<OptionalModelId>();
         if (configurationProperties != null) {
             // inspect properties to figure out which optional model ids to create:
@@ -110,14 +106,14 @@ public class ExecuteSplitsMode extends DAVMode {
                 LOGGER.info("Defined  modelId: " + newOne);
             }
         }
-        optionalModelIds = result.toArray(new OptionalModelId[result.size()]);
+        return result.toArray(new OptionalModelId[result.size()]);
     }
 
     @Override
     public void interpretArguments(
             final JSAP jsap, final JSAPResult result, final DAVOptions options) {
         super.interpretArguments(jsap, result, options);
-        this.parseOptionalModelIdProperties();
+        this.optionalModelIds=this.parseOptionalModelIdProperties(configurationProperties);
 
         evaluateStatistics = result.getBoolean("evaluate-statistics");
         if (!evaluateStatistics) {

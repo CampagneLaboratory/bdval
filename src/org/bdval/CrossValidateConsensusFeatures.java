@@ -78,6 +78,8 @@ public class CrossValidateConsensusFeatures {
         String submissionFilename;
         String folds;
         String cvRepeats;
+        public String propertiesFilename;
+        public OptionalModelId[] optionalModelIds;
     }
 
     private void process(final String[] args) {
@@ -85,12 +87,16 @@ public class CrossValidateConsensusFeatures {
         toolsArgs.modelConditionsFilename = CLI.getOption(args, "--model-conditions", "model-conditions.txt");
         toolsArgs.resultsDirectoryPath = CLI.getOption(args, "--results-directory", "results");
         toolsArgs.submissionFilename = CLI.getOption(args, "--submission-file", "maqcii-consensus-features-cv.txt");
+        toolsArgs.propertiesFilename = CLI.getOption(args, "--properties", null);
+
         toolsArgs.folds = CLI.getOption(args, "--folds", "5");
         toolsArgs.cvRepeats = CLI.getOption(args, "--cv-repeats", "20");
         // the consensus method: features, models or models for PCA pathway runs only (default)
 
         final String featuresDirectoryPath = toolsArgs.resultsDirectoryPath + "/consensus-features";
         System.out.println("Will look for features in directory " + featuresDirectoryPath);
+
+        toolsArgs.optionalModelIds= GenerateFinalModels. loadProperties(toolsArgs.propertiesFilename);
 
         final ProgressLogger pg = new ProgressLogger(LOG);
         pg.itemsName = "model conditions";
@@ -275,6 +281,9 @@ public class CrossValidateConsensusFeatures {
             if ("evaluate-statistics".equals(key)) {
                 continue;
             }
+              if (isAnOptionalModelId(key)) {
+                continue;
+            }
             newMap.put(key, map.get(key));
         }
         final String datasetName = map.get("dataset-name");
@@ -285,6 +294,13 @@ public class CrossValidateConsensusFeatures {
         newMap.put("folds", toolArgs.folds);
         newMap.put("cv-repeats", toolArgs.cvRepeats);
         return newMap;
+    }
+
+      private boolean isAnOptionalModelId(String key) {
+        for (OptionalModelId optionalId : toolArgs.optionalModelIds) {
+            if (optionalId.columnIdentifier.equalsIgnoreCase(key)) return true;
+        }
+        return false;
     }
 
     private String extractLabel(final String datasetName, final ObjectSet<String> featureFilenames) {

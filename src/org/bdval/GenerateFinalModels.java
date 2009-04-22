@@ -58,6 +58,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -115,6 +116,7 @@ public class GenerateFinalModels {
     private void process(final String[] args) {
         final String modelConditionsFilename = CLI.getOption(args, "--model-conditions", "model-conditions.txt");
         final String resultsDirectoryPath = CLI.getOption(args, "--results-directory", "results");
+        final String propertiesFilename = CLI.getOption(args, "--properties", null);
         // the consensus method: features, models or models for PCA pathway runs only (default)
 
         final String consensusMethodName = CLI.getOption(args, "--consensus", "pathways:models");
@@ -136,6 +138,8 @@ public class GenerateFinalModels {
             System.out.println("Will use the feature selection method as is on the full training set to generate the final model.");
             consensusMethod = ConsensusMethod.DIRECT_METHOD;
         }
+
+        this.optionalModelIds = loadProperties(propertiesFilename);
         forceCreateDir(featuresOutputDirectoryPath);
         forceCreateDir(modelsOutputDirectoryPath);
 
@@ -165,6 +169,21 @@ public class GenerateFinalModels {
         }
 
         pg.stop("Model condition processing complete");
+    }
+
+    public static OptionalModelId[] loadProperties(String propertiesFilename) {
+        if (propertiesFilename != null) {
+            Properties configurationProperties = new Properties();
+            try {
+                configurationProperties.load(new FileReader(propertiesFilename));
+            } catch (IOException e) {
+                System.out.println("Cannot load properties file " + propertiesFilename);
+                System.exit(1);
+            }
+            return ExecuteSplitsMode.parseOptionalModelIdProperties(configurationProperties);
+        } else {
+            return new OptionalModelId[0];
+        }
     }
 
     private ParallelTeam team;
@@ -514,6 +533,9 @@ public class GenerateFinalModels {
             if ("survival".equals(key)) {
                 continue;
             }
+            if (isAnOptionalModelId(key)) {
+                continue;
+            }
             if (map.get(key).contains("weka.WekaClassifier")) {
                 // if any value contains  weka.WekaClassifier, it is not a libSVM model
                 libSVMModel = false;
@@ -570,6 +592,9 @@ public class GenerateFinalModels {
             if ("survival".equals(key)) {
                 continue;
             }
+            if (isAnOptionalModelId(key)) {
+                continue;
+            }
             if (map.get(key).contains("weka.WekaClassifier")) {
                 // if any value contains  weka.WekaClassifier, it is not a libSVM model
                 libSVMModel = false;
@@ -590,6 +615,15 @@ public class GenerateFinalModels {
         }
         return newMap;
     }
+
+    private boolean isAnOptionalModelId(String key) {
+        for (OptionalModelId optionalId : optionalModelIds) {
+            if (optionalId.columnIdentifier.equalsIgnoreCase(key)) return true;
+        }
+        return false;
+    }
+
+    private OptionalModelId[] optionalModelIds = new OptionalModelId[0];
 
     private String extractLabel(final String datasetName,
                                 final ObjectSet<String> featureFilenames, final String modelId) {
@@ -857,13 +891,16 @@ public class GenerateFinalModels {
             if ("alpha".equals(key)) {
                 continue;
             }
-             if ("survival".equals(key)) {
+            if ("survival".equals(key)) {
                 continue;
-             }
+            }
             if ("weka-class".equals(key)) {
                 continue;
             }
             if ("evaluate-statistics".equals(key)) {
+                continue;
+            }
+            if (isAnOptionalModelId(key)) {
                 continue;
             }
             newMap.put(key, map.get(key));

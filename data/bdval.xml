@@ -307,7 +307,7 @@
                 </then>
                 <else>
                     <property name="survival-arg-1" value=""/>
-                    <property name="survival-arg-2" value="${@{endpoint-name}.survival-file}"/>
+                    <property name="survival-arg-2" value=""/>
                 </else>
             </if>
             <if>
@@ -344,8 +344,8 @@
                         <arg line="--dataset-root @{dataset-root}"/>
                         <arg line="--other-measures ${other-performance-measures}"/>
                         <arg line="--estimate-with-replacement @{sample-with-replacement}"/>
-                        <arg value="${survival-arg-1}"/>
-                        <arg value="${survival-arg-2}"/>
+                        <arg line="${survival-arg-1}"/>
+                        <arg line="${survival-arg-2}"/>
                     </java>
                 </then>
             </if>
@@ -1327,30 +1327,79 @@
         <attribute name="endpoint-name"/>
 
         <sequential>
-            <java classname="org.bdval.DiscoverAndValidate"
-                  classpathref="bdval.classpath" fork="true" failonerror="true">
-                <jvmarg value="-ea"/>
-                <jvmarg value="${memory-flag}"/>
-                <sysproperty key="log4j.debug" value="${log4j.debug}"/>
-                <sysproperty key="log4j.configuration" value="file:///${config}/log4j.properties"/>
-                <sysproperty key="RConnectionPool.configuration" value="file:///${config}/RConnectionPool.xml"/>
-                <arg value="-m"/>
-                <arg value="to-ranks"/>
-                <arg value="--dataset-name"/>
-                <arg value="${@{endpoint-name}.dataset-name}"/>
-                <arg value="-i"/>
-                <arg value="${@{endpoint-name}.dataset-file}"/>
+            <echo message="endpoint: @{endpoint-name} value: ${@{endpoint-name}.validation.dataset-file.ranked}"/>
+            <if>
+                <!-- Produce a ranked validation dataset only when the validation.dataset-file.ranked property
+                is defined for the endpoint -->
+                <equals arg1="${@{endpoint-name}.validation.dataset-file.ranked}"
+                        arg2="\${\@{endpoint-name}.validation.dataset-file.ranked}"/>
+                <then>
+                </then>
+                <else>
+                    <delete failonerror="false" file="${@{endpoint-name}.validation.dataset-file.ranked}"/>
+                    <java classname="org.bdval.DiscoverAndValidate"
+                          classpathref="bdval.classpath" fork="true" failonerror="true">
+                        <jvmarg value="-ea"/>
+                        <jvmarg value="${memory-flag}"/>
+                        <sysproperty key="log4j.debug" value="${log4j.debug}"/>
+                        <sysproperty key="log4j.configuration" value="file:///${config}/log4j.properties"/>
+                        <sysproperty key="RConnectionPool.configuration" value="file:///${config}/RConnectionPool.xml"/>
+                        <arg value="-m"/>
+                        <arg value="to-ranks"/>
+                        <arg value="--dataset-name"/>
+                        <arg value="${@{endpoint-name}.dataset-name}"/>
+                        <arg value="-i"/>
+                        <arg value="${@{endpoint-name}.validation.dataset-file}"/>
 
-                <arg value="-p"/>
-                <arg value="${@{endpoint-name}.platform-file}"/>
-                <arg value="-t"/>
-                <arg value="${@{endpoint-name}.tasks-file}"/>
-                <arg value="-c"/>
-                <arg value="${@{endpoint-name}.cids-file}"/>
-                <arg line="-o ${@{endpoint-name}.dataset-file.ranked} "/>
+                        <arg value="-p"/>
+                        <arg value="${@{endpoint-name}.platform-file}"/>
+                        <arg value="-t"/>
+                        <arg value="${@{endpoint-name}.tasks-file}"/>
+                        <arg value="-c"/>
+                        <arg value="${@{endpoint-name}.cids-file}"/>
+                        <arg line="-o ${@{endpoint-name}.validation.dataset-file.ranked} "/>
 
 
-            </java>
+                    </java>
+                </else>
+            </if>
+            <if>
+                <!-- Produce a ranked  dataset only when the dataset-file.ranked property
+                is defined for the endpoint -->
+                <equals arg1="${@{endpoint-name}.dataset-file.ranked}"
+                        arg2="\${\@{endpoint-name}.dataset-file.ranked}"/>
+                <then>
+                </then>
+                <else>
+                    <delete failonerror="false" file="${@{endpoint-name}.dataset-file.ranked}"/>
+
+                    <java classname="org.bdval.DiscoverAndValidate"
+                          classpathref="bdval.classpath" fork="true" failonerror="true">
+                        <jvmarg value="-ea"/>
+                        <jvmarg value="${memory-flag}"/>
+                        <sysproperty key="log4j.debug" value="${log4j.debug}"/>
+                        <sysproperty key="log4j.configuration" value="file:///${config}/log4j.properties"/>
+                        <sysproperty key="RConnectionPool.configuration" value="file:///${config}/RConnectionPool.xml"/>
+                        <arg value="-m"/>
+                        <arg value="to-ranks"/>
+                        <arg value="--dataset-name"/>
+                        <arg value="${@{endpoint-name}.dataset-name}"/>
+                        <arg value="-i"/>
+                        <arg value="${@{endpoint-name}.dataset-file}"/>
+
+                        <arg value="-p"/>
+                        <arg value="${@{endpoint-name}.platform-file}"/>
+                        <arg value="-t"/>
+                        <arg value="${@{endpoint-name}.tasks-file}"/>
+                        <arg value="-c"/>
+                        <arg value="${@{endpoint-name}.cids-file}"/>
+                        <arg line="-o ${@{endpoint-name}.dataset-file.ranked} "/>
+
+
+                    </java>
+                </else>
+            </if>
+
 
         </sequential>
     </macrodef>
@@ -1370,6 +1419,36 @@
             </for>
         </sequential>
     </target>
+    <macrodef name="cross-validation-consensus-features">
+        <attribute name="model-conditions"/>
+        <attribute name="results-directory"/>
+        <attribute name="output" default="@{results-directory}-CVCF-maqcii-submission.txt"/>
+
+        <sequential>
+            <java classname="org.bdval.CrossValidateConsensusFeatures" dir="${bdval.basedir}"
+                  classpathref="bdval.classpath" fork="true" failonerror="true">
+                <jvmarg value="-ea"/>
+                <jvmarg value="${memory-flag}"/>
+                <sysproperty key="log4j.debug" value="${log4j.debug}"/>
+                <sysproperty key="log4j.configuration" value="file:///${config}/log4j.properties"/>
+                <sysproperty key="RConnectionPool.configuration" value="file:///${config}/RConnectionPool.xml"/>
+                <sysproperty key="pj.nt" value="${num-threads}"/>
+                <arg value="--model-conditions"/>
+                <arg value="@{model-conditions}"/>
+                <arg value="--results-directory"/>
+                <arg value="@{results-directory}"/>
+                <arg value="--submission-file"/>
+                <arg value="@{output}"/>
+                <arg value="--folds"/>
+                <arg value="${external-CV-folds}"/>
+                <arg value="--cv-repeats"/>
+                <arg value="${external-CV-repeats-number}"/>
+                <arg value="--properties"/>
+                <arg value="${project-property-file}"/>
+            </java>
+        </sequential>
+    </macrodef>
+
     <target name="cross-validate-consensus-features"
             description="Performs cross-validation with the consensus features corresponding to each model."
             depends="prepare-bdval">
@@ -1379,26 +1458,10 @@
                defaultvalue="model-conditions.txt"/>
         <input addproperty="results-directory"
                message="Enter the directory where results are stored (features subdirectory must exist in the results directory)."/>
+        <cross-validation-consensus-features model-conditions="${model-conditions}"
+                                             results-directory="${results-directory}"/>
 
-        <java classname="org.bdval.CrossValidateConsensusFeatures" dir="${bdval.basedir}"
-              classpathref="bdval.classpath" fork="true" failonerror="true">
-            <jvmarg value="-ea"/>
-            <jvmarg value="${memory-flag}"/>
-            <sysproperty key="log4j.debug" value="${log4j.debug}"/>
-            <sysproperty key="log4j.configuration" value="file:///${config}/log4j.properties"/>
-            <sysproperty key="RConnectionPool.configuration" value="file:///${config}/RConnectionPool.xml"/>
-            <sysproperty key="pj.nt" value="${num-threads}"/>
-            <arg value="--model-conditions"/>
-            <arg value="${model-conditions}"/>
-            <arg value="--results-directory"/>
-            <arg value="${results-directory}"/>
-            <arg value="--submission-file"/>
-            <arg value="${results-directory}-CVCF-maqcii-submission.txt"/>
-            <arg value="--folds"/>
-            <arg value="${external-CV-folds}"/>
-            <arg value="--cv-repeats"/>
-            <arg value="${external-CV-repeats-number}"/>
-        </java>
+
     </target>
     <macrodef name="candidate-model-selections">
 
@@ -1481,6 +1544,31 @@
 
     </target>
 
+    <macrodef name="generate-final-models">
+        <attribute name="results-directory"/>
+        <attribute name="model-conditions"/>
+        <!-- By default, generate consensus model for pathway PCA models -->
+        <attribute name="consensus-type" default="pathways:models"/>
+        <sequential>
+            <java classname="org.bdval.GenerateFinalModels" dir="${bdval.basedir}"
+                  classpathref="bdval.classpath" fork="true" failonerror="true">
+                <jvmarg value="-ea"/>
+                <jvmarg value="${memory-flag}"/>
+                <sysproperty key="log4j.debug" value="${log4j.debug}"/>
+                <sysproperty key="log4j.configuration" value="file:///${config}/log4j.properties"/>
+                <sysproperty key="RConnectionPool.configuration" value="file:///${config}/RConnectionPool.xml"/>
+                <sysproperty key="pj.nt" value="${num-threads}"/>
+                <arg value="--model-conditions"/>
+                <arg value="@{model-conditions}"/>
+                <arg value="--results-directory"/>
+                <arg value="@{results-directory}"/>
+                <arg value="--consensus"/>
+                <arg value="@{consensus-type}"/>
+                <arg value="--properties"/>
+                <arg value="${project-property-file}"/>
+            </java>
+        </sequential>
+    </macrodef>
     <target name="generate-final-models"
             description="Calculate feature consensus across multiple feature selection strategies and generate models with consensus features on the whole training set."
             depends="prepare-bdval">
@@ -1490,22 +1578,10 @@
         <input addproperty="results-directory"
                message="Enter the directory where results are stored (features subdirectory must exist in the results directory)."/>
 
-        <java classname="org.bdval.GenerateFinalModels" dir="${bdval.basedir}"
-              classpathref="bdval.classpath" fork="true" failonerror="true">
-            <jvmarg value="-ea"/>
-            <jvmarg value="${memory-flag}"/>
-            <sysproperty key="log4j.debug" value="${log4j.debug}"/>
-            <sysproperty key="log4j.configuration" value="file:///${config}/log4j.properties"/>
-            <sysproperty key="RConnectionPool.configuration" value="file:///${config}/RConnectionPool.xml"/>
-            <sysproperty key="pj.nt" value="${num-threads}"/>
-            <arg value="--model-conditions"/>
-            <arg value="${model-conditions}"/>
-            <arg value="--results-directory"/>
-            <arg value="${results-directory}"/>
-            <arg value="--consensus"/>
-            <!-- Generate consensus model for pathway PCA models -->
-            <arg value="pathways:models"/>
-        </java>
+        <generate-final-models results-directory="${results-directory"
+                               model-conditions="${model-conditions}"/>
+
+
     </target>
     <target name="generate-final-models-direct-method"
             description="Calculate feature consensus across multiple feature selection strategies and generate models with consensus features on the whole training set."
@@ -1544,6 +1620,7 @@
 
         <input addproperty="inspect-directory"
                message="Enter the directory where results directory will be found (each results directory must include features and models subdirectories)."/>
+
 
         <for param="results-directory">
             <dirset dir="${inspect-directory}">
@@ -1638,46 +1715,56 @@
                 <include name="200*-results.zip"/>
             </fileset>
         </delete>
+
     </target>
+
+    <macrodef name="restat">
+        <attribute name="results-directory"/>
+        <attribute name="output" default="@{results-directory}-${save-data-tag}-evaluation-stats.txt"/>
+        <sequential>
+            <for param="prediction-table-filename" trim="yes">
+                <fileset dir="@{results-directory}/predictions">
+                    <include name="*/*prediction-table.txt"/>
+                </fileset>
+                <sequential>
+                    <java classname="org.bdval.DiscoverAndValidate" dir="${bdval.basedir}"
+                          classpathref="bdval.classpath" fork="true" failonerror="true">
+                        <jvmarg value="-ea"/>
+                        <jvmarg value="${memory-flag}"/>
+                        <sysproperty key="log4j.debug" value="${log4j.debug}"/>
+                        <sysproperty key="log4j.configuration" value="file:///${config}/log4j.properties"/>
+                        <sysproperty key="RConnectionPool.configuration" value="file:///${config}/RConnectionPool.xml"/>
+                        <sysproperty key="pj.nt" value="${num-threads}"/>
+                        <arg value="-m"/>
+                        <arg value="stats"/>
+                        <arg value="--predictions"/>
+                        <arg value="@{prediction-table-filename}"/>
+                        <arg value="--label"/>
+                        <arg value="auto"/>
+                        <arg value="--binary"/>
+                        <arg value="true"/>
+                        <arg value="--dataset-name"/>
+                        <arg value="auto"/>
+
+                        <arg value="--folds"/>
+                        <arg value="${external-CV-folds}"/>
+                        <arg value="--submission-file"/>
+                        <arg value="@{output}"/>
+                    </java>
+                </sequential>
+            </for>
+        </sequential>
+    </macrodef>
 
     <target name="restat" description="Recalculate statistics for prediction table files in a given directory"
             depends="init,prepare-bdval,rserve-status,tag-output-directory">
         <delete file="${statistics-output}"/>
         <input addproperty="results-directory"
                message="Enter the results directory to restat. The directory must contain a predictions directory."/>
+        <restat results-directory="${results-directory"/>
 
         <echo message="Calculating statistics for results in ${results-directory}"/>
-        <for param="prediction-table-filename" trim="yes">
-            <fileset dir="${results-directory}/predictions">
-                <include name="*/*prediction-table.txt"/>
-            </fileset>
-            <sequential>
-                <java classname="org.bdval.DiscoverAndValidate" dir="${bdval.basedir}"
-                      classpathref="bdval.classpath" fork="true" failonerror="true">
-                    <jvmarg value="-ea"/>
-                    <jvmarg value="${memory-flag}"/>
-                    <sysproperty key="log4j.debug" value="${log4j.debug}"/>
-                    <sysproperty key="log4j.configuration" value="file:///${config}/log4j.properties"/>
-                    <sysproperty key="RConnectionPool.configuration" value="file:///${config}/RConnectionPool.xml"/>
-                    <sysproperty key="pj.nt" value="${num-threads}"/>
-                    <arg value="-m"/>
-                    <arg value="stats"/>
-                    <arg value="--predictions"/>
-                    <arg value="@{prediction-table-filename}"/>
-                    <arg value="--label"/>
-                    <arg value="auto"/>
-                    <arg value="--binary"/>
-                    <arg value="true"/>
-                    <arg value="--dataset-name"/>
-                    <arg value="auto"/>
 
-                    <arg value="--folds"/>
-                    <arg value="${external-CV-folds}"/>
-                    <arg value="--submission-file"/>
-                    <arg value="${results-directory}-${save-data-tag}-evalution-stats.txt"/>
-                </java>
-            </sequential>
-        </for>
 
     </target>
 
@@ -1865,6 +1952,39 @@
             </sequential>
         </for>
     </target>
+    <macrodef name="predict-dataset">
+        <attribute name="test-set-name"/>
+        <attribute name="evaluate-stats"/>
+        <attribute name="model-directory"/>
+        <sequential>
+            <sequential>
+                <echo message="Predicting all endpoints ${all-endpoints}"/>
+
+                <for param="current-endpoint" delimiter=" " list="${all-endpoints}" parallel="true"
+                     threadCount="${num-threads}">
+                    <sequential>
+                        <if>
+                            <istrue value="${do.@{current-endpoint}}"/>
+                            <then>
+                                <echo message="Predicting for endpoint @{current-endpoint}"/>
+                                <process-predict
+                                        endpoint-name="@{current-endpoint}"
+                                        test-set-name="@{test-set-name}"
+                                        model-directory="@{model-directory}"
+                                        sample-with-replacement="false"
+                                        evaluate-statistics="@{evaluate-stats}"
+                                        label="predict-set=@{test-set-name}"
+                                        num-threads="1"/>
+                                <copy-output-files endpoint-name="@{current-endpoint}"/>
+                            </then>
+                        </if>
+                    </sequential>
+
+                </for>
+
+            </sequential>
+        </sequential>
+    </macrodef>
     <target name="predict-validation" depends="init,tag-output-directory"
             description="Generate prediction files for validation dataset">
         <input addproperty="results-directory" message="Enter the results directory."
@@ -1879,33 +1999,12 @@
                defaultvalue="validation"/>
         <input addproperty="evaluate-stats" message="Evaluate performance statistics"
                defaultvalue="false"/>
+        <predict-dataset
+                test-set-name="${test-set-name}"
+                evaluate-stats="${evaluate-stats}"
 
-        <sequential>
-            <echo message="Predicting all endpoints ${all-endpoints}"/>
+                />
 
-            <for param="current-endpoint" delimiter=" " list="${all-endpoints}" parallel="true"
-                 threadCount="${num-threads}">
-                <sequential>
-                    <if>
-                        <istrue value="${do.@{current-endpoint}}"/>
-                        <then>
-                            <echo message="Predicting for endpoint @{current-endpoint}"/>
-                            <process-predict
-                                    endpoint-name="@{current-endpoint}"
-                                    test-set-name="${test-set-name}"
-                                    model-directory="${model-directory}"
-                                    sample-with-replacement="false"
-                                    evaluate-statistics="${evaluate-stats}"
-                                    label="predict-set=${test-set-name}"
-                                    num-threads="1"/>
-                            <copy-output-files endpoint-name="@{current-endpoint}"/>
-                        </then>
-                    </if>
-                </sequential>
-
-            </for>
-
-        </sequential>
     </target>
 
     <target name="rserve-status" description="Displays status of Rserve instances defined in a configuration file">
@@ -1917,5 +2016,49 @@
             <arg value="${config}/RConnectionPool.xml"/>
         </java>
     </target>
+
+
+    <target name="best-practices-full-pipeline" description="Run a complete pipeline"
+            depends="prepare-bdval,tag-output-directory">
+        <delete file="${statistics-output}"/>
+
+        <echo message="Executing with ${num-threads} threads"/>
+        <sequential>
+            <property name="use-feature-selection-fold=true" value="true"/>
+            <property name="use-feature-selection-fold=false" value="false"/>
+
+            <!--property name="do.FC+P.logitboost" value="true"/>
+            <property name="do.random-forest" value="true"/>
+            <property name="do.baseline-tune-C" value="true"/>
+            <property name="do.foldchange-svmglobal" value="true"/>
+            <property name="do.minmax-svmglobal" value="true"/-->
+            <property name="do.ttest-svmglobal" value="true"/>
+
+            <!--execute-all-endpoints/-->
+            <var name="save-data-dir" value="D:/dev/bdval/data/20090422-1717-results"/>
+
+            <restat results-directory="${save-data-dir}"
+                    output="${save-data-dir}/CV.txt"/>
+            <generate-final-models
+                    model-conditions="model-conditions.txt"
+                    results-directory="${save-data-dir}"
+                    />
+            <cross-validation-consensus-features
+                    model-conditions="model-conditions.txt"
+                    results-directory="${save-data-dir}"
+                    output="${save-data-dir}/CVCF.txt"
+                    />
+
+            <predict-dataset
+                    test-set-name="validation"
+                    evaluate-stats="false"
+                    model-directory="${save-data-dir}/final-models"
+                    />
+            <!--antcall target="process-model-conditions"/-->
+            <!--antcall target="zip-results"/-->
+        </sequential>
+
+    </target>
+
 
 </project>

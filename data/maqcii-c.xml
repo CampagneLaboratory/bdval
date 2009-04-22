@@ -77,18 +77,20 @@
     -->
 
     <property name="do.Iconix" value="true"/>
-    <property name="do.HamnerWithControl" value="true"/>
-    <property name="do.Cologne_OS_MO" value="true"/>
-    <property name="do.Cologne_EFS_MO" value="true"/>
-    <property name="do.Cologne_NEP_R" value="true"/>
-    <property name="do.Cologne_NEP_S" value="true"/>
-    <property name="do.NIEHS" value="true"/>
-    <property name="do.MDACC_PCR" value="true"/>
-    <property name="do.MDACC_ERPOS" value="true"/>
-    <property name="do.UAMS_EFS_MO" value="true"/>
-    <property name="do.UAMS_OS_MO" value="true"/>
-    <property name="do.UAMS_CPR1" value="true"/>
-    <property name="do.UAMS_CPS1" value="true"/>
+     <property name="do.HamnerWithControl" value="true"/>
+     <property name="do.Cologne_OS_MO" value="true"/>
+     <property name="do.Cologne_EFS_MO" value="true"/>
+     <property name="do.Cologne_NEP_R" value="false"/>
+     <property name="do.Cologne_NEP_S" value="true"/>
+     <property name="do.NIEHS" value="true"/>
+     <property name="do.MDACC_PCR" value="true"/>
+     <property name="do.MDACC_ERPOS" value="true"/>
+     <property name="do.UAMS_EFS_MO" value="true"/>
+     <property name="do.UAMS_OS_MO" value="true"/>
+     <property name="do.UAMS_CPR1" value="false"/>
+     <property name="do.UAMS_CPS1" value="true"/>
+   
+
 
     <property name="all-endpoints"
               value="HamnerWithControl Iconix NIEHS MDACC_PCR MDACC_ERPOS Cologne_OS_MO Cologne_EFS_MO UAMS_EFS_MO UAMS_OS_MO UAMS_CPR1 UAMS_CPS1 Cologne_NEP_R Cologne_NEP_S"/>
