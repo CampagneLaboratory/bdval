@@ -2118,10 +2118,10 @@
              <property name="use-feature-selection-fold=true" value="true"/>
             <property name="use-feature-selection-fold=false" value="false"/>
 
-            <property name="do.FC+P.logitboost" value="false"/>
-            <property name="do.random-forest" value="false"/>
+            <property name="do.FC+P.logitboost" value="true"/>
+            <property name="do.random-forest" value="true"/>
             <!--property name="do.baseline-tune-C" value="true"/-->
-            <property name="do.foldchange-svmglobal" value="false"/>
+            <property name="do.foldchange-svmglobal" value="true"/>
             <property name="do.minmax-svmglobal" value="false"/>
             <property name="do.ttest-svmglobal" value="true"/>
             <execute-all-endpoints/>
