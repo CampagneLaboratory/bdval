@@ -77,19 +77,18 @@
     -->
 
     <property name="do.Iconix" value="true"/>
-     <property name="do.HamnerWithControl" value="true"/>
-     <property name="do.Cologne_OS_MO" value="true"/>
-     <property name="do.Cologne_EFS_MO" value="true"/>
-     <property name="do.Cologne_NEP_R" value="false"/>
-     <property name="do.Cologne_NEP_S" value="true"/>
-     <property name="do.NIEHS" value="true"/>
-     <property name="do.MDACC_PCR" value="true"/>
-     <property name="do.MDACC_ERPOS" value="true"/>
-     <property name="do.UAMS_EFS_MO" value="true"/>
-     <property name="do.UAMS_OS_MO" value="true"/>
-     <property name="do.UAMS_CPR1" value="false"/>
-     <property name="do.UAMS_CPS1" value="true"/>
-   
+    <property name="do.HamnerWithControl" value="false"/>
+    <property name="do.Cologne_OS_MO" value="false"/>
+    <property name="do.Cologne_EFS_MO" value="false"/>
+    <property name="do.Cologne_NEP_R" value="false"/>
+    <property name="do.Cologne_NEP_S" value="false"/>
+    <property name="do.NIEHS" value="false"/>
+    <property name="do.MDACC_PCR" value="false"/>
+    <property name="do.MDACC_ERPOS" value="false"/>
+    <property name="do.UAMS_EFS_MO" value="false"/>
+    <property name="do.UAMS_OS_MO" value="false"/>
+    <property name="do.UAMS_CPR1" value="false"/>
+    <property name="do.UAMS_CPS1" value="false"/>
 
 
     <property name="all-endpoints"
@@ -143,11 +142,11 @@
             <property name="use-feature-selection-fold=true" value="true"/>
             <property name="use-feature-selection-fold=false" value="false"/>
 
-            <property name="do.FC+P.logitboost" value="true"/>
-            <property name="do.random-forest" value="true"/>
-            <property name="do.baseline-tune-C" value="true"/>
-            <property name="do.foldchange-svmglobal" value="true"/>
-            <property name="do.minmax-svmglobal" value="true"/>
+            <property name="do.FC+P.logitboost" value="false"/>
+            <property name="do.random-forest" value="false"/>
+            <property name="do.baseline-tune-C" value="false"/>
+            <property name="do.foldchange-svmglobal" value="false"/>
+            <property name="do.minmax-svmglobal" value="false"/>
             <property name="do.ttest-svmglobal" value="true"/>
 
             <execute-all-endpoints/>

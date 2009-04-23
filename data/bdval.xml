@@ -255,6 +255,7 @@
         <attribute name="model"/>
         <attribute name="other-options" default=""/>
         <attribute name="sample-with-replacement" default="false"/>
+        <attribute name="submission-output" default="@{endpoint-name}-@{test-set-name}-maqcii-stats.txt"/>
         <sequential>
             <echo message="++"/>
             <echo message="++ Running  @{test-set-name} : predict -> @{output}"/>
@@ -327,7 +328,7 @@
                         <arg value="-i"/>
                         <arg value="${predict-dataset-file}"/>
                         <arg value="--submission-file"/>
-                        <arg value="@{endpoint-name}-@{test-set-name}-maqcii-stats.txt"/>
+                        <arg value="@{submission-output}"/>
                         <!-- short for faster -->
                         <arg value="--test-samples"/>
                         <arg value="${@{endpoint-name}.@{test-set-name}.test-samples}"/>
@@ -1226,6 +1227,8 @@
         <attribute name="label" default="predict-test"/>
         <attribute name="sample-with-replacement" default="false"/>
         <attribute name="evaluate-statistics" default="true"/>
+        <attribute name="output-directory" default="."/>
+        <attribute name="submission-output" default="@{endpoint-name}-@{test-set-name}-maqcii-stats.txt"/>
         <!-- TODO: predict has issues running in parallel.  See http://icbtools.med.cornell.edu/mantis/view.php?id=1301 -->
         <attribute name="num-threads" default="1"/>
 
@@ -1256,7 +1259,8 @@
                                         <then>
                                             <var name="evaluate-statistics-option"
                                                  value="--print-stats"/>
-                                            <var name="output-option" value="@{endpoint-name}-@{label}-stats.txt"/>
+                                            <var name="output-option"
+                                                 value="@{output-directory}/@{endpoint-name}-@{label}-stats.txt"/>
 
                                         </then>
                                         <else>
@@ -1282,7 +1286,8 @@
                                                     output="${output-option}"
                                                     model="@{predict-model-file}"
                                                     other-options="${evaluate-statistics-option} ${pathways-params} "
-                                                    sample-with-replacement="@{sample-with-replacement}"/>
+                                                    sample-with-replacement="@{sample-with-replacement}"
+                                                    submission-output="@{submission-output}"/>
                                         </then>
                                         <else>
                                             <echo message="Model basename (${model-basename}) does not contain endpoint (@{endpoint-name}). Skipping model for this endpoint"/>
@@ -1669,7 +1674,11 @@
         </sequential>
     </macrodef>
 
-    <target name="zip-results" description="Zip result files">
+    <macrodef name="zip-results">
+        <attribute name="include-split-models" default="true"/>
+        <attribute name="include-predictions" default="true"/>
+        <attribute name="include-final-models" default="true"/>
+        <attribute name="label" default="all"/>
         <sequential>
             <concat destfile="${save-data-dir}/${save-data-tag}-all-maqcii-submission.txt">
                 <fileset dir="${save-data-dir}" file="*maqcii-submission*.txt"/>
@@ -1679,6 +1688,8 @@
             </concat>
             <delete>
                 <fileset dir="${save-data-dir}">
+
+
                     <include name="*maqcii-submission*.txt"/>
                     <include name="*stats*.txt"/>
                     <exclude name="${save-data-tag}-all-maqcii-submission.txt"/>
@@ -1686,13 +1697,22 @@
                 </fileset>
             </delete>
             <echo message="Zipping results ${save-data-tag}.zip"/>
-            <zip destfile="${bdval.basedir}/${save-data-tag}.zip"
+            <zip destfile="${bdval.basedir}/${save-data-tag}-@{label}.zip"
                  comment="${ant.project.name} results from ${save-data-tag}">
                 <fileset dir="${bdval.basedir}">
+
+                    <exclude name="${save-data-tag}/features/**" unless="include-split-models"/>
+                    <exclude name="${save-data-tag}/models/**" unless="include-split-models"/>
+                    <exclude name="${save-data-tag}/predictions/**" unless="include-predictions"/>
+                    <exclude name="${save-data-tag}/final-models/**" unless="include-final-models"/>
+                    <exclude name="${save-data-tag}/final-models-direct/**" unless="include-final-models"/>
                     <include name="${save-data-tag}/**/*"/>
                 </fileset>
             </zip>
         </sequential>
+    </macrodef>
+    <target name="zip-results" description="Zip result files">
+        <zip-results/>
     </target>
 
     <target name="delete-results" description="Delete previous result files">
@@ -1797,20 +1817,28 @@
         </copy>
     </target>
 
+    <macrodef name="rewrite-model-conditions">
+        <attribute name="input"/>
+        <attribute name="output"/>
+        <sequential>
+            <java classname="org.bdval.util.RewriteModelConditions" dir="${bdval.basedir}"
+                  classpathref="bdval.classpath" fork="true" failonerror="true">
+                <jvmarg value="-ea"/>
+                <jvmarg value="${memory-flag}"/>
+                <sysproperty key="log4j.debug" value="${log4j.debug}"/>
+                <sysproperty key="log4j.configuration" value="file:///${config}/log4j.properties"/>
+                <sysproperty key="RConnectionPool.configuration" value="file:///${config}/RConnectionPool.xml"/>
+                <arg value="-i"/>
+                <arg value="@{input}"/>
+                <arg value="-o"/>
+                <arg value="@{output}"/>
+            </java>
+        </sequential>
+    </macrodef>
     <target name="rewrite-model-conditions-no-prompt" depends="prepare-bdval"
             description="Read a model-conditions.txt file, write a model-conditions-columns.txt file">
-        <java classname="org.bdval.util.RewriteModelConditionslConditions" dir="${bdval.basedir}"
-              classpathref="bdval.classpath" fork="true" failonerror="true">
-            <jvmarg value="-ea"/>
-            <jvmarg value="${memory-flag}"/>
-            <sysproperty key="log4j.debug" value="${log4j.debug}"/>
-            <sysproperty key="log4j.configuration" value="file:///${config}/log4j.properties"/>
-            <sysproperty key="RConnectionPool.configuration" value="file:///${config}/RConnectionPool.xml"/>
-            <arg value="-i"/>
-            <arg value="model-conditions.txt"/>
-            <arg value="-o"/>
-            <arg value="model-conditions-columns.txt"/>
-        </java>
+        <rewrite-model-conditions input="model-conditions.txt" output="model-conditions-columns.txt"/>
+
     </target>
 
     <target name="make-synthetic-dataset" depends="prepare-bdval"
@@ -1944,6 +1972,9 @@
         <attribute name="test-set-name"/>
         <attribute name="evaluate-stats"/>
         <attribute name="model-directory"/>
+
+        <attribute name="output-directory" default=""/>
+        <attribute name="submission-output" default="@{test-set-name}-maqcii-stats.txt"/>
         <sequential>
             <sequential>
                 <echo message="Predicting all endpoints ${all-endpoints}"/>
@@ -1962,7 +1993,10 @@
                                         sample-with-replacement="false"
                                         evaluate-statistics="@{evaluate-stats}"
                                         label="predict-set=@{test-set-name}"
-                                        num-threads="1"/>
+                                        num-threads="1"
+                                        submission-output="@{submission-output}"
+                                        output-directory="@{output-directory}"
+                                        />
                                 <copy-output-files endpoint-name="@{current-endpoint}"/>
                             </then>
                         </if>
@@ -2022,14 +2056,16 @@
             <property name="do.minmax-svmglobal" value="true"/-->
             <property name="do.ttest-svmglobal" value="true"/>
 
-            <!--execute-all-endpoints/-->
-            <var name="save-data-dir" value="D:/dev/bdval/data/20090422-1717-results"/>
+            <execute-all-endpoints/>
+            <!--
+            Used for testing. Just set the var to a previoulsy generated results directory
+            <var name="save-data-dir" value="D:\dev\bdval\data\20090423-1230-results"/>      -->
 
             <restat results-directory="${save-data-dir}"
                     output="${save-data-dir}/CV.txt"/>
             <generate-final-models
                     model-conditions="model-conditions.txt"
-                    results-directory="${save-data-dir}"                    />
+                    results-directory="${save-data-dir}"/>
 
             <generate-final-models results-directory="${save-data-dir}"
                                    model-conditions="model-conditions.txt"
@@ -2043,17 +2079,27 @@
 
             <predict-dataset
                     test-set-name="validation"
-                    evaluate-stats="false"
+                    evaluate-stats="true"
+                    submission-output="${save-data-dir}/validation.txt"
                     model-directory="${save-data-dir}/final-models"
                     />
-             <predict-dataset
+            <predict-dataset
                     test-set-name="validation"
-                    evaluate-stats="false"
+                    evaluate-stats="true"
+                    submission-output="${save-data-dir}/validation-direct-method-models.txt"
                     model-directory="${save-data-dir}/final-models-direct"
                     />
-            <!-- TODO write the output of predict-dataset to ${save-data-dir} --> 
-            <!--antcall target="process-model-conditions"/-->
-            <!--antcall target="zip-results"/-->
+
+            <antcall target="process-model-conditions"/>
+            <rewrite-model-conditions input="model-conditions.txt"
+                                      output="${save-data-dir}/model-conditions-column.txt"/>
+
+            <zip-results
+                    include-predictions="false"
+                    include-split-models="false"
+                    include-final-models="true"
+                    label="final-models-and-stats"/>
+
         </sequential>
 
     </target>
