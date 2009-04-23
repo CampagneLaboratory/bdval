@@ -73,6 +73,7 @@ public class ToRanksMode extends DAVMode {
             e.printStackTrace();
         }
         int numColumns = table.getColumnNumber();
+        // for each sample in the input file:
         for (int colIndex = 1; colIndex < numColumns; colIndex++) {
             String colIdf = table.getIdentifier(colIndex);
             try {

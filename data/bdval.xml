@@ -1474,6 +1474,7 @@
                    default="--model-ids-map-file C:\home\maqcii\dev-maqcii\results\Sept-17-2008\official-submission-May-5-2008\ModelId-Mapping-Info.txt"/>
         <attribute name="cv-results-filename"/>
         <attribute name="cvcf-results-filename"/>
+        <attribute name="validation-results-filename" default="N/A"/>
         <attribute name="output-filename"/>
         <attribute name="pvalue-output-filename" default="-"/>
         <attribute name="rank-output-filename" default="-"/>
@@ -1484,6 +1485,17 @@
         <attribute name="dump" default=""/>
 
         <sequential>
+            <if>
+                <not>
+                    <equals arg1="@{validation-results-filename}" arg2="N/A"/>
+                </not>
+                <then>
+                    <var name="test-arguments" value="--test @{validation-results-filename}"></var>
+                </then>
+                <else>
+                    <var name="test-arguments" value=" "></var>
+                </else>
+            </if>
 
             <java classname="org.bdval.modelselection.CandidateModelSelection" fork="true"
                   failonerror="true">
@@ -1499,6 +1511,7 @@
                 <arg value="@{rank-candidates-by}"/>
                 <arg value="--reward-performance"/>
                 <arg value="@{reward-performance}"/>
+                <arg line="${test-arguments}"/>
                 <arg line="@{model-ids}"/>
                 <arg line="@{custom-ranking-set}"/>
                 <arg line="@{dump}"/>
@@ -1515,6 +1528,37 @@
 
         </sequential>
     </macrodef>
+
+    <macrodef name="combine-statistics">
+
+        <attribute name="model-ids"
+                   default="--model-ids-map-file C:\home\maqcii\dev-maqcii\results\Sept-17-2008\official-submission-May-5-2008\ModelId-Mapping-Info.txt"/>
+        <attribute name="cv-statistics"/>
+        <attribute name="cvcf-statistics"/>
+        <attribute name="validation-statistics"/>
+        <attribute name="model-conditions"/>
+        <attribute name="output"/>
+        <attribute name="dump" default=""/>
+
+        <sequential>
+
+
+            <candidate-model-selections
+                    cv-results-filename="@{cv-statistics}"
+                    cvcf-results-filename="@{cvcf-statistics}"
+                    model-ids=""
+                    output-filename="-"
+                    dump="--dump @{output}  --model-conditions @{model-conditions}"
+                    reward-performance="AUC"
+                    rank-candidates-by="AUC"
+                    selection-strategy="CV"
+                    custom-ranking-set=""
+                    validation-results-filename="@{validation-statistics}"/>
+
+
+        </sequential>
+    </macrodef>
+
     <target name="candidate-model-selection"
             description="Rank models accroding to some model selection strategy."
             depends="prepare-bdval">
@@ -2049,8 +2093,15 @@
         </java>
     </target>
     <target name="test-full-pipeline" description="Run a complete pipeline">
-        <var name="save-data-dir" value="D:\dev\bdval\data\20090423-1355-results"/>
-        <var name="save-data-tag" value="20090423-1355-results"/>
+        <var name="save-data-dir" value="D:\dev\bdval\data\20090423-1557-results"/>
+        <var name="save-data-tag" value="20090423-1557-results"/>
+        <combine-statistics
+                cv-statistics="${save-data-dir}/CV.txt"
+                cvcf-statistics="${save-data-dir}/CVCF.txt"
+                validation-statistics="${save-data-dir}/CVCF.txt"
+                output="${save-data-dir}/CV_CVCF_validation.txt"
+                model-conditions="${save-data-dir}/model-conditions-column.txt"
+                />
         <zip-results
                 include-predictions="false"
                 include-split-models="false"
@@ -2111,6 +2162,13 @@
             <rewrite-model-conditions input="model-conditions.txt"
                                       output="${save-data-dir}/model-conditions-column.txt"/>
 
+            <combine-statistics
+                    cv-statistics="${save-data-dir}/CV.txt"
+                    cvcf-statistics="${save-data-dir}/CVCF.txt"
+                    validation-statistics="${save-data-dir}/CVCF.txt"
+                    output="${save-data-dir}/CV_CVCF_validation.txt"
+                    model-conditions="${save-data-dir}/model-conditions-column.txt"/>
+            
             <zip-results
                     include-predictions="false"
                     include-split-models="false"
