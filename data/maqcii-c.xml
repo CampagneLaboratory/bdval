@@ -143,7 +143,7 @@
             <property name="use-feature-selection-fold=false" value="false"/>
 
             <property name="do.FC+P.logitboost" value="false"/>
-            <property name="do.random-forest" value="false"/>
+            <property name="do.random-forest" value="true"/>
             <property name="do.baseline-tune-C" value="false"/>
             <property name="do.foldchange-svmglobal" value="false"/>
             <property name="do.minmax-svmglobal" value="false"/>

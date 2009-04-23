@@ -1697,6 +1697,16 @@
                 </fileset>
             </delete>
             <echo message="Zipping results ${save-data-tag}.zip"/>
+            <condition property="include-split-models">
+                <istrue value="@{include-split-models}"/>
+            </condition>
+            <condition property="include-predictions">
+                <istrue value="@{include-predictions}"/>
+            </condition>
+            <condition property="include-final-models">
+                <istrue value="@{include-final-models}"/>
+            </condition>
+
             <zip destfile="${bdval.basedir}/${save-data-tag}-@{label}.zip"
                  comment="${ant.project.name} results from ${save-data-tag}">
                 <fileset dir="${bdval.basedir}">
@@ -2038,8 +2048,16 @@
             <arg value="${config}/RConnectionPool.xml"/>
         </java>
     </target>
+    <target name="test-full-pipeline" description="Run a complete pipeline">
+        <var name="save-data-dir" value="D:\dev\bdval\data\20090423-1355-results"/>
+        <var name="save-data-tag" value="20090423-1355-results"/>
+        <zip-results
+                include-predictions="false"
+                include-split-models="false"
+                include-final-models="true"
+                label="final-models-and-stats"/>
 
-
+    </target>
     <target name="best-practices-full-pipeline" description="Run a complete pipeline"
             depends="prepare-bdval,tag-output-directory">
         <delete file="${statistics-output}"/>
@@ -2049,11 +2067,11 @@
             <property name="use-feature-selection-fold=true" value="true"/>
             <property name="use-feature-selection-fold=false" value="false"/>
 
-            <!--property name="do.FC+P.logitboost" value="true"/>
+            <property name="do.FC+P.logitboost" value="true"/>
             <property name="do.random-forest" value="true"/>
-            <property name="do.baseline-tune-C" value="true"/>
+            <!--property name="do.baseline-tune-C" value="true"/-->
             <property name="do.foldchange-svmglobal" value="true"/>
-            <property name="do.minmax-svmglobal" value="true"/-->
+            <property name="do.minmax-svmglobal" value="true"/>
             <property name="do.ttest-svmglobal" value="true"/>
 
             <execute-all-endpoints/>
@@ -2074,8 +2092,7 @@
             <cross-validation-consensus-features
                     model-conditions="model-conditions.txt"
                     results-directory="${save-data-dir}"
-                    output="${save-data-dir}/CVCF.txt"
-                    />
+                    output="${save-data-dir}/CVCF.txt"/>
 
             <predict-dataset
                     test-set-name="validation"
