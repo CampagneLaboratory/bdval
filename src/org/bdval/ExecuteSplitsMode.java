@@ -82,7 +82,11 @@ public class ExecuteSplitsMode extends DAVMode {
 
             for (String propertyName : configurationProperties.stringPropertyNames()) {
                 if (propertyName.startsWith("define.model-id.column-id")) {
-                    optionalModelIdColumnNames.add(configurationProperties.getProperty(propertyName));
+                    final String columnIdNames = configurationProperties.getProperty(propertyName);
+                    String[] names = columnIdNames.split(",");
+                    for (String name : names) {
+                        optionalModelIdColumnNames.add(name);
+                    }
                 }
             }
 
@@ -113,7 +117,7 @@ public class ExecuteSplitsMode extends DAVMode {
     public void interpretArguments(
             final JSAP jsap, final JSAPResult result, final DAVOptions options) {
         super.interpretArguments(jsap, result, options);
-        this.optionalModelIds=this.parseOptionalModelIdProperties(configurationProperties);
+        this.optionalModelIds = this.parseOptionalModelIdProperties(configurationProperties);
 
         evaluateStatistics = result.getBoolean("evaluate-statistics");
         if (!evaluateStatistics) {
@@ -186,16 +190,27 @@ public class ExecuteSplitsMode extends DAVMode {
         for (int i = 0; i < originalArgs.length; i++) {
             final String argumentName = originalArgs[i].
                     replaceAll("--", "");
+            if (optionalModelId.columnIdentifier.equalsIgnoreCase(argumentName)) {      // skip optional modelIds arguments as well.
+                final int skipNumber = 1;
+                LOGGER.info("For optional modelId: " + optionalModelId.columnIdentifier + " Filtering out argument " + argumentName + " total args skipped: " + skipNumber);
+
+                i += skipNumber; // skip argument name and 'skip' number of arguments.
+            }           
             if (optionalModelId.excludeArgumentNames.contains(argumentName)) {
                 final int skipNumber = optionalModelId.skipValue(argumentName);
                 LOGGER.info("For optional modelId: " + optionalModelId.columnIdentifier + " Filtering out argument " + argumentName + " total args skipped: " + skipNumber);
 
                 i += skipNumber; // skip argument name and 'skip' number of arguments.
             } else {
+                LOGGER.debug("Adding argument to hashCode: " + originalArgs[i]);
                 filteredArgs.add(originalArgs[i]);
             }
+
             if (i >= originalArgs.length) break;
+
         }
+        // Hashcode will depend on argument order, so we sort them after filtering:
+        Collections.sort(filteredArgs);
         return filteredArgs.toArray(new String[filteredArgs.size()]);
     }
 

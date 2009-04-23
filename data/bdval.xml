@@ -2093,8 +2093,8 @@
         </java>
     </target>
     <target name="test-full-pipeline" description="Run a complete pipeline">
-        <var name="save-data-dir" value="D:\dev\bdval\data\20090423-1557-results"/>
-        <var name="save-data-tag" value="20090423-1557-results"/>
+        <var name="save-data-dir" value="D:\dev\bdval\data\20090423-1511-results"/>
+        <var name="save-data-tag" value="20090423-1511-results"/>
         <combine-statistics
                 cv-statistics="${save-data-dir}/CV.txt"
                 cvcf-statistics="${save-data-dir}/CVCF.txt"
@@ -2115,16 +2115,15 @@
 
         <echo message="Executing with ${num-threads} threads"/>
         <sequential>
-            <property name="use-feature-selection-fold=true" value="true"/>
+             <property name="use-feature-selection-fold=true" value="true"/>
             <property name="use-feature-selection-fold=false" value="false"/>
 
-            <property name="do.FC+P.logitboost" value="true"/>
-            <property name="do.random-forest" value="true"/>
+            <property name="do.FC+P.logitboost" value="false"/>
+            <property name="do.random-forest" value="false"/>
             <!--property name="do.baseline-tune-C" value="true"/-->
-            <property name="do.foldchange-svmglobal" value="true"/>
-            <property name="do.minmax-svmglobal" value="true"/>
+            <property name="do.foldchange-svmglobal" value="false"/>
+            <property name="do.minmax-svmglobal" value="false"/>
             <property name="do.ttest-svmglobal" value="true"/>
-
             <execute-all-endpoints/>
             <!--
             Used for testing. Just set the var to a previoulsy generated results directory
