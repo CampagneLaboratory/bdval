@@ -2109,13 +2109,69 @@
                 label="final-models-and-stats"/>
 
     </target>
+    <macrodef name="collect-statistics">
+        <attribute name="save-data-dir"/>
+        <sequential>
+            <restat results-directory="@{save-data-dir}"
+                    output="@{save-data-dir}/CV.txt"/>
+            <generate-final-models
+                    model-conditions="model-conditions.txt"
+                    results-directory="@{save-data-dir}"/>
+
+            <generate-final-models results-directory="@{save-data-dir}"
+                                   model-conditions="model-conditions.txt"
+                                   consensus-type="direct"/>
+
+            <cross-validation-consensus-features
+                    model-conditions="model-conditions.txt"
+                    results-directory="@{save-data-dir}"
+                    output="@{save-data-dir}/CVCF.txt"/>
+
+            <predict-dataset
+                    test-set-name="validation"
+                    evaluate-stats="true"
+                    submission-output="@{save-data-dir}/validation.txt"
+                    model-directory="@{save-data-dir}/final-models"
+                    />
+            <predict-dataset
+                    test-set-name="validation"
+                    evaluate-stats="true"
+                    submission-output="@{save-data-dir}/validation-direct-method-models.txt"
+                    model-directory="@{save-data-dir}/final-models-direct"
+                    />
+
+            <antcall target="process-model-conditions"/>
+            <rewrite-model-conditions input="model-conditions.txt"
+                                      output="@{save-data-dir}/model-conditions-column.txt"/>
+
+            <combine-statistics
+                    cv-statistics="@{save-data-dir}/CV.txt"
+                    cvcf-statistics="@{save-data-dir}/CVCF.txt"
+                    validation-statistics="@{save-data-dir}/CVCF.txt"
+                    output="@{save-data-dir}/CV_CVCF_validation.txt"
+                    model-conditions="@{save-data-dir}/model-conditions-column.txt"/>
+
+            <zip-results
+                    include-predictions="false"
+                    include-split-models="false"
+                    include-final-models="true"
+                    label="final-models-and-stats"/>
+        </sequential>
+    </macrodef>
+
+    <target name="finish-pipeline" description="collect statistics for a results directory built previously">
+        <input addproperty="save-data-dir"
+               message="Enter the directory where results are stored (features subdirectory must exist in the results directory)."/>
+        <collect-statistics save-data-dir="${save-data-dir}"/>
+    </target>
+
     <target name="best-practices-full-pipeline" description="Run a complete pipeline"
             depends="prepare-bdval,tag-output-directory">
         <delete file="${statistics-output}"/>
 
         <echo message="Executing with ${num-threads} threads"/>
         <sequential>
-             <property name="use-feature-selection-fold=true" value="true"/>
+            <property name="use-feature-selection-fold=true" value="true"/>
             <property name="use-feature-selection-fold=false" value="false"/>
 
             <property name="do.FC+P.logitboost" value="true"/>
@@ -2129,51 +2185,8 @@
             Used for testing. Just set the var to a previoulsy generated results directory
             <var name="save-data-dir" value="D:\dev\bdval\data\20090423-1230-results"/>      -->
 
-            <restat results-directory="${save-data-dir}"
-                    output="${save-data-dir}/CV.txt"/>
-            <generate-final-models
-                    model-conditions="model-conditions.txt"
-                    results-directory="${save-data-dir}"/>
-
-            <generate-final-models results-directory="${save-data-dir}"
-                                   model-conditions="model-conditions.txt"
-                                   consensus-type="direct"/>
-
-            <cross-validation-consensus-features
-                    model-conditions="model-conditions.txt"
-                    results-directory="${save-data-dir}"
-                    output="${save-data-dir}/CVCF.txt"/>
-
-            <predict-dataset
-                    test-set-name="validation"
-                    evaluate-stats="true"
-                    submission-output="${save-data-dir}/validation.txt"
-                    model-directory="${save-data-dir}/final-models"
-                    />
-            <predict-dataset
-                    test-set-name="validation"
-                    evaluate-stats="true"
-                    submission-output="${save-data-dir}/validation-direct-method-models.txt"
-                    model-directory="${save-data-dir}/final-models-direct"
-                    />
-
-            <antcall target="process-model-conditions"/>
-            <rewrite-model-conditions input="model-conditions.txt"
-                                      output="${save-data-dir}/model-conditions-column.txt"/>
-
-            <combine-statistics
-                    cv-statistics="${save-data-dir}/CV.txt"
-                    cvcf-statistics="${save-data-dir}/CVCF.txt"
-                    validation-statistics="${save-data-dir}/CVCF.txt"
-                    output="${save-data-dir}/CV_CVCF_validation.txt"
-                    model-conditions="${save-data-dir}/model-conditions-column.txt"/>
-            
-            <zip-results
-                    include-predictions="false"
-                    include-split-models="false"
-                    include-final-models="true"
-                    label="final-models-and-stats"/>
-
+            <collect-statistics
+                    save-data-dir="${save-data-dir}"/>
         </sequential>
 
     </target>
