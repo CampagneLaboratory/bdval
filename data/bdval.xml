@@ -2196,10 +2196,7 @@
             <property name="do.minmax-svmglobal" value="false"/>
             <property name="do.ttest-svmglobal" value="true"/>
             <execute-all-endpoints/>
-            <!--
-            Used for testing. Just set the var to a previoulsy generated results directory
-            <var name="save-data-dir" value="D:\dev\bdval\data\20090423-1230-results"/>      -->
-
+          
             <collect-statistics
                     save-data-dir="${save-data-dir}"/>
         </sequential>
