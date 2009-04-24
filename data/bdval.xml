@@ -2096,12 +2096,17 @@
         <var name="save-data-dir" value="D:\dev\bdval\data\20090423-1511-results"/>
         <var name="save-data-tag" value="20090423-1511-results"/>
         <combine-statistics
-                cv-statistics="${save-data-dir}/CV.txt"
-                cvcf-statistics="${save-data-dir}/CVCF.txt"
-                validation-statistics="${save-data-dir}/CVCF.txt"
-                output="${save-data-dir}/CV_CVCF_validation.txt"
-                model-conditions="${save-data-dir}/model-conditions-column.txt"
-                />
+                cv-statistics="@{save-data-dir}/CV.txt"
+                cvcf-statistics="@{save-data-dir}/CVCF.txt"
+                validation-statistics="@{save-data-dir}/validation.txt"
+                output="@{save-data-dir}/CV_CVCF_validation.txt"
+                model-conditions="@{save-data-dir}/model-conditions-column.txt"/>
+        <combine-statistics
+                cv-statistics="@{save-data-dir}/CV.txt"
+                cvcf-statistics="@{save-data-dir}/CVCF.txt"
+                validation-statistics="@{save-data-dir}/validation-direct-method-models.txt"
+                output="@{save-data-dir}/CV_CVCF_validation-direct-method-models.txt"
+                model-conditions="@{save-data-dir}/model-conditions-column.txt"/>
         <zip-results
                 include-predictions="false"
                 include-split-models="false"
@@ -2135,7 +2140,7 @@
                     model-directory="@{save-data-dir}/final-models"
                     output-directory="@{save-data-dir}"/>
             <predict-dataset
-                         num-threads="1"
+                    num-threads="1"
                     test-set-name="validation"
                     evaluate-stats="true"
                     submission-output="@{save-data-dir}/validation-direct-method-models.txt"
@@ -2149,8 +2154,14 @@
             <combine-statistics
                     cv-statistics="@{save-data-dir}/CV.txt"
                     cvcf-statistics="@{save-data-dir}/CVCF.txt"
-                    validation-statistics="@{save-data-dir}/CVCF.txt"
+                    validation-statistics="@{save-data-dir}/validation.txt"
                     output="@{save-data-dir}/CV_CVCF_validation.txt"
+                    model-conditions="@{save-data-dir}/model-conditions-column.txt"/>
+            <combine-statistics
+                    cv-statistics="@{save-data-dir}/CV.txt"
+                    cvcf-statistics="@{save-data-dir}/CVCF.txt"
+                    validation-statistics="@{save-data-dir}/validation-direct-method-models.txt"
+                    output="@{save-data-dir}/CV_CVCF_validation-direct-method-models.txt"
                     model-conditions="@{save-data-dir}/model-conditions-column.txt"/>
 
             <zip-results
