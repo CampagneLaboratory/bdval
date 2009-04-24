@@ -2027,7 +2027,7 @@
         <attribute name="evaluate-stats"/>
         <attribute name="model-directory"/>
 
-        <attribute name="output-directory" default=""/>
+        <attribute name="output-directory" default="."/>
         <attribute name="submission-output" default="@{test-set-name}-maqcii-stats.txt"/>
         <sequential>
             <sequential>
@@ -2132,13 +2132,13 @@
                     evaluate-stats="true"
                     submission-output="@{save-data-dir}/validation.txt"
                     model-directory="@{save-data-dir}/final-models"
-                    />
+                    output-directory="@{save-data-dir}"/>
             <predict-dataset
                     test-set-name="validation"
                     evaluate-stats="true"
                     submission-output="@{save-data-dir}/validation-direct-method-models.txt"
                     model-directory="@{save-data-dir}/final-models-direct"
-                    />
+                    output-directory="@{save-data-dir}"/>
 
             <antcall target="process-model-conditions"/>
             <rewrite-model-conditions input="model-conditions.txt"
