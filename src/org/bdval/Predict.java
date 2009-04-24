@@ -551,8 +551,8 @@ public class Predict extends DAVMode {
         }
         if (label == null) {
             LOG.warn("Cannot find sampleId " + sampleId + " in true label information, for model  " +
-                    this.modelFilenamePrefixNoPath + ". We read true labels from filename: "+trueLabelFilename +"" +
-                    "The test set was read from "+testSampleFilename);
+                    this.modelFilenamePrefixNoPath + ". We read true labels from filename: "+trueLabelFilename  +
+                    " The test set was read from "+testSampleFilename);
             return "unknown";
         } else {
             return label;
