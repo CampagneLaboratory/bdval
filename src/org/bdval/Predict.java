@@ -94,9 +94,11 @@ public class Predict extends DAVMode {
     private String modelFilenamePrefix;
     private String modelFilenamePrefixNoPath;
     private BDVModel model;
+    private String trueLabelFilename;
 
     /**
      * Define command line options for this mode.
+     *
      * @param jsap the JSAP command line parser
      * @throws JSAPException if there is a problem building the options
      */
@@ -216,8 +218,9 @@ public class Predict extends DAVMode {
             survivalFileName = result.getString("survival");
         }
 
+         trueLabelFilename = result.getString("true-labels");
         sample2TrueLabelMap =
-                readSampleToTrueLabelsMap(result.getString("true-labels"), printStats);
+                readSampleToTrueLabelsMap(trueLabelFilename, printStats);
 
         final String testSampleFilename = result.getString("test-samples");
         this.testSampleFilename = testSampleFilename;
@@ -547,7 +550,8 @@ public class Predict extends DAVMode {
             LOG.trace("True label for " + sampleId + " is " + label);
         }
         if (label == null) {
-            LOG.warn("Cannot find sampleId " + sampleId + " in true label information.");
+            LOG.warn("Cannot find sampleId " + sampleId + " in true label information, for model  " +
+                    this.modelFilenamePrefixNoPath + ". We read true labels from filename: "+trueLabelFilename);
             return "unknown";
         } else {
             return label;

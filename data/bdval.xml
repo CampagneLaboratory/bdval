@@ -2026,7 +2026,7 @@
         <attribute name="test-set-name"/>
         <attribute name="evaluate-stats"/>
         <attribute name="model-directory"/>
-
+        <attribute name="num-threads" default="1"/>
         <attribute name="output-directory" default="."/>
         <attribute name="submission-output" default="@{test-set-name}-maqcii-stats.txt"/>
         <sequential>
@@ -2034,7 +2034,7 @@
                 <echo message="Predicting all endpoints ${all-endpoints}"/>
 
                 <for param="current-endpoint" delimiter=" " list="${all-endpoints}" parallel="true"
-                     threadCount="${num-threads}">
+                     threadCount="@{num-threads}">
                     <sequential>
                         <if>
                             <istrue value="${do.@{current-endpoint}}"/>
