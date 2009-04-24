@@ -2128,12 +2128,14 @@
                     output="@{save-data-dir}/CVCF.txt"/>
 
             <predict-dataset
+                    num-threads="1"
                     test-set-name="validation"
                     evaluate-stats="true"
                     submission-output="@{save-data-dir}/validation.txt"
                     model-directory="@{save-data-dir}/final-models"
                     output-directory="@{save-data-dir}"/>
             <predict-dataset
+                         num-threads="1"
                     test-set-name="validation"
                     evaluate-stats="true"
                     submission-output="@{save-data-dir}/validation-direct-method-models.txt"
