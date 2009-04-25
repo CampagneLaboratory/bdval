@@ -115,8 +115,8 @@ import java.util.zip.GZIPInputStream;
 /**
  * Main class used to define and process modes for
  * {@link org.bdval.DiscoverAndValidate}.
- * New modes should override this class.  See the
- * <a href="http://bdval.org">BDVal</a> page for more details.
+ * New modes should override this class.  See the wiki at
+ * <a href="http://bdval.org">BDVal.org</a> for more details.
  *
  * @author Fabien Campagne Date: Oct 19, 2007 Time: 2:14:46 PM
  */
