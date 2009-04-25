@@ -315,9 +315,10 @@ public class DAVMode extends UseModality<DAVOptions> {
                 .setLongFlag("pathways")
                 .setHelp("Filename of the pathway description information. "
                         + "The pathway description information is a file with one line per "
-                        + "pathway. Each line is tab delimited. The first field provides a "
-                        + "pathway identifier. Subsequent fields on the line are "
-                        + "Ensembl gene ids for gene that belong to the pathway. "
+                        + "pathway. Each line has two tab delimited field. The first field provides a "
+                        + "pathway identifier. The second field is space delimited. Each token of the " +
+                        " second field is an "
+                        + "(Ensembl) gene ids for gene that belong to the pathway. "
                         + "When this option is provided, features are aggregated by pathway "
                         + "and computations are performed in aggregated feature space. "
                         + "Some aggregation algorithms may generate several aggregated "

@@ -28,7 +28,7 @@ generateGene2Probes = {   endpointName ->
   probeIds.each( { probeId -> gene2probeWriter.write(probeId+"\t"+probeId+"\n" )})
 
   pathwayInfoWriter.write("whole-chip\t")
-  probeIds.each( { probeId -> pathwayInfoWriter .write(probeId+"\t" )})
+  probeIds.each( { probeId -> pathwayInfoWriter .write(probeId+" " )})
   pathwayInfoWriter.write("\n")
 
   pathwayInfoWriter.close();
