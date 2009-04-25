@@ -26,9 +26,6 @@
     <property name="num-features" value="50"/>
     <property name="max-intermediate-features" value="400"/>
 
-    <property name="use-feature-selection-fold=true" value="true"/>
-    <property name="use-feature-selection-fold=false" value="true"/>
-
     <property name="use-probability" value="false"/>
     <property name="fold-change-phi" value="1.5"
               description="Ratio for fold-change when running fold change sequences"/>

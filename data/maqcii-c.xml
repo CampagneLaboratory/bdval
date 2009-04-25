@@ -102,6 +102,10 @@
 
         <echo message="Executing with ${num-threads} threads"/>
         <sequential>
+
+            <property name="use-feature-selection-fold=true" value="true"/>
+            <property name="use-feature-selection-fold=false" value="true"/>
+
             <property name="do.baseline" value="false"/>
             <property name="do.naive-bayes" value="false"/>
             <property name="do.logit-boost" value="false"/>
@@ -161,7 +165,7 @@
 
         <echo message="Executing with ${num-threads} threads"/>
         <sequential>
-            <property name="use-feature-selection-fold=true" value="true"/>
+            <property name="use-feature-selection-fold=true" value="false"/>
             <property name="use-feature-selection-fold=false" value="true"/>
 
 

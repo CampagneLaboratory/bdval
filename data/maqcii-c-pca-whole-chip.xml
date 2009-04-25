@@ -98,12 +98,10 @@
     <target name="pathways" description="Run pathways." depends="prepare-bdval, tag-output-directory">
         <echo message="Executing with ${num-threads} threads"/>
         <sequential>
-            <property name="use-feature-selection-fold=true" value="true"/>
             <property name="use-feature-selection-fold=false" value="true"/>
 
-
             <property name="do.pathways-build-pathway-components" value="true"/>
-            <property name="do.pathways-ttest-svmglobal" value="true"/>
+            <property name="do.pathways-ttest-svmglobal" value="false"/>
             <property name="do.pathways-tune-C" value="false"/>
             <property name="do.pathways.baseline" value="false"/>
 
