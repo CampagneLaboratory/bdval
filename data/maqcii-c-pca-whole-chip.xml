@@ -42,7 +42,7 @@
     <property name="use-probability" value="false"/>
     <property name="fold-change-phi" value="1.5"/>
     <property name="ttest-alpha" value="0.05"/>
-    <property name="pathway-aggregation-method" value="average"/>
+    <property name="pathway-aggregation-method" value="PCA"/>
 
     <property name="scaler-class-name" value="edu.cornell.med.icb.learning.MinMaxScalingRowProcessor"/>
     <!--property name="scaler-class-name" value="edu.cornell.med.icb.learning.ZScoreScalingRowProcessor"/-->
