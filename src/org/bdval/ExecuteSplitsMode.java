@@ -39,6 +39,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.*;
 
+import cern.colt.*;
+import cern.colt.Timer;
+
 /**
  * Runs a sequence of biomarker discovery operations against a list of dataset splits.
  * The list of splits can be produced by DAVMode --mode define-splits
@@ -58,6 +61,7 @@ public class ExecuteSplitsMode extends DAVMode {
     private String modelId;
     private boolean evaluateStatistics;
     private OptionalModelId[] optionalModelIds = new OptionalModelId[0];
+    private TimeLoggingService timeService;
 
     /**
      * Parse properties to extract optional model id definitions. The format is as follow:
@@ -116,6 +120,9 @@ public class ExecuteSplitsMode extends DAVMode {
     @Override
     public void interpretArguments(
             final JSAP jsap, final JSAPResult result, final DAVOptions options) {
+        timeService = new TimeLoggingService("excute-splits");
+        timeService.start();
+
         super.interpretArguments(jsap, result, options);
         this.optionalModelIds = this.parseOptionalModelIdProperties(configurationProperties);
 
@@ -141,7 +148,7 @@ public class ExecuteSplitsMode extends DAVMode {
 
         modelId = ShortHash.shortHash(getOriginalArgs());
         options.modelId = modelId;
-
+        timeService.setModelId(options.modelId);
 
         final Map<String, String> additionalConditionsMap = new HashMap<String, String>();
         additionalConditionsMap.put("model-id", modelId);
@@ -195,7 +202,7 @@ public class ExecuteSplitsMode extends DAVMode {
                 LOGGER.info("For optional modelId: " + optionalModelId.columnIdentifier + " Filtering out argument " + argumentName + " total args skipped: " + skipNumber);
 
                 i += skipNumber; // skip argument name and 'skip' number of arguments.
-            }           
+            }
             if (optionalModelId.excludeArgumentNames.contains(argumentName)) {
                 final int skipNumber = optionalModelId.skipValue(argumentName);
                 LOGGER.info("For optional modelId: " + optionalModelId.columnIdentifier + " Filtering out argument " + argumentName + " total args skipped: " + skipNumber);
@@ -299,6 +306,13 @@ public class ExecuteSplitsMode extends DAVMode {
             LOGGER.error("An exception occurred.", e);
         }
         logger.stop();
+
+        /**
+         * Time the duration of the sequence:
+         */
+        timeService.stop();
+
+
         executed = region.getExecuted();
         if (executed != null && executed instanceof SequenceMode) {
 // if we executed SequenceMode

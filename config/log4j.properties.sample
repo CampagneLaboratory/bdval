@@ -2,6 +2,8 @@
 
 ################################################################
 log4j.rootLogger=INFO, file, console
+log4j.logger.org.bdval.TimeLoggingService=TRACE, fileTiming
+
 
 log4j.appender.CHAINSAW_CLIENT=org.apache.log4j.net.SocketAppender
 log4j.appender.CHAINSAW_CLIENT.RemoteHost=localhost
@@ -12,6 +14,14 @@ log4j.appender.CHAINSAW_CLIENT.Port=4445
 log4j.appender.file=org.apache.log4j.RollingFileAppender
 log4j.appender.file.File=logs/bdval.log
 log4j.appender.file.Append=true
+
+
+# Appender fileTiming writes all statements by default
+log4j.appender.fileTiming=org.apache.log4j.RollingFileAppender
+log4j.appender.fileTiming.File=logs/bdval-timing.log
+log4j.appender.fileTiming.Append=true
+log4j.appender.fileTiming.layout=org.apache.log4j.PatternLayout
+log4j.appender.fileTiming.layout.ConversionPattern=%m%n
 
 # Appender file uses the PatternLayout.
 log4j.appender.file.layout=org.apache.log4j.PatternLayout
