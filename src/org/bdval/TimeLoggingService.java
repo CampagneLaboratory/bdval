@@ -50,9 +50,10 @@ public class TimeLoggingService {
         this.modelId = modelId;
     }
 
-    Timer timer = new Timer();
+    Timer timer;
 
     public void start() {
+        timer = new Timer();
         LOGGER.trace("TIMING:modelId:" + modelId + ":MODE:" + mode + ":START");
         timer.start();
     }
@@ -60,9 +61,10 @@ public class TimeLoggingService {
     public void stop() {
 
         LOGGER.trace("TIMING:modelId:" + modelId + ":MODE:" + mode + ":STOP");
+
+        timer.stop();
         LOGGER.trace("TIMING:modelId:" + modelId + ":MODE:" + mode + ":DURATION_SECONDS:" + timer.seconds());
         LOGGER.trace("TIMING:modelId:" + modelId + ":MODE:" + mode + ":DURATION_MINUTES:" + timer.minutes());
 
-        timer.stop();
     }
 }

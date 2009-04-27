@@ -110,8 +110,11 @@ public class DiscoverAndValidate implements WithProcessMethod {
         davMode.registerMode("cox-regression", DiscoverWithCoxRegression.class);
         davMode.registerMode("to-ranks", ToRanksMode.class);
 
+        TimeLoggingService timeService=new TimeLoggingService(args);
+        timeService.start();
         final DAVOptions options = new DAVOptions();
         davMode.process(args, options);
+        timeService.stop();
         if (options.output != null) {
             options.output.flush();
         }

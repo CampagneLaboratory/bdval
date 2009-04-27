@@ -310,6 +310,7 @@ public class ExecuteSplitsMode extends DAVMode {
         /**
          * Time the duration of the sequence:
          */
+        timeService.setModelId(modelId);
         timeService.stop();
 
 
