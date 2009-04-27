@@ -120,7 +120,7 @@ public class ExecuteSplitsMode extends DAVMode {
     @Override
     public void interpretArguments(
             final JSAP jsap, final JSAPResult result, final DAVOptions options) {
-        timeService = new TimeLoggingService("excute-splits");
+        timeService = new TimeLoggingService("execute-splits");
         timeService.start();
 
         super.interpretArguments(jsap, result, options);
