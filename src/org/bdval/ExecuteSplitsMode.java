@@ -38,6 +38,7 @@ import it.unimi.dsi.fastutil.objects.ObjectSet;
 import it.unimi.dsi.logging.ProgressLogger;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.bdval.util.ShortHash;
@@ -108,10 +109,13 @@ public class ExecuteSplitsMode extends DAVMode {
             for (final String optionalColumnId : optionalModelIdColumnNames) {
                 final String defineModelIdExcludePropertyName = "define.model-id." + optionalColumnId + ".exclude";
                 final String argumentKeys = configurationProperties.getProperty(defineModelIdExcludePropertyName);
+                final String[] keys;
                 if (argumentKeys == null) {
                     System.err.println("Error parsing properties. Cannot find key=" + defineModelIdExcludePropertyName);
+                    keys = ArrayUtils.EMPTY_STRING_ARRAY;
+                } else {
+                    keys = argumentKeys.split(",");
                 }
-                final String[] keys = argumentKeys.split(",");
 
                 final OptionalModelId newOne = new OptionalModelId(optionalColumnId);
                 for (String key : keys) {
