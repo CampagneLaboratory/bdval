@@ -296,9 +296,11 @@ public class CrossValidateConsensusFeatures {
         return newMap;
     }
 
-      private boolean isAnOptionalModelId(String key) {
-        for (OptionalModelId optionalId : toolArgs.optionalModelIds) {
-            if (optionalId.columnIdentifier.equalsIgnoreCase(key)) return true;
+      private boolean isAnOptionalModelId(final String key) {
+        for (final OptionalModelId optionalId : toolArgs.optionalModelIds) {
+            if (optionalId.columnIdentifier.equalsIgnoreCase(key)) {
+                return true;
+            }
         }
         return false;
     }

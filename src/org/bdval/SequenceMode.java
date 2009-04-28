@@ -189,7 +189,7 @@ public class SequenceMode extends DAVMode {
             // Only add the short if the long isn't available.
             final char c = flagOpt.getShortFlag();
             if (c != JSAP.NO_SHORTFLAG) {
-                flagsForId.add("-" + String.valueOf(c));
+                flagsForId.add("-" + c);
             }
         } else if (paramObj instanceof Switch) {
             final Switch switchOpt = (Switch) paramObj;

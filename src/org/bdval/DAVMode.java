@@ -109,7 +109,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.Reader;
-import java.util.*;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
+import java.util.Vector;
 import java.util.zip.GZIPInputStream;
 
 /**
@@ -554,7 +559,7 @@ public class DAVMode extends UseModality<DAVOptions> {
     public void interpretArguments(final JSAP jsap, final JSAPResult result,
                                    final DAVOptions options) {
         checkArgumentsSound(jsap, result, false);
-        setupProperties(jsap, result);
+        setupProperties(result);
         setupModelId(result, options);
         setupDatasetName(result, options);
         setupDatasetRoot(result, options);
@@ -574,18 +579,21 @@ public class DAVMode extends UseModality<DAVOptions> {
         setupScalerOptions(result, options);
     }
 
-    private void setupProperties(JSAP jsap, JSAPResult result) {
+    private void setupProperties(final JSAPResult result) {
         if (result.contains("properties")) {
-
-            String propsFilename = result.getString("properties");
+            final String propsFilename = result.getString("properties");
             System.out.println("Loading BDVal  properties from file " + propsFilename);
-            Properties props = new Properties();
+            final Properties props = new Properties();
+            Reader propsReader = null;
             try {
-                props.load(new FileReader(propsFilename));
-                this.configurationProperties = props;
+                propsReader = new FileReader(propsFilename);
+                props.load(propsReader);
+                configurationProperties = props;
             } catch (IOException e) {
                 LOG.error("Cannot load BDVal properties file " + propsFilename, e);
                 System.exit(1);
+            } finally {
+                IOUtils.closeQuietly(propsReader);
             }
         }
     }

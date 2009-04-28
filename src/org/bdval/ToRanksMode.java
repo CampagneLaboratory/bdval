@@ -1,20 +1,6 @@
-package org.bdval;
-
-import com.martiansoftware.jsap.JSAP;
-import com.martiansoftware.jsap.JSAPException;
-import edu.mssm.crover.tables.ArrayTable;
-import edu.mssm.crover.tables.InvalidColumnException;
-import edu.mssm.crover.tables.TypeMismatchException;
-import edu.mssm.crover.tables.writers.InsightfulMinerTableWriter;
-
-import java.util.Collections;
-import java.util.Comparator;
-
-import it.unimi.dsi.fastutil.objects.ObjectList;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 /*
  * Copyright (C) 2009 Institute for Computational Biomedicine,
- *                         Weill Medical College of Cornell University
+ *                    Weill Medical College of Cornell University
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -30,9 +16,23 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+package org.bdval;
+
+import com.martiansoftware.jsap.JSAP;
+import com.martiansoftware.jsap.JSAPException;
+import edu.mssm.crover.tables.ArrayTable;
+import edu.mssm.crover.tables.InvalidColumnException;
+import edu.mssm.crover.tables.TypeMismatchException;
+import edu.mssm.crover.tables.writers.InsightfulMinerTableWriter;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectList;
+
+import java.util.Collections;
+import java.util.Comparator;
+
 /**
- * Converts a value dataset to a rank dataset. Rank datasets substitute the value of a feature signal in a sample by
- * the rank of the feature signal among all other features in the same sample.
+ * Converts a value dataset to a rank dataset. Rank datasets substitute the value of a feature
+ * signal in a sample by the rank of the feature signal among all other features in the same sample.
  *
  * @author Fabien Campagne
  *         Date: Apr 21, 2009
@@ -40,7 +40,7 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
  */
 public class ToRanksMode extends DAVMode {
     @Override
-    public void defineOptions(JSAP jsap) throws JSAPException {
+    public void defineOptions(final JSAP jsap) throws JSAPException {
 
     }
 
@@ -57,32 +57,32 @@ public class ToRanksMode extends DAVMode {
     };
 
     @Override
-    public void process(DAVOptions options) {
+    public void process(final DAVOptions options) {
         super.process(options);
 
-        ArrayTable table = (ArrayTable) options.inputTable;
-        ArrayTable destinationTable = new ArrayTable();
+        final ArrayTable table = (ArrayTable) options.inputTable;
+        final ArrayTable destinationTable = new ArrayTable();
         destinationTable.defineColumnsFrom(table);
 
         try {
-            String ids[] = table.getStrings("ID_REF");
-            for (String id : ids) {
+            final String[] ids = table.getStrings("ID_REF");
+            for (final String id : ids) {
                 destinationTable.appendObject(0, id);
             }
         } catch (InvalidColumnException e) {
             e.printStackTrace();
         }
-        int numColumns = table.getColumnNumber();
+        final int numColumns = table.getColumnNumber();
         // for each sample in the input file:
         for (int colIndex = 1; colIndex < numColumns; colIndex++) {
-            String colIdf = table.getIdentifier(colIndex);
+            final String colIdf = table.getIdentifier(colIndex);
             try {
-                double[] values = table.getDoubles(colIdf);
+                final double[] values = table.getDoubles(colIdf);
                 // convert values to ranks:
-                ObjectList<SignalValue> sorted = new ObjectArrayList<SignalValue>();
+                final ObjectList<SignalValue> sorted = new ObjectArrayList<SignalValue>();
                 int index = 0;
-                for (double value : values) {
-                    SignalValue v = new SignalValue();
+                for (final double value : values) {
+                    final SignalValue v = new SignalValue();
                     v.value = value;
                     v.rowIndex = index++;
                     sorted.add(v);
@@ -92,23 +92,25 @@ public class ToRanksMode extends DAVMode {
                 // assign ranks:
                 double lastValue = Double.NaN;
                 int lastRank = 0;
-                for (SignalValue signal : sorted) {
+                for (final SignalValue signal : sorted) {
                     if (signal.value != lastValue) {
                         signal.rank = lastRank + 1;
-                    } else signal.rank = lastRank;
+                    } else {
+                        signal.rank = lastRank;
+                    }
 
                     lastRank = signal.rank;
                     lastValue = signal.value;
                 }
 
                 // put the ranks back into the table:
-                for (SignalValue signal : sorted) {
+                for (final SignalValue signal : sorted) {
                     values[signal.rowIndex] = signal.rank;
                 }
-                for (double value : values) {
+                for (final double value : values) {
                     destinationTable.appendDoubleValue(colIndex, value);
                 }
-            } catch (InvalidColumnException e) {
+            } catch (InvalidColumnException e) { // NOPMD
                 // Cannot happen
             } catch (TypeMismatchException e) {
                 e.printStackTrace();

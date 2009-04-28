@@ -284,8 +284,8 @@ public class ConsensusBDVModel extends BDVModel {
             } finally {
                 try {
                     zipFile.close();
-                } catch (IOException e) {
-                    // NOPMD - ignore since there is not much we can do anyway
+                } catch (IOException e) { // NOPMD
+                    // ignore since there is not much we can do anyway
                 }
             }
         } else {

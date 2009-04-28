@@ -86,12 +86,12 @@ public class GEOPlatform {
         }
         try {
             genbankAcColumnIndex = platformFileContent.getColumnIndex(genbankAcColumnName);
-        } catch (InvalidColumnException e) {
+        } catch (InvalidColumnException e) { // NOPMD
             // OK, see below.
         }
         try {
             genbankListColumnIndex = platformFileContent.getColumnIndex(genbankListColumnName);
-        } catch (InvalidColumnException e) {
+        } catch (InvalidColumnException e) { // NOPMD
             // OK, see below.
         }
 

@@ -1,13 +1,6 @@
-package org.bdval;
-
-import it.unimi.dsi.fastutil.objects.ObjectSet;
-import it.unimi.dsi.fastutil.objects.ObjectArraySet;
-import it.unimi.dsi.fastutil.objects.ObjectList;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import it.unimi.dsi.fastutil.ints.IntArrayList;
 /*
- * Copyright (C) 2007-2008 Institute for Computational Biomedicine,
- *                         Weill Medical College of Cornell University
+ * Copyright (C) 2009 Institute for Computational Biomedicine,
+ *                    Weill Medical College of Cornell University
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -22,6 +15,12 @@ import it.unimi.dsi.fastutil.ints.IntArrayList;
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+package org.bdval;
+
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectList;
 
 /**
  * An optional model id may be created to hash a subset of model creation parameters.
@@ -44,7 +43,7 @@ public class OptionalModelId {
     String columnIdentifier;
 
 
-    public OptionalModelId(String columnIdentifier) {
+    public OptionalModelId(final String columnIdentifier) {
         this.columnIdentifier = columnIdentifier;
         this.excludeArgumentNames = new ObjectArrayList<String>();
         this.skipValueForArgumentName = new IntArrayList();
@@ -61,19 +60,19 @@ public class OptionalModelId {
      */
     IntArrayList skipValueForArgumentName;
 
-    public void addExcludeArgument(String excludeArgumentName, int skipForArgument) {
+    public void addExcludeArgument(final String excludeArgumentName, final int skipForArgument) {
         excludeArgumentNames.add(excludeArgumentName);
         skipValueForArgumentName.add(skipForArgument);
     }
 
     @Override
     public String toString() {
-        StringBuffer buffer = new StringBuffer();
+        final StringBuffer buffer = new StringBuffer();
         buffer.append("column-id: ");
         buffer.append(columnIdentifier);
         buffer.append('\n');
         int i = 0;
-        for (String argName : excludeArgumentNames) {
+        for (final String argName : excludeArgumentNames) {
             buffer.append("skip.arg-name: ");
             buffer.append(argName);
             buffer.append('\n');
@@ -84,8 +83,8 @@ public class OptionalModelId {
         return buffer.toString();
     }
 
-    public int skipValue(String argumentName) {
-        int index = excludeArgumentNames.indexOf(argumentName);
+    public int skipValue(final String argumentName) {
+        final int index = excludeArgumentNames.indexOf(argumentName);
         return skipValueForArgumentName.get(index);
     }
 }

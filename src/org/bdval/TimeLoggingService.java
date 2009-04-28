@@ -1,11 +1,6 @@
-package org.bdval;
-
-import cern.colt.Timer;
-import org.apache.log4j.Logger;
-import edu.mssm.crover.cli.CLI;
 /*
  * Copyright (C) 2009 Institute for Computational Biomedicine,
- *                         Weill Medical College of Cornell University
+ *                    Weill Medical College of Cornell University
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -21,6 +16,12 @@ import edu.mssm.crover.cli.CLI;
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+package org.bdval;
+
+import cern.colt.Timer;
+import edu.mssm.crover.cli.CLI;
+import org.apache.log4j.Logger;
+
 /**
  * @author Fabien Campagne
  *         Date: Apr 27, 2009
@@ -31,22 +32,22 @@ public class TimeLoggingService {
     private String mode;
     private String modelId;
 
-    public TimeLoggingService(String args[]) {
+    public TimeLoggingService(final String[] args) {
         mode = CLI.getOption(args, "--mode", CLI.getOption(args, "-m", "no-mode-argument"));
         modelId = CLI.getOption(args, "--model-id", "no-model-id");
     }
 
-    public TimeLoggingService(String mode, String modelId) {
+    public TimeLoggingService(final String mode, final String modelId) {
         this.mode = mode;
         this.modelId = modelId;
     }
 
-    public TimeLoggingService(String mode) {
+    public TimeLoggingService(final String mode) {
 
         this.mode = mode;
     }
 
-    public void setModelId(String modelId) {
+    public void setModelId(final String modelId) {
         this.modelId = modelId;
     }
 

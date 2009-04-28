@@ -21,10 +21,10 @@ package org.bdval;
 import edu.cornell.med.icb.io.TSVReader;
 import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
 import it.unimi.dsi.fastutil.doubles.DoubleList;
+import it.unimi.dsi.fastutil.ints.IntArraySet;
+import it.unimi.dsi.fastutil.ints.IntSet;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
-import it.unimi.dsi.fastutil.ints.IntSet;
-import it.unimi.dsi.fastutil.ints.IntArraySet;
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -101,7 +101,7 @@ public class PredictedItems extends ObjectArrayList<PredictedItem> {
      * @param splitId  The splitId for predictions of interest
      * @return List of decision values
      */
-    public DoubleList getDecisionsForSplit(int repeatId, int splitId) {
+    public DoubleList getDecisionsForSplit(final int repeatId, final int splitId) {
         final DoubleList result = new DoubleArrayList();
         for (final PredictedItem item : predictions) {
             if (item.repeatId == repeatId && item.splitId == splitId) {
@@ -150,7 +150,7 @@ public class PredictedItems extends ObjectArrayList<PredictedItem> {
      * @param splitId  The splitId for predictions of interest
      * @return List of decision values
      */
-    public DoubleList getTrueLabelsForSplit(int repeatId, int splitId) {
+    public DoubleList getTrueLabelsForSplit(final int repeatId, final int splitId) {
         final DoubleList result = new DoubleArrayList();
         for (final PredictedItem item : predictions) {
             if (item.repeatId == repeatId && item.splitId == splitId) {
@@ -181,7 +181,7 @@ public class PredictedItems extends ObjectArrayList<PredictedItem> {
          * @return
          */}
 
-    public ObjectList<String> getSampleIDsForSplit(int repeatId, int splitId) {
+    public ObjectList<String> getSampleIDsForSplit(final int repeatId, final int splitId) {
         final ObjectList<String> result = new ObjectArrayList<String>();
         for (final PredictedItem item : predictions) {
             if (item.repeatId == repeatId && item.splitId == splitId) {
@@ -214,10 +214,12 @@ public class PredictedItems extends ObjectArrayList<PredictedItem> {
      * @param repeatId  The repeatId of interest.
      * @return set of splidIds.
      */
-    public IntSet splitIdsForRepeat(int repeatId) {
-        IntSet result = new IntArraySet();
+    public IntSet splitIdsForRepeat(final int repeatId) {
+        final IntSet result = new IntArraySet();
         for (final PredictedItem item : predictions) {
-            if (item.repeatId == repeatId) result.add(item.splitId);
+            if (item.repeatId == repeatId) {
+                result.add(item.splitId);
+            }
         }
         return result;
     }

@@ -110,18 +110,14 @@ public class StatsMode extends Predict {
             maqciiHelper.setupSubmissionFile(result, options);
         }
 
-        String aggregationMethod = result.getString("aggregation-method");
+        final String aggregationMethod = result.getString("aggregation-method");
         if (aggregationMethod == null) {
-            this.statsEvalType = StatsEvaluationType.STATS_PER_REPEAT;
+            statsEvalType = StatsEvaluationType.STATS_PER_REPEAT;
         } else {
             if ("per-repeat".equalsIgnoreCase(aggregationMethod)) {
-                {
-                    this.statsEvalType = StatsEvaluationType.STATS_PER_REPEAT;
-                }
+                statsEvalType = StatsEvaluationType.STATS_PER_REPEAT;
             } else if ("per-test-set".equalsIgnoreCase(aggregationMethod)) {
-                {
-                    this.statsEvalType = StatsEvaluationType.STATS_PER_SPLIT;
-                }
+                statsEvalType = StatsEvaluationType.STATS_PER_SPLIT;
             } else {
                 System.err.println("Cannot parse argument of option --aggregation-method");
                 System.exit(1);
@@ -201,14 +197,10 @@ public class StatsMode extends Predict {
 
     @Override
     public void process(final DAVOptions options) {
-     
         evaluateStats(options);
     }
 
-
-
-
-    private void evaluateStats(DAVOptions options) {
+    private void evaluateStats(final DAVOptions options) {
         final List<SurvivalMeasures> survivalMeasuresList = new ArrayList<SurvivalMeasures>();
         LOG.info("Calculating statistics for predictions in file " + predictionsFilename);
         final int numberOfRepeats = predictions.getNumberOfRepeats();
@@ -234,15 +226,15 @@ public class StatsMode extends Predict {
         LOG.info(String.format("Overall: %s", repeatedEvaluationMeasure.toString()));
     }
 
-    private void evaluatePerformanceMeasurePerTestSet(List<SurvivalMeasures> survivalMeasuresList, int numberOfRepeats,
-                                                    ObjectSet<CharSequence> evaluationMeasureNames, EvaluationMeasure repeatedEvaluationMeasure) {
+    private void evaluatePerformanceMeasurePerTestSet(final List<SurvivalMeasures> survivalMeasuresList, final int numberOfRepeats,
+                                                      final ObjectSet<CharSequence> evaluationMeasureNames, final EvaluationMeasure repeatedEvaluationMeasure) {
 
         // Collect one evaluation measure per split test set of cross-validation.
 
         for (int repeatId = 1; repeatId <= numberOfRepeats; repeatId++) {
             if (predictions.containsRepeat(repeatId)) {
-                int maxSplitId = predictions.getNumberOfSplitsForRepeat(repeatId);
-                for (int splitId : predictions.splitIdsForRepeat(repeatId)) {
+                final int maxSplitId = predictions.getNumberOfSplitsForRepeat(repeatId);
+                for (final int splitId : predictions.splitIdsForRepeat(repeatId)) {
                     final DoubleList decisions = new DoubleArrayList();
                     final DoubleList trueLabels = new DoubleArrayList();
                     final ObjectList<String> sampleIDs = new ObjectArrayList<String>();
@@ -282,7 +274,7 @@ public class StatsMode extends Predict {
         }
     }
 
-    private void evaluatePerformanceMeasurePerRepeat(List<SurvivalMeasures> survivalMeasuresList, int numberOfRepeats, ObjectSet<CharSequence> evaluationMeasureNames, EvaluationMeasure repeatedEvaluationMeasure) {
+    private void evaluatePerformanceMeasurePerRepeat(final List<SurvivalMeasures> survivalMeasuresList, final int numberOfRepeats, final ObjectSet<CharSequence> evaluationMeasureNames, final EvaluationMeasure repeatedEvaluationMeasure) {
         for (int repeatId = 1; repeatId <= numberOfRepeats; repeatId++) {
             if (predictions.containsRepeat(repeatId)) {
                 final DoubleList decisions = new DoubleArrayList();

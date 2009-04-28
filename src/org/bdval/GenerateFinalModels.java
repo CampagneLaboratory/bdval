@@ -56,9 +56,10 @@ import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Reader;
 import java.util.Iterator;
-import java.util.Set;
 import java.util.Properties;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -171,14 +172,18 @@ public class GenerateFinalModels {
         pg.stop("Model condition processing complete");
     }
 
-    public static OptionalModelId[] loadProperties(String propertiesFilename) {
+    public static OptionalModelId[] loadProperties(final String propertiesFilename) {
         if (propertiesFilename != null) {
-            Properties configurationProperties = new Properties();
+            final Properties configurationProperties = new Properties();
+            Reader propertiesReader = null;
             try {
-                configurationProperties.load(new FileReader(propertiesFilename));
+                propertiesReader = new FileReader(propertiesFilename);
+                configurationProperties.load(propertiesReader);
             } catch (IOException e) {
                 System.out.println("Cannot load properties file " + propertiesFilename);
                 System.exit(1);
+            } finally {
+                IOUtils.closeQuietly(propertiesReader);
             }
             return ExecuteSplitsMode.parseOptionalModelIdProperties(configurationProperties);
         } else {
@@ -527,7 +532,7 @@ public class GenerateFinalModels {
             if ("evaluate-statistics".equals(key)) {
                 continue;
             }
-           
+
             if ("survival".equals(key)) {
                 continue;
             }
@@ -614,9 +619,11 @@ public class GenerateFinalModels {
         return newMap;
     }
 
-    private boolean isAnOptionalModelId(String key) {
-        for (OptionalModelId optionalId : optionalModelIds) {
-            if (optionalId.columnIdentifier.equalsIgnoreCase(key)) return true;
+    private boolean isAnOptionalModelId(final String key) {
+        for (final OptionalModelId optionalId : optionalModelIds) {
+            if (optionalId.columnIdentifier.equalsIgnoreCase(key)) {
+                return true;
+            }
         }
         return false;
     }

@@ -76,7 +76,7 @@ public class SplitPlan {
             if (reader != null) {
                 try {
                     reader.close();
-                } catch (IOException e) {
+                } catch (IOException e) { // NOPMD
                     // silently ignore
                 }
             }

@@ -18,14 +18,23 @@
 
 package org.bdval;
 
-import com.martiansoftware.jsap.*;
+import com.martiansoftware.jsap.Flagged;
+import com.martiansoftware.jsap.FlaggedOption;
+import com.martiansoftware.jsap.JSAP;
+import com.martiansoftware.jsap.JSAPException;
+import com.martiansoftware.jsap.JSAPResult;
+import com.martiansoftware.jsap.Parameter;
+import com.martiansoftware.jsap.Switch;
 import edu.cornell.med.icb.cli.UseModality;
 import edu.cornell.med.icb.iterators.IteratorIterable;
 import edu.mssm.crover.cli.CLI;
 import edu.rit.pj.IntegerForLoop;
 import edu.rit.pj.ParallelRegion;
 import edu.rit.pj.ParallelTeam;
-import it.unimi.dsi.fastutil.objects.*;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectArraySet;
+import it.unimi.dsi.fastutil.objects.ObjectList;
+import it.unimi.dsi.fastutil.objects.ObjectSet;
 import it.unimi.dsi.logging.ProgressLogger;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -37,10 +46,13 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.*;
-
-import cern.colt.*;
-import cern.colt.Timer;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 
 /**
  * Runs a sequence of biomarker discovery operations against a list of dataset splits.
@@ -77,36 +89,35 @@ public class ExecuteSplitsMode extends DAVMode {
      * These properties would define one new model-id called, to be written in a column called modelid-noScaler,
      * which excludes two arguments and one value each from the hashcode modelId calculation.
      */
-
-    public static OptionalModelId[] parseOptionalModelIdProperties(Properties configurationProperties) {
-        ObjectList<OptionalModelId> result = new ObjectArrayList<OptionalModelId>();
+    public static OptionalModelId[] parseOptionalModelIdProperties(final Properties configurationProperties) {
+        final ObjectList<OptionalModelId> result = new ObjectArrayList<OptionalModelId>();
         if (configurationProperties != null) {
             // inspect properties to figure out which optional model ids to create:
-            ObjectSet<String> optionalModelIdColumnNames = new ObjectArraySet<String>();
+            final ObjectSet<String> optionalModelIdColumnNames = new ObjectArraySet<String>();
 
-            for (String propertyName : configurationProperties.stringPropertyNames()) {
+            for (final String propertyName : configurationProperties.stringPropertyNames()) {
                 if (propertyName.startsWith("define.model-id.column-id")) {
                     final String columnIdNames = configurationProperties.getProperty(propertyName);
-                    String[] names = columnIdNames.split(",");
-                    for (String name : names) {
+                    final String[] names = columnIdNames.split(",");
+                    for (final String name : names) {
                         optionalModelIdColumnNames.add(name);
                     }
                 }
             }
 
-            for (String optionalColumnId : optionalModelIdColumnNames) {
+            for (final String optionalColumnId : optionalModelIdColumnNames) {
                 final String defineModelIdExcludePropertyName = "define.model-id." + optionalColumnId + ".exclude";
-                String argumentKeys = configurationProperties.getProperty(defineModelIdExcludePropertyName);
+                final String argumentKeys = configurationProperties.getProperty(defineModelIdExcludePropertyName);
                 if (argumentKeys == null) {
                     System.err.println("Error parsing properties. Cannot find key=" + defineModelIdExcludePropertyName);
                 }
-                String keys[] = argumentKeys.split(",");
+                final String[] keys = argumentKeys.split(",");
 
-                OptionalModelId newOne = new OptionalModelId(optionalColumnId);
+                final OptionalModelId newOne = new OptionalModelId(optionalColumnId);
                 for (String key : keys) {
                     key = key.trim();
-                    String excludeArgumentName = configurationProperties.getProperty(defineModelIdExcludePropertyName + "." + key + ".argument");
-                    String excludeArgumentSkip = configurationProperties.getProperty(defineModelIdExcludePropertyName + "." + key + ".skip");
+                    final String excludeArgumentName = configurationProperties.getProperty(defineModelIdExcludePropertyName + "." + key + ".argument");
+                    final String excludeArgumentSkip = configurationProperties.getProperty(defineModelIdExcludePropertyName + "." + key + ".skip");
                     newOne.addExcludeArgument(excludeArgumentName, Integer.parseInt(excludeArgumentSkip));
 
                 }
@@ -124,7 +135,7 @@ public class ExecuteSplitsMode extends DAVMode {
         timeService.start();
 
         super.interpretArguments(jsap, result, options);
-        this.optionalModelIds = this.parseOptionalModelIdProperties(configurationProperties);
+        optionalModelIds = parseOptionalModelIdProperties(configurationProperties);
 
         evaluateStatistics = result.getBoolean("evaluate-statistics");
         if (!evaluateStatistics) {
@@ -153,10 +164,10 @@ public class ExecuteSplitsMode extends DAVMode {
         final Map<String, String> additionalConditionsMap = new HashMap<String, String>();
         additionalConditionsMap.put("model-id", modelId);
 
-        for (OptionalModelId optionalModelId : optionalModelIds) {
+        for (final OptionalModelId optionalModelId : optionalModelIds) {
             final String[] originalArgs1 = expandShortArgs(getOriginalArgs(), jsap);
             final String[] filteredArgs = filterArgs(originalArgs1, optionalModelId);
-            String optionalModelIdValue = ShortHash.shortHash(filteredArgs);
+            final String optionalModelIdValue = ShortHash.shortHash(filteredArgs);
 
             additionalConditionsMap.put(optionalModelId.columnIdentifier, optionalModelIdValue);
         }
@@ -176,14 +187,14 @@ public class ExecuteSplitsMode extends DAVMode {
     /*
    Replace short argument name, such as "-m" with long argument names (such as "--mode" )
     */
-    private String[] expandShortArgs(String[] originalArgs, JSAP jsap) {
+    private String[] expandShortArgs(final String[] originalArgs, final JSAP jsap) {
         int index = 0;
-        for (String arg : originalArgs) {
+        for (final String arg : originalArgs) {
             if (!arg.startsWith("--") && arg.startsWith("-")) {
-                String argShortName = arg.substring(1);
+                final String argShortName = arg.substring(1);
                 if (argShortName.length() == 1) {
-                    char argShortNameCharacter = argShortName.charAt(0);
-                    Flagged param = jsap.getByShortFlag(argShortNameCharacter);
+                    final char argShortNameCharacter = argShortName.charAt(0);
+                    final Flagged param = jsap.getByShortFlag(argShortNameCharacter);
                     originalArgs[index] = "--" + param.getLongFlag();
                 }
             }
@@ -192,8 +203,8 @@ public class ExecuteSplitsMode extends DAVMode {
         return originalArgs;
     }
 
-    private String[] filterArgs(String[] originalArgs, OptionalModelId optionalModelId) {
-        ObjectList<String> filteredArgs = new ObjectArrayList<String>();
+    private String[] filterArgs(final String[] originalArgs, final OptionalModelId optionalModelId) {
+        final ObjectList<String> filteredArgs = new ObjectArrayList<String>();
         for (int i = 0; i < originalArgs.length; i++) {
             final String argumentName = originalArgs[i].
                     replaceAll("--", "");
@@ -213,7 +224,9 @@ public class ExecuteSplitsMode extends DAVMode {
                 filteredArgs.add(originalArgs[i]);
             }
 
-            if (i >= originalArgs.length) break;
+            if (i >= originalArgs.length) {
+                break;
+            }
 
         }
         // Hashcode will depend on argument order, so we sort them after filtering:
@@ -316,13 +329,13 @@ public class ExecuteSplitsMode extends DAVMode {
 
         executed = region.getExecuted();
         if (executed != null && executed instanceof SequenceMode) {
-// if we executed SequenceMode
+            // if we executed SequenceMode
             final SequenceMode sequenceMode = (SequenceMode) executed;
             if (evaluateStatistics) {
                 final String label = sequenceMode.getValue("label");
 
                 final String statsFilename = sequenceMode.getValue("predictions-filename");
-                String survivalFileName = sequenceMode.getValue("survival");
+                final String survivalFileName = sequenceMode.getValue("survival");
                 String survivaloption = "";
 
                 if (survivalFileName != null) {
