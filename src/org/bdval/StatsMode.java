@@ -101,7 +101,6 @@ public class StatsMode extends Predict {
             System.out.println("survival File" + survivalFileName);
         }
 
-
         if ("auto".equals(result.getString("label"))) {
             final String label = guessLabel(options.datasetName, filename);
 
@@ -211,15 +210,14 @@ public class StatsMode extends Predict {
         switch (statsEvalType) {
             case STATS_PER_REPEAT:
                 evaluatePerformanceMeasurePerRepeat(survivalMeasuresList, numberOfRepeats, evaluationMeasureNames, repeatedEvaluationMeasure);
+                break;
             case STATS_PER_SPLIT:
                 evaluatePerformanceMeasurePerTestSet(survivalMeasuresList, numberOfRepeats, evaluationMeasureNames, repeatedEvaluationMeasure);
-
+                break;
         }
-
 
         final int numberOfFeatures = predictions.modelNumFeatures();
         maqciiHelper.printSubmissionHeaders(options, survivalFileName != null);
-
 
         maqciiHelper.printSubmissionResults(options, repeatedEvaluationMeasure,
                 numberOfFeatures, numberOfRepeats, survivalMeasuresList);
