@@ -86,10 +86,6 @@
                 <exclude name="${tag}/src/org/bdval/modelselection/bmf/**"/>
                 <exclude name="${tag}/test-src/org/bdval/modelselection/bmf/**"/>
 			</fileset>
-            <!-- include enough data to run the unit tests -->
-            <fileset dir="${exportdir}">
-                <include name="${tag}/test-data/**"/>
-            </fileset>
        	</zip>
 
         <!-- delete the configuration files after the zip file is created -->
