@@ -62,7 +62,7 @@
         <symlink link="${releasedir}/bdval-deps.zip" resource="${depsfile}"/>
 	    <symlink link="${releasedir}/bdval-apidoc.zip" resource="${apidocfile}"/>
 	    <symlink link="${releasedir}/bdval-data.zip" resource="${datafile}"/>
-        <symlink link="${releasedir}/bdval-bdval.zip" resource="${bdval-binary-zipfile}"/>
+        <symlink link="${releasedir}/bdval.zip" resource="${bdval-binary-zipfile}"/>
 
         <!-- copy the zip to the web folder -->
         <!-- todo -->
