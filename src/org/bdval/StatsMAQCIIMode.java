@@ -27,7 +27,7 @@ import edu.cornell.med.icb.io.TSVReader;
 import edu.cornell.med.icb.io.TsvToFromMap;
 import edu.cornell.med.icb.iterators.TextFileLineIterator;
 import edu.cornell.med.icb.learning.CrossValidation;
-import edu.cornell.med.icb.tools.svmlight.EvaluationMeasure;
+import edu.cornell.med.icb.learning.tools.svmlight.EvaluationMeasure;
 import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
 import it.unimi.dsi.fastutil.doubles.DoubleList;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;

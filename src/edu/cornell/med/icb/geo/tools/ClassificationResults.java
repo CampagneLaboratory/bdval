@@ -18,8 +18,8 @@
 
 package edu.cornell.med.icb.geo.tools;
 
-import edu.cornell.med.icb.tools.svmlight.EvaluationMeasure;
-import edu.cornell.med.icb.tools.svmlight.EvaluationMeasureCache;
+import edu.cornell.med.icb.learning.tools.svmlight.EvaluationMeasure;
+import edu.cornell.med.icb.learning.tools.svmlight.EvaluationMeasureCache;
 
 import java.io.File;
 import java.io.PrintWriter;

@@ -18,7 +18,7 @@
 
 package edu.cornell.med.icb.geo.tools;
 
-import edu.cornell.med.icb.tools.svmlight.EvaluationMeasure;
+import edu.cornell.med.icb.learning.tools.svmlight.EvaluationMeasure;
 import edu.mssm.crover.tables.Table;
 
 /**

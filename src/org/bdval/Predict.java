@@ -26,7 +26,7 @@ import com.martiansoftware.jsap.Parameter;
 import com.martiansoftware.jsap.Switch;
 import edu.cornell.med.icb.geo.tools.ClassificationTask;
 import edu.cornell.med.icb.learning.CrossValidation;
-import edu.cornell.med.icb.tools.svmlight.EvaluationMeasure;
+import edu.cornell.med.icb.learning.tools.svmlight.EvaluationMeasure;
 import edu.mssm.crover.tables.ColumnTypeException;
 import edu.mssm.crover.tables.InvalidColumnException;
 import edu.mssm.crover.tables.Table;

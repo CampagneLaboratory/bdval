@@ -27,7 +27,7 @@ import edu.cornell.med.icb.geo.tools.MicroarrayTrainEvaluate;
 import edu.cornell.med.icb.learning.ClassificationHelper;
 import edu.cornell.med.icb.learning.CrossValidation;
 import edu.cornell.med.icb.learning.FeatureScaler;
-import edu.cornell.med.icb.tools.svmlight.EvaluationMeasure;
+import edu.cornell.med.icb.learning.tools.svmlight.EvaluationMeasure;
 import edu.mssm.crover.tables.InvalidColumnException;
 import edu.mssm.crover.tables.Table;
 import edu.mssm.crover.tables.TypeMismatchException;

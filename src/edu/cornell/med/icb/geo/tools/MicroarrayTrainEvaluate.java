@@ -20,9 +20,9 @@ package edu.cornell.med.icb.geo.tools;
 
 import cern.jet.random.engine.MersenneTwister;
 import cern.jet.random.engine.RandomEngine;
+import edu.cornell.med.icb.learning.tools.svmlight.EvaluationMeasure;
+import edu.cornell.med.icb.learning.tools.svmlight.SVMLightDriver;
 import edu.cornell.med.icb.tissueinfo.similarity.clustering.Cluster;
-import edu.cornell.med.icb.tools.svmlight.EvaluationMeasure;
-import edu.cornell.med.icb.tools.svmlight.SVMLightDriver;
 import edu.mssm.crover.tables.ArrayTable;
 import edu.mssm.crover.tables.ColumnTypeException;
 import edu.mssm.crover.tables.DefineColumnFromRow;
