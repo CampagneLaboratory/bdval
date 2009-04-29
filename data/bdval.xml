@@ -15,6 +15,7 @@
     <property name="evaluate-statistics-after-splits" value="true"/>
     <property name="ga-wrapper-population-size" value="200"/>
     <property name="ga-wrapper-number-of-iterations" value="20"/>
+    <property name="ga-wrapper-roc-str" value=""/>
     <property name="performance-measure-maximized-by-GA" value="MCC"/>
     <property name="internal-CV-repeats" value="--cv-repeats 10 "/>
     <property name="internal-CV-folds" value="3"/>
