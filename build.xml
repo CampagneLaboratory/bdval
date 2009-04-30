@@ -46,7 +46,7 @@
 
     <target name="compile" depends="init" description="Compile Source code">
         <javac srcdir="${src}" destdir="${classes}" debug="${debug}" deprecation="${deprecation}">
-            <compilerarg value="-Xlint"/>
+            <!--<compilerarg value="-Xlint"/>-->
             <classpath refid="compile.classpath"/>
         </javac>
     </target>
@@ -95,7 +95,6 @@
                 <include name="libsvm.jar"/>
                 <include name="log4j-1.2.15.jar"/>
                 <include name="mtj.jar"/>
-                <include name="optimization.jar"/>
                 <include name="pj20071021.jar"/>
                 <include name="tisim-api.jar"/>
                 <include name="weka-3.5.6.jar"/>
