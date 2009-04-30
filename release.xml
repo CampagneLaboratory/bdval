@@ -58,11 +58,11 @@
     <target name="release" description="Tag and release build"
 	    	depends="tag, source, jar, data, dependencies, javadoc, bdval">
         <!-- make links to the release files to match what the web server expects -->
-	    <symlink link="${releasedir}/bdval-src.zip" resource="${srcfile}"/>
-        <symlink link="${releasedir}/bdval-deps.zip" resource="${depsfile}"/>
-	    <symlink link="${releasedir}/bdval-apidoc.zip" resource="${apidocfile}"/>
-	    <symlink link="${releasedir}/bdval-data.zip" resource="${datafile}"/>
-        <symlink link="${releasedir}/bdval.zip" resource="${bdval-binary-zipfile}"/>
+	    <symlink link="${releasedir}/bdval-src.zip" resource="${tag}-src.zip"/>
+        <symlink link="${releasedir}/bdval-deps.zip" resource="${tag}-deps.zip"/>
+	    <symlink link="${releasedir}/bdval-apidoc.zip" resource="${tag}-apidoc.zip"/>
+	    <symlink link="${releasedir}/bdval-data.zip" resource="${tag}-data.zip"/>
+        <symlink link="${releasedir}/bdval.zip" resource="${tag}-bdval.zip"/>
 
         <!-- copy the zip to the web folder -->
         <!-- todo -->
