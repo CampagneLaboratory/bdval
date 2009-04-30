@@ -18,10 +18,6 @@
 
 package edu.cornell.med.icb.pca;
 
-import edu.cornell.med.icb.io.compound.CompoundDataInput;
-import edu.cornell.med.icb.io.compound.CompoundDataOutput;
-import edu.cornell.med.icb.io.compound.CompoundFileReader;
-import edu.cornell.med.icb.io.compound.CompoundFileWriter;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArraySet;
 import it.unimi.dsi.fastutil.objects.ObjectSet;
@@ -29,6 +25,10 @@ import it.unimi.dsi.lang.MutableString;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.apache.oro.io.GlobFilenameFilter;
+import org.bdval.io.compound.CompoundDataInput;
+import org.bdval.io.compound.CompoundDataOutput;
+import org.bdval.io.compound.CompoundFileReader;
+import org.bdval.io.compound.CompoundFileWriter;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -327,7 +327,7 @@ public class RotationReaderWriter {
         } finally {
             if (dataOutput != null) {
                 try {
-                   
+
                     dataOutput.close();
                 } catch (IOException e) {
                     LOG.error("Error closing CompoundDataOutput", e);
