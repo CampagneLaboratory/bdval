@@ -182,6 +182,7 @@
         <zip destfile="${bdval-binary-zipfile}" comment="BDVal version: ${tag}">
         	<fileset dir="${exportdir}">
                 <include name="${tag}/README-BDVal.txt"/>
+                <include name="${tag}/CHANGES.txt"/>
                 <include name="${tag}/data/bdval/**"/>
                 <include name="${tag}/data/sequences/**"/>
                 <include name="${tag}/data/templates/**"/>

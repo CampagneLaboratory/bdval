@@ -1,0 +1,11 @@
+1.0.1
+
+- Fixed a crash due to missing class "ProgressLogger".
+  See http://icbtools.med.cornell.edu/mantis/view.php?id=1314
+
+- Updated icb-utils.jar to version icb-utils-144.  Previously
+  included version included duplicate but older CompoundFile code.
+
+1.0
+
+- First release.
