@@ -33,6 +33,7 @@ import java.io.DataInput;
  * TODO: Work on reverting back to thread safe version!
  * TODO: If an EOF is reached while reading mutiple bytes in one operation from the delegate inputstream, this class
  * may just throw EOFException without reading any bytes at all. This is not the behavior expected from DataInputStream
+ *
  * @author Kevin Dorff
  */
 public class CompoundDataInput implements DataInput {
@@ -99,7 +100,7 @@ public class CompoundDataInput implements DataInput {
      * {@inheritDoc}
      */
     public byte readByte() throws IOException {
-      System.out.println("readByte fileSize="+fileSize);
+        System.out.println("readByte fileSize=" + fileSize);
         --fileSize;
         if (fileSize < 0) throw new EOFException();
         else return dataInput.readByte();
@@ -181,15 +182,35 @@ public class CompoundDataInput implements DataInput {
     /**
      * {@inheritDoc}
      */
+
     public String readLine() throws IOException {
-        throw new UnsupportedOperationException("Cannot read line from compound reader.");
+        StringBuffer line = new StringBuffer();
+        byte b = -1;
+        while (b != '\n') {
+            b = readByte();
+            line.append((char) b);
+        }
+        return line.toString();
+
     }
 
     /**
      * {@inheritDoc}
      */
     public String readUTF() throws IOException {
-        throw new UnsupportedOperationException("Cannot read line from compound reader.");
+        String token;
+
+        // peek ahead to determine the length of the String:
+        
+        long position=dataInput.getChannel().position();
+        int stringLength = readShort();     
+        dataInput.seek(position);
+        fileSize -= stringLength;
+        if (fileSize < 0) throw new EOFException();
+
+        token = dataInput.readUTF();
+        return token;
+
     }
 
     public long length() throws IOException {
