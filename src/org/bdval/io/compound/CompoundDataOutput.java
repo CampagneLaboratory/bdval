@@ -18,7 +18,13 @@
 
 package org.bdval.io.compound;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
+import java.io.DataOutput;
+import java.io.IOException;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
+import java.io.RandomAccessFile;
 
 /**
  * A DataOutput object that also supports writeObject.
