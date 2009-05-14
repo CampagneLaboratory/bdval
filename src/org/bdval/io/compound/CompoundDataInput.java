@@ -22,6 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
+import java.io.EOFException;
 import java.io.RandomAccessFile;
 import java.io.ByteArrayInputStream;
 import java.io.ObjectInputStream;
@@ -30,6 +31,8 @@ import java.io.DataInput;
 /**
  * A DataOutput object that also supports writeObject.
  * TODO: Work on reverting back to thread safe version!
+ * TODO: If an EOF is reached while reading mutiple bytes in one operation from the delegate inputstream, this class
+ * may just throw EOFException without reading any bytes at all. This is not the behavior expected from DataInputStream
  * @author Kevin Dorff
  */
 public class CompoundDataInput implements DataInput {
@@ -39,21 +42,28 @@ public class CompoundDataInput implements DataInput {
      */
     private static final Log LOG = LogFactory.getLog(CompoundDataInput.class);
 
-    /** The delegate DataInput object. */
+    /**
+     * The delegate DataInput object.
+     */
     private RandomAccessFile dataInput;
+    private long fileSize;
 
     /**
      * Create a CompoundDataInput. This is created by CompoundFileReader.
+     *
      * @param input the current reader stream
      */
-    CompoundDataInput(final RandomAccessFile input) {
+    CompoundDataInput(final RandomAccessFile input, long fileSize) {
         this.dataInput = input;
+        this.fileSize = fileSize;
     }
 
     /**
      * {@inheritDoc}
      */
     public void readFully(final byte[] b) throws IOException {
+        fileSize -= b.length;
+        if (fileSize < 0) throw new EOFException();
         dataInput.readFully(b);
     }
 
@@ -61,6 +71,9 @@ public class CompoundDataInput implements DataInput {
      * {@inheritDoc}
      */
     public void readFully(final byte[] b, final int off, final int len) throws IOException {
+        fileSize -= len;
+        if (fileSize < 0) throw new EOFException();
+
         dataInput.readFully(b, off, len);
     }
 
@@ -68,6 +81,8 @@ public class CompoundDataInput implements DataInput {
      * {@inheritDoc}
      */
     public int skipBytes(final int n) throws IOException {
+        fileSize -= n;
+        if (fileSize < 0) throw new EOFException();
         return dataInput.skipBytes(n);
     }
 
@@ -75,6 +90,8 @@ public class CompoundDataInput implements DataInput {
      * {@inheritDoc}
      */
     public boolean readBoolean() throws IOException {
+        fileSize -= 1;
+        if (fileSize < 0) throw new EOFException();
         return dataInput.readBoolean();
     }
 
@@ -82,13 +99,18 @@ public class CompoundDataInput implements DataInput {
      * {@inheritDoc}
      */
     public byte readByte() throws IOException {
-        return dataInput.readByte();
+      System.out.println("readByte fileSize="+fileSize);
+        --fileSize;
+        if (fileSize < 0) throw new EOFException();
+        else return dataInput.readByte();
     }
 
     /**
      * {@inheritDoc}
      */
     public int readUnsignedByte() throws IOException {
+        --fileSize;
+        if (fileSize < 0) throw new EOFException();
         return dataInput.readUnsignedByte();
     }
 
@@ -96,6 +118,8 @@ public class CompoundDataInput implements DataInput {
      * {@inheritDoc}
      */
     public short readShort() throws IOException {
+        fileSize -= 2;
+        if (fileSize < 0) throw new EOFException();
         return dataInput.readShort();
     }
 
@@ -103,6 +127,8 @@ public class CompoundDataInput implements DataInput {
      * {@inheritDoc}
      */
     public int readUnsignedShort() throws IOException {
+        fileSize -= Short.SIZE;
+        if (fileSize < 0) throw new EOFException();
         return dataInput.readUnsignedShort();
     }
 
@@ -110,6 +136,8 @@ public class CompoundDataInput implements DataInput {
      * {@inheritDoc}
      */
     public char readChar() throws IOException {
+        fileSize -= 1;
+        if (fileSize < 0) throw new EOFException();
         return dataInput.readChar();
     }
 
@@ -117,6 +145,9 @@ public class CompoundDataInput implements DataInput {
      * {@inheritDoc}
      */
     public int readInt() throws IOException {
+
+        fileSize -= 4;
+        if (fileSize < 0) throw new EOFException();
         return dataInput.readInt();
     }
 
@@ -124,6 +155,8 @@ public class CompoundDataInput implements DataInput {
      * {@inheritDoc}
      */
     public long readLong() throws IOException {
+        fileSize -= 8;
+        if (fileSize < 0) throw new EOFException();
         return dataInput.readLong();
     }
 
@@ -131,6 +164,8 @@ public class CompoundDataInput implements DataInput {
      * {@inheritDoc}
      */
     public float readFloat() throws IOException {
+        fileSize -= 4;
+        if (fileSize < 0) throw new EOFException();
         return dataInput.readFloat();
     }
 
@@ -138,6 +173,8 @@ public class CompoundDataInput implements DataInput {
      * {@inheritDoc}
      */
     public double readDouble() throws IOException {
+        fileSize -= 8;
+        if (fileSize < 0) throw new EOFException();
         return dataInput.readDouble();
     }
 
@@ -145,29 +182,35 @@ public class CompoundDataInput implements DataInput {
      * {@inheritDoc}
      */
     public String readLine() throws IOException {
-        return dataInput.readLine();
+        throw new UnsupportedOperationException("Cannot read line from compound reader.");
     }
 
     /**
      * {@inheritDoc}
      */
     public String readUTF() throws IOException {
-        return dataInput.readUTF();
+        throw new UnsupportedOperationException("Cannot read line from compound reader.");
+    }
+
+    public long length() throws IOException {
+        return Math.min(fileSize, dataInput.length());
     }
 
     /**
      * Read an object from the current stream position.
+     *
      * @return the object
-     * @throws IOException error reading the object
+     * @throws IOException            error reading the object
      * @throws ClassNotFoundException error de-serializing the object
      */
     public Object readObject() throws IOException, ClassNotFoundException {
-        final int size = dataInput.readInt();
+        final int size = readInt();
+
         if (LOG.isDebugEnabled()) {
             LOG.debug("Reading an object that should be " + (size + 4) + " bytes long");
         }
         final byte[] buf = new byte[size];
-        dataInput.readFully(buf);
+        readFully(buf);
         final ByteArrayInputStream bis = new ByteArrayInputStream(buf);
         final ObjectInputStream ois = new ObjectInputStream(bis);
         final Object deserializedObject = ois.readObject();

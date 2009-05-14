@@ -108,7 +108,7 @@ public class CompoundFileReader implements Closeable {
             LOG.debug("Reading an file that should be " + entry.getFileSize() + " bytes long");
         }
         stream.seek(position);
-        return new CompoundDataInput(stream);
+        return new CompoundDataInput(stream, entry.getFileSize());
     }
 
     /**

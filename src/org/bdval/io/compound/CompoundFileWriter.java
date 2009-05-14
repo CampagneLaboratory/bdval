@@ -219,7 +219,7 @@ public class CompoundFileWriter implements Closeable {
      * @throws IOException problem finishing addFile. The CompoundFile
      * is probably un-usable.
      */
-    void finishAddFile() throws IOException {
+   public void finishAddFile() throws IOException {
         if (entryBeingAdded == null) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("skipping finish add...");
