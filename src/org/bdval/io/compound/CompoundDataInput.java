@@ -100,7 +100,7 @@ public class CompoundDataInput implements DataInput {
      * {@inheritDoc}
      */
     public byte readByte() throws IOException {
-        System.out.println("readByte fileSize=" + fileSize);
+     
         --fileSize;
         if (fileSize < 0) throw new EOFException();
         else return dataInput.readByte();
