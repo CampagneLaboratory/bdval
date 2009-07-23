@@ -1,3 +1,12 @@
+1.0.2
+
+- Set the properties for "use-feature-selection-fold" to true in
+  the  prostate-example.xml file. When these are not defined, the
+  prostate example doesn't produce any results.
+
+- Improve error handling in the "compound file" code used to store
+  results.
+
 1.0.1
 
 - Fixed a crash due to missing class "ProgressLogger".
