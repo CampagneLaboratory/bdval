@@ -2059,6 +2059,7 @@
             </sequential>
         </sequential>
     </macrodef>
+
     <target name="predict-validation" depends="init,tag-output-directory"
             description="Generate prediction files for validation dataset">
         <input addproperty="results-directory" message="Enter the results directory."
@@ -2076,7 +2077,7 @@
         <predict-dataset
                 test-set-name="${test-set-name}"
                 evaluate-stats="${evaluate-stats}"
-
+                model-directory="${model-directory}"
                 />
 
     </target>
