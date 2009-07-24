@@ -1625,7 +1625,7 @@
         <input addproperty="results-directory"
                message="Enter the directory where results are stored (features subdirectory must exist in the results directory)."/>
 
-        <generate-final-models results-directory="${results-directory"
+        <generate-final-models results-directory="${results-directory}"
                                model-conditions="${model-conditions}"/>
 
 
@@ -1821,7 +1821,7 @@
         <delete file="${statistics-output}"/>
         <input addproperty="results-directory"
                message="Enter the results directory to restat. The directory must contain a predictions directory."/>
-        <restat results-directory="${results-directory"/>
+        <restat results-directory="${results-directory}"/>
 
         <echo message="Calculating statistics for results in ${results-directory}"/>
 
@@ -2194,7 +2194,7 @@
             <property name="do.minmax-svmglobal" value="false"/>
             <property name="do.ttest-svmglobal" value="true"/>
             <execute-all-endpoints/>
-          
+
             <collect-statistics
                     save-data-dir="${save-data-dir}"/>
         </sequential>
