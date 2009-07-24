@@ -65,7 +65,7 @@
         <symlink link="${releasedir}/bdval.zip" resource="${tag}-bdval.zip"/>
 
         <!-- copy the changes file to the release directory -->
-        <copy todir="${releasedir}" file="${tag}/CHANGES.txt"/>
+        <copy todir="${releasedir}" file="${exportdir}/${tag}/CHANGES.txt"/>
 
         <!-- copy the zip to the web folder -->
         <!-- todo -->
