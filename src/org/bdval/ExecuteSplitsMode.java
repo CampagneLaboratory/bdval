@@ -39,6 +39,7 @@ import it.unimi.dsi.logging.ProgressLogger;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.bdval.util.ShortHash;
@@ -339,15 +340,9 @@ public class ExecuteSplitsMode extends DAVMode {
                 final String label = sequenceMode.getValue("label");
 
                 final String statsFilename = sequenceMode.getValue("predictions-filename");
-                final String survivalFileName = sequenceMode.getValue("survival");
-                String survivaloption = "";
-
-                if (survivalFileName != null) {
-                    survivaloption = " --survival " + survivalFileName + " ";
-                }
 
                 if (statsFilename != null && label != null) {
-                    // and the sequence defined the variables"predictions-filename"  and "label"
+                    // and the sequence defined the variables "predictions-filename" and "label"
                     try {
                         final String floorParam;
                         if (options.adjustSignalToFloorValue) {
@@ -356,24 +351,33 @@ public class ExecuteSplitsMode extends DAVMode {
                             floorParam = "";
                         }
 
+                        // extract survival options if any
+                        // TODO: clean this up - we should not be checking for "%survival%"
+                        final String survivalFileName = sequenceMode.getValue("survival");
+                        final String survivalOption;
+                        if (StringUtils.isNotBlank(survivalFileName) && !"%survival%".equals(survivalFileName)) {
+                            survivalOption = " --survival " + survivalFileName + " ";
+                        } else {
+                            survivalOption = "";
+                        }
+
                         final String featureSelectionCode = getFeatureSelectionCode(label);
                         final String sequenceArgs = String.format(
                                 "--mode stats --predictions %s "
-                                        + survivaloption
+                                        + survivalOption
                                         + "--submission-file %s-maqcii-submission.txt "
                                         + "--feature-selection-method %s "
                                         + "--label %s "
                                         + "--model-id %s "
                                         + "--dataset-name %s --folds %d %s --other-measures prec,rec,F-1,MCC,binary-auc",
                                 statsFilename,
-                                survivalFileName,
                                 labelPrefix(label),
                                 featureSelectionCode,
                                 label,
                                 modelId,
                                 options.datasetName, options.crossValidationFoldNumber, floorParam);
 
-                        LOGGER.info("Estimating statistics: " + sequenceArgs);
+                        LOGGER.debug("Estimating statistics: " + sequenceArgs);
                         DiscoverAndValidate.main(buildArguments(sequenceArgs));
 
                     } catch (Exception e) {

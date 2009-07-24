@@ -98,12 +98,11 @@ public class StatsMode extends Predict {
 
         if (result.contains("survival")) {
             survivalFileName = result.getString("survival");
-            System.out.println("survival File" + survivalFileName);
+            LOG.debug("Survival file:" + survivalFileName);
         }
 
         if ("auto".equals(result.getString("label"))) {
             final String label = guessLabel(options.datasetName, filename);
-
             maqciiHelper.setupSubmissionFile(result, options, label);
         } else {
             maqciiHelper.setupSubmissionFile(result, options);
@@ -240,8 +239,8 @@ public class StatsMode extends Predict {
                     decisions.addAll(predictions.getDecisionsForSplit(repeatId, splitId));
                     trueLabels.addAll(predictions.getTrueLabelsForSplit(repeatId, splitId));
                     sampleIDs.addAll(predictions.getSampleIDsForSplit(repeatId, splitId));
-                    if (decisions.size()==0) {
-                        System.out.println("cannot process empty decision list");
+                    if (decisions.size() == 0) {
+                        LOG.fatal("cannot process empty decision list");
                         System.exit(10);
                     }
                     final EvaluationMeasure allSplitsInARepeatMeasure =
