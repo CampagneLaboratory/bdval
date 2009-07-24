@@ -124,6 +124,9 @@
 
         <echo message="Executing with ${num-threads} threads"/>
         <sequential>
+            <property name="use-feature-selection-fold=true" value="true"/>
+            <property name="use-feature-selection-fold=false" value="true"/>
+
             <property name="do.baseline" value="false"/>
             <property name="do.baseline-tune-C" value="false"/>
             <property name="do.foldchange-genetic-algorithm" value="false"/>
@@ -156,6 +159,9 @@
 
         <echo message="Executing with ${num-threads} threads"/>
         <sequential>
+            <property name="use-feature-selection-fold=true" value="true"/>
+            <property name="use-feature-selection-fold=false" value="true"/>
+
             <property name="do.baseline" value="false"/>
             <property name="do.whole-chip" value="false"/>
             <property name="do.baseline-tune-C" value="false"/>
@@ -190,6 +196,9 @@
 
         <echo message="Executing with ${num-threads} threads"/>
         <sequential>
+            <property name="use-feature-selection-fold=true" value="true"/>
+            <property name="use-feature-selection-fold=false" value="true"/>
+
             <property name="do.baseline" value="false"/>
             <property name="do.whole-chip" value="false"/>
             <property name="do.foldchange-genetic-algorithm" value="false"/>
