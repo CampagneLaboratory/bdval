@@ -1106,13 +1106,13 @@
                         </then>
                     </if>
 
-                    <!-- determine if this endpoint has specific array parameters (i.e., log10) -->
+                    <!-- determine if this endpoint has specific array parameters (i.e., logged-array) -->
                     <echo level="debug" message="array parameter: ${@{endpoint-name}.array-parameters}"/>
                     <if>
                         <isset property="@{endpoint-name}.array-parameters"/>
                         <then>
                             <var name="array-params" value="${@{endpoint-name}.array-parameters}"/>
-                            <!-- cdna-array and log10-array parameters -->
+                            <!-- cdna-array and logged-array parameters -->
                         </then>
                         <else>
                             <var name="array-params" value=""/>
