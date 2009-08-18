@@ -1,3 +1,8 @@
+TBD
+
+- Change template to use "--logged-array" rather than the older
+  "--log-10-array"
+
 1.0.4
 
 - Update template scripts and configuration files to include
