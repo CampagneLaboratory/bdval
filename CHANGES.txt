@@ -1,13 +1,20 @@
+1.0.4
+
+- Update template scripts and configuration files to include
+  missing parameters that were referenced in the project
+  documentation and prostate example ("use-feature-selection-fold"
+  for example).
+
 1.0.3
 
- - "Survival" mode option was not being set properly and caused
-   the ExecuteSplits mode to fail when generating statistics.
+- "Survival" mode option was not being set properly and caused
+  the ExecuteSplits mode to fail when generating statistics.
 
- - The correct name for the prostate example test split is
-   now set to GSE8402-FusionYesNo-TestSplit.cids.
+- The correct name for the prostate example test split is
+  now set to GSE8402-FusionYesNo-TestSplit.cids.
 
- - The "predict-validation" target now sets the required attribute
-   "model-directory" properly.
+- The "predict-validation" target now sets the required attribute
+  "model-directory" properly.
 
 1.0.2
 
