@@ -875,7 +875,7 @@ public class BDVModel {
      * @param stream         The stream to store the properties to
      * @param options        The options associated with this model
      * @param task
-     * @param splitPlan
+     * @param splitPlan      The split plan assoicated with this model
      * @param writeModelMode
      * @throws IOException if there is a problem writing to the stream
      */
