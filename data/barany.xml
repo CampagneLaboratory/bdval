@@ -21,7 +21,7 @@
     <property file="${project-property-file}"/> 
 	
     <property name="do-specific-gene-lists-only" value="false"/>
-    <property name="enable-flooring" value="true"/>
+    <property name="enable-flooring" value="false"/>
 
     <property name="ga-wrapper-population-size" value="20"/>
     <property name="ga-wrapper-number-of-iterations" value="20"/>
