@@ -139,14 +139,14 @@
             <property name="do.genelist-genetic-algorithm" value="false"/>
             <property name="do.genelist-svmglobal" value="false"/>
             <property name="do.genelist-svmglobal-tune-C" value="false"/>
-            <property name="do.minmax-svmglobal" value="false"/>
+            <property name="do.minmax-svmglobal" value="true"/>
             <property name="do.pathways-ttest-svmglobal" value="false"/>
             <property name="do.pathways-tune-C" value="false"/>
             <property name="do.pathways.baseline" value="false"/>
-            <property name="do.svmiterative" value="false"/>
+            <property name="do.svmiterative" value="true"/>
             <property name="do.ttest-genetic-algorithm" value="false"/>
-            <property name="do.ttest-svmglobal" value="false"/>
-            <property name="do.ttest-svmiterative" value="false"/>
+            <property name="do.ttest-svmglobal" value="true"/>
+            <property name="do.ttest-svmiterative" value="true"/>
             <property name="do.coxreg-svmglobal" value="false"/>
             <property name="do.pathways-coxreg-svmglobal" value="false"/>
 
