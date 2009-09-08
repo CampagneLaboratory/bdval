@@ -101,14 +101,15 @@
     Normal targets (non-pathways) -->
     <!-- name following "do." must match the names in the corresponding properties file -->
 
-    <property name="do.barany" value="true"/>
+    <property name="do.barany_original" value="true"/>
+    <property name="do.barany_5year" value="true"/>
 
 
     <!-- CONFIGURE THIS
          All endpoints to be run should be listed here by their symbol, separated by a space -->
     <!-- note that the "do." is NOT listed here, only the endpoint symbol.
          The symbol used must match an endpoint symbol defined in the project properties file. -->
-    <property name="all-endpoints" value="barany"/>
+    <property name="all-endpoints" value="barany_original barany_5year"/>
     <!--<property name="all-endpoints" value="MY_ENDPOINT1 MY_ENDPOINT2 MY_ENDPOINT3"/>-->
 
     <!-- end of the endpoint definitions -->
