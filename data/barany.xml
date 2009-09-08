@@ -9,7 +9,7 @@
     <!-- be sure to load the "local" property file first to override any global values -->
 
 
-	<property name="cache-dir-location" value="cache"/>
+	<property name="cache-dir-location" value="./"/>
 	<dirname property="bdval-project.basedir" file="${ant.file.barany}"/>
     <import file="${bdval-project.basedir}/../buildsupport/build.xml"/>
     <property name="evaluate-statistics-after-splits" value="true"/>
