@@ -1,4 +1,6 @@
 TBD
+- Make T-Test calculation dependent on --logged-array parameter. Please note that calibration
+  models must be rebuilt for approaches which use fold-change and process logged array datasets.
 
 - Change template to use "--logged-array" rather than the older
   "--log-10-array"

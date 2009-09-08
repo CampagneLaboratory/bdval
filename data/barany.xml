@@ -124,16 +124,16 @@
         <sequential>
             <!-- CONFIGURE THIS-->
             <!-- change values to "true" below in order to run the condition listed -->
-             <property name="do.baseline" value="false"/>
-            <property name="do.naive-bayes" value="false"/>
-            <property name="do.logit-boost" value="false"/>
+             <property name="do.baseline" value="true"/>
+            <property name="do.naive-bayes" value="true"/>
+            <property name="do.logit-boost" value="true"/>
             <property name="do.logistic" value="false"/>
-            <property name="do.random-forest" value="false"/>
-            <property name="do.k-star" value="false"/>
+            <property name="do.random-forest" value="true"/>
+            <property name="do.k-star" value="true"/>
             <property name="do.whole-chip" value="false"/>
-            <property name="do.baseline-tune-C" value="false"/>
+            <property name="do.baseline-tune-C" value="true"/>
             <property name="do.foldchange-genetic-algorithm" value="false"/>
-            <property name="do.foldchange-svmglobal" value="false"/>
+            <property name="do.foldchange-svmglobal" value="true"/>
             <property name="do.foldchange-svmiterative" value="true"/>
             <property name="do.full-genetic-algorithm" value="false"/>
             <property name="do.genelist-genetic-algorithm" value="false"/>
