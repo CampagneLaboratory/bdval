@@ -126,11 +126,11 @@
              <property name="do.baseline" value="true"/>
             <property name="do.naive-bayes" value="true"/>
             <property name="do.logit-boost" value="true"/>
-            <property name="do.logistic" value="true"/>
+            <property name="do.logistic" value="false"/>
             <property name="do.random-forest" value="true"/>
             <property name="do.k-star" value="true"/>
             <property name="do.whole-chip" value="false"/>
-            <property name="do.baseline-tune-C" value="false"/>
+            <property name="do.baseline-tune-C" value="true"/>
             <property name="do.foldchange-genetic-algorithm" value="false"/>
             <property name="do.foldchange-svmglobal" value="true"/>
             <property name="do.foldchange-svmiterative" value="true"/>
@@ -138,10 +138,10 @@
             <property name="do.genelist-genetic-algorithm" value="false"/>
             <property name="do.genelist-svmglobal" value="false"/>
             <property name="do.genelist-svmglobal-tune-C" value="false"/>
-            <property name="do.minmax-svmglobal" value="false"/>
+            <property name="do.minmax-svmglobal" value="true"/>
             <property name="do.pathways-ttest-svmglobal" value="false"/>
             <property name="do.pathways-tune-C" value="false"/>
-            <property name="do.pathways.baseline" value="true"/>
+            <property name="do.pathways.baseline" value="false"/>
             <property name="do.svmiterative" value="true"/>
             <property name="do.ttest-genetic-algorithm" value="false"/>
             <property name="do.ttest-svmglobal" value="true"/>
