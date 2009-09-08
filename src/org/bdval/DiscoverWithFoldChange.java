@@ -76,6 +76,7 @@ public class DiscoverWithFoldChange extends DAVMode {
 
     /**
      * Define command line options for this mode.
+     *
      * @param jsap the JSAP command line parser
      * @throws JSAPException if there is a problem building the options
      */
@@ -118,7 +119,7 @@ public class DiscoverWithFoldChange extends DAVMode {
                     final Table processedTable =
                             processTable(geneList, options.inputTable,
                                     options, MicroarrayTrainEvaluate.calculateLabelValueGroups(
-                                    task));
+                                            task));
                     final ArrayTable.ColumnDescription labelColumn =
                             processedTable.getColumnValues(0);
                     assert labelColumn.type
@@ -164,20 +165,29 @@ public class DiscoverWithFoldChange extends DAVMode {
                             averagePositiveClass += value;
                         }
                         averagePositiveClass /= positiveLabelValues.size();
+                        final double featureRatio;
+                        final double inverseRatio;
 
+                        if (options.loggedArray) {
+                        // signal on the array has been logged. Fold change is the difference of logged signal values.
+                            featureRatio = averagePositiveClass - averageNegativeClass;
+                            inverseRatio = averageNegativeClass - averagePositiveClass;
+                        } else {
+                            // signal on the array was not logged. Fold change is ratio of signal values.
+                            featureRatio = averagePositiveClass / averageNegativeClass;
+                            inverseRatio = averageNegativeClass / averagePositiveClass;
+                        }
 
-                        final double featureRatio = averagePositiveClass / averageNegativeClass;
-                        final double inverseRatio = averageNegativeClass / averagePositiveClass;
                         if (featureRatio >= ratio || inverseRatio >= ratio) {
                             final MutableString probesetId =
                                     options.getProbesetIdentifier(probesetIndex);
-                           /* System.out.println("featureIndex:" + featureIndex);
+                            /* System.out.println("featureIndex:" + featureIndex);
 
-                            System.out.println("featureId:" + probesetId);
-                            System.out.println("fold-change:" + featureRatio);
-                            System.out.println("positive: " + positiveLabelValues.toString());
-                            System.out.println("negative: " + negativeLabelValues.toString());
-                             */
+                           System.out.println("featureId:" + probesetId);
+                           System.out.println("fold-change:" + featureRatio);
+                           System.out.println("positive: " + positiveLabelValues.toString());
+                           System.out.println("negative: " + negativeLabelValues.toString());
+                            */
                             LOG.debug("Selecting feature by fold change " + probesetId);
                             selectedProbesets.enqueue(probesetIndex, Math.max(featureRatio, inverseRatio));
                             ratios.put(probesetIndex, featureRatio);
