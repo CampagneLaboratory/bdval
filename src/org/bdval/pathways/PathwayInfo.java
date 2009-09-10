@@ -33,7 +33,7 @@ public class PathwayInfo {
     public MutableString pathwayId;
     public int pathwayIndex;
     public ObjectSet<MutableString> probesetIds;
-    // probeset indices must stored in a consistent order. A List is used.
+    // probeset indices must be stored in a consistent order. A List is used.
     public IntList probesetIndices;
 
 }
