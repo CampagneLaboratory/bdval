@@ -1,4 +1,6 @@
 TBD
+- Upgraded common-math to version 2.0. Commons-math provides the T-Test implementation used
+  by the t-test mode.
 - Make T-Test calculation dependent on --logged-array parameter. Please note that calibration
   models must be rebuilt for approaches which use fold-change and process logged array datasets.
 

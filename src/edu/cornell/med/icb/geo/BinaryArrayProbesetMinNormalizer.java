@@ -31,7 +31,6 @@ import it.unimi.dsi.fastutil.objects.ObjectList;
 import it.unimi.dsi.lang.MutableString;
 import it.unimi.dsi.logging.ProgressLogger;
 import org.apache.commons.math.stat.descriptive.SummaryStatistics;
-import org.apache.commons.math.stat.descriptive.SummaryStatisticsImpl;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -101,7 +100,7 @@ public class BinaryArrayProbesetMinNormalizer implements FormatAdapter {
         projectTo = "tissue";
         final double[] sumSignalBySample = sumSignal(platform);
 
-        final SummaryStatistics statHelper = new SummaryStatisticsImpl();
+        final SummaryStatistics statHelper = new SummaryStatistics();
         for (final double sumForOneSample : sumSignalBySample) {
             statHelper.addValue(sumForOneSample);
         }
@@ -222,7 +221,7 @@ public class BinaryArrayProbesetMinNormalizer implements FormatAdapter {
             }
             arrayReader.close();
             for (int probesetIndex = 0; probesetIndex < smallestSignalValuesForProbesets.length; probesetIndex++) {
-                final SummaryStatistics helper = new SummaryStatisticsImpl();
+                final SummaryStatistics helper = new SummaryStatistics();
                 while (!smallestSignalValuesForProbesets[probesetIndex].isEmpty()) {
                     final TranscriptScore score = smallestSignalValuesForProbesets[probesetIndex].dequeue();
                     final double smallestSignalValue = -score.score;
