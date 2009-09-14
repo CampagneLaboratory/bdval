@@ -81,6 +81,7 @@ public class DiscoverWithTTest extends DAVMode {
 
     /**
      * Define command line options for this mode.
+     *
      * @param jsap the JSAP command line parser
      * @throws JSAPException if there is a problem building the options
      */
@@ -154,7 +155,12 @@ public class DiscoverWithTTest extends DAVMode {
                             }
                             index++;
                         }
-                        double pValue = tester.tTest(
+                        double pValue;
+                        // T-Test cannot be applied to sets of numbers with less than two elements.
+                        // In such cases, consider that no feature is significant.
+                        if (positiveLabelValues.size() < 2 || negativeLabelValues.size() < 2) pValue = Double.NaN;
+
+                        else pValue = tester.tTest(
                                 positiveLabelValues.toDoubleArray(),
                                 negativeLabelValues.toDoubleArray());
 
