@@ -34,7 +34,7 @@
     <property name="external-CV-repeats" value="--cv-repeats ${external-CV-repeats-number} "/>
     <property name="external-CV-folds" value="2"/>
   
-	<property name="use-feature-selection-fold=true" value="true"/>
+	<property name="use-feature-selection-fold=true" value="false"/>
 	<property name="use-feature-selection-fold=false" value="true"/>
 
 	
