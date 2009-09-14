@@ -65,12 +65,13 @@ public class ClassificationTask {
             throw new IllegalArgumentException(
                     "condition name " + getFirstConditionName() + " must be defined.");
         }
-        if (!conditionsIdentifiers.conditionExists(getSecondConditionName())) {
+        if (numberOfClasses==2 &&!conditionsIdentifiers.conditionExists(getSecondConditionName())) {
             throw new IllegalArgumentException(
                     "condition name " + getSecondConditionName() + " must be defined.");
         }
 
     }
+    int numberOfClasses;
 
     public static ClassificationTask[] parseTaskAndConditions(final Reader taskListReader,
                                                               final Reader conditionIdsReader) {
@@ -121,7 +122,7 @@ public class ClassificationTask {
                     task.setConditionName(1, tokens[2]);
                     task.setConditionInstanceNumber(0, Integer.parseInt(tokens[3]));
                     task.setConditionInstanceNumber(1, Integer.parseInt(tokens[4]));
-
+                    task.numberOfClasses=numberOfClasses;
                 }
 
                 task.setConditionsIdentifiers(conditionIdentifiers);
