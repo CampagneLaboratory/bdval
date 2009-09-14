@@ -63,11 +63,11 @@ public class ClassificationTask {
         this.conditionsIdentifiers = conditionsIdentifiers;
         if (!conditionsIdentifiers.conditionExists(getFirstConditionName())) {
             throw new IllegalArgumentException(
-                    "condition name " + getFirstConditionName() + "must be defined.");
+                    "condition name " + getFirstConditionName() + " must be defined.");
         }
-        if (!conditionsIdentifiers.conditionExists(getFirstConditionName())) {
+        if (!conditionsIdentifiers.conditionExists(getSecondConditionName())) {
             throw new IllegalArgumentException(
-                    "condition name " + getSecondConditionName() + "must be defined.");
+                    "condition name " + getSecondConditionName() + " must be defined.");
         }
 
     }
