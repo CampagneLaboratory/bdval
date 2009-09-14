@@ -30,9 +30,9 @@
     <property name="internal-CV-repeats" value="--cv-repeats 5"/>
     <property name="internal-CV-folds" value="3"/>
 
-    <property name="external-CV-repeats-number" value="10"/>
+    <property name="external-CV-repeats-number" value="30"/>
     <property name="external-CV-repeats" value="--cv-repeats ${external-CV-repeats-number} "/>
-    <property name="external-CV-folds" value="5"/>
+    <property name="external-CV-folds" value="2"/>
   
 	<property name="use-feature-selection-fold=true" value="true"/>
 	<property name="use-feature-selection-fold=false" value="true"/>
