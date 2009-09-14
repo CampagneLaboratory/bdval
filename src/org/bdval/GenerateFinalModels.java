@@ -782,13 +782,7 @@ public class GenerateFinalModels {
                 }
             }
             ttest.interpretArguments(jsap, result, options);
-            /*   {
-               // force ttest to use the union features rather than the full array.
-              // This speeds up loading the cached data and the computations.
-               options.geneLists = new GeneList[1];
-               options.geneLists[0] = new FixedGeneList(featureUnion.toArray(new String[featureUnion.size()]));
 
-           } */
             ttest.process(options);
             return ttest.probesetPvalues;
         } catch (JSAPException e) {
