@@ -30,9 +30,9 @@
     <property name="internal-CV-repeats" value="--cv-repeats 5"/>
     <property name="internal-CV-folds" value="3"/>
 
-    <property name="external-CV-repeats-number" value="30"/>
+    <property name="external-CV-repeats-number" value="10"/>
     <property name="external-CV-repeats" value="--cv-repeats ${external-CV-repeats-number} "/>
-    <property name="external-CV-folds" value="2"/>
+    <property name="external-CV-folds" value="5"/>
   
 	<property name="use-feature-selection-fold=true" value="false"/>
 	<property name="use-feature-selection-fold=false" value="true"/>
@@ -42,7 +42,7 @@
     <!-- Number of features to generate models with. This can be a single integer, or a list
     or integers separated by commas. When it is a list, models are generated with each number of
     feature indicated. -->
-    <property name="num-features" value="100"/>
+    <property name="num-features" value="10,25,50,100"/>
 
     <!-- Maximum number of features to keep after the first step of two-steps feature
          selection strategy. Consider a strategy with T-Test (alpha=0.05) and SVM-weight
