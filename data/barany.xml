@@ -105,13 +105,14 @@
     <property name="do.barany_original" value="false"/>
     <property name="do.barany_5year" value="false"/>
     <property name="do.barany_mas5_dod_at_5years" value="true"/>
+    <property name="do.barany_sex" value="true"/>
 
 
     <!-- CONFIGURE THIS
          All endpoints to be run should be listed here by their symbol, separated by a space -->
     <!-- note that the "do." is NOT listed here, only the endpoint symbol.
          The symbol used must match an endpoint symbol defined in the project properties file. -->
-    <property name="all-endpoints" value="barany_original barany_5year barany_mas5_dod_at_5years"/>
+    <property name="all-endpoints" value="barany_original barany_5year barany_mas5_dod_at_5years barany_sex"/>
     <!--<property name="all-endpoints" value="MY_ENDPOINT1 MY_ENDPOINT2 MY_ENDPOINT3"/>-->
 
     <!-- end of the endpoint definitions -->
