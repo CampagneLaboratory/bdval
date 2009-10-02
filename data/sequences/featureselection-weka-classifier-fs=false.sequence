@@ -1,0 +1,14 @@
+def label=weka-%feature-selection-mode%-%weka-class%-%model-id%
+def predictions-filename=%dataset-name%-%label%-prediction-table.txt
+def survival=%survival%
+#
+addoption required:other-options:Other DAVMode options can be provided here
+addoption required:split-id:id of split being processed
+addoption required:num-features:Number of features in the generated model
+addoption required:weka-class:Classname of the weka classifier
+addoption required:max-intermediate-features:Maximum number of intermediate features to consider
+#
+#
+-m %feature-selection-mode%  --report-max-probes %max-intermediate-features%  --overwrite-output true -o %dataset-name%-%split-id%-%label%-features.txt --gene-list full --gene-features-dir %gene-features-dir% --alpha %alpha% --output-gene-list --report-max-probes %num-features% %other-options% --split-type training
+-m write-model --overwrite-output true --gene-list %label%|%dataset-name%-%split-id%-%label%-features.txt %other-options% --split-type training --model-prefix weka_%dataset-name%-%split-id%-%label%
+-m predict --overwrite-output false --model weka_%dataset-name%-%split-id%-%label%.model -o %predictions-filename% %other-options% --split-type test --true-labels %conditions%

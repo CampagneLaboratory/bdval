@@ -1,0 +1,11 @@
+#Writes a final model, applying the ttest+weka classifier to the full training set.
+def label=weka-%feature-selection-mode% -%weka-class%-%model-id%
+#
+addoption required:weka-class:Classname of the weka classifier
+addoption required:model-final-features-filename:Path and filename where to write the final model
+addoption required:model-prefix:Path and filename where to write the final model
+addoption required:num-features:Number of features in the generated model
+addoption required:max-intermediate-features:Maximum number of intermediate features to consider
+#
+-m %feature-selection-mode% --report-max-probes %max-intermediate-features%  --overwrite-output true -o %model-final-features-filename% --gene-list full --gene-features-dir %gene-features-dir% --alpha %alpha% --output-gene-list --report-max-probes %num-features%
+-m write-model --overwrite-output true --gene-list %label%|%model-final-features-filename%  --model-prefix %model-prefix%

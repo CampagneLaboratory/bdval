@@ -605,6 +605,35 @@
         </sequential>
     </macrodef>
 
+    <macrodef name="do-weka-feature-selection-modes" description="train a weka model with a confugurable feature selection step">
+           <attribute name="endpoint-name"/>
+           <attribute name="dataset-root"/>
+           <attribute name="floor-param"/>
+           <attribute name="array-params"/>
+           <attribute name="weka-class"/>
+           <attribute name="survival-file" default="-"/>
+           <attribute  name="feature-selection-mode" default="t-test"/>
+           <sequential>
+
+               <execute-splits feature-selection-fold="true"
+                               sequence-file="ttest-weka-classifier-fs=true.sequence"
+                               endpoint-name="@{endpoint-name}"
+                               dataset-root="@{dataset-root}"
+                               floor-param="@{floor-param}"
+                               array-params="@{array-params}"
+                               all-classifier-parameters=" --classifier edu.cornell.med.icb.learning.weka.WekaClassifier  --classifier-parameters wekaClass=@{weka-class} "
+                               other-options="--max-intermediate-features ${max-intermediate-features} --weka-class @{weka-class} --feature-selection-mode @{feature-selection-mode}"/>
+               <execute-splits feature-selection-fold="false"
+                               sequence-file="featureselection-weka-classifier-fs=false.sequence"
+                               endpoint-name="@{endpoint-name}"
+                               dataset-root="@{dataset-root}"
+                               floor-param="@{floor-param}"
+                               array-params="@{array-params}"
+                               all-classifier-parameters=" --classifier edu.cornell.med.icb.learning.weka.WekaClassifier  --classifier-parameters wekaClass=@{weka-class}  "
+                               other-options="--max-intermediate-features ${max-intermediate-features} --weka-class @{weka-class} --feature-selection-mode @{feature-selection-mode} "/>
+           </sequential>
+       </macrodef>
+
     <macrodef name="process-splits-all" description="Tune : execute all split plans">
         <attribute name="workingdir" default="${basedir}" description="directory where processing should take place"/>
         <attribute name="endpoint-name"/>
@@ -672,6 +701,13 @@
             <if>
                 <istrue value="${do.logit-boost}"/>
                 <then>
+                    <do-weka
+                            endpoint-name="@{endpoint-name}"
+                            dataset-root="@{dataset-root}"
+                            array-params="@{array-params}"
+                            survival-file="${survival-file}"
+                            floor-param="@{floor-param}" weka-class="weka.classifiers.meta.LogitBoost">
+                    </do-weka>
                     <do-weka
                             endpoint-name="@{endpoint-name}"
                             dataset-root="@{dataset-root}"
