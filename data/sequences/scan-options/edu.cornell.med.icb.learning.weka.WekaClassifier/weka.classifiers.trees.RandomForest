@@ -1,0 +1,13 @@
+--classifier-parameters -I=5,-K=10,wekaClass=weka.classifiers.trees.RandomForest
+--classifier-parameters -I=10,-K=10,wekaClass=weka.classifiers.trees.RandomForest
+--classifier-parameters -I=20,-K=10,wekaClass=weka.classifiers.trees.RandomForest
+--classifier-parameters -I=30,-K=10,wekaClass=weka.classifiers.trees.RandomForest
+--classifier-parameters -I=40,-K=10,wekaClass=weka.classifiers.trees.RandomForest
+--classifier-parameters -I=50,-K=10,wekaClass=weka.classifiers.trees.RandomForest
+--classifier-parameters -I=50,-K=20,wekaClass=weka.classifiers.trees.RandomForest
+--classifier-parameters -I=50,-K=30,wekaClass=weka.classifiers.trees.RandomForest
+--classifier-parameters -I=50,-K=40,wekaClass=weka.classifiers.trees.RandomForest
+--classifier-parameters -I=50,-K=50,wekaClass=weka.classifiers.trees.RandomForest
+--classifier-parameters -I=50,-K=75,wekaClass=weka.classifiers.trees.RandomForest
+--classifier-parameters -I=50,-K=100,wekaClass=weka.classifiers.trees.RandomForest
+
