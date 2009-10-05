@@ -620,9 +620,9 @@
             <loadfile property="file-content"
                       srcfile="${bdval.basedir}/../data/sequences/scan-options/@{classifier-classname}/@{weka-class}.scan-options"/>
             <echo  message="file content: ${file-content}"/>
-            
-            <for param="scan-options" delimiter="\n"
-                 list="${file-content}">
+
+            <!-- one scan option per line: -->
+            <for param="scan-options" delimiter="&#xA;"  list="${file-content}">
 
                 <sequential>
 
@@ -633,7 +633,7 @@
                                     floor-param="@{floor-param}"
                                     array-params="@{array-params}"
                                     all-classifier-parameters=" --classifier edu.cornell.med.icb.learning.weka.WekaClassifier  --classifier-parameters wekaClass=@{weka-class} "
-                                    other-options="--max-intermediate-features ${max-intermediate-features} --weka-class @{weka-class} --feature-selection-mode @{feature-selection-mode}"/>
+                                    other-options="--max-intermediate-features ${max-intermediate-features} --weka-class @{weka-class} --feature-selection-mode @{feature-selection-mode} @{scan-options}"/>
                     <execute-splits feature-selection-fold="false"
                                     sequence-file="featureselection-weka-classifier-fs=false.sequence"
                                     endpoint-name="@{endpoint-name}"
