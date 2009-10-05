@@ -307,7 +307,9 @@ public class ExecuteSplitsMode extends DAVMode {
 
     @Override
     public void process(final DAVOptions options) {
-
+        // TODO Does the method  getOriginalArgs (from icb.cli package) support options that appear multiple
+        // times on the command line? When --classifier-parameters are repeated on the command line, all but
+        // the first seem to disappear?
         final String[] args = getOriginalArgs();
         final UseModality<DAVOptions> executed;
         final int maxSplitIndex = splitPlan.getMaxSplitIndex();

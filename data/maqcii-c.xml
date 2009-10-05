@@ -31,7 +31,7 @@
     <property name="internal-CV-repeats" value="--cv-repeats 5"/>
     <property name="internal-CV-folds" value="3"/>
 
-    <property name="external-CV-repeats-number" value="10"/>
+    <property name="external-CV-repeats-number" value="1"/>
     <property name="external-CV-repeats" value="--cv-repeats ${external-CV-repeats-number} "/>
     <property name="external-CV-folds" value="5"/>
     <!-- Number of features to generate models with. This can be a single integer, or a list
@@ -185,7 +185,7 @@
         <echo message="Executing with ${num-threads} threads"/>
         <sequential>
 
-            <property name="use-feature-selection-fold=true" value="true"/>
+            <property name="use-feature-selection-fold=true" value="false"/>
             <property name="use-feature-selection-fold=false" value="true"/>
 
             <property name="do.weka-feature-selection-scan" value="true"/>

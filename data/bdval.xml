@@ -632,7 +632,7 @@
                                     dataset-root="@{dataset-root}"
                                     floor-param="@{floor-param}"
                                     array-params="@{array-params}"
-                                    all-classifier-parameters=" --classifier edu.cornell.med.icb.learning.weka.WekaClassifier  --classifier-parameters wekaClass=@{weka-class} "
+                                    all-classifier-parameters=" --classifier edu.cornell.med.icb.learning.weka.WekaClassifier   "
                                     other-options="--max-intermediate-features ${max-intermediate-features} --weka-class @{weka-class} --feature-selection-mode @{feature-selection-mode} @{scan-options}"/>
                     <execute-splits feature-selection-fold="false"
                                     sequence-file="featureselection-weka-classifier-fs=false.sequence"
@@ -640,7 +640,7 @@
                                     dataset-root="@{dataset-root}"
                                     floor-param="@{floor-param}"
                                     array-params="@{array-params}"
-                                    all-classifier-parameters=" --classifier @{classifier-classname}  --classifier-parameters wekaClass=@{weka-class} "
+                                    all-classifier-parameters=" --classifier @{classifier-classname}   "
                                     other-options="--max-intermediate-features ${max-intermediate-features} --weka-class @{weka-class} --feature-selection-mode @{feature-selection-mode} @{scan-options}"/>
                 </sequential>
             </for>
