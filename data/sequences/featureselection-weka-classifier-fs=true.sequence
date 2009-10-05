@@ -7,8 +7,9 @@ addoption required:split-id:id of split being processed
 addoption required:num-features:Number of features in the generated model
 addoption required:weka-class:Classname of the weka classifier
 addoption required:max-intermediate-features:Maximum number of intermediate features to consider
+addoption required:feature-selection-mode:Name of the feature selection mode to run
 #
 #
--m %feature-selection-mode% --report-max-probes %max-intermediate-features% --overwrite-output true -o %dataset-name%-%split-id%-%label%-features.txt --gene-list full --gene-features-dir %gene-features-dir% --alpha %alpha% --output-gene-list --report-max-probes %num-features% %other-options% --split-type feature-selection
--m write-model --overwrite-output true --gene-list %label%|%dataset-name%-%split-id%-%label%-features.txt %other-options% --split-type training --model-prefix weka_%dataset-name%-%split-id%-%label%
--m predict --overwrite-output false --model weka_%dataset-name%-%split-id%-%label%.model -o %predictions-filename% %other-options% --split-type test --true-labels %conditions%
+-m %feature-selection-mode% --report-max-probes %max-intermediate-features% --overwrite-output true -o %dataset-name%-%split-id%-%label%-features.txt --gene-list full --gene-features-dir %gene-features-dir% --output-gene-list  %other-options% --split-type feature-selection
+-m write-model --overwrite-output true --gene-list %label%|%dataset-name%-%split-id%-%label%-features.txt %other-options% --model-prefix weka_%dataset-name%-%split-id%-%label%   --split-type training
+-m predict --overwrite-output false --model weka_%dataset-name%-%split-id%-%label%.model -o %predictions-filename% %other-options%  --true-labels %conditions%  --split-type test

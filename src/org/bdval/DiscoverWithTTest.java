@@ -90,7 +90,8 @@ public class DiscoverWithTTest extends DAVMode {
         final Parameter numFeatureParam = new FlaggedOption("alpha")
                 .setStringParser(JSAP.DOUBLE_PARSER)
                 .setDefault("0.05")
-                .setRequired(true)
+                .setRequired(false)
+                .setDefault("1.0")
                 .setLongFlag("alpha")
                 .setShortFlag('n')
                 .setHelp("The significance level for the univariate T-test p-value. "

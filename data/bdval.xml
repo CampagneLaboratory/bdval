@@ -47,7 +47,7 @@
     <property name="other-performance-measures" value=""/>
 
     <!-- setting "cache-options" to the empty string will disable the cache -->
-    <property name="cache-options" value=""/>
+    <!--property name="cache-options" value=""/-->
     <property name="cache-options" value="--enable-cache"/>
 
     <!-- this property controls the output of the internal log4j configuration initialization -->
@@ -617,13 +617,17 @@
         <attribute name="feature-selection-mode" default="t-test"/>
         <sequential>
 
-           <for param="scan-options" delimiter="\n" parallel="false"
-                         file="${bdval.basedir}/../data/sequences/@{classifier-classname}/@{weka-class}.scan-options">
+            <loadfile property="file-content"
+                      srcfile="${bdval.basedir}/../data/sequences/scan-options/@{classifier-classname}/@{weka-class}.scan-options"/>
+            <echo  message="file content: ${file-content}"/>
+            
+            <for param="scan-options" delimiter="\n"
+                 list="${file-content}">
 
                 <sequential>
 
                     <execute-splits feature-selection-fold="true"
-                                    sequence-file="ttest-weka-classifier-fs=true.sequence"
+                                    sequence-file="featureselection-weka-classifier-fs=true.sequence"
                                     endpoint-name="@{endpoint-name}"
                                     dataset-root="@{dataset-root}"
                                     floor-param="@{floor-param}"
@@ -679,7 +683,44 @@
                            rserve-port="@{rserve-port}"
                            floor-param="@{floor-param}"
                            array-params="@{array-params}"/>
+            <if>
+                <istrue value="${do.weka-feature-selection-scan}"/>
+                <then>
 
+                    <for param="feature-selection-mode" delimiter=" " list="t-test fold-change min-max svm-weight">
+                        <sequential>
+
+                            <for param="weka-class" delimiter=" "
+                                 list="weka.classifiers.meta.LogitBoost weka.classifiers.lazy.KStar weka.classifiers.trees.RandomForest weka.classifiers.functions.Logistic weka.classifiers.bayes.NaiveBayesUpdateable">
+                                <sequential>
+                                    <echo message="Considering doing weka scan @{feature-selection-mode} @{weka-class}"/>
+                                    <do-weka-feature-selection-modes
+                                            endpoint-name="@{endpoint-name}"
+                                            dataset-root="@{dataset-root}"
+                                            array-params="@{array-params}"
+                                            survival-file="${survival-file}"
+                                            floor-param="@{floor-param}"
+                                            weka-class="@{weka-class}"
+                                            feature-selection-mode="@{feature-selection-mode}"
+                                            classifier-classname="edu.cornell.med.icb.learning.weka.WekaClassifier">
+                                    </do-weka-feature-selection-modes>
+                                </sequential>
+                            </for>
+                            <do-weka-feature-selection-modes
+                                    endpoint-name="@{endpoint-name}"
+                                    dataset-root="@{dataset-root}"
+                                    array-params="@{array-params}"
+                                    survival-file="${survival-file}"
+                                    floor-param="@{floor-param}"
+                                    weka-class="libSVM"
+                                    feature-selection-mode="@{feature-selection-mode}"
+                                    classifier-classname="edu.cornell.med.icb.learning.libsvm.LibSvmClassifier">
+                            </do-weka-feature-selection-modes>
+                        </sequential>
+                    </for>
+                </then>
+
+            </if>
             <if>
                 <istrue value="${do.FC+P.logitboost}"/>
                 <then>
@@ -694,6 +735,7 @@
                 </then>
             </if>
             <if>
+
                 <istrue value="${do.naive-bayes}"/>
                 <then>
                     <do-weka
@@ -762,6 +804,8 @@
                     </do-weka>
                 </then>
             </if>
+
+
             <if>
                 <istrue value="${do.baseline}"/>
                 <then>

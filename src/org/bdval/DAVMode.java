@@ -450,6 +450,7 @@ public class DAVMode extends UseModality<DAVOptions> {
                 .setStringParser(JSAP.STRING_PARSER)
                 .setDefault(JSAP.NO_DEFAULT)
                 .setRequired(false)
+                .setAllowMultipleDeclarations(true)
                 .setShortFlag('a')
                 .setLongFlag("classifier-parameters")
                 .setHelp("Comma separated list of parameters that will be passed to the "
@@ -809,8 +810,22 @@ public class DAVMode extends UseModality<DAVOptions> {
 
     protected void setupClassifier(final JSAPResult result, final DAVOptions options) {
         options.classiferClass = result.getClass("classifier");
+        final String parameters[] = result.getStringArray("classifier-parameters");
+        // combine multiple occurences of --classifier-parameters on the command line into one parameter string,
+        // separating occurences by a comma.
+        StringBuffer parameterCollected = new StringBuffer();
+        int i = 0;
+        for (String params : parameters) {
+            parameterCollected.append(params);
+            if (i != parameters.length - 1) {
+                parameterCollected.append(",");
+            }
+            i++;
+        }
+        LOG.info("collected classifier parameters: " + parameterCollected.toString());
         final String classifierParametersResult =
-                StringUtils.defaultString(result.getString("classifier-parameters"));
+                StringUtils.defaultString(parameterCollected.toString());
+
         options.classifierParameters = classifierParametersResult.split("[,]");
         options.scaleFeatures = result.getBoolean("scale-features");
         options.percentileScaling = result.getBoolean("percentile-scaling");
@@ -828,7 +843,7 @@ public class DAVMode extends UseModality<DAVOptions> {
         }
     }
 
-    protected void setupInput(final JSAPResult result, final DAVOptions options) {
+    protected synchronized void  setupInput(final JSAPResult result, final DAVOptions options) {
         options.input = result.getString("input");
         if (isTableCacheEnabled) {
             assert tableCache != null : "TableCache must be initialized.";
