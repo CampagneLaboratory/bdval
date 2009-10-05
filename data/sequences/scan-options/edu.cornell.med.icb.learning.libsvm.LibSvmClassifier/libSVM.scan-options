@@ -1,7 +1,7 @@
--C0.1
--C0.01
--C0.001
--C0.3
--C2
--C5
--C10
+--classifier-parameters C=0.1
+--classifier-parameters C=0.01
+--classifier-parameters C=0.001
+--classifier-parameters C=0.3
+--classifier-parameters C=2
+--classifier-parameters C=5
+--classifier-parameters C=10

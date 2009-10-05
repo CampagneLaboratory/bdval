@@ -1,11 +1,11 @@
--I 5   -W weka.classifiers.trees.DecisionStump
--I 10  -W weka.classifiers.trees.DecisionStump
--I 20  -W weka.classifiers.trees.DecisionStump
--I 30  -W weka.classifiers.trees.DecisionStump
--I 40  -W weka.classifiers.trees.DecisionStump
--I 50  -W weka.classifiers.trees.DecisionStump
--I 60  -W weka.classifiers.trees.DecisionStump
--I 70  -W weka.classifiers.trees.DecisionStump
--I 80  -W weka.classifiers.trees.DecisionStump
--I 90  -W weka.classifiers.trees.DecisionStump
--I 100 -W weka.classifiers.trees.DecisionStump
+--classifier-parameters -I=5,-W=weka.classifiers.trees.DecisionStump
+--classifier-parameters -I=10,-W=weka.classifiers.trees.DecisionStump
+--classifier-parameters -I=20,-W=weka.classifiers.trees.DecisionStump
+--classifier-parameters -I=30,-W=weka.classifiers.trees.DecisionStump
+--classifier-parameters -I=40,-W=weka.classifiers.trees.DecisionStump
+--classifier-parameters -I=50,-W=weka.classifiers.trees.DecisionStump
+--classifier-parameters -I=60,-W=weka.classifiers.trees.DecisionStump
+--classifier-parameters -I=70,-W=weka.classifiers.trees.DecisionStump
+--classifier-parameters -I=80,-W=weka.classifiers.trees.DecisionStump
+--classifier-parameters -I=90,-W=weka.classifiers.trees.DecisionStump
+--classifier-parameters -I=100,-W=weka.classifiers.trees.DecisionStump
