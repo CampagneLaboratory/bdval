@@ -1,0 +1,12 @@
+--classifier-parameters -B=0,wekaClass=weka.classifiers.lazy.KStar
+--classifier-parameters -B=10,wekaClass=weka.classifiers.lazy.KStar
+--classifier-parameters -B=20,wekaClass=weka.classifiers.lazy.KStar
+--classifier-parameters -B=30,wekaClass=weka.classifiers.lazy.KStar
+--classifier-parameters -B=40,wekaClass=weka.classifiers.lazy.KStar
+--classifier-parameters -B=50,wekaClass=weka.classifiers.lazy.KStar
+--classifier-parameters -B=60,wekaClass=weka.classifiers.lazy.KStar
+--classifier-parameters -B=70,wekaClass=weka.classifiers.lazy.KStar
+--classifier-parameters -B=80,wekaClass=weka.classifiers.lazy.KStar
+--classifier-parameters -B=90,wekaClass=weka.classifiers.lazy.KStar
+--classifier-parameters -B=90,wekaClass=weka.classifiers.lazy.KStar
+--classifier-parameters -E,wekaClass=weka.classifiers.lazy.KStar
