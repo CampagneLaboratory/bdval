@@ -143,10 +143,12 @@
     <target name="javadoc" description="Run Javadoc on all source code files">
         <!--  Create the Java doc directory -->
         <mkdir dir="${javadocs}"/>
-        <javadoc packagenames="org.bdval" sourcepath="${src}"
-                 destdir="${javadocs}" author="true" version="true"
+        <javadoc destdir="${javadocs}" author="true" version="true"
                  windowtitle="BDVal API ${buildstamp}"
                  header="BDVal API ${buildstamp}">
+            <packageset dir="${src}">
+                <exclude name="org/bdval/modelselection/bmf/**"/>
+            </packageset>
             <link href="http://java.sun.com/javase/6/docs/api/"/>
             <link href="http://castor.codehaus.org/javadoc/"/>
             <link href="http://mg4j.dsi.unimi.it/docs/"/>
