@@ -1,3 +1,4 @@
+--classifier-parameters -E
 --classifier-parameters -B=0
 --classifier-parameters -B=10
 --classifier-parameters -B=20
@@ -9,4 +10,3 @@
 --classifier-parameters -B=80
 --classifier-parameters -B=90
 --classifier-parameters -B=90
---classifier-parameters -E
