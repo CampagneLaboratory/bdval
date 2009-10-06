@@ -613,6 +613,7 @@
         <attribute name="floor-param"/>
         <attribute name="array-params"/>
         <attribute name="weka-class"/>
+
         <attribute name="classifier-classname" default="edu.cornell.med.icb.learning.weka.WekaClassifier"/>
         <attribute name="survival-file" default="-"/>
         <attribute name="feature-selection-mode" default="t-test"/>
@@ -626,23 +627,34 @@
             <for param="scan-options" delimiter="&#xA;" list="${file-content}">
 
                 <sequential>
-
+                    <if>
+                        <equals arg1="@{weka-class}" arg2="libSVM"/>
+                        <then>
+                            <var name="weka-class-parameter1" value=""/>
+                            <var name="weka-class-parameter2" value=""/>
+                        </then>
+                         <else>
+                            <var name="weka-class-parameter1" value="--classifier-parameters wekaClass=@{weka-class}"/>
+                            <var name="weka-class-parameter2" value="--weka-class @{weka-class}"/>
+                        </else>
+                    </if>
+                   <echo  message="${weka-class-parameter1}  ${weka-class-parameter2} "/>
                     <execute-splits feature-selection-fold="true"
                                     sequence-file="featureselection-weka-classifier-fs=true.sequence"
                                     endpoint-name="@{endpoint-name}"
                                     dataset-root="@{dataset-root}"
                                     floor-param="@{floor-param}"
                                     array-params="@{array-params}"
-                                    all-classifier-parameters=" --classifier edu.cornell.med.icb.learning.weka.WekaClassifier   "
-                                    other-options="--max-intermediate-features ${max-intermediate-features} --weka-class @{weka-class} --feature-selection-mode @{feature-selection-mode} @{scan-options}"/>
+                                    all-classifier-parameters=" --classifier @{classifier-classname} ${weka-class-parameter1}  "
+                                    other-options=" ${weka-class-parameter2}  --feature-selection-mode @{feature-selection-mode} @{scan-options}"/>
                     <execute-splits feature-selection-fold="false"
                                     sequence-file="featureselection-weka-classifier-fs=false.sequence"
                                     endpoint-name="@{endpoint-name}"
                                     dataset-root="@{dataset-root}"
                                     floor-param="@{floor-param}"
                                     array-params="@{array-params}"
-                                    all-classifier-parameters=" --classifier @{classifier-classname}   "
-                                    other-options="--max-intermediate-features ${max-intermediate-features} --weka-class @{weka-class} --feature-selection-mode @{feature-selection-mode} @{scan-options}"/>
+                                    all-classifier-parameters=" --classifier @{classifier-classname}  ${weka-class-parameter1}  "
+                                    other-options=" ${weka-class-parameter2}  --feature-selection-mode @{feature-selection-mode} @{scan-options}"/>
                 </sequential>
             </for>
         </sequential>
@@ -707,7 +719,7 @@
                                     </do-weka-feature-selection-modes>
                                 </sequential>
                             </for>
-                            <do-weka-feature-selection-modes
+                             <do-weka-feature-selection-modes
                                     endpoint-name="@{endpoint-name}"
                                     dataset-root="@{dataset-root}"
                                     array-params="@{array-params}"
