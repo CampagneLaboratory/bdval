@@ -22,6 +22,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import java.util.zip.Adler32;
+import java.util.zip.CRC32;
 
 /**
  * Utility class to create a short hash of a String or String[].
@@ -92,8 +93,8 @@ public class ShortHash {
             return null;
         }
 
-        // Get the Alder32 checksum of the string
-        final Adler32 adler = new Adler32();
+        // Get the CRC32 checksum of the string (CRC will clash less often than the Adler checksum for short strings)
+        final CRC32 adler = new CRC32();
         adler.update(toHash.getBytes());
         // Map it from a long to an int with mod
         final int checksum = (int) (adler.getValue() % Integer.MAX_VALUE);
