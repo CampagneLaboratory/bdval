@@ -704,7 +704,7 @@
                         <sequential>
 
                             <for param="weka-class" delimiter=" "
-                                 list="weka.classifiers.meta.LogitBoost weka.classifiers.lazy.KStar weka.classifiers.trees.RandomForest weka.classifiers.functions.Logistic weka.classifiers.bayes.NaiveBayesUpdateable">
+                                 list="weka.classifiers.lazy.KStar weka.classifiers.trees.RandomForest weka.classifiers.functions.Logistic weka.classifiers.bayes.NaiveBayesUpdateable weka.classifiers.meta.LogitBoost">
                                 <sequential>
                                     <echo message="Considering doing weka scan @{feature-selection-mode} @{weka-class}"/>
                                     <do-weka-feature-selection-modes

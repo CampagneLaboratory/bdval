@@ -38,8 +38,8 @@ import it.unimi.dsi.lang.MutableString;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.LineIterator;
 import org.apache.log4j.Logger;
-import org.bdval.DistributionDifferenceByFeatureMode;
 import org.bdval.WithProcessMethod;
+import org.bdval.modelconditions.ProcessModelConditionsMode;
 import org.bdval.tools.convert.OptionsSupport;
 
 import java.io.File;
@@ -459,7 +459,7 @@ public class CandidateModelSelectionAllTeams implements WithProcessMethod {
         final Map<String, Map<String, String>> modelConditions = null;
         if (toolsArgs.modelConditionsFilename != null) {
             System.out.println("Reading model condition file: " + toolsArgs.modelConditionsFilename);
-            toolsArgs.modelConditions = DistributionDifferenceByFeatureMode.readModelConditionsFile(toolsArgs.modelConditionsFilename, modelIds);
+            toolsArgs.modelConditions = ProcessModelConditionsMode.readModelConditionsFile(toolsArgs.modelConditionsFilename, modelIds);
             addFeatureSelectionFoldColumn(toolsArgs.modelConditions);
             addFeatureSelectionStatTypeColumn(toolsArgs.modelConditions);
             addFeatureClassifierTypeColumn(toolsArgs.modelConditions);
@@ -468,7 +468,7 @@ public class CandidateModelSelectionAllTeams implements WithProcessMethod {
         }
     }
 
-    private void addFeatureClassifierTypeColumn(final Map<String, Map<String, String>> modelConditions) {
+    public static void addFeatureClassifierTypeColumn(final Map<String, Map<String, String>> modelConditions) {
         if (modelConditions == null) {
             return;
         }
@@ -631,7 +631,7 @@ public class CandidateModelSelectionAllTeams implements WithProcessMethod {
         }
     }
 
-    private void addFeatureSelectionFoldColumn
+    public static void addFeatureSelectionFoldColumn
             (final Map<String, Map<String, String>> modelConditions) {
         if (modelConditions == null) {
             return;
@@ -647,7 +647,7 @@ public class CandidateModelSelectionAllTeams implements WithProcessMethod {
         }
     }
 
-    private void addFeatureSelectionStatTypeColumn
+    public static void addFeatureSelectionStatTypeColumn
             (final Map<String, Map<String, String>> modelConditions) {
         if (modelConditions == null) {
             return;

@@ -25,7 +25,6 @@ import com.martiansoftware.jsap.JSAPResult;
 import com.martiansoftware.jsap.Parameter;
 import edu.cornell.med.icb.geo.tools.ClassificationTask;
 import edu.cornell.med.icb.geo.tools.ConditionIdentifiers;
-import edu.cornell.med.icb.io.TsvToFromMap;
 import edu.cornell.med.icb.iterators.RecursiveFileListIterator;
 import edu.cornell.med.icb.iterators.TextFileLineIterator;
 import edu.cornell.med.icb.util.ICBStringUtils;
@@ -43,7 +42,6 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ObjectSet;
-import it.unimi.dsi.lang.MutableString;
 import it.unimi.dsi.util.Properties;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.lang.ArrayUtils;
@@ -52,6 +50,7 @@ import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bdval.signalquality.BaseSignalQualityCalculator;
+import org.bdval.modelconditions.ProcessModelConditionsMode;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -324,7 +323,7 @@ public class DistributionDifferenceByFeatureMode extends DAVMode {
 
         // Only retain model conditions in keepModelSet
         LOG.info("Reading the model conditions file...");
-        modelIdToModelConditionsMap = readModelConditionsFile(modelConditionsFile, keepModelSet);
+        modelIdToModelConditionsMap = ProcessModelConditionsMode.readModelConditionsFile(modelConditionsFile, keepModelSet);
         LOG.info(String.format("... found model conditions for %d models",
                 modelIdToModelConditionsMap.keySet().size()));
 
@@ -920,96 +919,6 @@ public class DistributionDifferenceByFeatureMode extends DAVMode {
             }
         }
         return data;
-    }
-
-    /**
-     * Read the model conditions file into a map of model id's to model conditions values.
-     * This can handle both the normal version ("model-conditions.txt") or the columns version
-     * ("model-conditions-columns.txt"). It can detect the difference as the first line of the
-     * columns version ("model-conditions-columns.txt") starts with "model-id\t".
-     *
-     * @param modelConditionsFilename the model conditions file
-     * @param keepModelIdsSet         the set of model id's to keep. If this set is null or empty
-     *                                ALL model conditions will be read
-     * @return the map of model id's to model conditions values
-     */
-    public static Map<String, Map<String, String>> readModelConditionsFile(
-            final String modelConditionsFilename, final Set<String> keepModelIdsSet) {
-        final File modelConditionsFile = new File(modelConditionsFilename);
-        final Map<String, Map<String, String>> modelIdToModelConditionsMap =
-                new Object2ObjectLinkedOpenHashMap<String, Map<String, String>>();
-        if (!modelConditionsFile.exists()) {
-            LOG.fatal("model conditions file " + modelConditionsFilename + " does not exist");
-            return null;
-        }
-        if (!modelConditionsFile.isFile()) {
-            LOG.fatal("model conditions file " + modelConditionsFilename + " is not a file");
-            return null;
-        }
-        if (!modelConditionsFile.canRead()) {
-            LOG.fatal("model conditions file " + modelConditionsFilename + " unreadable");
-            return null;
-        }
-
-        try {
-            int lineNo = 0;
-            Boolean columnsMode = null;
-            TsvToFromMap tsvToFromMap = null;
-            for (final String line : new TextFileLineIterator(modelConditionsFile)) {
-                if (columnsMode == null) {
-                    columnsMode = line.startsWith("model-id\t");
-                }
-
-                final Map<String, String> modelValues;
-                if (columnsMode) {
-                    if (tsvToFromMap == null) {
-                        tsvToFromMap = TsvToFromMap.createFromTsvFile(modelConditionsFile);
-                    }
-                    if (lineNo++ == 0 || StringUtils.isBlank(line) || line.startsWith("#")) {
-                        continue;
-                    }
-                    modelValues = tsvToFromMap.readDataToMap(line);
-                } else {
-                    lineNo++;
-                    if (StringUtils.isBlank(line) || line.startsWith("#")) {
-                        continue;
-                    }
-                    modelValues = new Object2ObjectLinkedOpenHashMap<String, String>();
-                    final String[] params = StringUtils.split(line, '\t');
-                    for (final String param : params) {
-                        final String[] parts = StringUtils.split(param, '=');
-                        if (parts.length == 2) {
-                            modelValues.put(parts[0], parts[1]);
-                        } else {
-                           // the value may contain a '=' for instance cache-dir=fs=true
-                            final MutableString value = new MutableString();
-                            for (int i = 1; i < parts.length; i++) {
-                                value.append(parts[i]);
-                            }
-                            modelValues.put(parts[0], value.toString());
-
-                        }
-                    }
-                }
-                if (modelValues == null) {
-                    continue;
-                }
-                final String modelId = modelValues.get("model-id");
-                if (modelId == null || modelId.equals("N/A")) {
-                    continue;
-                }
-                if (keepModelIdsSet == null
-                        || keepModelIdsSet.size() == 0
-                        || keepModelIdsSet.contains(modelId)) {
-
-                    modelIdToModelConditionsMap.put(modelId, modelValues);
-                }
-            }
-            return modelIdToModelConditionsMap;
-        } catch (IOException e) {
-            LOG.fatal("Error reading model conditions file " + modelConditionsFilename, e);
-            return null;
-        }
     }
 
     /**

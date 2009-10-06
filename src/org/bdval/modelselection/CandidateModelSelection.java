@@ -38,8 +38,8 @@ import it.unimi.dsi.lang.MutableString;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.LineIterator;
 import org.apache.log4j.Logger;
-import org.bdval.DistributionDifferenceByFeatureMode;
 import org.bdval.WithProcessMethod;
+import org.bdval.modelconditions.ProcessModelConditionsMode;
 import org.bdval.tools.convert.OptionsSupport;
 
 import java.io.File;
@@ -350,7 +350,7 @@ public class CandidateModelSelection implements WithProcessMethod {
         final Map<String, Map<String, String>> modelConditions = null;
         if (toolsArgs.modelConditionsFilename != null) {
             System.out.println("Reading model condition file: " + toolsArgs.modelConditionsFilename);
-            toolsArgs.modelConditions = DistributionDifferenceByFeatureMode.readModelConditionsFile(toolsArgs.modelConditionsFilename, modelIds);
+            toolsArgs.modelConditions = ProcessModelConditionsMode.readModelConditionsFile(toolsArgs.modelConditionsFilename, modelIds);
             addFeatureSelectionFoldColumn(toolsArgs.modelConditions);
             addFeatureSelectionStatTypeColumn(toolsArgs.modelConditions);
             addFeatureClassifierTypeColumn(toolsArgs.modelConditions);

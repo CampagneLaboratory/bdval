@@ -369,7 +369,7 @@ public class GenerateFinalModels {
         }
     }
 
-    private String[] readLines(final String modelConditionsFilename) {
+    public static String[] readLines(final String modelConditionsFilename) {
         FastBufferedReader reader = null;
         try {
             final ObjectList<String> lines = new ObjectArrayList<String>();

@@ -127,7 +127,7 @@ public class ExecuteSplitsMode extends DAVMode {
 
                 }
                 result.add(newOne);
-                LOGGER.info("Defined  modelId: " + newOne);
+                LOGGER.debug("Defined  modelId: " + newOne);
             }
         }
         return result.toArray(new OptionalModelId[result.size()]);
