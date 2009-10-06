@@ -164,6 +164,7 @@
             <link href="http://www.cs.rit.edu/~ark/pj/doc/"/>
             <link href="http://icbtools.med.cornell.edu/javadocs/qtclustering/"/>
             <link href="http://icbtools.med.cornell.edu/javadocs/icb-utils/"/>
+            <link href="http://martiansoftware.com/jsap/doc/javadoc/"/>
             <classpath refid="classpath"/>
             <bottom>
                 <![CDATA[<i>Copyright &#169; 2007-${year} Institute for Computational Biomedicine, All Rights Reserved.</i>]]></bottom>
