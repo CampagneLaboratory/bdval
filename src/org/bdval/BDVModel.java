@@ -129,6 +129,7 @@ public class BDVModel {
 
     /**
      * Properties for this model.
+     *
      * @return Properties recorded when this model was trained and written to file.
      */
     public Properties getProperties() {
@@ -137,6 +138,7 @@ public class BDVModel {
 
     /**
      * Get the common base prefix for all BDVModel files.
+     *
      * @return The prefix for the model
      */
     public String getModelFilenamePrefix() {
@@ -215,7 +217,7 @@ public class BDVModel {
      * Create a new BDVModel with the specified prefix name.
      *
      * @param modelPrefix Prefix to use for all files associated with this BDVModel
-     * @param format The format to store the files in
+     * @param format      The format to store the files in
      */
     public BDVModel(final String modelPrefix, final Format format) {
         super();
@@ -266,8 +268,9 @@ public class BDVModel {
 
     /**
      * Remove the suffix from a filename only if it matches the given string.
+     *
      * @param filename The filename to remove the suffix from
-     * @param suffix The suffix to remove
+     * @param suffix   The suffix to remove
      * @return The modified filename or the original if it didn't end with the suffix
      */
     public static String removeSuffix(final String filename, final String suffix) {
@@ -289,8 +292,9 @@ public class BDVModel {
     /**
      * Loads a BDVal model from disk. BDVal models are generated with the
      * {@link org.bdval.DiscoverAndValidate} tools (BDVal).
+     *
      * @param options specific options to use when loading the model
-     * @throws IOException if there is a problem accessing the model
+     * @throws IOException            if there is a problem accessing the model
      * @throws ClassNotFoundException if the type of the model is not recognized
      */
     public void load(final DAVOptions options) throws IOException, ClassNotFoundException {
@@ -299,7 +303,7 @@ public class BDVModel {
             LOG.debug("model zip file exists: " + BooleanUtils.toStringYesNo(zipExists));
         }
         properties.clear();
-
+        properties.setDelimiterParsingDisabled(true);
         // check to see if a zip file exists - if it doesn't we assume it's an old binary format
         if (zipModel && zipExists) {
             LOG.info("Reading model from filename: " + zipFilename);
@@ -518,6 +522,7 @@ public class BDVModel {
      */
     protected Properties loadProperties(final InputStream stream, final DAVOptions options) {
         final Properties properties = new Properties();
+        properties.setDelimiterParsingDisabled(true);
         try {
             properties.load(stream);
         } catch (ConfigurationException e) {
@@ -664,9 +669,9 @@ public class BDVModel {
      * Save the model to a set of files. The files will contain all the information needed to
      * apply the BDVal model to new samples.
      *
-     * @param options The options associated with this model
-     * @param task The classification task used for this model
-     * @param splitPlan The split plan used to generat this model
+     * @param options        The options associated with this model
+     * @param task           The classification task used for this model
+     * @param splitPlan      The split plan used to generat this model
      * @param writeModelMode The mode saving the model
      * @throws IOException if there is a problem writing to the files
      */
@@ -709,10 +714,10 @@ public class BDVModel {
      * Save the model to a set the specified zip stream. The files will contain all the
      * information needed to apply the BDVal model to new samples.
      *
-     * @param zipStream The stream to store the model to
-     * @param options The options associated with this model
-     * @param task The classification task used for this model
-     * @param splitPlan The split plan used to generat this model
+     * @param zipStream      The stream to store the model to
+     * @param options        The options associated with this model
+     * @param task           The classification task used for this model
+     * @param splitPlan      The split plan used to generat this model
      * @param writeModelMode The mode saving the model
      * @throws IOException if there is a problem writing to the files
      */
@@ -753,6 +758,7 @@ public class BDVModel {
 
     /**
      * Sets the comment for this model into zip stream.
+     *
      * @param zipStream The stream to set the comment for
      */
     protected void setZipStreamComment(final ZipOutputStream zipStream) {
@@ -884,6 +890,7 @@ public class BDVModel {
                                   final SplitPlan splitPlan,
                                   final WriteModel writeModelMode) throws IOException {
         final Properties modelProperties = new Properties();
+        modelProperties.setDelimiterParsingDisabled(true);
         modelProperties.addProperty("trained.from.dataset", task.getExperimentDataFilename());
         modelProperties.addProperty("training.class0.label", task.getFirstConditionName());
         modelProperties.addProperty("training.class0.encoding", -1);
@@ -925,6 +932,7 @@ public class BDVModel {
 
     /**
      * Add properties specific to the model type.
+     *
      * @param modelProperties The property object to add properties to.
      */
     protected void addProperties(final Properties modelProperties) {
