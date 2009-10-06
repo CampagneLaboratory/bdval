@@ -200,6 +200,7 @@ public class ExecuteSplitsMode extends DAVMode {
                 if (argShortName.length() == 1) {
                     final char argShortNameCharacter = argShortName.charAt(0);
                     final Flagged param = jsap.getByShortFlag(argShortNameCharacter);
+                    if (param==null) continue;
                     originalArgs[index] = "--" + param.getLongFlag();
                 }
             }
