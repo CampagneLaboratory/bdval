@@ -1439,35 +1439,7 @@
         </sequential>
     </macrodef>
 
-    <macrodef name="execute-endpoints-claudel" description="Run do-one-splits for each target">
-        <sequential>
-            <for param="current-endpoint" delimiter=" " list="${endpoints-claudel}">
-                <sequential>
-                    <if>
-                        <istrue value="${do.@{current-endpoint}}"/>
-                        <then>
-                            <do-one-splits-all endpoint-name="@{current-endpoint}"/>
-                        </then>
-                    </if>
-                </sequential>
-            </for>
-        </sequential>
-    </macrodef>
-
-    <macrodef name="execute-endpoints-rodin" description="Run do-one-splits for each target">
-        <sequential>
-            <for param="current-endpoint" delimiter=" " list="${endpoints-rodin}">
-                <sequential>
-                    <if>
-                        <istrue value="${do.@{current-endpoint}}"/>
-                        <then>
-                            <do-one-splits-all endpoint-name="@{current-endpoint}"/>
-                        </then>
-                    </if>
-                </sequential>
-            </for>
-        </sequential>
-    </macrodef>
+   
 
     <macrodef name="prepare-rank-dataset">
         <attribute name="endpoint-name"/>

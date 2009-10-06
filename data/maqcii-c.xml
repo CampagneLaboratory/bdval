@@ -77,27 +77,10 @@
          case "maqcii-c.properities"
     -->
 
-    <property name="do.Iconix" value="true"/>
-    <property name="do.HamnerWithControl" value="true"/>
-    <property name="do.Cologne_OS_MO" value="true"/>
-    <property name="do.Cologne_EFS_MO" value="true"/>
-    <property name="do.Cologne_NEP_R" value="false"/>
-    <property name="do.Cologne_NEP_S" value="false"/>
-    <property name="do.NIEHS" value="true"/>
-    <property name="do.MDACC_PCR" value="true"/>
-    <property name="do.MDACC_ERPOS" value="true"/>
-    <property name="do.UAMS_EFS_MO" value="false"/>
-    <property name="do.UAMS_OS_MO" value="false"/>
-    <property name="do.UAMS_CPR1" value="false"/>
-    <property name="do.UAMS_CPS1" value="false"/>
-    <property name="do.GSE8402_FusionYesNo" value="true"/>
 
-
-     <property name="endpoints-claudel" value="HamnerWithControl Iconix MDACC_PCR MDACC_ERPOS"/>
-    <property name="endpoints-rodin" value="NIEHS Cologne_OS_MO Cologne_EFS_MO GSE8402_FusionYesNo"/>
     <property name="all-endpoints"
-                  value="HamnerWithControl Iconix NIEHS MDACC_PCR MDACC_ERPOS Cologne_OS_MO Cologne_EFS_MO UAMS_EFS_MO UAMS_OS_MO UAMS_CPR1 UAMS_CPS1 Cologne_NEP_R Cologne_NEP_S GSE8402_FusionYesNo"/>
-       
+              value="HamnerWithControl Iconix NIEHS MDACC_PCR MDACC_ERPOS Cologne_OS_MO Cologne_EFS_MO UAMS_EFS_MO UAMS_OS_MO UAMS_CPR1 UAMS_CPS1 Cologne_NEP_R Cologne_NEP_S GSE8402_FusionYesNo"/>
+
     <!-- end of the endpoint definitions -->
 
     <import file="bdval.xml"/>
@@ -105,6 +88,21 @@
     <target name="evaluate" description="Run a complete evaluation." depends="prepare-bdval,tag-output-directory">
         <delete file="${statistics-output}"/>
 
+        <property name="do.Iconix" value="true"/>
+        <property name="do.HamnerWithControl" value="true"/>
+        <property name="do.Cologne_OS_MO" value="true"/>
+        <property name="do.Cologne_EFS_MO" value="true"/>
+        <property name="do.Cologne_NEP_R" value="false"/>
+        <property name="do.Cologne_NEP_S" value="false"/>
+        <property name="do.NIEHS" value="true"/>
+        <property name="do.MDACC_PCR" value="true"/>
+        <property name="do.MDACC_ERPOS" value="true"/>
+        <property name="do.UAMS_EFS_MO" value="false"/>
+        <property name="do.UAMS_OS_MO" value="false"/>
+        <property name="do.UAMS_CPR1" value="false"/>
+        <property name="do.UAMS_CPS1" value="false"/>
+        <property name="do.GSE8402_FusionYesNo" value="true"/>
+            
         <echo message="Executing with ${num-threads} threads"/>
         <sequential>
 
@@ -145,6 +143,20 @@
     <target name="fast" description="Run a complete evaluation." depends="prepare-bdval,tag-output-directory">
         <delete file="${statistics-output}"/>
 
+        <property name="do.Iconix" value="true"/>
+        <property name="do.HamnerWithControl" value="true"/>
+        <property name="do.Cologne_OS_MO" value="true"/>
+        <property name="do.Cologne_EFS_MO" value="true"/>
+        <property name="do.Cologne_NEP_R" value="false"/>
+        <property name="do.Cologne_NEP_S" value="false"/>
+        <property name="do.NIEHS" value="true"/>
+        <property name="do.MDACC_PCR" value="true"/>
+        <property name="do.MDACC_ERPOS" value="true"/>
+        <property name="do.UAMS_EFS_MO" value="false"/>
+        <property name="do.UAMS_OS_MO" value="false"/>
+        <property name="do.UAMS_CPR1" value="false"/>
+        <property name="do.UAMS_CPS1" value="false"/>
+        <property name="do.GSE8402_FusionYesNo" value="true"/>
         <echo message="Executing with ${num-threads} threads"/>
         <sequential>
 
@@ -188,13 +200,30 @@
 
         <echo message="Executing with ${num-threads} threads"/>
         <sequential>
+            <property name="endpoints-claudel" value="HamnerWithControl Iconix MDACC_PCR MDACC_ERPOS"/>
+
+            <property name="do.Iconix" value="true"/>
+            <property name="do.HamnerWithControl" value="true"/>
+            <property name="do.Cologne_OS_MO" value="false"/>
+            <property name="do.Cologne_EFS_MO" value="false"/>
+            <property name="do.Cologne_NEP_R" value="false"/>
+            <property name="do.Cologne_NEP_S" value="false"/>
+            <property name="do.NIEHS" value="false"/>
+            <property name="do.MDACC_PCR" value="true"/>
+            <property name="do.MDACC_ERPOS" value="true"/>
+            <property name="do.UAMS_EFS_MO" value="false"/>
+            <property name="do.UAMS_OS_MO" value="false"/>
+            <property name="do.UAMS_CPR1" value="false"/>
+            <property name="do.UAMS_CPS1" value="false"/>
+            <property name="do.GSE8402_FusionYesNo" value="false"/>
+
 
             <property name="use-feature-selection-fold=true" value="false"/>
             <property name="use-feature-selection-fold=false" value="true"/>
 
             <property name="do.weka-feature-selection-scan" value="true"/>
 
-            <execute-endpoints-claudel/>
+            <execute-all-endpoints/>
 
         </sequential>
         <antcall target="process-model-conditions"/>
@@ -206,13 +235,28 @@
 
         <echo message="Executing with ${num-threads} threads"/>
         <sequential>
+            <property name="do.Iconix" value="true"/>
+            <property name="do.HamnerWithControl" value="false"/>
+            <property name="do.Cologne_OS_MO" value="true"/>
+            <property name="do.Cologne_EFS_MO" value="true"/>
+            <property name="do.Cologne_NEP_R" value="false"/>
+            <property name="do.Cologne_NEP_S" value="false"/>
+            <property name="do.NIEHS" value="true"/>
+            <property name="do.MDACC_PCR" value="true"/>
+            <property name="do.MDACC_ERPOS" value="true"/>
+            <property name="do.UAMS_EFS_MO" value="false"/>
+            <property name="do.UAMS_OS_MO" value="false"/>
+            <property name="do.UAMS_CPR1" value="false"/>
+            <property name="do.UAMS_CPS1" value="false"/>
+            <property name="do.GSE8402_FusionYesNo" value="true"/>
 
             <property name="use-feature-selection-fold=true" value="false"/>
             <property name="use-feature-selection-fold=false" value="true"/>
 
             <property name="do.weka-feature-selection-scan" value="true"/>
 
-            <execute-endpoints-rodin/>
+            <execute-all-endpoints/>
+
 
         </sequential>
         <antcall target="process-model-conditions"/>
