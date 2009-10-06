@@ -560,7 +560,7 @@ public class ExecuteSplitsMode extends DAVMode {
                         } else {
                             modelConditionsWriter.print("\t");
                         }
-                        final String stringVal = SequenceMode.jsapOptionToString(jsapResult, flagOpt);
+                        final String stringVal = SequenceMode.jsapOptionToConcatenatedString(jsapResult, flagOpt,',');
                         modelConditionsWriter.printf("%s=%s", id, stringVal);
                     }
                 }

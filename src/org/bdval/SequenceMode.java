@@ -34,12 +34,7 @@ import org.apache.commons.logging.LogFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -67,6 +62,7 @@ public class SequenceMode extends DAVMode {
      * be completely ignored.
      */
     public static final Set<String> FLAGS_TO_IGNORE;
+
     static {
         FLAGS_TO_IGNORE = new HashSet<String>();
         FLAGS_TO_IGNORE.add("-m");
@@ -111,6 +107,7 @@ public class SequenceMode extends DAVMode {
 
     /**
      * Define command line options for this mode.
+     *
      * @param jsap the JSAP command line parser
      * @throws JSAPException if there is a problem building the options
      */
@@ -269,12 +266,15 @@ public class SequenceMode extends DAVMode {
                 // A flag switch exists. Pass it along.
                 final FlaggedOption flagOpt = (FlaggedOption) paramObj;
                 if (jsapResult.contains(id)) {
+
                     final String stringVal = jsapOptionToString(jsapResult, flagOpt);
+
                     if (sequenceLine.contains("%" + id + "%")) {
                         LOG.debug("Replacing %" + id + "% with " + stringVal);
                         sequenceLine = StringUtils.replace(
                                 sequenceLine, "%" + id + "%", stringVal);
                     }
+
                     if (sequenceLineContainsParameter(sequenceLine, jsapFlags)) {
                         LOG.debug("NOT Appending already existing flag " + primaryJsapFlag);
                     } else {
@@ -445,19 +445,72 @@ public class SequenceMode extends DAVMode {
      */
     public static String jsapOptionToString(final JSAPResult jsapResult, final FlaggedOption flagOpt) {
         final StringParser parser = flagOpt.getStringParser();
-        if (parser == JSAP.STRING_PARSER) {
-            return jsapResult.getString(flagOpt.getID());
-        } else if (parser == JSAP.INTEGER_PARSER) {
-            return String.valueOf(jsapResult.getInt(flagOpt.getID()));
+        ArrayList<String> listOfStrings = new ArrayList<String>();
+        final String id = flagOpt.getID();
+        if (parser == JSAP.INTEGER_PARSER) {
+            for (int value : jsapResult.getIntArray(id)) {
+                listOfStrings.add(String.valueOf(value));
+            }
         } else if (parser == JSAP.DOUBLE_PARSER) {
-            return String.valueOf(jsapResult.getDouble(flagOpt.getID()));
+            for (double value : jsapResult.getDoubleArray(id)) {
+                listOfStrings.add(String.valueOf(value));
+            }
         } else if (parser == JSAP.BOOLEAN_PARSER) {
-            return String.valueOf(jsapResult.getBoolean(flagOpt.getID()));
+            for (boolean value : jsapResult.getBooleanArray(id)) {
+                listOfStrings.add(String.valueOf(value));
+            }
         } else if (parser == JSAP.CLASS_PARSER) {
-            return jsapResult.getClass(flagOpt.getID()).getName();
+            for (Class value : jsapResult.getClassArray(id)) {
+                listOfStrings.add(value.getCanonicalName());
+            }
         } else {
-            return jsapResult.getString(flagOpt.getID());
+            // assume strings:
+            for (String value : jsapResult.getStringArray(id)) {
+                listOfStrings.add(String.valueOf(value));
+            }
         }
+        String replacementValue = "";
+
+        replacementValue = listOfStrings.get(0);
+
+        for (int i = 1; i < listOfStrings.size(); i++) replacementValue += " --" + id + " " + listOfStrings.get(i);
+
+        return replacementValue;
+    }
+
+    public static String jsapOptionToConcatenatedString(final JSAPResult jsapResult, final FlaggedOption flagOpt, char delimiter) {
+        final StringParser parser = flagOpt.getStringParser();
+        ArrayList<String> listOfStrings = new ArrayList<String>();
+        final String id = flagOpt.getID();
+        if (parser == JSAP.INTEGER_PARSER) {
+            for (int value : jsapResult.getIntArray(id)) {
+                listOfStrings.add(String.valueOf(value));
+            }
+        } else if (parser == JSAP.DOUBLE_PARSER) {
+            for (double value : jsapResult.getDoubleArray(id)) {
+                listOfStrings.add(String.valueOf(value));
+            }
+        } else if (parser == JSAP.BOOLEAN_PARSER) {
+            for (boolean value : jsapResult.getBooleanArray(id)) {
+                listOfStrings.add(String.valueOf(value));
+            }
+        } else if (parser == JSAP.CLASS_PARSER) {
+            for (Class value : jsapResult.getClassArray(id)) {
+                listOfStrings.add(value.getCanonicalName());
+            }
+        } else {
+            // assume strings:
+            for (String value : jsapResult.getStringArray(id)) {
+                listOfStrings.add(String.valueOf(value));
+            }
+        }
+        String replacementValue = "";
+
+        replacementValue = listOfStrings.get(0);
+
+        for (int i = 1; i < listOfStrings.size(); i++) replacementValue += delimiter + listOfStrings.get(i);
+
+        return replacementValue;
     }
 
     /**
@@ -502,8 +555,8 @@ public class SequenceMode extends DAVMode {
      * this will try to read such a line and place the definition
      * of the variable inside the variables variable
      *
-     * @param jsap         the jsap command line processor being used
-     * @param sequenceLine the line to try to parse a variable from
+     * @param jsap             the jsap command line processor being used
+     * @param sequenceLine     the line to try to parse a variable from
      * @param sequenceFilename the filename to add the sequence line from
      * @throws JSAPException error adding JSAP options
      */

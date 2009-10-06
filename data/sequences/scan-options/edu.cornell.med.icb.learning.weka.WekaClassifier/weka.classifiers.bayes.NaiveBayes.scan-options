@@ -1,4 +1,4 @@
---classifier-parameters wekaClass=weka.classifiers.bayes.NaiveBayes.scan-options
---classifier-parameters -K,wekaClass=weka.classifiers.bayes.NaiveBayes.scan-options
---classifier-parameters -D,wekaClass=weka.classifiers.bayes.NaiveBayes.scan-options
---classifier-parameters -K,-D,wekaClass=weka.classifiers.bayes.NaiveBayes.scan-options
+--classifier-parameters
+--classifier-parameters -K
+--classifier-parameters -D
+--classifier-parameters -K,-D
