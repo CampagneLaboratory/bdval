@@ -212,7 +212,7 @@
 
             <property name="do.weka-feature-selection-scan" value="true"/>
 
-            <execute-all-endpoints/>
+            <execute-endpoints-rodin/>
 
         </sequential>
         <antcall target="process-model-conditions"/>
