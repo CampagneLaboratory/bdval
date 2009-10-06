@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project name="bdval" basedir=".">
+
     <dirname property="bdval.basedir" file="${ant.file.bdval}"/>
     <property file="${bdval.basedir}/bdval.properties"/>
     <import file="${bdval.basedir}/../buildsupport/build.xml"/>
@@ -619,10 +620,10 @@
 
             <loadfile property="file-content"
                       srcfile="${bdval.basedir}/../data/sequences/scan-options/@{classifier-classname}/@{weka-class}.scan-options"/>
-            <echo  message="file content: ${file-content}"/>
+            <echo message="file content: ${file-content}"/>
 
             <!-- one scan option per line: -->
-            <for param="scan-options" delimiter="&#xA;"  list="${file-content}">
+            <for param="scan-options" delimiter="&#xA;" list="${file-content}">
 
                 <sequential>
 
@@ -903,6 +904,18 @@
                 <then>
                     <execute-splits feature-selection-fold="true"
                                     sequence-file="ttest-svmglobal.sequence"
+                                    endpoint-name="@{endpoint-name}"
+                                    dataset-root="@{dataset-root}"
+                                    other-options=" --alpha ${ttest-alpha} --max-intermediate-features ${max-intermediate-features}"
+                                    floor-param="@{floor-param}"
+                                    array-params="@{array-params}"/>
+                </then>
+            </if>
+            <if>
+                <istrue value="${do.permutation-svmglobal}"/>
+                <then>
+                    <execute-splits feature-selection-fold="true"
+                                    sequence-file="permutation-svmglobal.sequence"
                                     endpoint-name="@{endpoint-name}"
                                     dataset-root="@{dataset-root}"
                                     other-options=" --alpha ${ttest-alpha} --max-intermediate-features ${max-intermediate-features}"
@@ -1414,6 +1427,35 @@
         </sequential>
     </macrodef>
 
+    <macrodef name="execute-endpoints-claudel" description="Run do-one-splits for each target">
+        <sequential>
+            <for param="current-endpoint" delimiter=" " list="${endpoints-claudel}">
+                <sequential>
+                    <if>
+                        <istrue value="${do.@{current-endpoint}}"/>
+                        <then>
+                            <do-one-splits-all endpoint-name="@{current-endpoint}"/>
+                        </then>
+                    </if>
+                </sequential>
+            </for>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="execute-endpoints-rodin" description="Run do-one-splits for each target">
+        <sequential>
+            <for param="current-endpoint" delimiter=" " list="${endpoints-rodin}">
+                <sequential>
+                    <if>
+                        <istrue value="${do.@{current-endpoint}}"/>
+                        <then>
+                            <do-one-splits-all endpoint-name="@{current-endpoint}"/>
+                        </then>
+                    </if>
+                </sequential>
+            </for>
+        </sequential>
+    </macrodef>
 
     <macrodef name="prepare-rank-dataset">
         <attribute name="endpoint-name"/>
