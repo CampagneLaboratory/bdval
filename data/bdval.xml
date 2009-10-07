@@ -716,6 +716,11 @@
                                             weka-class="@{weka-class}"
                                             feature-selection-mode="@{feature-selection-mode}"
                                             classifier-classname="edu.cornell.med.icb.learning.weka.WekaClassifier">
+
+                                            <loadfile property="file-content"
+                                                srcfile="${bdval.basedir}/../data/sequences/scan-options/@{classifier-classname}/@{weka-class}.scan-options"/>
+            <echo message="file content: ${file-content}"/>
+
                                     </do-weka-feature-selection-modes>
                                 </sequential>
                             </for>
