@@ -89,8 +89,8 @@ public class DiscoverWithMinMax extends DAVMode {
     public void defineOptions(final JSAP jsap) throws JSAPException {
         final Parameter numFeatureParam = new FlaggedOption("ratio")
                 .setStringParser(JSAP.DOUBLE_PARSER)
-                .setDefault(".5")
-                .setRequired(true)
+                .setDefault("0")
+                .setRequired(false)
                 .setLongFlag("ratio")
                 .setHelp("The Min/Max value used as threshold. Default Min/Max>=5.");
         jsap.registerParameter(numFeatureParam);
