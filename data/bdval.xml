@@ -619,12 +619,12 @@
         <attribute name="feature-selection-mode" default="t-test"/>
         <sequential>
 
-            <loadfile property="file-content"
+            <loadfile property="file-content-@{classifier-classname}-@{weka-class}"
                       srcfile="${bdval.basedir}/../data/sequences/scan-options/@{classifier-classname}/@{weka-class}.scan-options"/>
             <echo message="file content: ${file-content}"/>
 
             <!-- one scan option per line: -->
-            <for param="scan-options" delimiter="&#xA;" list="${file-content}">
+            <for param="scan-options" delimiter="&#xA;" list="${file-content-@{classifier-classname}-@{weka-class}}">
 
                 <sequential>
                     <if>
