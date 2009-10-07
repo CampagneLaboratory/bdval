@@ -1,4 +1,1 @@
 --classifier-parameters
---classifier-parameters -K
---classifier-parameters -D
---classifier-parameters -K,-D
