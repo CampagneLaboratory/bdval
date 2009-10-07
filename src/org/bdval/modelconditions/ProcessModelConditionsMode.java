@@ -4,12 +4,15 @@ import com.martiansoftware.jsap.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.bdval.GenerateFinalModels;
 import org.bdval.DistributionDifferenceByFeatureMode;
+import org.bdval.PredictedItems;
 import org.bdval.modelselection.CandidateModelSelectionAllTeams;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.FilenameFilter;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -31,7 +34,8 @@ public class ProcessModelConditionsMode extends edu.cornell.med.icb.cli.UseModal
     /**
      * Used to log debug and informational messages.
      */
-    private static final Log LOG = LogFactory.getLog(ProcessModelConditionsMode.class);
+    protected static final Log LOG = LogFactory.getLog(ProcessModelConditionsMode.class);
+    private ProcessModelConditionsOptions options;
 
 
     /**
@@ -46,13 +50,12 @@ public class ProcessModelConditionsMode extends edu.cornell.med.icb.cli.UseModal
     @Override
     public void defineOptions(final JSAP jsap) throws JSAPException {
         super.defineOptions(jsap);    // help option is defined by the superclass call
-        final Parameter resultsDirectoryOption = new FlaggedOption("result-directory")
-                .setStringParser(JSAP.STRING_PARSER)
-                .setDefault(JSAP.NO_DEFAULT)
-                .setRequired(true)
-                .setShortFlag('r')
-                .setLongFlag("result-directory")
+        final UnflaggedOption resultsDirectoryOption = new UnflaggedOption("result-directory");
+
+        resultsDirectoryOption.setStringParser(JSAP.STRING_PARSER)
+                .setGreedy(true)
                 .setHelp("Directory that contains results written by the bdval ant scripts.");
+
         jsap.registerParameter(resultsDirectoryOption);
 
         final Parameter modelconditionsOption = new FlaggedOption("model-conditions")
@@ -66,8 +69,8 @@ public class ProcessModelConditionsMode extends edu.cornell.med.icb.cli.UseModal
     }
 
     public void interpretArguments(JSAP jsap, JSAPResult jsapResult, ProcessModelConditionsOptions options) {
-        final String resultDirectory = jsapResult.getString("result-directory");
-        options.resultDirectory = new File(resultDirectory);
+        final String[] resultDirectories = jsapResult.getStringArray("result-directory");
+        options.resultDirectories = resultDirectories;
         options.modelConditionsFilename = jsapResult.getString("model-conditions");
         options.modelConditionLines = GenerateFinalModels.readLines(options.modelConditionsFilename);
         options.modelConditions = readModelConditionsFile(options.modelConditionsFilename,
@@ -80,6 +83,7 @@ public class ProcessModelConditionsMode extends edu.cornell.med.icb.cli.UseModal
     }
 
     public void process(ProcessModelConditionsOptions options) {
+        this.options = options;
         for (String modelId : options.modelConditions.keySet()) {
             processOneModelId(options, modelId);
         }
@@ -91,7 +95,8 @@ public class ProcessModelConditionsMode extends edu.cornell.med.icb.cli.UseModal
      *
      * @param modelId
      */
-    public  void processOneModelId(ProcessModelConditionsOptions options, String modelId){}
+    public void processOneModelId(ProcessModelConditionsOptions options, String modelId) {
+    }
 
     /**
      * Read the model conditions file into a map of model id's to model conditions values.
@@ -181,5 +186,68 @@ public class ProcessModelConditionsMode extends edu.cornell.med.icb.cli.UseModal
             LOG.fatal("Error reading model conditions file " + modelConditionsFilename, e);
             return null;
         }
+    }
+
+    /**
+     * Load the predictions corresponding to a model id.
+     *
+     * @param modelId
+     * @return
+     */
+    public PredictedItems loadPredictions(final String modelId) {
+        for (String resultDirectory : options.resultDirectories) {
+            String predictionsDirectoryPath = FilenameUtils.concat(resultDirectory, "predictions");
+            predictionsDirectoryPath = FilenameUtils.concat(predictionsDirectoryPath, getDatasetName(modelId));
+            File predictionDir = new File(predictionsDirectoryPath);
+            String matchingFilenames[] = predictionDir.list(new FilenameFilter() {
+                public boolean accept(File file, String name) {
+                    return (name.contains(modelId));
+                }
+            });
+            String predictionsFilename = "";
+            if (matchingFilenames.length == 0) {
+                LOG.trace(String.format("no prediction file was found for modelId=%s", modelId));
+                return null;
+            }
+            if (matchingFilenames.length > 1) {
+                System.err.println(String.format("more than one prediction file was found for modelId=%s", modelId));
+                System.out.println("Filenames were : ");
+                for (String filename : matchingFilenames) {
+                    System.out.println(filename);
+                }
+                System.out.flush();
+                System.exit(1);
+            } else {
+                predictionsFilename = FilenameUtils.concat(predictionsDirectoryPath, matchingFilenames[0]);
+            }
+            try {
+                PredictedItems predictions = new PredictedItems();
+                predictions.load(predictionsFilename);
+                return predictions;
+            } catch (IOException e) {
+                LOG.fatal("An error occurred reading predictions file " + predictionsFilename, e);
+                System.exit(1);
+            }
+
+        }
+        return null;
+    }
+
+    protected String getDatasetName(String modelId) {
+        return options.modelConditions.get(modelId).get("dataset-name");
+    }
+
+    protected String constructLabel(String modelId) {
+        String classifierType = options.modelConditions.get(modelId).get("classifier-type");
+        String featureSelectionType = options.modelConditions.get(modelId).get("feature-selection-type");
+        String featureSelectionMode = options.modelConditions.get(modelId).get("feature-selection-mode");
+        String featureSelection = "unknown";
+        if (featureSelectionMode != null) featureSelection = featureSelectionMode;
+        if (featureSelectionType != null) featureSelection = featureSelectionType;
+        String classifierParameters= options.modelConditions.get(modelId).get("classifier-parameters");
+        int removeThat=classifierParameters.lastIndexOf(",wekaClass");
+        if (removeThat==-1) removeThat=classifierParameters.length();
+        String parameters=classifierParameters.substring(0, removeThat);
+        return classifierType + '-' + featureSelection+'-'+parameters;
     }
 }

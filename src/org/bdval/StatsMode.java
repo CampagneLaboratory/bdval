@@ -54,12 +54,12 @@ public class StatsMode extends Predict {
      * Used to log debug and error messages.
      */
     private static final Log LOG = LogFactory.getLog(StatsMode.class);
-    private PredictedItems predictions;
+
     private String predictionsFilename;
     private final MaqciiHelper maqciiHelper = new MaqciiHelper();
     private String survivalFileName;
 
-    enum StatsEvaluationType {
+    public enum StatsEvaluationType {
         STATS_PER_REPEAT,
         STATS_PER_SPLIT,
     }
@@ -76,13 +76,7 @@ public class StatsMode extends Predict {
         if (options.datasetName.equals("auto")) {
             options.datasetName = filename.substring(0, filename.indexOf('-'));
         }
-        try {
-            predictions = new PredictedItems();
-            predictions.load(predictionsFilename);
-        } catch (IOException e) {
-            LOG.fatal("An error occurred reading predictions file " + predictionsFilename, e);
-            System.exit(1);
-        }
+
         options.modelId = result.getString("model-id");
         if ("no_model_id".equals(options.modelId)) {
             // try to guess from predictions filename:
@@ -195,12 +189,23 @@ public class StatsMode extends Predict {
 
     @Override
     public void process(final DAVOptions options) {
-        evaluateStats(options);
+        evaluateStats(options, predictionsFilename);
+
+
     }
 
-    private void evaluateStats(final DAVOptions options) {
+    private void evaluateStats(final DAVOptions options, String predictionsFilename) {
+        PredictedItems predictions=null;
+        try {
+
+            predictions = new PredictedItems();
+            predictions.load(predictionsFilename);
+        } catch (IOException e) {
+            LOG.fatal("An error occurred reading predictions file " + predictionsFilename, e);
+            System.exit(1);
+        }
         final List<SurvivalMeasures> survivalMeasuresList = new ArrayList<SurvivalMeasures>();
-        LOG.info("Calculating statistics for predictions in file " + predictionsFilename);
+        LOG.info("Calculating statistics for predictions in file " + this.predictionsFilename);
         final int numberOfRepeats = predictions.getNumberOfRepeats();
         final ObjectSet<CharSequence> evaluationMeasureNames = new ObjectArraySet<CharSequence>();
         evaluationMeasureNames.addAll(Arrays.asList(MEASURES));
@@ -208,10 +213,12 @@ public class StatsMode extends Predict {
 
         switch (statsEvalType) {
             case STATS_PER_REPEAT:
-                evaluatePerformanceMeasurePerRepeat(survivalMeasuresList, numberOfRepeats, evaluationMeasureNames, repeatedEvaluationMeasure);
+                evaluatePerformanceMeasurePerRepeat(predictions, survivalFileName, survivalMeasuresList, numberOfRepeats,
+                        evaluationMeasureNames, repeatedEvaluationMeasure);
                 break;
             case STATS_PER_SPLIT:
-                evaluatePerformanceMeasurePerTestSet(survivalMeasuresList, numberOfRepeats, evaluationMeasureNames, repeatedEvaluationMeasure);
+                evaluatePerformanceMeasurePerTestSet(predictions, survivalFileName, survivalMeasuresList, numberOfRepeats,
+                        evaluationMeasureNames, repeatedEvaluationMeasure);
                 break;
         }
 
@@ -223,8 +230,11 @@ public class StatsMode extends Predict {
         LOG.info(String.format("Overall: %s", repeatedEvaluationMeasure.toString()));
     }
 
-    private void evaluatePerformanceMeasurePerTestSet(final List<SurvivalMeasures> survivalMeasuresList, final int numberOfRepeats,
-                                                      final ObjectSet<CharSequence> evaluationMeasureNames, final EvaluationMeasure repeatedEvaluationMeasure) {
+    public static void evaluatePerformanceMeasurePerTestSet(PredictedItems predictions,
+                                                            String survivalFileName, final List<SurvivalMeasures> survivalMeasuresList,
+                                                            final int numberOfRepeats,
+                                                            final ObjectSet<CharSequence> evaluationMeasureNames,
+                                                            final EvaluationMeasure repeatedEvaluationMeasure) {
 
         // Collect one evaluation measure per split test set of cross-validation.
 
@@ -265,13 +275,15 @@ public class StatsMode extends Predict {
                         repeatedEvaluationMeasure.addValue(binaryName,
                                 allSplitsInARepeatMeasure.getPerformanceValueAverage(binaryName));
                     }
-                    LOG.info(String.format("repeatId: %d %s", repeatId, allSplitsInARepeatMeasure.toString()));
+                    LOG.trace(String.format("repeatId: %d %s", repeatId, allSplitsInARepeatMeasure.toString()));
                 }
             }
         }
     }
 
-    private void evaluatePerformanceMeasurePerRepeat(final List<SurvivalMeasures> survivalMeasuresList, final int numberOfRepeats, final ObjectSet<CharSequence> evaluationMeasureNames, final EvaluationMeasure repeatedEvaluationMeasure) {
+    public static void evaluatePerformanceMeasurePerRepeat(
+            PredictedItems predictions, String survivalFileName, final List<SurvivalMeasures> survivalMeasuresList,
+            final int numberOfRepeats, final ObjectSet<CharSequence> evaluationMeasureNames, final EvaluationMeasure repeatedEvaluationMeasure) {
         for (int repeatId = 1; repeatId <= numberOfRepeats; repeatId++) {
             if (predictions.containsRepeat(repeatId)) {
                 final DoubleList decisions = new DoubleArrayList();
@@ -304,7 +316,7 @@ public class StatsMode extends Predict {
                     repeatedEvaluationMeasure.addValue(binaryName,
                             allSplitsInARepeatMeasure.getPerformanceValueAverage(binaryName));
                 }
-                LOG.info(String.format("repeatId: %d %s", repeatId, allSplitsInARepeatMeasure.toString()));
+                LOG.trace(String.format("repeatId: %d %s", repeatId, allSplitsInARepeatMeasure.toString()));
             }
         }
     }

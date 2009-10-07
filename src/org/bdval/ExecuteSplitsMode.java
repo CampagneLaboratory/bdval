@@ -200,7 +200,7 @@ public class ExecuteSplitsMode extends DAVMode {
                 if (argShortName.length() == 1) {
                     final char argShortNameCharacter = argShortName.charAt(0);
                     final Flagged param = jsap.getByShortFlag(argShortNameCharacter);
-                    if (param==null) continue;
+                    if (param == null) continue;
                     originalArgs[index] = "--" + param.getLongFlag();
                 }
             }
@@ -363,19 +363,18 @@ public class ExecuteSplitsMode extends DAVMode {
 
                         final String featureSelectionCode = getFeatureSelectionCode(label);
                         final String sequenceArgs = String.format(
-                                "--mode stats --predictions %s "
-                                        + survivalOption
-                                        + "--submission-file %s-maqcii-submission.txt "
-                                        + "--feature-selection-method %s "
+                                "--mode stats --predictions %s" +
+                                        " %s " +
+                                        " --submission-file %s-maqcii-submission.txt "
                                         + "--label %s "
                                         + "--model-id %s "
-                                        + "--dataset-name %s --folds %d %s --other-measures prec,rec,F-1,MCC,binary-auc",
+                                        + "--dataset-name %s %s --other-measures prec,rec,F-1,MCC,binary-auc",
                                 statsFilename,
+                                survivalOption,
                                 labelPrefix(label),
-                                featureSelectionCode,
                                 label,
                                 modelId,
-                                options.datasetName, options.crossValidationFoldNumber, floorParam);
+                                options.datasetName, floorParam);
 
                         LOGGER.debug("Estimating statistics: " + sequenceArgs);
                         DiscoverAndValidate.main(buildArguments(sequenceArgs));
@@ -561,7 +560,7 @@ public class ExecuteSplitsMode extends DAVMode {
                         } else {
                             modelConditionsWriter.print("\t");
                         }
-                        final String stringVal = SequenceMode.jsapOptionToConcatenatedString(jsapResult, flagOpt,',');
+                        final String stringVal = SequenceMode.jsapOptionToConcatenatedString(jsapResult, flagOpt, ',');
                         modelConditionsWriter.printf("%s=%s", id, stringVal);
                     }
                 }

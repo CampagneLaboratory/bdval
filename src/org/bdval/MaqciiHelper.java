@@ -62,6 +62,43 @@ public class MaqciiHelper {
     private String modelId;
     private String endpointCode;
 
+    public void setupSubmissionFile(final JSAPResult result, final DAVOptions options,
+                                    final String label) {
+        outputBinaryMeasures = result.getBoolean("binary");
+
+        options.submissionFilename = result.getString("submission-file");
+        if (StringUtils.isBlank(options.submissionFilename)
+                || options.submissionFilename.equals("-")) {
+            options.submissionFilename = null;
+            options.submissionOutput = null;
+        }
+        if (options.submissionFilename != null) {
+            try {
+                final File submissionFile = new File(options.submissionFilename);
+                options.submissionFilePreexist = submissionFile.exists();
+                options.submissionOutput = new PrintWriter(
+                        new FileWriter(options.submissionFilename, true));
+            } catch (IOException e) {
+                LOG.error("Could not create MAQC-II submission file named "
+                        + options.submissionFilename + " - submission file will not be written.");
+                options.submissionOutput = null;
+            }
+        }
+        this.label = label;
+        this.featureSelectionMethod = getFeatureSelectionCode(label);
+        final String otherOptions = result.getString("other-measures");
+        final ObjectSet<String> otherMeasures = new ObjectArraySet<String>();
+
+        for (final String name : otherOptions.split("[,]")) {
+            if (name.trim().length() > 0) {
+                otherMeasures.add(name.trim());
+                LOG.info("Will evaluate additional performance measure: " + name.trim());
+            }
+
+        }
+        this.otherMeasureNames = otherMeasures.toArray(new String[otherMeasures.size()]);
+    }
+
     public void defineSubmissionFileOption(final JSAP jsap) throws JSAPException {
         final Parameter submissionFileParam =
                 new FlaggedOption("submission-file")
@@ -74,14 +111,6 @@ public class MaqciiHelper {
                                 + "These columns must be created manually in excel.");
         jsap.registerParameter(submissionFileParam);
 
-        final Parameter fsmOption = new FlaggedOption("feature-selection-method")
-                .setStringParser(JSAP.STRING_PARSER)
-                .setDefault("deprecated")
-                .setRequired(false)
-                .setLongFlag("feature-selection-method")
-                .setHelp("This option is deprecated. The feature selection method will be "
-                        + "determined automatically from the label provided.");
-        jsap.registerParameter(fsmOption);
 
         final Parameter otherMeasureNamesOption = new FlaggedOption("other-measures")
                 .setStringParser(JSAP.STRING_PARSER)
@@ -102,15 +131,6 @@ public class MaqciiHelper {
                         + "the models.");
         jsap.registerParameter(labelOption);
 
-        final Parameter foldNumber =
-                new FlaggedOption("folds")
-                        .setStringParser(JSAP.INTEGER_PARSER)
-                        .setDefault(JSAP.NO_DEFAULT)
-                        .setRequired(true)
-                        .setShortFlag('f')
-                        .setLongFlag("folds")
-                        .setHelp("Number of cross validation folds.");
-        jsap.registerParameter(foldNumber);
 
         final Parameter binaryOption = new FlaggedOption("binary")
                 .setStringParser(JSAP.BOOLEAN_PARSER)
@@ -232,9 +252,11 @@ public class MaqciiHelper {
     }
 
     public void printSubmissionHeaders(final DAVOptions options, final Boolean printSurvival) {
+
         if (options.submissionFilePreexist || options.submissionOutput == null) {
             return;
         }
+
         options.submissionOutput.print("OrganizationCode");
         options.submissionOutput.print("\t");
         options.submissionOutput.print("DatasetCode");
@@ -337,6 +359,119 @@ public class MaqciiHelper {
         }
         options.submissionOutput.print("\n");
         options.submissionOutput.flush();
+        options.submissionFilePreexist = new File(options.submissionFilename).exists();
+                
+    }
+
+    public void printSubmissionHeaders(boolean submissionFilePreexist,
+                                       boolean outputBinaryMeasures,
+                                       PrintWriter submissionOutput,
+                                       final Boolean printSurvival) {
+        if (submissionFilePreexist || submissionOutput == null) {
+            return;
+        }
+        submissionOutput.print("OrganizationCode");
+        submissionOutput.print("\t");
+        submissionOutput.print("DatasetCode");
+        submissionOutput.print("\t");
+        submissionOutput.print("EndpointCode");
+        submissionOutput.print("\t");
+        submissionOutput.print("ExcelColumnHeader");
+        submissionOutput.print("\t");
+        submissionOutput.print("MCC");
+        submissionOutput.print("\t");
+        submissionOutput.print("Accuracy");
+        submissionOutput.print("\t");
+        submissionOutput.print("Sensitivity");
+        submissionOutput.print("\t");
+        submissionOutput.print("Specificity");
+        submissionOutput.print("\t");
+        submissionOutput.print("AUC");
+        submissionOutput.print("\t");
+        submissionOutput.print("RMSE");
+        submissionOutput.print("\t");
+        submissionOutput.print("MCC_StdDev");
+        submissionOutput.print("\t");
+        submissionOutput.print("Accuracy_StdDev");
+        submissionOutput.print("\t");
+        submissionOutput.print("Sensitivity_StdDev");
+        submissionOutput.print("\t");
+        submissionOutput.print("Specificity_StdDev");
+        submissionOutput.print("\t");
+        submissionOutput.print("AUC_StdDev");
+        submissionOutput.print("\t");
+        submissionOutput.print("RMSE_StdDev");
+        submissionOutput.print("\t");
+        submissionOutput.print("SummaryNormalization");
+        submissionOutput.print("\t");
+        submissionOutput.print("FeatureSelectionMethod");
+        submissionOutput.print("\t");
+        submissionOutput.print("NumberOfFeatureUsed");
+        submissionOutput.print("\t");
+        submissionOutput.print("ClassificationAlgorithm");
+        submissionOutput.print("\t");
+        submissionOutput.print("BatchEffectRemovalMethod");
+        submissionOutput.print("\t");
+        submissionOutput.print("InternalValidation");
+        submissionOutput.print("\t");
+        submissionOutput.print("ValidationIterations");
+        submissionOutput.print("\t");
+        submissionOutput.print("ModelId");
+        submissionOutput.print("\t");
+        submissionOutput.print("Label");
+        submissionOutput.print("\t");
+        submissionOutput.print("combinedPerformance"); // MCC+ AUC - MCC_std - AUC_std
+
+        if (outputBinaryMeasures) {
+            submissionOutput.print("\t");
+            submissionOutput.print("binary-MCC");
+            submissionOutput.print("\t");
+            submissionOutput.print("binary-Accuracy");
+            submissionOutput.print("\t");
+            submissionOutput.print("binary-Sensitivity");
+            submissionOutput.print("\t");
+            submissionOutput.print("binary-Specificity");
+            submissionOutput.print("\t");
+            submissionOutput.print("binary-AUC");
+            submissionOutput.print("\t");
+            submissionOutput.print("binary-RMSE");
+            submissionOutput.print("\t");
+            submissionOutput.print("binary-MCC_StdDev");
+            submissionOutput.print("\t");
+            submissionOutput.print("binary-Accuracy_StdDev");
+            submissionOutput.print("\t");
+            submissionOutput.print("binary-Sensitivity_StdDev");
+            submissionOutput.print("\t");
+            submissionOutput.print("binary-Specificity_StdDev");
+            submissionOutput.print("\t");
+            submissionOutput.print("binary-AUC_StdDev");
+            submissionOutput.print("\t");
+            submissionOutput.print("binary-RMSE_StdDev");
+            submissionOutput.print("\t");
+            submissionOutput.print("MCC-thresholdIndependent");
+            submissionOutput.print("\t");
+            submissionOutput.print("MCC-thresholdIndependent_StdDev");
+        }
+        for (final String otherMeasureName : otherMeasureNames) {
+            submissionOutput.print("\t");
+            submissionOutput.print(otherMeasureName);
+            submissionOutput.print("\t");
+            submissionOutput.print(otherMeasureName + "_StdDev");
+        }
+        if (printSurvival) {
+            submissionOutput.print("\t");
+            submissionOutput.print("survival_coxP");
+            submissionOutput.print("\t");
+            submissionOutput.print("survival_hazardRatio");
+            submissionOutput.print("\t");
+            submissionOutput.print("survival_lowCI");
+            submissionOutput.print("\t");
+            submissionOutput.print("survival_upCI");
+            submissionOutput.print("\t");
+            submissionOutput.print("survival_logRankP");
+        }
+        submissionOutput.print("\n");
+        submissionOutput.flush();
     }
 
     /**
@@ -377,9 +512,10 @@ public class MaqciiHelper {
     public void printSubmissionResults(final DAVOptions options,
                                        final EvaluationMeasure measure,
                                        final int numberOfFeatures, final int numRepeats) {
-        printSubmissionResults(options, measure, numberOfFeatures, numRepeats,  null);
+        printSubmissionResults(options, measure, numberOfFeatures, numRepeats, null);
 
     }
+
     public void printSubmissionResults(final DAVOptions options,
                                        final EvaluationMeasure measure,
                                        final int numberOfFeatures, final int numRepeats, final List<SurvivalMeasures> survivalMeasuresList) {
@@ -395,7 +531,7 @@ public class MaqciiHelper {
         }
 
         final String featureSelectionMethod = getFeatureSelectionMethod(options);
-        LOG.info(String.format("Submission line for dataset=%s, featureSelection=%s",
+        LOG.debug(String.format("Submission line for dataset=%s, featureSelection=%s",
                 options.datasetName, featureSelectionMethod));
 
         options.submissionOutput.print("Cornell");    //OrganizationCode
@@ -446,10 +582,10 @@ public class MaqciiHelper {
         options.submissionOutput.print(Integer.toString(numRepeats));    //ValidationIteration
         options.submissionOutput.print("\t");
         if (this.modelId != null) {
-            LOG.info("Using helper's modelId");
+            LOG.trace("Using helper's modelId");
             options.submissionOutput.print(this.modelId);    //ModelID
         } else {
-            LOG.info("Using option's modelId");
+            LOG.trace("Using option's modelId");
             options.submissionOutput.print(options.modelId);    //ModelID
         }
         options.submissionOutput.print("\t");
@@ -525,7 +661,7 @@ public class MaqciiHelper {
         normd.setMean(0);
         normd.setStandardDeviation(1);
         final int size = pval.length;
-        final double[] z = new double [size];
+        final double[] z = new double[size];
         double zCombine = 0;
 
         for (int i = 0; i < size; i++) {
@@ -540,7 +676,7 @@ public class MaqciiHelper {
 
         try {
             rval = normd.cumulativeProbability(zCombine);
-        } catch (MathException e){
+        } catch (MathException e) {
         }
 
         return rval;
@@ -548,15 +684,15 @@ public class MaqciiHelper {
 
     //index is the covariate; decision score is the last one
     private SurvivalMeasureResult averageSurvivalMeasuresList(
-            final List <SurvivalMeasures> survivalMeasuresList, final int index){
+            final List<SurvivalMeasures> survivalMeasuresList, final int index) {
         final SurvivalMeasureResult survivalMeasureResult = new SurvivalMeasureResult();
 
         double h = 0;
         double lo = 0;
         double up = 0;
         final int numRepeat = survivalMeasuresList.size(); //number of repeat of CV in the list
-        final double[] coxpVector = new double [numRepeat];
-        final double[] logpVector = new double [numRepeat];
+        final double[] coxpVector = new double[numRepeat];
+        final double[] logpVector = new double[numRepeat];
         for (int i = 0; i < numRepeat; i++) {
             logpVector[i] = survivalMeasuresList.get(i).logRankP;
             coxpVector[i] = survivalMeasuresList.get(i).coxP[index];
@@ -565,7 +701,7 @@ public class MaqciiHelper {
             up += survivalMeasuresList.get(i).upCI[index];
         }
 
-        final double stoufferCoxP =  stouffer(coxpVector);
+        final double stoufferCoxP = stouffer(coxpVector);
         final double stoufferLogRankP = stouffer(logpVector);
         survivalMeasureResult.assignValue(stoufferCoxP, h / numRepeat, lo / numRepeat,
                 up / numRepeat, stoufferLogRankP);
@@ -585,11 +721,12 @@ public class MaqciiHelper {
     private String valueToString(final double value) {
         return valueToString(value, 2);
     }
+
     private String stdDevToString(final double value) {
         return valueToString(value, 4);
     }
 
-    private synchronized  String valueToString(final double value, final int numberOfDigits) {
+    private synchronized String valueToString(final double value, final int numberOfDigits) {
         if (Double.isNaN(value)) {
             return "NaN";
         } else {
@@ -600,6 +737,7 @@ public class MaqciiHelper {
 
     /**
      * Delete the submission file if specified and it exists.
+     *
      * @param result the parsed command line options
      */
     public void deletePreExistingSubmissionFile(final JSAPResult result) {
@@ -616,45 +754,6 @@ public class MaqciiHelper {
         setupSubmissionFile(result, options, result.getString("label"));
     }
 
-    public void setupSubmissionFile(final JSAPResult result, final DAVOptions options,
-                                    final String label) {
-        outputBinaryMeasures = result.getBoolean("binary");
-        if (result.contains("folds")) {
-            final int foldNumber = result.getInt("folds");
-            options.crossValidationFoldNumber = foldNumber;
-        }
-        options.submissionFilename = result.getString("submission-file");
-        if (StringUtils.isBlank(options.submissionFilename)
-                || options.submissionFilename.equals("-")) {
-            options.submissionFilename = null;
-            options.submissionOutput = null;
-        }
-        if (options.submissionFilename != null) {
-            try {
-                final File submissionFile = new File(options.submissionFilename);
-                options.submissionFilePreexist = submissionFile.exists();
-                options.submissionOutput = new PrintWriter(
-                        new FileWriter(options.submissionFilename, true));
-            } catch (IOException e) {
-                LOG.error("Could not create MAQC-II submission file named "
-                        + options.submissionFilename + " - submission file will not be written.");
-                options.submissionOutput = null;
-            }
-        }
-        this.label = label;
-        this.featureSelectionMethod = getFeatureSelectionCode(label);
-        final String otherOptions = result.getString("other-measures");
-        final ObjectSet<String> otherMeasures = new ObjectArraySet<String>();
-
-        for (final String name : otherOptions.split("[,]")) {
-            if (name.trim().length() > 0) {
-                otherMeasures.add(name.trim());
-                LOG.info("Will evaluate additional performance measure: " + name.trim());
-            }
-
-        }
-        this.otherMeasureNames = otherMeasures.toArray(new String[otherMeasures.size()]);
-    }
 
     private String getFeatureSelectionCode(final String label) {
         if (label.contains("genelists")) {

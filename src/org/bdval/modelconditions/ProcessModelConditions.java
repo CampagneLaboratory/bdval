@@ -86,7 +86,7 @@ public class ProcessModelConditions implements WithProcessMethod {
             IllegalAccessException, InstantiationException {
         final ProcessModelConditionsMode modes = new ProcessModelConditionsMode();
 
-        modes.registerMode("restat", RestatMode.class);
+        modes.registerMode("stats", RestatMode.class);
 
         final TimeLoggingService timeService=new TimeLoggingService(args);
         timeService.start();

@@ -37,6 +37,7 @@ import java.io.IOException;
 public class PredictedItems extends ObjectArrayList<PredictedItem> {
     public static ObjectList<PredictedItem> predictions;
     private int numberOfRepeats;
+    private int numberOfFolds;
 
     public void load(final String filename) throws IOException {
         final TSVReader reader = new TSVReader(new FileReader(filename));
@@ -48,6 +49,7 @@ public class PredictedItems extends ObjectArrayList<PredictedItem> {
                 final PredictedItem item = new PredictedItem();
                 reader.next();
                 item.splitId = reader.getInt();
+                numberOfFolds=Math.max(item.splitId, numberOfFolds);
                 item.splitType = reader.getString();
                 item.repeatId = reader.getInt();
                 numberOfRepeats = Math.max(item.repeatId, numberOfRepeats);
@@ -222,5 +224,9 @@ public class PredictedItems extends ObjectArrayList<PredictedItem> {
             }
         }
         return result;
+    }
+
+    public int getNumberOfFolds() {
+        return numberOfFolds;
     }
 }

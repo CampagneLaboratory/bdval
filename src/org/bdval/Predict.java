@@ -83,7 +83,7 @@ public class Predict extends DAVMode {
     private String survivalFileName;
     private ObjectSet<String> testSampleIds;
 
-    static final CharSequence[] MEASURES = {
+    static public final CharSequence[] MEASURES = {
             "auc", "mat", "rmse", "acc", "f", "spec", "sens", "prec", "rec", "MCC"
     };
 
@@ -174,7 +174,7 @@ public class Predict extends DAVMode {
 
         maqciiHelper.defineSubmissionFileOption(jsap);
         jsap.getByID("label").addDefault("auto");
-        jsap.getByID("folds").addDefault("0");
+      //  jsap.getByID("folds").addDefault("0");
     }
 
     @Override
@@ -218,7 +218,7 @@ public class Predict extends DAVMode {
             survivalFileName = result.getString("survival");
         }
 
-         trueLabelFilename = result.getString("true-labels");
+        trueLabelFilename = result.getString("true-labels");
         sample2TrueLabelMap =
                 readSampleToTrueLabelsMap(trueLabelFilename, printStats);
 
@@ -551,8 +551,8 @@ public class Predict extends DAVMode {
         }
         if (label == null) {
             LOG.warn("Cannot find sampleId " + sampleId + " in true label information, for model  " +
-                    this.modelFilenamePrefixNoPath + ". We read true labels from filename: "+trueLabelFilename  +
-                    " The test set was read from "+testSampleFilename);
+                    this.modelFilenamePrefixNoPath + ". We read true labels from filename: " + trueLabelFilename +
+                    " The test set was read from " + testSampleFilename);
             return "unknown";
         } else {
             return label;

@@ -10,7 +10,7 @@ import java.util.Map;
  *         Time: 4:07:13 PM
  */
 public class ProcessModelConditionsOptions {
-    public File resultDirectory;
+    public String[] resultDirectories;
     public String modelConditionsFilename;
     public String[] modelConditionLines;
     public Map<String, Map<String, String>> modelConditions;
