@@ -621,7 +621,7 @@
 
             <loadfile property="file-content-@{classifier-classname}-@{weka-class}"
                       srcfile="${bdval.basedir}/../data/sequences/scan-options/@{classifier-classname}/@{weka-class}.scan-options"/>
-            <echo message="file content: ${file-content}"/>
+            <echo message="file content: ${file-content-@{classifier-classname}-@{weka-class}}"/>
 
             <!-- one scan option per line: -->
             <for param="scan-options" delimiter="&#xA;" list="${file-content-@{classifier-classname}-@{weka-class}}">
