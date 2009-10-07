@@ -716,9 +716,6 @@
                                             weka-class="@{weka-class}"
                                             feature-selection-mode="@{feature-selection-mode}"
                                             classifier-classname="edu.cornell.med.icb.learning.weka.WekaClassifier">
-
-                                     <echo message="file content: ${file-content}"/>
-
                                     </do-weka-feature-selection-modes>
                                 </sequential>
                             </for>
