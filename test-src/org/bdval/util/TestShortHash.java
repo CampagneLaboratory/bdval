@@ -19,10 +19,13 @@
 package org.bdval.util;
 
 import static junit.framework.Assert.assertEquals;
+import org.apache.commons.lang.ArrayUtils;
+import static org.junit.Assert.assertNull;
 import org.junit.Test;
 
 /**
- * Describe class here.
+ * Validates that the {@link org.bdval.util.ShortHash} functions return correct and consistent
+ * values.
  *
  * @author Kevin Dorff
  */
@@ -30,9 +33,28 @@ public class TestShortHash {
 
     @Test
     public void testShortHash() {
-        assertEquals("AIQAO", ShortHash.shortHash("A"));
-        assertEquals("HSWGJ", ShortHash.shortHash("asdfasdf"));
-        assertEquals("UGEWV", ShortHash.shortHash("Checks if a String is not empty (\"\"), not null and not whitespace only."));
-        assertEquals("QTGXF", ShortHash.shortHash("--this=that --fudge=cicle --cat=dog"));
+        assertNull(ShortHash.shortHash((String) null));
+        assertNull(ShortHash.shortHash(""));
+        assertNull(ShortHash.shortHash(" "));
+        assertNull(ShortHash.shortHash("             "));
+        assertNull(ShortHash.shortHash(ArrayUtils.EMPTY_STRING_ARRAY));
+
+        assertEquals("PHMJM", ShortHash.shortHash("A"));
+        assertEquals("PHMJM", ShortHash.shortHash(new String[] {"A"}));
+
+        assertEquals("OZKTS", ShortHash.shortHash("asdfasdf"));
+        assertEquals("OZKTS", ShortHash.shortHash(new String[] {"asdfasdf"}));
+
+        assertEquals("FIWCB", ShortHash.shortHash("foo bar"));
+        assertEquals("FIWCB", ShortHash.shortHash(new String[] {"foo", "bar"}));
+
+        final String stringWithQuotes =
+                "Checks if a String is not empty (\"\"), not null and not whitespace only.";
+        assertEquals("GDEQM", ShortHash.shortHash(stringWithQuotes));
+        assertEquals("GDEQM", ShortHash.shortHash(stringWithQuotes.split(" ")));
+
+        final String stringWithArgs = "--this=that --fudge=cicle --cat=dog";
+        assertEquals("ADQVZ", ShortHash.shortHash(stringWithArgs));
+        assertEquals("ADQVZ", ShortHash.shortHash(stringWithArgs.split(" ")));
     }
 }

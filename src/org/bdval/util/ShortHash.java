@@ -21,11 +21,10 @@ package org.bdval.util;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
-import java.util.zip.Adler32;
 import java.util.zip.CRC32;
 
 /**
- * Utility class to create a short hash of a String or String[].
+ * Utility class to create a short hash of a {@link String} or String[].
  * @author Kevin Dorff
  */
 public class ShortHash {
@@ -49,7 +48,7 @@ public class ShortHash {
     /**
      * Five int-sized masks for the 5 parts of the hash.
      */
-    private static final int[] MASKS = new int[] {
+    private static final int[] MASKS = {
         Integer.parseInt("01111110000000000000000000000000", 2),
         Integer.parseInt("00000001111110000000000000000000", 2),
         Integer.parseInt("00000000000001111110000000000000", 2),
@@ -61,7 +60,7 @@ public class ShortHash {
      * Five int-sized shifts for the 5 parts of the hash
      * after the value has been masked.
      */
-    private static final int[] MASK_SHIFTS = new int[] {
+    private static final int[] MASK_SHIFTS = {
             25, 19, 13, 7, 0
         //Integer.parseInt("00000001111111111111111111111111", 2),
         //Integer.parseInt("00000000000001111111111111111111", 2),
@@ -77,8 +76,12 @@ public class ShortHash {
      */
     public static String shortHash(final String[] toHash) {
         final StringBuilder argsSb = new StringBuilder();
+        int count = 0;
         for (final String arg : toHash) {
-            argsSb.append(arg).append(' ');
+            if (count++ > 0) {
+                argsSb.append(' ');
+            }
+            argsSb.append(arg);
         }
         return shortHash(argsSb.toString());
     }
@@ -94,10 +97,10 @@ public class ShortHash {
         }
 
         // Get the CRC32 checksum of the string (CRC will clash less often than the Adler checksum for short strings)
-        final CRC32 adler = new CRC32();
-        adler.update(toHash.getBytes());
+        final CRC32 crc32 = new CRC32();
+        crc32.update(toHash.getBytes());
         // Map it from a long to an int with mod
-        final int checksum = (int) (adler.getValue() % Integer.MAX_VALUE);
+        final int checksum = (int) (crc32.getValue() % Integer.MAX_VALUE);
 
         final StringBuilder output = new StringBuilder();
         for (int i = 0; i < MASKS.length; i++) {
