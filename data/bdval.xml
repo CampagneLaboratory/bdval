@@ -700,7 +700,7 @@
                 <istrue value="${do.weka-feature-selection-scan}"/>
                 <then>
 
-                    <for param="feature-selection-mode" delimiter=" " list="t-test fold-change min-max svm-weight">
+                    <for param="feature-selection-mode" delimiter=" " list="t-test fold-change min-max svm-weights">
                         <sequential>
 
                             <for param="weka-class" delimiter=" "
