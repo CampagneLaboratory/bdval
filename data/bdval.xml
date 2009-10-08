@@ -555,7 +555,7 @@
                                                     floor-param="@{floor-param}"
                                                     array-params="${array-params}"
                                                     evaluate-statistics="${evaluate-statistics-after-splits}"
-                                                    other-options="--num-features @{a-num-features} --cache-dir &quot;${cache-dir}&quot;
+                                                    other-options=" --num-features @{a-num-features} --cache-dir &quot;${cache-dir}&quot;
                                     --splits &quot;${split-plan-file}&quot; --gene-list full --sequence-file &quot;${bdval.basedir}/sequences/@{sequence-file}&quot;
                                     @{other-options} --pathway-components-dir &quot;${pathway-components-dir}&quot;"/>
                                         </then>
@@ -633,12 +633,12 @@
                             <var name="weka-class-parameter1" value=""/>
                             <var name="weka-class-parameter2" value=""/>
                         </then>
-                         <else>
+                        <else>
                             <var name="weka-class-parameter1" value="--classifier-parameters wekaClass=@{weka-class}"/>
                             <var name="weka-class-parameter2" value="--weka-class @{weka-class}"/>
                         </else>
                     </if>
-                   <echo  message="${weka-class-parameter1}  ${weka-class-parameter2} "/>
+                    <echo message="${weka-class-parameter1}  ${weka-class-parameter2} "/>
                     <execute-splits feature-selection-fold="true"
                                     sequence-file="featureselection-weka-classifier-fs=true.sequence"
                                     endpoint-name="@{endpoint-name}"
@@ -719,7 +719,7 @@
                                     </do-weka-feature-selection-modes>
                                 </sequential>
                             </for>
-                             <do-weka-feature-selection-modes
+                            <do-weka-feature-selection-modes
                                     endpoint-name="@{endpoint-name}"
                                     dataset-root="@{dataset-root}"
                                     array-params="@{array-params}"
@@ -1439,7 +1439,6 @@
         </sequential>
     </macrodef>
 
-   
 
     <macrodef name="prepare-rank-dataset">
         <attribute name="endpoint-name"/>
@@ -1895,48 +1894,38 @@
 
     <macrodef name="restat">
         <attribute name="results-directory"/>
+        <attribute name="model-conditions" default="model-conditions.txt"/>
         <attribute name="output" default="@{results-directory}-${save-data-tag}-evaluation-stats.txt"/>
         <sequential>
-            <for param="prediction-table-filename" trim="yes">
-                <fileset dir="@{results-directory}/predictions">
-                    <include name="*/*prediction-table.txt"/>
-                </fileset>
-                <sequential>
-                    <java classname="org.bdval.DiscoverAndValidate" dir="${bdval.basedir}"
-                          classpathref="bdval.classpath" fork="true" failonerror="true">
-                        <jvmarg value="-ea"/>
-                        <jvmarg value="${memory-flag}"/>
-                        <sysproperty key="log4j.debug" value="${log4j.debug}"/>
-                        <sysproperty key="log4j.configuration" value="file:///${config}/log4j.properties"/>
-                        <sysproperty key="RConnectionPool.configuration" value="file:///${config}/RConnectionPool.xml"/>
-                        <sysproperty key="pj.nt" value="${num-threads}"/>
-                        <arg value="-m"/>
-                        <arg value="stats"/>
-                        <arg value="--predictions"/>
-                        <arg value="@{prediction-table-filename}"/>
-                        <arg value="--label"/>
-                        <arg value="auto"/>
-                        <arg value="--binary"/>
-                        <arg value="true"/>
-                        <arg value="--dataset-name"/>
-                        <arg value="auto"/>
 
-                        <arg value="--folds"/>
-                        <arg value="${external-CV-folds}"/>
-                        <arg value="--submission-file"/>
-                        <arg value="@{output}"/>
-                    </java>
-                </sequential>
-            </for>
+            <java classname="org.bdval.modelconditions.ProcessModelConditions" dir="${bdval.basedir}"
+                  classpathref="bdval.classpath" fork="true" failonerror="true">
+                <jvmarg value="-ea"/>
+                <jvmarg value="${memory-flag}"/>
+                <sysproperty key="log4j.debug" value="${log4j.debug}"/>
+                <sysproperty key="log4j.configuration" value="file:///${config}/log4j.properties"/>
+                <sysproperty key="RConnectionPool.configuration" value="file:///${config}/RConnectionPool.xml"/>
+                <sysproperty key="pj.nt" value="${num-threads}"/>
+                <arg value="-m"/>
+                <arg value="stats"/>
+                <arg value="--submission-file"/>
+                <arg value="@{output}"/>
+                <arg value="--model-conditions"/>
+                <arg value="@{model-conditions}"/>
+                <arg line="@{results-directory}"/>
+            </java>
         </sequential>
     </macrodef>
 
     <target name="restat" description="Recalculate statistics for prediction table files in a given directory"
             depends="init,prepare-bdval,rserve-status,tag-output-directory">
-        <delete file="${statistics-output}"/>
+
         <input addproperty="results-directory"
-               message="Enter the results directory to restat. The directory must contain a predictions directory."/>
-        <restat results-directory="${results-directory}"/>
+               message="Enter the results directories to restat. The directories must contain a predictions directory."/>
+        <input addproperty="model-conditions"
+               message="Enter the name of model conditions file associated with the results."
+               defaultvalue="model-conditions.txt"/>
+        <restat results-directory="${results-directory}" model-conditions="${model-conditions}"/>
 
         <echo message="Calculating statistics for results in ${results-directory}"/>
 
