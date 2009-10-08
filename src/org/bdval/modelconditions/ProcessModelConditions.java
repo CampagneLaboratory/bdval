@@ -52,8 +52,8 @@ public class ProcessModelConditions implements WithProcessMethod {
             LOG.debug("Running with: " + ArrayUtils.toString(args));
         }
 
-        final ProcessModelConditions davTool = new ProcessModelConditions();
-        davTool.process(args);
+        final ProcessModelConditions pmcTools = new ProcessModelConditions();
+        pmcTools.process(args);
     }
 
     /**
@@ -68,7 +68,7 @@ public class ProcessModelConditions implements WithProcessMethod {
      */
     public void process(final String[] args) throws JSAPException,
             IllegalAccessException, InstantiationException {
-        processReturnDavMode(args);
+        processReturnPmcMode(args);
     }
 
     /**
@@ -82,7 +82,7 @@ public class ProcessModelConditions implements WithProcessMethod {
      * @see org.bdval.DAVMode
      * @see org.bdval.DAVOptions
      */
-    public ProcessModelConditionsMode processReturnDavMode(final String[] args) throws JSAPException,
+    public ProcessModelConditionsMode processReturnPmcMode(final String[] args) throws JSAPException,
             IllegalAccessException, InstantiationException {
         final ProcessModelConditionsMode modes = new ProcessModelConditionsMode();
 

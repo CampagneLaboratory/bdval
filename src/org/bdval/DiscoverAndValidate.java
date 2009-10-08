@@ -20,9 +20,14 @@ package org.bdval;
 
 import com.martiansoftware.jsap.JSAPException;
 import edu.cornell.med.icb.util.VersionUtils;
+import edu.mssm.crover.cli.CLI;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.bdval.modelconditions.ProcessModelConditionsMode;
+import org.bdval.modelconditions.ProcessModelConditions;
+
+import java.util.HashSet;
 
 /**
  * A set of programs to discover and validate biomarkers.
@@ -34,6 +39,11 @@ public class DiscoverAndValidate implements WithProcessMethod {
      * Used to log debug and informational messages.
      */
     private static final Log LOG = LogFactory.getLog(DiscoverAndValidate.class);
+    private static HashSet<String> modelConditionModes = new HashSet<String>();
+
+    static {
+        modelConditionModes.add("stats");
+    }
 
     /**
      * Create a new DiscoverAndValidate instance.
@@ -50,16 +60,26 @@ public class DiscoverAndValidate implements WithProcessMethod {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Running with: " + ArrayUtils.toString(args));
         }
+        String mode = CLI.getOption(args, "-m", CLI.getOption(args, "--mode", null));
+        {
+            if (modelConditionModes.contains(mode)) {
+                final ProcessModelConditions pmcTool = new ProcessModelConditions();
+                pmcTool.process(args);
+            } else {
+                final DiscoverAndValidate davTool = new DiscoverAndValidate();
+                davTool.process(args);
+            }
 
-        final DiscoverAndValidate davTool = new DiscoverAndValidate();
-        davTool.process(args);
+        }
+
     }
 
     /**
      * Process command line arguments.  This method takes care of registering new
      * modes and delegates the processing to one or more of these modes.
+     *
      * @param args The list command line arguments
-     * @throws JSAPException if there is a problem parsing the command line.
+     * @throws JSAPException          if there is a problem parsing the command line.
      * @throws IllegalAccessException if a registered mode cannot be accessed
      * @throws InstantiationException if a registerd mode cannot be instantiated
      * @see org.bdval.DAVMode
@@ -73,11 +93,12 @@ public class DiscoverAndValidate implements WithProcessMethod {
     /**
      * Process command line arguments.  This method takes care of registering new
      * modes and delegates the processing to one or more of these modes.
+     *
      * @param args The list command line arguments
-     * @throws JSAPException if there is a problem parsing the command line.
+     * @return The DAVMode object created during this session.
+     * @throws JSAPException          if there is a problem parsing the command line.
      * @throws IllegalAccessException if a registered mode cannot be accessed
      * @throws InstantiationException if a registerd mode cannot be instantiated
-     * @return The DAVMode object created during this session.
      * @see org.bdval.DAVMode
      * @see org.bdval.DAVOptions
      */
@@ -106,11 +127,10 @@ public class DiscoverAndValidate implements WithProcessMethod {
                 DistributionDifferenceByFeatureMode.class);
         davMode.registerMode("distribution-difference", DistributionDifferenceByModelMode.class);
         davMode.registerMode("rserve-status", RserveStatusMode.class);
-// TODO:        davMode.registerMode("combine-data", CombineDataMode.class);
         davMode.registerMode("cox-regression", DiscoverWithCoxRegression.class);
         davMode.registerMode("to-ranks", ToRanksMode.class);
 
-        final TimeLoggingService timeService=new TimeLoggingService(args);
+        final TimeLoggingService timeService = new TimeLoggingService(args);
         timeService.start();
         final DAVOptions options = new DAVOptions();
         davMode.process(args, options);

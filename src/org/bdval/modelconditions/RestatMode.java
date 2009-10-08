@@ -3,12 +3,18 @@ package org.bdval.modelconditions;
 import com.martiansoftware.jsap.*;
 import it.unimi.dsi.fastutil.objects.ObjectSet;
 import it.unimi.dsi.fastutil.objects.ObjectArraySet;
+import it.unimi.dsi.fastutil.objects.ObjectList;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.doubles.DoubleList;
+import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
+import java.io.IOException;
 
 import edu.cornell.med.icb.learning.tools.svmlight.EvaluationMeasure;
+import edu.cornell.med.icb.learning.CrossValidation;
 import org.bdval.*;
 
 /**
@@ -22,7 +28,7 @@ public class RestatMode extends ProcessModelConditionsMode {
     private final MaqciiHelper maqciiHelper = new MaqciiHelper();
     private String survivalFileName;
     private DAVOptions davOptions;
-    StatsMode.StatsEvaluationType statsEvalType = StatsMode.StatsEvaluationType.STATS_PER_REPEAT;
+    StatsEvaluationType statsEvalType = StatsEvaluationType.STATS_PER_REPEAT;
 
 
     public void defineOptions(final JSAP jsap) throws JSAPException {
@@ -61,12 +67,12 @@ public class RestatMode extends ProcessModelConditionsMode {
         }
         final String aggregationMethod = jsapResult.getString("aggregation-method");
         if (aggregationMethod == null) {
-            statsEvalType = StatsMode.StatsEvaluationType.STATS_PER_REPEAT;
+            statsEvalType = StatsEvaluationType.STATS_PER_REPEAT;
         } else {
             if ("per-repeat".equalsIgnoreCase(aggregationMethod)) {
-                statsEvalType = StatsMode.StatsEvaluationType.STATS_PER_REPEAT;
+                statsEvalType = StatsEvaluationType.STATS_PER_REPEAT;
             } else if ("per-test-set".equalsIgnoreCase(aggregationMethod)) {
-                statsEvalType = StatsMode.StatsEvaluationType.STATS_PER_SPLIT;
+                statsEvalType = StatsEvaluationType.STATS_PER_SPLIT;
             } else {
                 System.err.println("Cannot parse argument of option --aggregation-method");
                 System.exit(1);
@@ -93,11 +99,11 @@ public class RestatMode extends ProcessModelConditionsMode {
             final List<SurvivalMeasures> survivalMeasuresList = new ArrayList<SurvivalMeasures>();
             switch (statsEvalType) {
                 case STATS_PER_REPEAT:
-                    StatsMode.evaluatePerformanceMeasurePerRepeat(predictions, null, survivalMeasuresList,
+                    evaluatePerformanceMeasurePerRepeat(predictions, null, survivalMeasuresList,
                             numberOfRepeats, evaluationMeasureNames, repeatedEvaluationMeasure);
                     break;
                 case STATS_PER_SPLIT:
-                    StatsMode.evaluatePerformanceMeasurePerTestSet(predictions, null, survivalMeasuresList,
+                    evaluatePerformanceMeasurePerTestSet(predictions, null, survivalMeasuresList,
                             numberOfRepeats, evaluationMeasureNames, repeatedEvaluationMeasure);
                     break;
             }
@@ -112,5 +118,100 @@ public class RestatMode extends ProcessModelConditionsMode {
         }
     }
 
+    public static void evaluatePerformanceMeasurePerTestSet(PredictedItems predictions,
+                                                            String survivalFileName, final List<SurvivalMeasures> survivalMeasuresList,
+                                                            final int numberOfRepeats,
+                                                            final ObjectSet<CharSequence> evaluationMeasureNames,
+                                                            final EvaluationMeasure repeatedEvaluationMeasure) {
 
+        // Collect one evaluation measure per split test set of cross-validation.
+
+        for (int repeatId = 1; repeatId <= numberOfRepeats; repeatId++) {
+            if (predictions.containsRepeat(repeatId)) {
+                final int maxSplitId = predictions.getNumberOfSplitsForRepeat(repeatId);
+                for (final int splitId : predictions.splitIdsForRepeat(repeatId)) {
+                    final DoubleList decisions = new DoubleArrayList();
+                    final DoubleList trueLabels = new DoubleArrayList();
+                    final ObjectList<String> sampleIDs = new ObjectArrayList<String>();
+
+                    decisions.addAll(predictions.getDecisionsForSplit(repeatId, splitId));
+                    trueLabels.addAll(predictions.getTrueLabelsForSplit(repeatId, splitId));
+                    sampleIDs.addAll(predictions.getSampleIDsForSplit(repeatId, splitId));
+                    if (decisions.size() == 0) {
+                        LOG.fatal("cannot process empty decision list");
+                        System.exit(10);
+                    }
+                    final EvaluationMeasure allSplitsInARepeatMeasure =
+                            CrossValidation.testSetEvaluation(decisions.toDoubleArray(),
+                                    trueLabels.toDoubleArray(), evaluationMeasureNames, true);
+
+                    if (survivalFileName != null) {
+                        try {
+                            final SurvivalMeasures survivalMeasures = new SurvivalMeasures(
+                                    survivalFileName, decisions, trueLabels,
+                                    sampleIDs.toArray(new String[sampleIDs.size()]));
+                            survivalMeasuresList.add(survivalMeasures);
+                        } catch (IOException e) {
+                            LOG.fatal("Error processing input file ", e);
+                            System.exit(10);
+                        }
+                    }
+                    for (final CharSequence measure : Predict.MEASURES) {
+                        repeatedEvaluationMeasure.addValue(measure,
+                                allSplitsInARepeatMeasure.getPerformanceValueAverage(measure.toString()));
+                        final String binaryName = ("binary-" + measure).intern();
+                        repeatedEvaluationMeasure.addValue(binaryName,
+                                allSplitsInARepeatMeasure.getPerformanceValueAverage(binaryName));
+                    }
+                    LOG.trace(String.format("repeatId: %d %s", repeatId, allSplitsInARepeatMeasure.toString()));
+                }
+            }
+        }
+    }
+
+    public static void evaluatePerformanceMeasurePerRepeat(
+            PredictedItems predictions, String survivalFileName, final List<SurvivalMeasures> survivalMeasuresList,
+            final int numberOfRepeats, final ObjectSet<CharSequence> evaluationMeasureNames, final EvaluationMeasure repeatedEvaluationMeasure) {
+        for (int repeatId = 1; repeatId <= numberOfRepeats; repeatId++) {
+            if (predictions.containsRepeat(repeatId)) {
+                final DoubleList decisions = new DoubleArrayList();
+                final DoubleList trueLabels = new DoubleArrayList();
+                final ObjectList<String> sampleIDs = new ObjectArrayList<String>();
+
+                decisions.addAll(predictions.getDecisionsForRepeat(repeatId));
+                trueLabels.addAll(predictions.getTrueLabelsForRepeat(repeatId));
+                sampleIDs.addAll(predictions.getSampleIDsForRepeat(repeatId));
+                final EvaluationMeasure allSplitsInARepeatMeasure =
+                        CrossValidation.testSetEvaluation(decisions.toDoubleArray(),
+                                trueLabels.toDoubleArray(), evaluationMeasureNames, true);
+
+                if (survivalFileName != null) {
+                    try {
+                        final SurvivalMeasures survivalMeasures = new SurvivalMeasures(
+                                survivalFileName, decisions, trueLabels,
+                                sampleIDs.toArray(new String[sampleIDs.size()]));
+                        survivalMeasuresList.add(survivalMeasures);
+                    } catch (IOException e) {
+                        LOG.fatal("Error processing input file ", e);
+                        System.exit(10);
+                    }
+                }
+
+                for (final CharSequence measure : Predict.MEASURES) {
+                    repeatedEvaluationMeasure.addValue(measure,
+                            allSplitsInARepeatMeasure.getPerformanceValueAverage(measure.toString()));
+                    final String binaryName = ("binary-" + measure).intern();
+                    repeatedEvaluationMeasure.addValue(binaryName,
+                            allSplitsInARepeatMeasure.getPerformanceValueAverage(binaryName));
+                }
+                LOG.trace(String.format("repeatId: %d %s", repeatId, allSplitsInARepeatMeasure.toString()));
+            }
+        }
+    }
+
+
+    public enum StatsEvaluationType {
+        STATS_PER_REPEAT,
+        STATS_PER_SPLIT,
+    }
 }
