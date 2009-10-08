@@ -29,7 +29,11 @@ public class RestatMode extends ProcessModelConditionsMode {
     private String survivalFileName;
     private DAVOptions davOptions;
     StatsEvaluationType statsEvalType = StatsEvaluationType.STATS_PER_REPEAT;
+    static final ObjectSet<CharSequence> evaluationMeasureNames = new ObjectArraySet<CharSequence>();
 
+    static {
+        evaluationMeasureNames.addAll(Arrays.asList(org.bdval.Predict.MEASURES));
+    }
 
     public void defineOptions(final JSAP jsap) throws JSAPException {
         final Parameter survivalFilenameOption = new FlaggedOption("survival")
@@ -92,8 +96,7 @@ public class RestatMode extends ProcessModelConditionsMode {
             davOptions.datasetName = getDatasetName(modelId);
             maqciiHelper.setLabel(constructLabel(modelId));
             final int numberOfRepeats = predictions.getNumberOfRepeats();
-            final ObjectSet<CharSequence> evaluationMeasureNames = new ObjectArraySet<CharSequence>();
-            evaluationMeasureNames.addAll(Arrays.asList(org.bdval.Predict.MEASURES));
+
             final EvaluationMeasure repeatedEvaluationMeasure = new EvaluationMeasure();
 
             final List<SurvivalMeasures> survivalMeasuresList = new ArrayList<SurvivalMeasures>();

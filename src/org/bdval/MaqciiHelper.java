@@ -274,6 +274,8 @@ public class MaqciiHelper {
         options.submissionOutput.print("Specificity");
         options.submissionOutput.print("\t");
         options.submissionOutput.print("AUC");
+         options.submissionOutput.print("\t");
+        options.submissionOutput.print("AUCjava");
         options.submissionOutput.print("\t");
         options.submissionOutput.print("RMSE");
         options.submissionOutput.print("\t");
@@ -552,6 +554,8 @@ public class MaqciiHelper {
         options.submissionOutput.print(valueToString(measure.getPerformanceValueAverage("spec")));    //Specificity
         options.submissionOutput.print("\t");
         options.submissionOutput.print(valueToString(measure.getPerformanceValueAverage("auc")));    //AUC
+        options.submissionOutput.print("\t");
+        options.submissionOutput.print(valueToString(measure.getPerformanceValueAverage("AUCjava")));    //AUC
         options.submissionOutput.print("\t");
         options.submissionOutput.print(valueToString(measure.getPerformanceValueAverage("rmse")));    //RMSE
         options.submissionOutput.print("\t");
