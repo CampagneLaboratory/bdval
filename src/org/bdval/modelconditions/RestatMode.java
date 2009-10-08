@@ -22,6 +22,8 @@ public class RestatMode extends ProcessModelConditionsMode {
     private final MaqciiHelper maqciiHelper = new MaqciiHelper();
     private String survivalFileName;
     private DAVOptions davOptions;
+    StatsMode.StatsEvaluationType statsEvalType = StatsMode.StatsEvaluationType.STATS_PER_REPEAT;
+
 
     public void defineOptions(final JSAP jsap) throws JSAPException {
         final Parameter survivalFilenameOption = new FlaggedOption("survival")
@@ -57,6 +59,19 @@ public class RestatMode extends ProcessModelConditionsMode {
             survivalFileName = jsapResult.getString("survival");
             LOG.debug("Survival file:" + survivalFileName);
         }
+        final String aggregationMethod = jsapResult.getString("aggregation-method");
+        if (aggregationMethod == null) {
+            statsEvalType = StatsMode.StatsEvaluationType.STATS_PER_REPEAT;
+        } else {
+            if ("per-repeat".equalsIgnoreCase(aggregationMethod)) {
+                statsEvalType = StatsMode.StatsEvaluationType.STATS_PER_REPEAT;
+            } else if ("per-test-set".equalsIgnoreCase(aggregationMethod)) {
+                statsEvalType = StatsMode.StatsEvaluationType.STATS_PER_SPLIT;
+            } else {
+                System.err.println("Cannot parse argument of option --aggregation-method");
+                System.exit(1);
+            }
+        }
         davOptions = new DAVOptions();
         maqciiHelper.setupSubmissionFile(jsapResult, davOptions);
     }
@@ -74,7 +89,7 @@ public class RestatMode extends ProcessModelConditionsMode {
             final ObjectSet<CharSequence> evaluationMeasureNames = new ObjectArraySet<CharSequence>();
             evaluationMeasureNames.addAll(Arrays.asList(org.bdval.Predict.MEASURES));
             final EvaluationMeasure repeatedEvaluationMeasure = new EvaluationMeasure();
-            StatsMode.StatsEvaluationType statsEvalType = StatsMode.StatsEvaluationType.STATS_PER_REPEAT;
+
             final List<SurvivalMeasures> survivalMeasuresList = new ArrayList<SurvivalMeasures>();
             switch (statsEvalType) {
                 case STATS_PER_REPEAT:
