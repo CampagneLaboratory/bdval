@@ -26,7 +26,8 @@ import org.apache.commons.logging.LogFactory;
 import org.bdval.*;
 
 /**
- * A set of programs to process a set of models described in a model conditions file and associated results directory.
+ * The mode for programs that process a set of models described in a model conditions file
+ * and associated results directory.
  *
  * @author Fabien Campagne Date: Oct 19, 2007 Time: 2:11:24 PM
  */

@@ -6,7 +6,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.bdval.GenerateFinalModels;
-import org.bdval.DistributionDifferenceByFeatureMode;
 import org.bdval.PredictedItems;
 import org.bdval.modelselection.CandidateModelSelectionAllTeams;
 
@@ -79,11 +78,20 @@ public class ProcessModelConditionsMode extends edu.cornell.med.icb.cli.UseModal
         CandidateModelSelectionAllTeams.addFeatureSelectionFoldColumn(options.modelConditions);
         CandidateModelSelectionAllTeams.addFeatureSelectionStatTypeColumn(options.modelConditions);
         CandidateModelSelectionAllTeams.addFeatureClassifierTypeColumn(options.modelConditions);
+        setupRserve();
+    }
 
+    protected void setupRserve() {
+        if (System.getProperty("RConnectionPool.configuration") == null) {
+            System.setProperty("RConnectionPool.configuration", "config/RconnectionPool.xml");
+            LOG.info("Will use the default location config/RconnectionPool.xml. Specify alternative location with -DRConnectionPool.configuration=<path>");
+        }
+       
     }
 
     public void process(ProcessModelConditionsOptions options) {
         this.options = options;
+
         for (String modelId : options.modelConditions.keySet()) {
             processOneModelId(options, modelId);
         }
@@ -244,10 +252,10 @@ public class ProcessModelConditionsMode extends edu.cornell.med.icb.cli.UseModal
         String featureSelection = "unknown";
         if (featureSelectionMode != null) featureSelection = featureSelectionMode;
         if (featureSelectionType != null) featureSelection = featureSelectionType;
-        String classifierParameters= options.modelConditions.get(modelId).get("classifier-parameters");
-        int removeThat=classifierParameters.lastIndexOf(",wekaClass");
-        if (removeThat==-1) removeThat=classifierParameters.length();
-        String parameters=classifierParameters.substring(0, removeThat);
-        return classifierType + '-' + featureSelection+'-'+parameters;
+        String classifierParameters = options.modelConditions.get(modelId).get("classifier-parameters");
+        int removeThat = classifierParameters.lastIndexOf(",wekaClass");
+        if (removeThat == -1) removeThat = classifierParameters.length();
+        String parameters = classifierParameters.substring(0, removeThat);
+        return classifierType + '-' + featureSelection + '-' + parameters;
     }
 }
