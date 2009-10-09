@@ -24,7 +24,6 @@ import edu.mssm.crover.cli.CLI;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.bdval.modelconditions.ProcessModelConditionsMode;
 import org.bdval.modelconditions.ProcessModelConditions;
 
 import java.util.HashSet;
@@ -39,7 +38,7 @@ public class DiscoverAndValidate implements WithProcessMethod {
      * Used to log debug and informational messages.
      */
     private static final Log LOG = LogFactory.getLog(DiscoverAndValidate.class);
-    private static HashSet<String> modelConditionModes = new HashSet<String>();
+    private static final HashSet<String> modelConditionModes = new HashSet<String>();
 
     static {
         modelConditionModes.add("stats");
@@ -60,16 +59,14 @@ public class DiscoverAndValidate implements WithProcessMethod {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Running with: " + ArrayUtils.toString(args));
         }
-        String mode = CLI.getOption(args, "-m", CLI.getOption(args, "--mode", null));
-        {
-            if (modelConditionModes.contains(mode)) {
-                final ProcessModelConditions pmcTool = new ProcessModelConditions();
-                pmcTool.process(args);
-            } else {
-                final DiscoverAndValidate davTool = new DiscoverAndValidate();
-                davTool.process(args);
-            }
 
+        final String mode = CLI.getOption(args, "-m", CLI.getOption(args, "--mode", null));
+        if (modelConditionModes.contains(mode)) {
+            final ProcessModelConditions pmcTool = new ProcessModelConditions();
+            pmcTool.process(args);
+        } else {
+            final DiscoverAndValidate davTool = new DiscoverAndValidate();
+            davTool.process(args);
         }
 
     }

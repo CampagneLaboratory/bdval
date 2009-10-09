@@ -1,21 +1,48 @@
+/*
+ * Copyright (C) 2008-2009 Institute for Computational Biomedicine,
+ *                         Weill Medical College of Cornell University
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.bdval.modelconditions;
 
-import com.martiansoftware.jsap.*;
-import it.unimi.dsi.fastutil.objects.ObjectSet;
+import com.martiansoftware.jsap.FlaggedOption;
+import com.martiansoftware.jsap.JSAP;
+import com.martiansoftware.jsap.JSAPException;
+import com.martiansoftware.jsap.JSAPResult;
+import com.martiansoftware.jsap.Parameter;
+import edu.cornell.med.icb.learning.CrossValidation;
+import edu.cornell.med.icb.learning.tools.svmlight.EvaluationMeasure;
+import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
+import it.unimi.dsi.fastutil.doubles.DoubleList;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectArraySet;
 import it.unimi.dsi.fastutil.objects.ObjectList;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import it.unimi.dsi.fastutil.doubles.DoubleList;
-import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectSet;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.bdval.DAVOptions;
+import org.bdval.MaqciiHelper;
+import org.bdval.Predict;
+import org.bdval.PredictedItems;
+import org.bdval.SurvivalMeasures;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.ArrayList;
-import java.io.IOException;
-
-import edu.cornell.med.icb.learning.tools.svmlight.EvaluationMeasure;
-import edu.cornell.med.icb.learning.CrossValidation;
-import org.bdval.*;
 
 /**
  * Calculates statistics from model conditions and a set of results directories.
@@ -25,6 +52,11 @@ import org.bdval.*;
  *         Time: 5:34:23 PM
  */
 public class RestatMode extends ProcessModelConditionsMode {
+    /**
+     * Used to log debug and informational messages.
+     */
+    private static final Log LOG = LogFactory.getLog(RestatMode.class);
+
     private final MaqciiHelper maqciiHelper = new MaqciiHelper();
     private String survivalFileName;
     private DAVOptions davOptions;

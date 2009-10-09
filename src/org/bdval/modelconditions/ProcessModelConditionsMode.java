@@ -1,26 +1,47 @@
+/*
+ * Copyright (C) 2008-2009 Institute for Computational Biomedicine,
+ *                         Weill Medical College of Cornell University
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.bdval.modelconditions;
 
-import com.martiansoftware.jsap.*;
+import com.martiansoftware.jsap.FlaggedOption;
+import com.martiansoftware.jsap.JSAP;
+import com.martiansoftware.jsap.JSAPException;
+import com.martiansoftware.jsap.JSAPResult;
+import com.martiansoftware.jsap.Parameter;
+import com.martiansoftware.jsap.UnflaggedOption;
+import edu.cornell.med.icb.io.TsvToFromMap;
+import edu.cornell.med.icb.iterators.TextFileLineIterator;
+import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
+import it.unimi.dsi.lang.MutableString;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.bdval.GenerateFinalModels;
 import org.bdval.PredictedItems;
 import org.bdval.modelselection.CandidateModelSelectionAllTeams;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
-import it.unimi.dsi.lang.MutableString;
-import edu.cornell.med.icb.io.TsvToFromMap;
-import edu.cornell.med.icb.iterators.TextFileLineIterator;
-
 
 /**
  * A mode to process model conditions in some way. Sub-classes of this mode implement useful behavior.
@@ -33,7 +54,7 @@ public class ProcessModelConditionsMode extends edu.cornell.med.icb.cli.UseModal
     /**
      * Used to log debug and informational messages.
      */
-    protected static final Log LOG = LogFactory.getLog(ProcessModelConditionsMode.class);
+    private static final Log LOG = LogFactory.getLog(ProcessModelConditionsMode.class);
     private ProcessModelConditionsOptions options;
 
 
@@ -78,15 +99,6 @@ public class ProcessModelConditionsMode extends edu.cornell.med.icb.cli.UseModal
         CandidateModelSelectionAllTeams.addFeatureSelectionFoldColumn(options.modelConditions);
         CandidateModelSelectionAllTeams.addFeatureSelectionStatTypeColumn(options.modelConditions);
         CandidateModelSelectionAllTeams.addFeatureClassifierTypeColumn(options.modelConditions);
-        setupRserve();
-    }
-
-    protected void setupRserve() {
-        if (System.getProperty("RConnectionPool.configuration") == null) {
-            System.setProperty("RConnectionPool.configuration", "config/RconnectionPool.xml");
-            LOG.info("Will use the default location config/RconnectionPool.xml. Specify alternative location with -DRConnectionPool.configuration=<path>");
-        }
-       
     }
 
     public void process(ProcessModelConditionsOptions options) {
