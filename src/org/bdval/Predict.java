@@ -84,7 +84,7 @@ public class Predict extends DAVMode {
     private ObjectSet<String> testSampleIds;
 
     static public final CharSequence[] MEASURES = {
-            "auc", "mat", "rmse", "acc", "f", "spec", "sens", "prec", "rec", "MCC","AUCjava"
+            "auc", "mat", "rmse", "acc", "f", "spec", "sens", "prec", "rec", "MCC","RMSEjava", 
     };
 
     private final MaqciiHelper maqciiHelper = new MaqciiHelper();

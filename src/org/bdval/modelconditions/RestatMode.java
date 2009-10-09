@@ -191,13 +191,7 @@ public class RestatMode extends ProcessModelConditionsMode {
                             System.exit(10);
                         }
                     }
-                    for (final CharSequence measure : Predict.MEASURES) {
-                        repeatedEvaluationMeasure.addValue(measure,
-                                allSplitsInARepeatMeasure.getPerformanceValueAverage(measure.toString()));
-                        final String binaryName = ("binary-" + measure).intern();
-                        repeatedEvaluationMeasure.addValue(binaryName,
-                                allSplitsInARepeatMeasure.getPerformanceValueAverage(binaryName));
-                    }
+                    averageMeasuresPerReplicates(repeatedEvaluationMeasure, allSplitsInARepeatMeasure);
                     LOG.trace(String.format("repeatId: %d %s", repeatId, allSplitsInARepeatMeasure.toString()));
                 }
             }
@@ -232,15 +226,22 @@ public class RestatMode extends ProcessModelConditionsMode {
                     }
                 }
 
-                for (final CharSequence measure : Predict.MEASURES) {
-                    repeatedEvaluationMeasure.addValue(measure,
-                            allSplitsInARepeatMeasure.getPerformanceValueAverage(measure.toString()));
-                    final String binaryName = ("binary-" + measure).intern();
-                    repeatedEvaluationMeasure.addValue(binaryName,
-                            allSplitsInARepeatMeasure.getPerformanceValueAverage(binaryName));
-                }
+                averageMeasuresPerReplicates(repeatedEvaluationMeasure, allSplitsInARepeatMeasure);
                 LOG.trace(String.format("repeatId: %d %s", repeatId, allSplitsInARepeatMeasure.toString()));
             }
+        }
+    }
+
+    private static void averageMeasuresPerReplicates(EvaluationMeasure repeatedEvaluationMeasure, EvaluationMeasure allSplitsInARepeatMeasure) {
+        for (final CharSequence measure : Predict.MEASURES) {
+            repeatedEvaluationMeasure.addValue(measure,
+                    allSplitsInARepeatMeasure.getPerformanceValueAverage(measure.toString()));
+            final String binaryName = ("binary-" + measure).intern();
+            repeatedEvaluationMeasure.addValue(binaryName,
+                    allSplitsInARepeatMeasure.getPerformanceValueAverage(binaryName));
+            final String zeroThresholdName = (measure + "-zero").intern();
+            repeatedEvaluationMeasure.addValue(binaryName,
+                    allSplitsInARepeatMeasure.getPerformanceValueAverage(zeroThresholdName));
         }
     }
 

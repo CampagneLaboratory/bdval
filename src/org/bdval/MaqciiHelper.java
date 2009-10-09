@@ -274,10 +274,10 @@ public class MaqciiHelper {
         options.submissionOutput.print("Specificity");
         options.submissionOutput.print("\t");
         options.submissionOutput.print("AUC");
-         options.submissionOutput.print("\t");
-        options.submissionOutput.print("AUCjava");
         options.submissionOutput.print("\t");
         options.submissionOutput.print("RMSE");
+        options.submissionOutput.print("\t");
+        options.submissionOutput.print("RMSEjava");
         options.submissionOutput.print("\t");
         options.submissionOutput.print("MCC_StdDev");
         options.submissionOutput.print("\t");
@@ -362,119 +362,9 @@ public class MaqciiHelper {
         options.submissionOutput.print("\n");
         options.submissionOutput.flush();
         options.submissionFilePreexist = new File(options.submissionFilename).exists();
-                
+
     }
 
-    public void printSubmissionHeaders(boolean submissionFilePreexist,
-                                       boolean outputBinaryMeasures,
-                                       PrintWriter submissionOutput,
-                                       final Boolean printSurvival) {
-        if (submissionFilePreexist || submissionOutput == null) {
-            return;
-        }
-        submissionOutput.print("OrganizationCode");
-        submissionOutput.print("\t");
-        submissionOutput.print("DatasetCode");
-        submissionOutput.print("\t");
-        submissionOutput.print("EndpointCode");
-        submissionOutput.print("\t");
-        submissionOutput.print("ExcelColumnHeader");
-        submissionOutput.print("\t");
-        submissionOutput.print("MCC");
-        submissionOutput.print("\t");
-        submissionOutput.print("Accuracy");
-        submissionOutput.print("\t");
-        submissionOutput.print("Sensitivity");
-        submissionOutput.print("\t");
-        submissionOutput.print("Specificity");
-        submissionOutput.print("\t");
-        submissionOutput.print("AUC");
-        submissionOutput.print("\t");
-        submissionOutput.print("RMSE");
-        submissionOutput.print("\t");
-        submissionOutput.print("MCC_StdDev");
-        submissionOutput.print("\t");
-        submissionOutput.print("Accuracy_StdDev");
-        submissionOutput.print("\t");
-        submissionOutput.print("Sensitivity_StdDev");
-        submissionOutput.print("\t");
-        submissionOutput.print("Specificity_StdDev");
-        submissionOutput.print("\t");
-        submissionOutput.print("AUC_StdDev");
-        submissionOutput.print("\t");
-        submissionOutput.print("RMSE_StdDev");
-        submissionOutput.print("\t");
-        submissionOutput.print("SummaryNormalization");
-        submissionOutput.print("\t");
-        submissionOutput.print("FeatureSelectionMethod");
-        submissionOutput.print("\t");
-        submissionOutput.print("NumberOfFeatureUsed");
-        submissionOutput.print("\t");
-        submissionOutput.print("ClassificationAlgorithm");
-        submissionOutput.print("\t");
-        submissionOutput.print("BatchEffectRemovalMethod");
-        submissionOutput.print("\t");
-        submissionOutput.print("InternalValidation");
-        submissionOutput.print("\t");
-        submissionOutput.print("ValidationIterations");
-        submissionOutput.print("\t");
-        submissionOutput.print("ModelId");
-        submissionOutput.print("\t");
-        submissionOutput.print("Label");
-        submissionOutput.print("\t");
-        submissionOutput.print("combinedPerformance"); // MCC+ AUC - MCC_std - AUC_std
-
-        if (outputBinaryMeasures) {
-            submissionOutput.print("\t");
-            submissionOutput.print("binary-MCC");
-            submissionOutput.print("\t");
-            submissionOutput.print("binary-Accuracy");
-            submissionOutput.print("\t");
-            submissionOutput.print("binary-Sensitivity");
-            submissionOutput.print("\t");
-            submissionOutput.print("binary-Specificity");
-            submissionOutput.print("\t");
-            submissionOutput.print("binary-AUC");
-            submissionOutput.print("\t");
-            submissionOutput.print("binary-RMSE");
-            submissionOutput.print("\t");
-            submissionOutput.print("binary-MCC_StdDev");
-            submissionOutput.print("\t");
-            submissionOutput.print("binary-Accuracy_StdDev");
-            submissionOutput.print("\t");
-            submissionOutput.print("binary-Sensitivity_StdDev");
-            submissionOutput.print("\t");
-            submissionOutput.print("binary-Specificity_StdDev");
-            submissionOutput.print("\t");
-            submissionOutput.print("binary-AUC_StdDev");
-            submissionOutput.print("\t");
-            submissionOutput.print("binary-RMSE_StdDev");
-            submissionOutput.print("\t");
-            submissionOutput.print("MCC-thresholdIndependent");
-            submissionOutput.print("\t");
-            submissionOutput.print("MCC-thresholdIndependent_StdDev");
-        }
-        for (final String otherMeasureName : otherMeasureNames) {
-            submissionOutput.print("\t");
-            submissionOutput.print(otherMeasureName);
-            submissionOutput.print("\t");
-            submissionOutput.print(otherMeasureName + "_StdDev");
-        }
-        if (printSurvival) {
-            submissionOutput.print("\t");
-            submissionOutput.print("survival_coxP");
-            submissionOutput.print("\t");
-            submissionOutput.print("survival_hazardRatio");
-            submissionOutput.print("\t");
-            submissionOutput.print("survival_lowCI");
-            submissionOutput.print("\t");
-            submissionOutput.print("survival_upCI");
-            submissionOutput.print("\t");
-            submissionOutput.print("survival_logRankP");
-        }
-        submissionOutput.print("\n");
-        submissionOutput.flush();
-    }
 
     /**
      * Get the feature selection method for the current options.
@@ -520,7 +410,9 @@ public class MaqciiHelper {
 
     public void printSubmissionResults(final DAVOptions options,
                                        final EvaluationMeasure measure,
-                                       final int numberOfFeatures, final int numRepeats, final List<SurvivalMeasures> survivalMeasuresList) {
+                                       final int numberOfFeatures,
+                                       final int numRepeats,
+                                       final List<SurvivalMeasures> survivalMeasuresList) {
         if (options.submissionOutput == null) {
             LOG.info("Omitting submission output, submission-file not specified.");
             return;
@@ -555,9 +447,9 @@ public class MaqciiHelper {
         options.submissionOutput.print("\t");
         options.submissionOutput.print(valueToString(measure.getPerformanceValueAverage("auc")));    //AUC
         options.submissionOutput.print("\t");
-        options.submissionOutput.print(valueToString(measure.getPerformanceValueAverage("AUCjava")));    //AUC
-        options.submissionOutput.print("\t");
         options.submissionOutput.print(valueToString(measure.getPerformanceValueAverage("rmse")));    //RMSE
+        options.submissionOutput.print("\t");
+        options.submissionOutput.print(valueToString(measure.getPerformanceValueAverage("RMSEjava")));    //RMSE
         options.submissionOutput.print("\t");
         options.submissionOutput.print(stdDevToString(measure.getPerformanceValueStd("mat")));    //MCC_StdDev
         options.submissionOutput.print("\t");
@@ -567,7 +459,7 @@ public class MaqciiHelper {
         options.submissionOutput.print("\t");
         options.submissionOutput.print(stdDevToString(measure.getPerformanceValueStd("spec")));    //Specificity_StdDev
         options.submissionOutput.print("\t");
-        options.submissionOutput.print(stdDevToString(measure.getPerformanceValueStd("auc")));    //AUC_StdDev
+        options.submissionOutput.print(stdDevToString(measure.getPerformanceValueStd("auc")));    //AUC_StdDev       
         options.submissionOutput.print("\t");
         options.submissionOutput.print(stdDevToString(measure.getPerformanceValueStd("rmse")));    //RMSE_StdDev
         options.submissionOutput.print("\t");
@@ -621,12 +513,13 @@ public class MaqciiHelper {
             options.submissionOutput.print(stdDevToString(measure.getPerformanceValueStd("binary-auc")));    //AUC_StdDev
             options.submissionOutput.print("\t");
             options.submissionOutput.print(stdDevToString(measure.getPerformanceValueStd("binary-rmse")));    //RMSE_StdDev
-            options.submissionOutput.print("\t");
-            options.submissionOutput.print(valueToString(measure.getPerformanceValueAverage("MCC")));    //MCC-threshold independent
-            options.submissionOutput.print("\t");
-            options.submissionOutput.print(stdDevToString(measure.getPerformanceValueStd("MCC")));    //MCC-threshold independent_StdDev
+
 
         }
+        options.submissionOutput.print("\t");
+        options.submissionOutput.print(valueToString(measure.getPerformanceValueAverage("MCC-zero")));    //MCC-threshold independent
+        options.submissionOutput.print("\t");
+        options.submissionOutput.print(stdDevToString(measure.getPerformanceValueStd("MCC-zero")));    //MCC-threshold independent_StdDev
 
         for (final String otherMeasureName : otherMeasureNames) {
             options.submissionOutput.print("\t");
