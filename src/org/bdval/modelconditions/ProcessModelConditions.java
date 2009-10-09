@@ -23,7 +23,8 @@ import edu.cornell.med.icb.util.VersionUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.bdval.*;
+import org.bdval.TimeLoggingService;
+import org.bdval.WithProcessMethod;
 
 /**
  * The mode for programs that process a set of models described in a model conditions file

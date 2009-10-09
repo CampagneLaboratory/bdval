@@ -40,6 +40,8 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -88,9 +90,9 @@ public class ProcessModelConditionsMode extends edu.cornell.med.icb.cli.UseModal
         jsap.registerParameter(modelconditionsOption);
     }
 
-    public void interpretArguments(JSAP jsap, JSAPResult jsapResult, ProcessModelConditionsOptions options) {
-        final String[] resultDirectories = jsapResult.getStringArray("result-directory");
-        options.resultDirectories = resultDirectories;
+    @Override
+    public void interpretArguments(final JSAP jsap, final JSAPResult jsapResult, final ProcessModelConditionsOptions options) {
+        options.resultDirectories = jsapResult.getStringArray("result-directory");
         options.modelConditionsFilename = jsapResult.getString("model-conditions");
         options.modelConditionLines = GenerateFinalModels.readLines(options.modelConditionsFilename);
         options.modelConditions = readModelConditionsFile(options.modelConditionsFilename,
@@ -101,10 +103,11 @@ public class ProcessModelConditionsMode extends edu.cornell.med.icb.cli.UseModal
         CandidateModelSelectionAllTeams.addFeatureClassifierTypeColumn(options.modelConditions);
     }
 
-    public void process(ProcessModelConditionsOptions options) {
+    @Override
+    public void process(final ProcessModelConditionsOptions options) {
         this.options = options;
 
-        for (String modelId : options.modelConditions.keySet()) {
+        for (final String modelId : options.modelConditions.keySet()) {
             processOneModelId(options, modelId);
         }
     }
@@ -115,7 +118,7 @@ public class ProcessModelConditionsMode extends edu.cornell.med.icb.cli.UseModal
      *
      * @param modelId
      */
-    public void processOneModelId(ProcessModelConditionsOptions options, String modelId) {
+    public void processOneModelId(final ProcessModelConditionsOptions options, final String modelId) {
     }
 
     /**
@@ -215,59 +218,72 @@ public class ProcessModelConditionsMode extends edu.cornell.med.icb.cli.UseModal
      * @return
      */
     public PredictedItems loadPredictions(final String modelId) {
-        for (String resultDirectory : options.resultDirectories) {
+        // search the result directories for prediction files that match the given model id
+        final List<String> matchingFilenamesList = new LinkedList<String>();
+        for (final String resultDirectory : options.resultDirectories) {
             String predictionsDirectoryPath = FilenameUtils.concat(resultDirectory, "predictions");
             predictionsDirectoryPath = FilenameUtils.concat(predictionsDirectoryPath, getDatasetName(modelId));
-            File predictionDir = new File(predictionsDirectoryPath);
-            String matchingFilenames[] = predictionDir.list(new FilenameFilter() {
-                public boolean accept(File file, String name) {
-                    return (name.contains(modelId));
+            final File predictionDir = new File(predictionsDirectoryPath);
+            final String[] matchingFilenames = predictionDir.list(new FilenameFilter() {
+                public boolean accept(final File file, final String name) {
+                    return name.contains(modelId);
                 }
             });
-            String predictionsFilename = "";
-            if (matchingFilenames.length == 0) {
-                LOG.trace(String.format("no prediction file was found for modelId=%s", modelId));
-                return null;
-            }
-            if (matchingFilenames.length > 1) {
-                System.err.println(String.format("more than one prediction file was found for modelId=%s", modelId));
-                System.out.println("Filenames were : ");
-                for (String filename : matchingFilenames) {
-                    System.out.println(filename);
-                }
-                System.out.flush();
-                System.exit(1);
-            } else {
-                predictionsFilename = FilenameUtils.concat(predictionsDirectoryPath, matchingFilenames[0]);
-            }
-            try {
-                PredictedItems predictions = new PredictedItems();
-                predictions.load(predictionsFilename);
-                return predictions;
-            } catch (IOException e) {
-                LOG.fatal("An error occurred reading predictions file " + predictionsFilename, e);
-                System.exit(1);
-            }
 
+            if (matchingFilenames != null) {
+                for (final String filename : matchingFilenames) {
+                    matchingFilenamesList.add(FilenameUtils.concat(predictionsDirectoryPath, filename));
+                }
+            }
         }
-        return null;
+
+        String predictionsFilename = null;
+        if (matchingFilenamesList.isEmpty()) {
+            LOG.trace(String.format("no prediction file was found for modelId=%s", modelId));
+            return null;
+        } else if (matchingFilenamesList.size() > 1) {
+            System.err.println(String.format("more than one prediction file was found for modelId=%s", modelId));
+            System.out.println("Filenames were : ");
+            for (final String filename : matchingFilenamesList) {
+                System.out.println(filename);
+            }
+            System.out.flush();
+            System.exit(1);
+        } else {
+            predictionsFilename = matchingFilenamesList.get(0);
+        }
+
+        final PredictedItems predictions = new PredictedItems();
+        try {
+            predictions.load(predictionsFilename);
+        } catch (IOException e) {
+            LOG.fatal("An error occurred reading predictions file " + predictionsFilename, e);
+            System.exit(1);
+        }
+        return predictions;
     }
 
-    protected String getDatasetName(String modelId) {
+    protected String getDatasetName(final String modelId) {
         return options.modelConditions.get(modelId).get("dataset-name");
     }
 
-    protected String constructLabel(String modelId) {
-        String classifierType = options.modelConditions.get(modelId).get("classifier-type");
-        String featureSelectionType = options.modelConditions.get(modelId).get("feature-selection-type");
-        String featureSelectionMode = options.modelConditions.get(modelId).get("feature-selection-mode");
+    protected String constructLabel(final String modelId) {
+        final String classifierType = options.modelConditions.get(modelId).get("classifier-type");
+        final String featureSelectionType = options.modelConditions.get(modelId).get("feature-selection-type");
+        final String featureSelectionMode = options.modelConditions.get(modelId).get("feature-selection-mode");
         String featureSelection = "unknown";
-        if (featureSelectionMode != null) featureSelection = featureSelectionMode;
-        if (featureSelectionType != null) featureSelection = featureSelectionType;
-        String classifierParameters = options.modelConditions.get(modelId).get("classifier-parameters");
+        if (featureSelectionMode != null) {
+            featureSelection = featureSelectionMode;
+        }
+        if (featureSelectionType != null) {
+            featureSelection = featureSelectionType;
+        }
+        final String classifierParameters = options.modelConditions.get(modelId).get("classifier-parameters");
         int removeThat = classifierParameters.lastIndexOf(",wekaClass");
-        if (removeThat == -1) removeThat = classifierParameters.length();
-        String parameters = classifierParameters.substring(0, removeThat);
+        if (removeThat == -1) {
+            removeThat = classifierParameters.length();
+        }
+        final String parameters = classifierParameters.substring(0, removeThat);
         return classifierType + '-' + featureSelection + '-' + parameters;
     }
 }

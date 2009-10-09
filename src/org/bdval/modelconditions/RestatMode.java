@@ -67,6 +67,7 @@ public class RestatMode extends ProcessModelConditionsMode {
         evaluationMeasureNames.addAll(Arrays.asList(org.bdval.Predict.MEASURES));
     }
 
+    @Override
     public void defineOptions(final JSAP jsap) throws JSAPException {
         final Parameter survivalFilenameOption = new FlaggedOption("survival")
                 .setStringParser(JSAP.STRING_PARSER)
@@ -95,7 +96,7 @@ public class RestatMode extends ProcessModelConditionsMode {
     }
 
     @Override
-    public void interpretArguments(JSAP jsap, JSAPResult jsapResult, ProcessModelConditionsOptions options) {
+    public void interpretArguments(final JSAP jsap, final JSAPResult jsapResult, final ProcessModelConditionsOptions options) {
         super.interpretArguments(jsap, jsapResult, options);
         if (jsapResult.contains("survival")) {
             survivalFileName = jsapResult.getString("survival");
@@ -119,7 +120,7 @@ public class RestatMode extends ProcessModelConditionsMode {
     }
 
     @Override
-    public void processOneModelId(ProcessModelConditionsOptions options, String modelId) {
+    public void processOneModelId(final ProcessModelConditionsOptions options, final String modelId) {
         //  System.out.println("will process model id:" + modelId);
         final PredictedItems predictions = loadPredictions(modelId);
         if (predictions != null) {
@@ -153,8 +154,8 @@ public class RestatMode extends ProcessModelConditionsMode {
         }
     }
 
-    public static void evaluatePerformanceMeasurePerTestSet(PredictedItems predictions,
-                                                            String survivalFileName, final List<SurvivalMeasures> survivalMeasuresList,
+    public static void evaluatePerformanceMeasurePerTestSet(final PredictedItems predictions,
+                                                            final String survivalFileName, final List<SurvivalMeasures> survivalMeasuresList,
                                                             final int numberOfRepeats,
                                                             final ObjectSet<CharSequence> evaluationMeasureNames,
                                                             final EvaluationMeasure repeatedEvaluationMeasure) {
@@ -199,7 +200,7 @@ public class RestatMode extends ProcessModelConditionsMode {
     }
 
     public static void evaluatePerformanceMeasurePerRepeat(
-            PredictedItems predictions, String survivalFileName, final List<SurvivalMeasures> survivalMeasuresList,
+            final PredictedItems predictions, final String survivalFileName, final List<SurvivalMeasures> survivalMeasuresList,
             final int numberOfRepeats, final ObjectSet<CharSequence> evaluationMeasureNames, final EvaluationMeasure repeatedEvaluationMeasure) {
         for (int repeatId = 1; repeatId <= numberOfRepeats; repeatId++) {
             if (predictions.containsRepeat(repeatId)) {
@@ -232,7 +233,7 @@ public class RestatMode extends ProcessModelConditionsMode {
         }
     }
 
-    private static void averageMeasuresPerReplicates(EvaluationMeasure repeatedEvaluationMeasure, EvaluationMeasure allSplitsInARepeatMeasure) {
+    private static void averageMeasuresPerReplicates(final EvaluationMeasure repeatedEvaluationMeasure, final EvaluationMeasure allSplitsInARepeatMeasure) {
         for (final CharSequence measure : Predict.MEASURES) {
             repeatedEvaluationMeasure.addValue(measure,
                     allSplitsInARepeatMeasure.getPerformanceValueAverage(measure.toString()));
