@@ -84,7 +84,7 @@ public class Predict extends DAVMode {
     private ObjectSet<String> testSampleIds;
 
     static public final CharSequence[] MEASURES = {
-            "auc", "mat", "rmse", "acc", "f", "spec", "sens", "prec", "rec", "MCC","RMSEjava", 
+            "auc", "mat", "rmse", "acc", "f", "spec", "sens", "prec", "rec", "AUC", "MCC", "RMSEjava",
     };
 
     private final MaqciiHelper maqciiHelper = new MaqciiHelper();
@@ -174,7 +174,7 @@ public class Predict extends DAVMode {
 
         maqciiHelper.defineSubmissionFileOption(jsap);
         jsap.getByID("label").addDefault("auto");
-      //  jsap.getByID("folds").addDefault("0");
+        //  jsap.getByID("folds").addDefault("0");
     }
 
     @Override
@@ -486,7 +486,8 @@ public class Predict extends DAVMode {
 
             final double[] probabilities = new double[2];
             final double decision = model.predict(sampleIndex, probabilities);
-            assert decision == 1 || decision == -1 : "decision must be binary.";
+
+            assert decision == 1 || decision == -1 : "decision must be binary. Assertion encountered processing model " + modelFilenamePrefix;
 
             final double probability = Math.max(probabilities[0], probabilities[1]);
             final String[] symbolicClassLabel = model.getSymbolicClassLabel();
