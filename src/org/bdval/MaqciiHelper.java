@@ -445,7 +445,7 @@ public class MaqciiHelper {
         options.submissionOutput.print("\t");
         options.submissionOutput.print(valueToString(measure.getPerformanceValueAverage("spec")));    //Specificity
         options.submissionOutput.print("\t");
-        options.submissionOutput.print(valueToString(measure.getPerformanceValueAverage("auc")));    //AUC
+        options.submissionOutput.print(valueToString(measure.getPerformanceValueAverage("AUC")));    //AUC, calculated with AreadUnderTheRocCurveCalculator
         options.submissionOutput.print("\t");
         options.submissionOutput.print(valueToString(measure.getPerformanceValueAverage("rmse")));    //RMSE
         options.submissionOutput.print("\t");
@@ -459,7 +459,7 @@ public class MaqciiHelper {
         options.submissionOutput.print("\t");
         options.submissionOutput.print(stdDevToString(measure.getPerformanceValueStd("spec")));    //Specificity_StdDev
         options.submissionOutput.print("\t");
-        options.submissionOutput.print(stdDevToString(measure.getPerformanceValueStd("auc")));    //AUC_StdDev       
+        options.submissionOutput.print(stdDevToString(measure.getPerformanceValueStd("AUC")));    //AUC_StdDev calculated with AreadUnderTheRocCurveCalculator
         options.submissionOutput.print("\t");
         options.submissionOutput.print(stdDevToString(measure.getPerformanceValueStd("rmse")));    //RMSE_StdDev
         options.submissionOutput.print("\t");
