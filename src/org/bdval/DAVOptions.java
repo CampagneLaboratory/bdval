@@ -78,6 +78,7 @@ public class DAVOptions {
     public String datasetRoot;
 
     public String modelId;
+    public String seriesModelId;
 
     /**
      * True if the output file was not created by this program. In that case, header are assumed
