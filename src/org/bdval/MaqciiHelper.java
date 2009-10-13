@@ -307,9 +307,11 @@ public class MaqciiHelper {
         options.submissionOutput.print("\t");
         options.submissionOutput.print("ModelId");
         options.submissionOutput.print("\t");
+        options.submissionOutput.print("Model-Series-Id");
+        options.submissionOutput.print("\t");      
         options.submissionOutput.print("Label");
         options.submissionOutput.print("\t");
-        options.submissionOutput.print("combinedPerformance"); // MCC+ AUC - MCC_std - AUC_std
+        options.submissionOutput.print("combinedPerformance");   // MCC+ AUC - MCC_std - AUC_std
 
         if (outputBinaryMeasures) {
             options.submissionOutput.print("\t");
@@ -485,9 +487,13 @@ public class MaqciiHelper {
             options.submissionOutput.print(options.modelId);    //ModelID
         }
         options.submissionOutput.print("\t");
+        options.submissionOutput.print(options.seriesModelId);
+        options.submissionOutput.print("\t");
         options.submissionOutput.print(label);    //Label
         options.submissionOutput.print("\t");
         options.submissionOutput.print(valueToString(getCompositeMeasure(measure), 4));    // auc+mcc -auc_std -mcc_std
+
+
         if (outputBinaryMeasures) {
             options.submissionOutput.print("\t");
             options.submissionOutput.print(valueToString(measure.getPerformanceValueAverage("binary-mat")));    //MCC
