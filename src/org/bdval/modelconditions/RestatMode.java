@@ -128,6 +128,8 @@ public class RestatMode extends ProcessModelConditionsMode {
             davOptions.crossValidationFoldNumber = predictions.getNumberOfFolds();
             davOptions.datasetName = getDatasetName(modelId);
             maqciiHelper.setLabel(constructLabel(modelId));
+            davOptions.seriesModelId= options.modelConditions.get(modelId).get("id-parameter-scan-series");
+
             final int numberOfRepeats = predictions.getNumberOfRepeats();
 
             final EvaluationMeasure repeatedEvaluationMeasure = new EvaluationMeasure();
