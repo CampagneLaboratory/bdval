@@ -1454,7 +1454,6 @@
         </sequential>
     </macrodef>
 
-
     <macrodef name="prepare-rank-dataset">
         <attribute name="endpoint-name"/>
 
@@ -1490,8 +1489,6 @@
                         <arg value="-c"/>
                         <arg value="${@{endpoint-name}.cids-file}"/>
                         <arg line="-o ${@{endpoint-name}.validation.dataset-file.ranked} "/>
-
-
                     </java>
                 </else>
             </if>
@@ -1526,13 +1523,9 @@
                         <arg value="-c"/>
                         <arg value="${@{endpoint-name}.cids-file}"/>
                         <arg line="-o ${@{endpoint-name}.dataset-file.ranked} "/>
-
-
                     </java>
                 </else>
             </if>
-
-
         </sequential>
     </macrodef>
 
@@ -1551,6 +1544,7 @@
             </for>
         </sequential>
     </target>
+
     <macrodef name="cross-validation-consensus-features">
         <attribute name="model-conditions"/>
         <attribute name="results-directory"/>
@@ -1592,8 +1586,6 @@
                message="Enter the directory where results are stored (features subdirectory must exist in the results directory)."/>
         <cross-validation-consensus-features model-conditions="${model-conditions}"
                                              results-directory="${results-directory}"/>
-
-
     </target>
     <macrodef name="candidate-model-selections">
 
@@ -1651,8 +1643,6 @@
                 <arg value="@{rank-output-filename}"/>
                 <classpath refid="bdval.classpath"/>
             </java>
-
-
         </sequential>
     </macrodef>
 
@@ -1668,8 +1658,6 @@
         <attribute name="dump" default=""/>
 
         <sequential>
-
-
             <candidate-model-selections
                     cv-results-filename="@{cv-statistics}"
                     cvcf-results-filename="@{cvcf-statistics}"
@@ -1681,8 +1669,6 @@
                     selection-strategy="CV"
                     custom-ranking-set=""
                     validation-results-filename="@{validation-statistics}"/>
-
-
         </sequential>
     </macrodef>
 
@@ -2210,28 +2196,7 @@
             <arg value="${config}/RConnectionPool.xml"/>
         </java>
     </target>
-    <target name="test-full-pipeline" description="Run a complete pipeline">
-        <var name="save-data-dir" value="D:\dev\bdval\data\20090423-1511-results"/>
-        <var name="save-data-tag" value="20090423-1511-results"/>
-        <combine-statistics
-                cv-statistics="@{save-data-dir}/CV.txt"
-                cvcf-statistics="@{save-data-dir}/CVCF.txt"
-                validation-statistics="@{save-data-dir}/validation.txt"
-                output="@{save-data-dir}/CV_CVCF_validation.txt"
-                model-conditions="@{save-data-dir}/model-conditions-column.txt"/>
-        <combine-statistics
-                cv-statistics="@{save-data-dir}/CV.txt"
-                cvcf-statistics="@{save-data-dir}/CVCF.txt"
-                validation-statistics="@{save-data-dir}/validation-direct-method-models.txt"
-                output="@{save-data-dir}/CV_CVCF_validation-direct-method-models.txt"
-                model-conditions="@{save-data-dir}/model-conditions-column.txt"/>
-        <zip-results
-                include-predictions="false"
-                include-split-models="false"
-                include-final-models="true"
-                label="final-models-and-stats"/>
 
-    </target>
     <macrodef name="collect-statistics">
         <attribute name="save-data-dir"/>
         <sequential>
@@ -2318,8 +2283,5 @@
             <collect-statistics
                     save-data-dir="${save-data-dir}"/>
         </sequential>
-
     </target>
-
-
 </project>
