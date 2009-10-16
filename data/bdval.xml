@@ -1845,8 +1845,6 @@
             </concat>
             <delete>
                 <fileset dir="${save-data-dir}">
-
-
                     <include name="*maqcii-submission*.txt"/>
                     <include name="*stats*.txt"/>
                     <exclude name="${save-data-tag}-all-maqcii-submission.txt"/>
@@ -1867,7 +1865,6 @@
             <zip destfile="${bdval.basedir}/${save-data-tag}-@{label}.zip"
                  comment="${ant.project.name} results from ${save-data-tag}">
                 <fileset dir="${bdval.basedir}">
-
                     <exclude name="${save-data-tag}/features/**" unless="include-split-models"/>
                     <exclude name="${save-data-tag}/models/**" unless="include-split-models"/>
                     <exclude name="${save-data-tag}/predictions/**" unless="include-predictions"/>
@@ -1878,6 +1875,7 @@
             </zip>
         </sequential>
     </macrodef>
+
     <target name="zip-results" description="Zip result files">
         <zip-results/>
     </target>
@@ -2046,8 +2044,8 @@
 
     <target name="tag-output-directory">
         <tstamp/>
-        <property name="save-data-dir" location="${bdval-project.basedir}/${DSTAMP}-${TSTAMP}-results/"/>
         <property name="save-data-tag" value="${DSTAMP}-${TSTAMP}-results"/>
+        <property name="save-data-dir" location="${bdval-project.basedir}/${save-data-tag}/"/>
         <mkdir dir="${save-data-dir}"/>
         <echo message="Save tag: ${save-data-tag}"/>
 
