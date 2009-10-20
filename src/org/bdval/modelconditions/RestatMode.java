@@ -43,6 +43,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.HashMap;
 
 /**
  * Calculates statistics from model conditions and a set of results directories.
@@ -56,12 +57,13 @@ public class RestatMode extends ProcessModelConditionsMode {
      * Used to log debug and informational messages.
      */
     private static final Log LOG = LogFactory.getLog(RestatMode.class);
-
     private final MaqciiHelper maqciiHelper = new MaqciiHelper();
     private String survivalFileName;
     private DAVOptions davOptions;
     StatsEvaluationType statsEvalType = StatsEvaluationType.STATS_PER_REPEAT;
     static final ObjectSet<CharSequence> evaluationMeasureNames = new ObjectArraySet<CharSequence>();
+    static double globalMinError;
+    static EvaluationMeasure measure;
 
     static {
         evaluationMeasureNames.addAll(Arrays.asList(org.bdval.Predict.MEASURES));
@@ -83,7 +85,7 @@ public class RestatMode extends ProcessModelConditionsMode {
 
         final Parameter typeOfSplitHandling = new FlaggedOption("aggregation-method")
                 .setStringParser(JSAP.STRING_PARSER)
-                .setDefault("per-repeat")
+                .setDefault("per-test-set")
                 .setRequired(false)
                 .setLongFlag("aggregation-method")
                 .setHelp("Type of aggregation method. Predictions can be aggregated by repeat of cross-validation " +
@@ -119,22 +121,25 @@ public class RestatMode extends ProcessModelConditionsMode {
         maqciiHelper.setupSubmissionFile(jsapResult, davOptions);
     }
 
+  
     @Override
     public void processOneModelId(final ProcessModelConditionsOptions options, final String modelId) {
         //  System.out.println("will process model id:" + modelId);
+
         final PredictedItems predictions = loadPredictions(modelId);
         if (predictions != null) {
             System.out.println("Processing predictions for model id " + modelId);
             davOptions.crossValidationFoldNumber = predictions.getNumberOfFolds();
             davOptions.datasetName = getDatasetName(modelId);
             maqciiHelper.setLabel(constructLabel(modelId));
-            davOptions.seriesModelId= options.modelConditions.get(modelId).get("id-parameter-scan-series");
+            davOptions.seriesModelId = options.modelConditions.get(modelId).get("id-parameter-scan-series");
 
             final int numberOfRepeats = predictions.getNumberOfRepeats();
 
             final EvaluationMeasure repeatedEvaluationMeasure = new EvaluationMeasure();
 
             final List<SurvivalMeasures> survivalMeasuresList = new ArrayList<SurvivalMeasures>();
+
             switch (statsEvalType) {
                 case STATS_PER_REPEAT:
                     evaluatePerformanceMeasurePerRepeat(predictions, null, survivalMeasuresList,
@@ -146,14 +151,91 @@ public class RestatMode extends ProcessModelConditionsMode {
                     break;
             }
 
+            evaluateBias(predictions, survivalFileName, survivalMeasuresList,  numberOfRepeats,
+                                       evaluationMeasureNames, repeatedEvaluationMeasure);
+
             final int numberOfFeatures = predictions.modelNumFeatures();
+
             davOptions.modelId = modelId;
 
             maqciiHelper.printSubmissionHeaders(davOptions, survivalFileName != null);
-
-            maqciiHelper.printSubmissionResults(davOptions, repeatedEvaluationMeasure,
+            maqciiHelper.printSubmissionResults(davOptions, measure,
                     numberOfFeatures, numberOfRepeats, survivalMeasuresList);
         }
+    }
+
+    public static void evaluateBias(final PredictedItems predictions, final String survivalFileName,
+                                      final List<SurvivalMeasures> survivalMeasuresList, final int numberOfRepeats,
+                                      final ObjectSet<CharSequence> evaluationMeasureNames,
+                                      final EvaluationMeasure repeatedEvaluationMeasure) {
+        double totalBias=0.0;
+        double bias=0.0;
+
+        // Collect one evaluation measure per split test set of cross-validation.
+        for (int repeatId = 1; repeatId <= numberOfRepeats; repeatId++) {
+            if (predictions.containsRepeat(repeatId)) {
+                for (final int splitId : predictions.splitIdsForRepeat(repeatId)) {
+                    final DoubleList decisions = new DoubleArrayList();
+                    final DoubleList trueLabels = new DoubleArrayList();
+                    final ObjectList<String> sampleIDs = new ObjectArrayList<String>();
+
+                    decisions.addAll(predictions.getDecisionsForSplit(repeatId, splitId));
+                    trueLabels.addAll(predictions.getTrueLabelsForSplit(repeatId, splitId));
+                    sampleIDs.addAll(predictions.getSampleIDsForSplit(repeatId, splitId));
+
+                    if (decisions.size() == 0) {
+                        LOG.fatal("cannot process empty decision list");
+                        System.exit(10);
+                    }
+                    final EvaluationMeasure allSplitsInARepeatMeasure =
+                            CrossValidation.testSetEvaluation(decisions.toDoubleArray(),
+                                    trueLabels.toDoubleArray(), evaluationMeasureNames, true);
+
+                    double splitError = allSplitsInARepeatMeasure.getErrorRate() / 1000;
+                    globalMinError= Math.min(globalMinError, splitError);
+
+                }
+            }
+
+            for (repeatId = 1; repeatId <= numberOfRepeats; repeatId++) {
+                final int maxSplitId = predictions.getNumberOfSplitsForRepeat(repeatId);
+                if (predictions.containsRepeat(repeatId)) {
+                for (final int splitId : predictions.splitIdsForRepeat(repeatId)) {
+                    final DoubleList decisions = new DoubleArrayList();
+                    final DoubleList trueLabels = new DoubleArrayList();
+                    final ObjectList<String> sampleIDs = new ObjectArrayList<String>();
+
+                    decisions.addAll(predictions.getDecisionsForSplit(repeatId, splitId));
+                    trueLabels.addAll(predictions.getTrueLabelsForSplit(repeatId, splitId));
+                    sampleIDs.addAll(predictions.getSampleIDsForSplit(repeatId, splitId));
+
+                    if (decisions.size() == 0) {
+                        LOG.fatal("cannot process empty decision list");
+                        System.exit(10);
+                    }
+                    final EvaluationMeasure allSplitsInARepeatMeasure =
+                            CrossValidation.testSetEvaluation(decisions.toDoubleArray(),
+                                    trueLabels.toDoubleArray(), evaluationMeasureNames, true);
+
+                    double splitError = allSplitsInARepeatMeasure.getErrorRate() / 1000;
+                    double splitbias=splitError-globalMinError;
+                    totalBias+= splitbias;
+                }
+
+                } 
+                bias= (totalBias/maxSplitId);
+
+                repeatedEvaluationMeasure.addValue("bias ", bias);
+                measure= repeatedEvaluationMeasure;
+
+                System.out.println("bias is "+ bias);
+
+            }
+
+
+        }
+
+
     }
 
     public static void evaluatePerformanceMeasurePerTestSet(final PredictedItems predictions,
@@ -163,10 +245,11 @@ public class RestatMode extends ProcessModelConditionsMode {
                                                             final EvaluationMeasure repeatedEvaluationMeasure) {
 
         // Collect one evaluation measure per split test set of cross-validation.
-
         for (int repeatId = 1; repeatId <= numberOfRepeats; repeatId++) {
             if (predictions.containsRepeat(repeatId)) {
+
                 final int maxSplitId = predictions.getNumberOfSplitsForRepeat(repeatId);
+
                 for (final int splitId : predictions.splitIdsForRepeat(repeatId)) {
                     final DoubleList decisions = new DoubleArrayList();
                     final DoubleList trueLabels = new DoubleArrayList();
@@ -201,9 +284,10 @@ public class RestatMode extends ProcessModelConditionsMode {
         }
     }
 
-    public static void evaluatePerformanceMeasurePerRepeat(
-            final PredictedItems predictions, final String survivalFileName, final List<SurvivalMeasures> survivalMeasuresList,
-            final int numberOfRepeats, final ObjectSet<CharSequence> evaluationMeasureNames, final EvaluationMeasure repeatedEvaluationMeasure) {
+    public static void evaluatePerformanceMeasurePerRepeat(final PredictedItems predictions,
+                                                           final String survivalFileName, final List<SurvivalMeasures> survivalMeasuresList,
+                                                           final int numberOfRepeats, final ObjectSet<CharSequence> evaluationMeasureNames,
+                                                           final EvaluationMeasure repeatedEvaluationMeasure) {
         for (int repeatId = 1; repeatId <= numberOfRepeats; repeatId++) {
             if (predictions.containsRepeat(repeatId)) {
                 final DoubleList decisions = new DoubleArrayList();
@@ -239,6 +323,7 @@ public class RestatMode extends ProcessModelConditionsMode {
         for (final CharSequence measure : Predict.MEASURES) {
             repeatedEvaluationMeasure.addValue(measure,
                     allSplitsInARepeatMeasure.getPerformanceValueAverage(measure.toString()));
+
             final String binaryName = ("binary-" + measure).intern();
             repeatedEvaluationMeasure.addValue(binaryName,
                     allSplitsInARepeatMeasure.getPerformanceValueAverage(binaryName));
