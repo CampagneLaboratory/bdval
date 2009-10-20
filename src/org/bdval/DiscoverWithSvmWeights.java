@@ -49,7 +49,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class DiscoverWithSvmWeights extends DAVMode {
     private static final Log LOG = LogFactory.getLog(DiscoverWithSvmWeights.class);
-
+     private int maxProbesToReport;
     @Override
     public void interpretArguments(final JSAP jsap, final JSAPResult result,
                                    final DAVOptions options) {
@@ -58,6 +58,11 @@ public class DiscoverWithSvmWeights extends DAVMode {
         numProbesets = result.getInt("num-features");
         writeGeneListFormat = result.getBoolean("output-gene-list");
         reporter = new FeatureReporting(writeGeneListFormat);
+        if (result.contains("report-max-probes")) {
+            maxProbesToReport = result.getInt("report-max-probes");
+            LOG.info("Output will be restricted to the " + maxProbesToReport
+                    + " probesets with larger fold change.");
+        }
     }
 
     /**
@@ -69,8 +74,8 @@ public class DiscoverWithSvmWeights extends DAVMode {
     public void defineOptions(final JSAP jsap) throws JSAPException {
         final Parameter numFeatureParam = new FlaggedOption("num-features")
                 .setStringParser(JSAP.INTEGER_PARSER)
-                .setDefault("50")
-                .setRequired(true)
+                .setDefault("400")
+                .setRequired(false)
                 .setLongFlag("num-features")
                 .setShortFlag('n')
                 .setHelp("Number of features to select.");
@@ -80,6 +85,13 @@ public class DiscoverWithSvmWeights extends DAVMode {
                 .setLongFlag("output-gene-list")
                 .setHelp("Write features to the output in the tissueinfo gene list format.");
         jsap.registerParameter(outputGeneList);
+
+        final Parameter reportMaxProbes = new FlaggedOption("report-max-probes")
+                .setStringParser(JSAP.INTEGER_PARSER)
+                .setLongFlag("report-max-probes")
+                .setHelp("Restrict output to the top ranked probes. This option works in "
+                        + "conjunction with the num-features and can further restrict the output.");
+        jsap.registerParameter(reportMaxProbes);
     }
 
     int numProbesets = 50;
@@ -96,6 +108,10 @@ public class DiscoverWithSvmWeights extends DAVMode {
             for (final GeneList geneList : options.geneLists) {
 
                 try {
+                    // force the classifier to be libSVM, irrespective of the command line:
+                    options.classifierParameters=new String[0];
+                    options.classiferClass=edu.cornell.med.icb.learning.libsvm.LibSvmClassifier.class;
+
                     System.out.println(
                             "Discover markers with SVM weights for " + task);
                     final Table processedTable =
@@ -113,6 +129,7 @@ public class DiscoverWithSvmWeights extends DAVMode {
                     timer.stop();
 
                     LOG.info("trained model in " + timer.seconds() + " seconds");
+
                     final double[] weights = LibSvmUtils.calculateWeights(((LibSvmModel) model).getNativeModel());
                     final ScoredTranscriptBoundedSizeQueue queue =
                             new ScoredTranscriptBoundedSizeQueue(numProbesets);
