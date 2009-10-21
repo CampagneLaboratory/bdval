@@ -16,7 +16,7 @@ BDVAL_DATA=${BDVAL_DIR}/data
 
 JOB=$1
 JOB_TAG=${JOB}-$$
-JOB_DIR=$(readlink -f $JOB_TAG) 
+JOB_DIR=$(readlink -f .)/${JOB_TAG}
 JOB_CONFIG=${JOB_DIR}/config
 JOB_DATA=${JOB_DIR}/data
 
