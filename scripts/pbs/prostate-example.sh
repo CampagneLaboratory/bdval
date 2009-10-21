@@ -55,7 +55,7 @@ do
   echo $node
   echo "============="
 
-  ls -l /tmp/foobar.jar
+  ls -lR /tmp
 
   ssh $node "java -jar /home/marko/RUtils/icb-rutils.jar --port 6311 --validate"
   ssh $node "java -jar /home/marko/RUtils/icb-rutils.jar --port 6312 --validate"
