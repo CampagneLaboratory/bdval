@@ -159,7 +159,7 @@ do
 done
 
 # launch bdval on each node
-pbsdsh -v \$TMPDIR/\$JOB_TAG/bdval-pbs.sh
+pbsdsh -v \$TMPDIR/$JOB_TAG/bdval-pbs.sh
 
 # Just double checking stuff here
 for node in \`sort \$PBS_NODEFILE | uniq\`
