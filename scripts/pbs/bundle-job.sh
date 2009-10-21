@@ -1,5 +1,10 @@
 #!/bin/sh -fx
 
+#
+# Script to bundle BDVAL and required data into a
+# suitable format for submission to a PBS queue
+#
+
 if [ -z $1 ]; then
     echo "Job name is required"
     exit 1
@@ -10,25 +15,38 @@ SCRIPT=$(readlink -f $0)
 # Absolute path this script is in.
 SCRIPT_DIR=`dirname $SCRIPT`
 
+# Local bdval locations
 BDVAL_DIR=${BDVAL_DIR:-$SCRIPT_DIR/../..}
-BDVAL_CONFIG=${BDVAL_DIR}/config
-BDVAL_DATA=${BDVAL_DIR}/data
+BDVAL_CONFIG_DIR=${BDVAL_DIR}/config
+BDVAL_DATA_DIR=${BDVAL_DIR}/data
+
+if [ ! -e ${BDVAL_DIR}/bdval.jar ]; then
+    echo "bdval.jar not found!"
+    exit 2
+fi
 
 JOB=$1
 JOB_TAG=${JOB}-$$
 JOB_DIR=$(readlink -f .)/${JOB_TAG}
-JOB_CONFIG=${JOB_DIR}/config
-JOB_DATA=${JOB_DIR}/data
+JOB_CONFIG_DIR=${JOB_DIR}/config
+JOB_DATA_DIR=${JOB_DIR}/data
 
-#. ${JOB}-pbs-env.sh
+if [ ! -e ${JOB}-pbs-env.sh ]; then
+    echo "${JOB}-pbs-env.sh not found!"
+    exit 3
+fi
 
-/bin/mkdir -p ${JOB_DIR} ${JOB_CONFIG} ${JOB_DATA}
-/bin/cp ${BDVAL_DIR}/bdval.jar ${JOB_DIR}
-/bin/cp -r ${BDVAL_DIR}/buildsupport ${JOB_DIR}
-/bin/cp ${SCRIPT_DIR}/start-rserve.sh ${JOB_DIR}
+. ${JOB}-pbs-env.sh
+
+# Bundle the files required for the job submission
+/bin/mkdir -p ${JOB_DIR} ${JOB_CONFIG_DIR} ${JOB_DATA_DIR}
+/bin/cp -p ${SCRIPT_DIR}/start-rserve.sh ${JOB_DIR}
+/bin/cp -p ${BDVAL_DIR}/bdval.jar ${JOB_DIR}
+/bin/cp -pr ${BDVAL_DIR}/buildsupport ${JOB_DIR}
+/bin/cp -p ${BDVAL_DATA_DIR}/bdval.xml ${BDVAL_DATA_DIR}/${JOB}.xml ${BDVAL_DATA_DIR}/${JOB}.properties ${JOB_DATA_DIR}
 
 #
-# Tell bdval not to try and compile
+# Tell bdval not to try and compile when running
 #
 cat > ${JOB_DIR}/bdval.properties <<EOF
 use-bdval-jar=true
@@ -38,7 +56,7 @@ EOF
 #
 # Two instances of Rserve per node
 #
-cat > ${JOB_CONFIG}/RConnectionPool.xml <<EOF
+cat > ${JOB_CONFIG_DIR}/RConnectionPool.xml <<EOF
 <RConnectionPool>
    <RConfiguration>
       <RServer host="localhost" port="6311"/>
@@ -50,11 +68,20 @@ EOF
 #
 # Two threads per node
 #
-cat > ${JOB_CONFIG}/${JOB}-local.properties <<EOF
+cat > ${JOB_CONFIG_DIR}/${JOB}-local.properties <<EOF
 eval-dataset-root=bdval/GSE8402
 computer.type=server
 server.thread-number=2
 server.memory=-Xmx2000m
+EOF
+
+#
+# Create the actual job script that will launch bdval
+#
+cat > ${JOB_DIR}/bdval-pbs.sh <<EOF
+#!/bin/sh
+. /etc/profile
+ant -Dsave-data-tag=foo -Dtag-description="hi mom" -f ${JOB}.xml
 EOF
 
 #
@@ -64,16 +91,13 @@ cat > ${JOB_TAG}.qsub <<EOF
 #/bin/sh -x
 
 # Determines the queue a job is submitted to
-#PBS -q normal
+#PBS -q $PBS_QUEUE
 
 # Combine PBS error and output files.
 #PBS -j oe
 
 # Number of nodes (exclusive access)
 #PBS -l nodes=2#excl
-
-# Requred files on each node
-#PBS -W stagein=/tmp/${JOB_TAG}@master01:${JOB_DIR}
 
 # Mail job status at completion
 #PBS -m ae
@@ -86,7 +110,7 @@ cat > ${JOB_TAG}.qsub <<EOF
 #
 echo ------------------------------------------------------
 echo Job is running on the following nodes:
-cat $PBS_NODEFILE
+cat \$PBS_NODEFILE
 echo ------------------------------------------------------
 echo PBS: qsub is running on \$PBS_O_HOST
 echo PBS: originating queue is \$PBS_O_QUEUE
@@ -100,22 +124,26 @@ echo PBS: current home directory is \$PBS_O_HOME
 echo PBS: PATH = \$PBS_O_PATH
 echo ------------------------------------------------------
 
-printenv | sort
+# Copy needed files from master node to each worker
+for node in \`sort \$PBS_NODEFILE | uniq\`
+do
+  echo "=============================================="
+  echo "Copying files to \$node"
+  echo "=============================================="
+  scp -pr @master01:$JOB_DIR @\$node:\$TMPDIR
+done
 
 #
 # Start instances of Rserve on each node in the cluster
 #
-pbsdsh -v /tmp/${JOB_TAG}/start-rserve.sh 6311
-pbsdsh -v /tmp/${JOB_TAG}/start-rserve.sh 6312
+echo "=============================================="
+echo "Starting Rserve instances"
+echo "=============================================="
+pbsdsh -v \$TMPDIR/$JOB_TAG/start-rserve.sh 6311
+pbsdsh -v \$TMPDIR/$JOB_TAG/start-rserve.sh 6312
 
-# Just double checking stuff here
 for node in \`sort \$PBS_NODEFILE | uniq\`
 do
-  echo \$node
-  echo "============="
-
-  ls -lR /tmp
-
   ssh \$node "java -jar /home/marko/RUtils/icb-rutils.jar --port 6311 --validate"
   ssh \$node "java -jar /home/marko/RUtils/icb-rutils.jar --port 6312 --validate"
 
@@ -123,7 +151,7 @@ do
 done
 
 # TODO - launch bdval here
-pbsdsh -v /home/marko/bdval/scripts/pbs/bdval-pbs.sh
+#pbsdsh -v /home/marko/bdval/scripts/pbs/bdval-pbs.sh
 
 # Just double checking stuff here
 for node in \`sort \$PBS_NODEFILE | uniq\`
@@ -131,6 +159,7 @@ do
   ssh \$node "ls -R /tmp"
 done
 
+# TODO - copy stuff back here
 EOF
 
 echo "Job tag is $JOB_TAG"

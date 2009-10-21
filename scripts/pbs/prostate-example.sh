@@ -13,9 +13,6 @@
 # Number of nodes (exclusive access)
 #PBS -l nodes=2#excl
 
-# Requred files on each node
-#PBS -W stagein=/tmp/foobar.jar@master01:/home/marko/bdval/bdval.jar
-
 # Mail job status at completion
 #PBS -m ae
 
@@ -41,22 +38,26 @@ echo PBS: current home directory is $PBS_O_HOME
 echo PBS: PATH = $PBS_O_PATH
 echo ------------------------------------------------------
 
-printenv | sort
+# Copy needed files from master node to each worker
+for node in `sort $PBS_NODEFILE | uniq`
+do
+  echo "=============================================="
+  echo "Copying files to $node"
+  echo "=============================================="
+  scp -pr @master01:/home/marko/bdval/scripts/pbs/foo-8384 @$node:$TMPDIR
+done
 
 #
 # Start instances of Rserve on each node in the cluster
 #
-pbsdsh -v /home/marko/bdval/scripts/pbs/start-rserve.sh 6311
-pbsdsh -v /home/marko/bdval/scripts/pbs/start-rserve.sh 6312
+echo "=============================================="
+echo "Starting Rserve instances"
+echo "=============================================="
+pbsdsh -v $TMPDIR/foo-8384/start-rserve.sh 6311
+pbsdsh -v $TMPDIR/foo-8384/start-rserve.sh 6312
 
-# Just double checking stuff here
 for node in `sort $PBS_NODEFILE | uniq`
 do
-  echo $node
-  echo "============="
-
-  ls -lR /tmp
-
   ssh $node "java -jar /home/marko/RUtils/icb-rutils.jar --port 6311 --validate"
   ssh $node "java -jar /home/marko/RUtils/icb-rutils.jar --port 6312 --validate"
 
@@ -64,10 +65,10 @@ do
 done
 
 # TODO - launch bdval here
-pbsdsh -v /home/marko/bdval/scripts/pbs/bdval-pbs.sh
+#pbsdsh -v /home/marko/bdval/scripts/pbs/bdval-pbs.sh
 
 # Just double checking stuff here
 for node in `sort $PBS_NODEFILE | uniq`
 do
-  ssh $node "ls -R /tmp
+  ssh $node "ls -R /tmp"
 done
