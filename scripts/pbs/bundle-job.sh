@@ -81,6 +81,13 @@ EOF
 cat > ${JOB_DIR}/bdval-pbs.sh <<EOF
 #!/bin/sh
 . /etc/profile
+
+# Absolute path to this script.
+SCRIPT=\$(readlink -f \$0)
+# Absolute path this script is in.
+SCRIPT_DIR=\`dirname \$SCRIPT\`
+
+cd \$SCRIPT_DIR/data
 ant -Dsave-data-tag=foo -Dtag-description="hi mom" -f ${JOB}.xml
 EOF
 
@@ -142,6 +149,7 @@ echo "=============================================="
 pbsdsh -v \$TMPDIR/$JOB_TAG/start-rserve.sh 6311
 pbsdsh -v \$TMPDIR/$JOB_TAG/start-rserve.sh 6312
 
+# TODO - remove this block it's just for testing
 for node in \`sort \$PBS_NODEFILE | uniq\`
 do
   ssh \$node "java -jar /home/marko/RUtils/icb-rutils.jar --port 6311 --validate"
@@ -150,8 +158,8 @@ do
   ssh \$node "ps -elf | grep \$USER"
 done
 
-# TODO - launch bdval here
-#pbsdsh -v /home/marko/bdval/scripts/pbs/bdval-pbs.sh
+# launch bdval on each node
+pbsdsh -v \$TMPDIR/\$JOB_TAG/bdval-pbs.sh
 
 # Just double checking stuff here
 for node in \`sort \$PBS_NODEFILE | uniq\`
