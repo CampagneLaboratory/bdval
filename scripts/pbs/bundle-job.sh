@@ -31,6 +31,8 @@ JOB_DIR=$(readlink -f .)/${JOB_TAG}
 JOB_CONFIG_DIR=${JOB_DIR}/config
 JOB_DATA_DIR=${JOB_DIR}/data
 
+JOB_RESULTS_DIR=${JOB_RESULTS_DIR:-$JOB_DIR/results}
+
 if [ ! -e ${JOB}-pbs-env.sh ]; then
     echo "${JOB}-pbs-env.sh not found!"
     exit 3
@@ -39,7 +41,7 @@ fi
 . ${JOB}-pbs-env.sh
 
 # Bundle the files required for the job submission
-/bin/mkdir -p ${JOB_DIR} ${JOB_CONFIG_DIR} ${JOB_DATA_DIR}
+/bin/mkdir -p ${JOB_DIR} ${JOB_CONFIG_DIR} ${JOB_DATA_DIR} ${JOB_RESULTS_DIR}
 /bin/cp -p ${SCRIPT_DIR}/start-rserve.sh ${JOB_DIR}
 /bin/cp -p ${BDVAL_DIR}/bdval.jar ${JOB_DIR}
 /bin/cp -pr ${BDVAL_DIR}/buildsupport ${JOB_DIR}
@@ -94,8 +96,14 @@ SCRIPT=\$(readlink -f \$0)
 # Absolute path this script is in.
 SCRIPT_DIR=\`dirname \$SCRIPT\`
 
+# Run bdval job
 cd \$SCRIPT_DIR/data
-ant -verbose -Dsave-data-tag=foo -Dtag-description="hi mom" -f ${JOB}.xml
+ant -Dsave-data-tag="${SAVE_DATA_TAG}" -Dtag-description="${TAG_DESCRIPTION}" -f ${JOB}.xml ${ANT_TARGET}
+
+# Copy results back to the master node when we are done
+RESULTS_DIR=${JOB_RESULTS_DIR}/\${HOSTNAME}
+ssh master01 "/bin/mkdir -p \${RESULTS_DIR}"
+scp -r *.zip logs @master01:\${RESULTS_DIR}
 EOF
 
 chmod u+x ${JOB_DIR}/bdval-pbs.sh
@@ -119,7 +127,7 @@ cat > ${JOB_TAG}.qsub <<EOF
 #PBS -m ae
 
 # Mail to user specified
-#PBS -M mas2062@med.cornell.edu
+#PBS -M $MAILTO
 
 #
 # Output some useful job information
@@ -158,7 +166,7 @@ echo "=============================================="
 pbsdsh -v \$TMPDIR/$JOB_TAG/start-rserve.sh 6311
 pbsdsh -v \$TMPDIR/$JOB_TAG/start-rserve.sh 6312
 
-# TODO - remove this block it's just for testing
+# TODO - remove this block it's just for testing (bdval will do this anyway)
 for node in \`sort \$PBS_NODEFILE | uniq\`
 do
   ssh \$node "java -jar /home/marko/RUtils/icb-rutils.jar --port 6311 --validate"
@@ -170,13 +178,10 @@ done
 # launch bdval on each node
 pbsdsh -v \$TMPDIR/$JOB_TAG/bdval-pbs.sh
 
-# Just double checking stuff here
+# TODO - remove this block - just double checking stuff here
 for node in \`sort \$PBS_NODEFILE | uniq\`
 do
   ssh \$node "ls -R /tmp"
 done
-
-# TODO - copy stuff back here
-EOF
 
 echo "Job tag is $JOB_TAG"
