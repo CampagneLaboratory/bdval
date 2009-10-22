@@ -94,9 +94,18 @@ public class ProcessModelConditionsMode extends edu.cornell.med.icb.cli.UseModal
         this.options = options;
 
         for (String modelId : options.modelConditions.keySet()) {
-            processOneModelId(options, modelId);
+            processOneModelIdPassOne(options, modelId);
+        }
+
+        for (String modelId : options.modelConditions.keySet()) {
+            //processOneModelIdPassOne(options, modelId);
+            processOneModelIdPassTwo(options, modelId);
+
         }
     }
+
+    public void processOneModelIdPassTwo(ProcessModelConditionsOptions options, String modelId) {
+     }
 
     /**
      * This method is called to process one model id.
@@ -104,7 +113,7 @@ public class ProcessModelConditionsMode extends edu.cornell.med.icb.cli.UseModal
      *
      * @param modelId
      */
-    public void processOneModelId(ProcessModelConditionsOptions options, String modelId) {
+    public void processOneModelIdPassOne(ProcessModelConditionsOptions options, String modelId) {
     }
 
     /**
