@@ -44,6 +44,13 @@ fi
 /bin/cp -p ${BDVAL_DIR}/bdval.jar ${JOB_DIR}
 /bin/cp -pr ${BDVAL_DIR}/buildsupport ${JOB_DIR}
 /bin/cp -p ${BDVAL_DATA_DIR}/bdval.xml ${BDVAL_DATA_DIR}/${JOB}.xml ${BDVAL_DATA_DIR}/${JOB}.properties ${JOB_DATA_DIR}
+/bin/cp -pr ${BDVAL_DATA_DIR}/sequences ${BDVAL_DATA_DIR}/gene-lists ${JOB_DATA_DIR}
+/bin/cp -pr ${DATASET_ROOT} ${JOB_DATA_DIR}/${JOB}-data
+
+if [ -e ${BDVAL_CONFIG_DIR}/log4j.properties ]; then
+    /bin/cp -p ${BDVAL_CONFIG_DIR}/log4j.properties ${JOB_CONFIG_DIR}
+fi
+
 
 #
 # Tell bdval not to try and compile when running
@@ -69,7 +76,7 @@ EOF
 # Two threads per node
 #
 cat > ${JOB_CONFIG_DIR}/${JOB}-local.properties <<EOF
-eval-dataset-root=bdval/GSE8402
+eval-dataset-root=${JOB}-data
 computer.type=server
 server.thread-number=2
 server.memory=-Xmx2000m
@@ -88,7 +95,7 @@ SCRIPT=\$(readlink -f \$0)
 SCRIPT_DIR=\`dirname \$SCRIPT\`
 
 cd \$SCRIPT_DIR/data
-ant -Dsave-data-tag=foo -Dtag-description="hi mom" -f ${JOB}.xml
+ant -verbose -Dsave-data-tag=foo -Dtag-description="hi mom" -f ${JOB}.xml
 EOF
 
 chmod u+x ${JOB_DIR}/bdval-pbs.sh
