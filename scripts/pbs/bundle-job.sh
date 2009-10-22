@@ -48,7 +48,7 @@ fi
 #
 # Tell bdval not to try and compile when running
 #
-cat > ${JOB_DIR}/bdval.properties <<EOF
+cat > ${JOB_CONFIG_DIR}/bdval.properties <<EOF
 use-bdval-jar=true
 nocompile=true
 EOF
@@ -91,6 +91,8 @@ cd \$SCRIPT_DIR/data
 ant -Dsave-data-tag=foo -Dtag-description="hi mom" -f ${JOB}.xml
 EOF
 
+chmod u+x ${JOB_DIR}/bdval-pbs.sh
+
 #
 # Create the job submission script
 #
@@ -104,7 +106,7 @@ cat > ${JOB_TAG}.qsub <<EOF
 #PBS -j oe
 
 # Number of nodes (exclusive access)
-#PBS -l nodes=2#excl
+#PBS -l nodes=1#excl
 
 # Mail job status at completion
 #PBS -m ae
