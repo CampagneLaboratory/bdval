@@ -48,7 +48,7 @@ fi
 #
 # Tell bdval not to try and compile when running
 #
-cat > ${JOB_CONFIG_DIR}/bdval.properties <<EOF
+cat > ${JOB_DATA_DIR}/bdval.properties <<EOF
 use-bdval-jar=true
 nocompile=true
 EOF
