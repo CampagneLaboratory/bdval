@@ -1,4 +1,4 @@
-#!/bin/sh -fx
+#!/bin/sh -f
 
 #
 # Script to bundle BDVAL and required data into a
@@ -25,8 +25,12 @@ if [ ! -e ${BDVAL_DIR}/bdval.jar ]; then
     exit 2
 fi
 
+# The job name identifies which scipts to pull in
 JOB=$1
-JOB_TAG=${JOB}-$$
+
+# Create a somewhat unique tag but limit it to 15 characters (PBS name limit)
+PID=$$
+JOB_TAG=${JOB:0:15-${#PID}}$PID
 JOB_DIR=$(readlink -f .)/${JOB_TAG}
 JOB_CONFIG_DIR=${JOB_DIR}/config
 JOB_DATA_DIR=${JOB_DIR}/data
@@ -39,6 +43,8 @@ if [ ! -e ${JOB}-pbs-env.sh ]; then
 fi
 
 . ${JOB}-pbs-env.sh
+
+echo "Bundling job submission files"
 
 # Bundle the files required for the job submission
 /bin/mkdir -p ${JOB_DIR} ${JOB_CONFIG_DIR} ${JOB_DATA_DIR} ${JOB_RESULTS_DIR}
@@ -53,6 +59,7 @@ if [ -e ${BDVAL_CONFIG_DIR}/log4j.properties ]; then
     /bin/cp -p ${BDVAL_CONFIG_DIR}/log4j.properties ${JOB_CONFIG_DIR}
 fi
 
+echo "Creating submission script"
 
 #
 # Tell bdval not to try and compile when running
@@ -115,13 +122,19 @@ cat > ${JOB_TAG}.qsub <<EOF
 #/bin/sh -x
 
 # Determines the queue a job is submitted to
-#PBS -q $PBS_QUEUE
+#PBS -q ${PBS_QUEUE}
+
+# Name of the job
+#PBS -N ${JOB_TAG}
 
 # Combine PBS error and output files.
 #PBS -j oe
 
+# Save PBS output to the result directory
+#PBS -o ${RESULTS_DIR}/${JOB_TAG}.log
+
 # Number of nodes (exclusive access)
-#PBS -l nodes=1#excl
+#PBS -l nodes=$PBS_NODES#excl
 
 # Mail job status at completion
 #PBS -m ae
@@ -183,5 +196,10 @@ for node in \`sort \$PBS_NODEFILE | uniq\`
 do
   ssh \$node "ls -R /tmp"
 done
+EOF
 
+echo
 echo "Job tag is $JOB_TAG"
+echo "Submit the job by executing \"qsub $JOB_TAG.qsub\""
+echo "Once submitted check status with \"qstat -fnu $USER\""
+echo "Results will placed in ${RESULTS_DIR}"
