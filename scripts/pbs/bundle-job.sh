@@ -108,9 +108,9 @@ cd \$SCRIPT_DIR/data
 ant -Dsave-data-tag="${SAVE_DATA_TAG}" -Dtag-description="${TAG_DESCRIPTION}" -f ${JOB}.xml ${ANT_TARGET}
 
 # Copy results back to the master node when we are done
-RESULTS_DIR=${JOB_RESULTS_DIR}/\${HOSTNAME}
-ssh master01 "/bin/mkdir -p \${RESULTS_DIR}"
-scp -r *.zip logs @master01:\${RESULTS_DIR}
+JOB_RESULTS_DIR=${JOB_RESULTS_DIR}/\${HOSTNAME}
+ssh master01 "/bin/mkdir -p \${JOB_RESULTS_DIR}"
+scp -r *.zip logs @master01:\${JOB_RESULTS_DIR}
 EOF
 
 chmod u+x ${JOB_DIR}/bdval-pbs.sh
@@ -131,7 +131,7 @@ cat > ${JOB_TAG}.qsub <<EOF
 #PBS -j oe
 
 # Save PBS output to the result directory
-#PBS -o ${RESULTS_DIR}/${JOB_TAG}.log
+#PBS -o ${JOB_RESULTS_DIR}/${JOB_TAG}.log
 
 # Number of nodes (exclusive access)
 #PBS -l nodes=$PBS_NODES#excl
@@ -202,4 +202,4 @@ echo
 echo "Job tag is $JOB_TAG"
 echo "Submit the job by executing \"qsub $JOB_TAG.qsub\""
 echo "Once submitted check status with \"qstat -fnu $USER\""
-echo "Results will placed in ${RESULTS_DIR}"
+echo "Results will placed in ${JOB_RESULTS_DIR}"
