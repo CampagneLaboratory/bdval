@@ -50,7 +50,7 @@ PBS_NODES=${PBS_NODES:-1}
 echo "Bundling job submission files"
 
 # Bundle the files required for the job submission
-/bin/mkdir -p ${JOB_DIR} ${JOB_CONFIG_DIR} ${JOB_DATA_DIR} ${JOB_RESULTS_DIR}
+/bin/mkdir -p ${JOB_DIR} ${JOB_CONFIG_DIR} ${JOB_DATA_DIR}
 /bin/cp -p ${SCRIPT_DIR}/start-rserve.sh ${JOB_DIR}
 /bin/cp -p ${BDVAL_DIR}/bdval.jar ${JOB_DIR}
 /bin/cp -pr ${BDVAL_DIR}/buildsupport ${JOB_DIR}
