@@ -44,6 +44,9 @@ fi
 
 . ${JOB}-pbs-env.sh
 
+PBS_QUEUE=${PBS_QUEUE:-"normal"}
+PBS_NODES=${PBS_NODES:-1}
+
 echo "Bundling job submission files"
 
 # Bundle the files required for the job submission
