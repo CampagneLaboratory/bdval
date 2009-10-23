@@ -35,7 +35,7 @@ JOB_DIR=$(readlink -f .)/${JOB_TAG}
 JOB_CONFIG_DIR=${JOB_DIR}/config
 JOB_DATA_DIR=${JOB_DIR}/data
 
-JOB_RESULTS_DIR=${JOB_RESULTS_DIR:-$JOB_DIR/results}
+JOB_RESULTS_DIR=${JOB_RESULTS_DIR:-$(readlink -f .)/${JOB_TAG}-results}
 
 if [ ! -e ${JOB}-pbs-env.sh ]; then
     echo "${JOB}-pbs-env.sh not found!"
@@ -82,13 +82,18 @@ cat > ${JOB_CONFIG_DIR}/RConnectionPool.xml <<EOF
 EOF
 
 #
-# Two threads per node
+# Two threads per node, memory size depends on node type
 #
+if [ "$PBS_QUEUE" = "fat" ]; then
+    SERVER_MEMORY="8g"
+else
+    SERVER_MEMORY="2g"
+fi
 cat > ${JOB_CONFIG_DIR}/${JOB}-local.properties <<EOF
 eval-dataset-root=${JOB}-data
 computer.type=server
 server.thread-number=2
-server.memory=-Xmx2000m
+server.memory=-Xmx${SERVER_MEMORY}
 EOF
 
 #
