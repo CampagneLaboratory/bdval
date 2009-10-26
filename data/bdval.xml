@@ -198,7 +198,6 @@
                         </else>
                     </if>
                 </then>
-
                 <else>
                     <var name="gene-list-argument" value="--gene-lists @{gene-list}"/>
                 </else>
@@ -601,7 +600,6 @@
         <attribute name="weka-class"/>
         <attribute name="survival-file" default="-"/>
         <sequential>
-
             <execute-splits feature-selection-fold="true"
                             sequence-file="ttest-weka-classifier-fs=true.sequence"
                             endpoint-name="@{endpoint-name}"
@@ -688,7 +686,6 @@
         <attribute name="endpoint-specific-genelist-names"
                    default="Merged HM200 NC01-2000 GDS1070 GDS183 GDS232 NuttAO NuttGBM POMEROY-0 POMEROY-1 POMEROY-2 POMEROY-3 POMEROY-4 POMEROY-400 Rhodes2004 "/>
 
-
         <sequential>
             <!-- define survival file, with default value of "-" -->
             <var name="survival-file" value="-"/>
@@ -711,13 +708,17 @@
                            rserve-port="@{rserve-port}"
                            floor-param="@{floor-param}"
                            array-params="@{array-params}"/>
+
+            <if>
+                <not>
+                    <istrue value="${define-splits-only}"/>
+                </not>
+            <then>
             <if>
                 <istrue value="${do.weka-feature-selection-scan}"/>
                 <then>
-
                     <for param="feature-selection-mode" delimiter=" " list="t-test fold-change min-max svm-weights">
                         <sequential>
-
                             <for param="weka-class" delimiter=" "
                                  list="weka.classifiers.lazy.KStar weka.classifiers.trees.RandomForest weka.classifiers.functions.Logistic weka.classifiers.bayes.NaiveBayesUpdateable weka.classifiers.meta.LogitBoost">
                                 <sequential>
@@ -747,7 +748,6 @@
                         </sequential>
                     </for>
                 </then>
-
             </if>
             <if>
                 <istrue value="${do.FC+P.logitboost}"/>
@@ -763,7 +763,6 @@
                 </then>
             </if>
             <if>
-
                 <istrue value="${do.naive-bayes}"/>
                 <then>
                     <do-weka
@@ -1194,6 +1193,8 @@
 
                 </then>
             </if>
+            </then>
+            </if>
         </sequential>
     </macrodef>
 
@@ -1588,7 +1589,6 @@
                                              results-directory="${results-directory}"/>
     </target>
     <macrodef name="candidate-model-selections">
-
         <attribute name="model-ids"
                    default="--model-ids-map-file C:\home\maqcii\dev-maqcii\results\Sept-17-2008\official-submission-May-5-2008\ModelId-Mapping-Info.txt"/>
         <attribute name="cv-results-filename"/>
