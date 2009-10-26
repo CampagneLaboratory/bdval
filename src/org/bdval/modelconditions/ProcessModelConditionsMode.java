@@ -87,25 +87,26 @@ public class ProcessModelConditionsMode extends edu.cornell.med.icb.cli.UseModal
             System.setProperty("RConnectionPool.configuration", "config/RconnectionPool.xml");
             LOG.info("Will use the default location config/RconnectionPool.xml. Specify alternative location with -DRConnectionPool.configuration=<path>");
         }
-       
+
     }
 
     public void process(ProcessModelConditionsOptions options) {
         this.options = options;
 
         for (String modelId : options.modelConditions.keySet()) {
-            processOneModelIdPassOne(options, modelId);
-        }
-
-        for (String modelId : options.modelConditions.keySet()) {
-            //processOneModelIdPassOne(options, modelId);
-            processOneModelIdPassTwo(options, modelId);
-
+            processSeries(options, modelId);
         }
     }
 
-    public void processOneModelIdPassTwo(ProcessModelConditionsOptions options, String modelId) {
-     }
+    /**
+     * Method to process a series
+     *
+     * @param options
+     * @param modelId
+     */
+    public void processSeries(ProcessModelConditionsOptions options, String modelId) {
+    }
+
 
     /**
      * This method is called to process one model id.
@@ -115,6 +116,17 @@ public class ProcessModelConditionsMode extends edu.cornell.med.icb.cli.UseModal
      */
     public void processOneModelIdPassOne(ProcessModelConditionsOptions options, String modelId) {
     }
+
+    /**
+     * This method is called to process one model id.
+     * Details about the model id are available through the options:
+     *
+     * @param modelId
+     */
+
+    public void processOneModelIdPassTwo(ProcessModelConditionsOptions options, String modelId) {
+    }
+
 
     /**
      * Read the model conditions file into a map of model id's to model conditions values.
@@ -265,7 +277,7 @@ public class ProcessModelConditionsMode extends edu.cornell.med.icb.cli.UseModal
         String classifierParameters = options.modelConditions.get(modelId).get("classifier-parameters");
         int removeThat = classifierParameters.lastIndexOf(",wekaClass");
         if (removeThat == -1) removeThat = classifierParameters.length();
-        String parameters = classifierParameters.substring(0, removeThat);        
+        String parameters = classifierParameters.substring(0, removeThat);
         return classifierType + '-' + featureSelection + '-' + parameters;
     }
 

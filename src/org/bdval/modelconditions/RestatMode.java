@@ -116,20 +116,128 @@ public class RestatMode extends ProcessModelConditionsMode {
         maqciiHelper.setupSubmissionFile(jsapResult, davOptions);
     }
 
+
+    ArrayList<String> series = new ArrayList(); // list of series that have been processed
     EvaluationMeasure repeatedEvaluationMeasure = new EvaluationMeasure();
     PredictedItems predictions;
     int numberOfRepeats;
     final List<SurvivalMeasures> survivalMeasuresList = new ArrayList<SurvivalMeasures>();
-    Map<String, EvaluationMeasure> map = new HashMap();
+    static Map<String, double[]> acrossAllFoldsMap = new HashMap<String, double[]>();
+    int numberOfFeatures = 0;
+    static int numberOfFolds = 0;
 
     @Override
-    public void processOneModelIdPassOne(final ProcessModelConditionsOptions options, final String modelId) {
+    public void processSeries(ProcessModelConditionsOptions options, String modelId) {
+
+        // group together models that are in the same series?
+        String seriesID = options.modelConditions.get(modelId).get("id-parameter-scan-series");
+        if (!(series.contains(seriesID))) {//checks whether a series has been processed before preceding
+            series.add(seriesID);
+            ArrayList<String> models = extractSeriesModelIds(options, seriesID);
+
+
+        // for all models in a series get accuracy measures for each fold,
+            for (int t = 0; t < models.size(); t++) {
+                processOneModelIdPassOne(options, models.get(t));
+            }
+
+            // across the series, record mininum theta_k across each fold
+
+            // map that stores the minimum theta_k for each fold
+            Map<String, Double[]> foldMins = new HashMap<String, Double[]>();
+            Double[] compare = new Double[numberOfFolds];
+
+            for (int z = 1; z < models.size(); z++) { 
+                int pos = 0; // maintains the position in the model accuracies array
+                double[] modelAccuracies = acrossAllFoldsMap.get(models.get(z));
+
+                for (int r = 0; r < numberOfRepeats; r++) {
+                    for (int c = 0; c < numberOfFolds; c++) {
+
+                        double now = modelAccuracies[pos];
+
+                        if (compare[c] == null) {
+                            compare[c] = now;
+                        } else {
+                            if (now > compare[c]) {
+                                compare[c] = now;
+                            }
+                        }
+                        pos++;
+                    }
+                }
+
+                foldMins.put(seriesID, compare);
+
+            }
+
+            // now calculate bias for this  series
+            evaluateSeriesBias(options, seriesID, models, acrossAllFoldsMap, foldMins);
+
+        }
+    }
+
+    private ArrayList<String> extractSeriesModelIds(ProcessModelConditionsOptions options, String seriesID) {
+
+        Set<String> allKeys = options.modelConditions.keySet();
+        // model-Id's associated with model-conditions file
+
+        String[] keys = (String[]) allKeys.toArray(new String[allKeys.size()]);
+        ArrayList<String> models = new ArrayList(); // arraylist of models in the same series
+
+        for (int i = 0; i < keys.length; i++) {
+            String otherseriesId = options.modelConditions.get(keys[i]).get("id-parameter-scan-series");
+            if (otherseriesId.equals(seriesID)) {
+                models.add(keys[i]);
+            }
+        }
+        System.out.println("models in same series " + models.toString());
+        System.out.println("# models in " + seriesID + " series = " + models.size());
+         return models;
+    }
+
+    private void evaluateSeriesBias(ProcessModelConditionsOptions options, String seriesID, ArrayList<String> models, Map<String, double[]> acrossAllFoldsMap, Map<String, Double[]> foldMins) {
+        double bias = 0.0;
+        for (String model : models) {
+            int key = 0;
+            for (int rpt = 0; rpt < numberOfRepeats; rpt++) {
+                for (int f = 0; f < numberOfFolds; f++) {
+                    double theta_all_k = (1 - (acrossAllFoldsMap.get(model)[key] / 100));
+                    double theta_only_k = (1.0 - (foldMins.get(seriesID)[f] / 100));
+                    bias += (theta_all_k - theta_only_k);
+
+                    System.out.println("bias total " + bias);
+                }
+                bias /= numberOfFolds;
+
+                davOptions.modelId = model;
+
+
+            }
+            key++;
+            bias /= numberOfRepeats;
+            System.out.println("bias for " + davOptions.modelId + " is " + bias);
+            processOneModelIdPassTwo (davOptions.modelId, bias);
+        }
+
+
+    }
+
+
+    @Override
+    public void processOneModelIdPassOne
+            (
+                    final ProcessModelConditionsOptions options,
+                    final String modelId) {
 
         predictions = loadPredictions(modelId);
 
         if (predictions != null) {
+            numberOfFeatures = predictions.modelNumFeatures();
+
             System.out.println("Processing predictions(first pass) for model id  " + modelId);
             davOptions.crossValidationFoldNumber = predictions.getNumberOfFolds();
+
             davOptions.datasetName = getDatasetName(modelId);
             maqciiHelper.setLabel(constructLabel(modelId));
             davOptions.seriesModelId = options.modelConditions.get(modelId).get("id-parameter-scan-series");
@@ -147,23 +255,34 @@ public class RestatMode extends ProcessModelConditionsMode {
                     break;
             }
 
-            //store eval measures in a map
-            map.put(modelId, repeatedEvaluationMeasure);
+            evaluateAccuracyPerTestSet(modelId, predictions, numberOfRepeats, evaluationMeasureNames);
 
         }
     }
 
-    @Override
-    public void processOneModelIdPassTwo(ProcessModelConditionsOptions options, String modelId) {
+   
+    public void processOneModelIdPassTwo(String modelId, Double bias) {
+        predictions = loadPredictions(modelId);
         if (predictions != null) {
             System.out.println("Processing predictions(second pass) for model id  " + modelId);
 
-            evaluateBias(modelId, options, predictions, numberOfRepeats, evaluationMeasureNames, repeatedEvaluationMeasure);
 
             final int numberOfFeatures = predictions.modelNumFeatures();
+            repeatedEvaluationMeasure = new EvaluationMeasure();
+
+                        switch (statsEvalType) {
+                            case STATS_PER_REPEAT:
+                                evaluatePerformanceMeasurePerRepeat(predictions, null, survivalMeasuresList,
+                                        numberOfRepeats, evaluationMeasureNames, repeatedEvaluationMeasure);
+                                break;
+                            case STATS_PER_SPLIT:
+                                evaluatePerformanceMeasurePerTestSet(predictions, null, survivalMeasuresList,
+                                        numberOfRepeats, evaluationMeasureNames, repeatedEvaluationMeasure);
+                                break;
+                        }
 
             davOptions.modelId = modelId;
-
+            repeatedEvaluationMeasure.addValue("bias", bias);
             maqciiHelper.printSubmissionHeaders(davOptions, survivalFileName != null);
             maqciiHelper.printSubmissionResults(davOptions, repeatedEvaluationMeasure,
                     numberOfFeatures, numberOfRepeats, survivalMeasuresList);
@@ -171,52 +290,6 @@ public class RestatMode extends ProcessModelConditionsMode {
         }
 
     }
-
-
-    private void evaluateBias(String modelId, ProcessModelConditionsOptions options, PredictedItems predictions,
-                              int numberOfRepeats, ObjectSet<CharSequence> evaluationMeasureNames,
-                              EvaluationMeasure repeatedEvaluationMeasure) {
-
-        // which models are in the same series?
-        String seriesID = options.modelConditions.get(modelId).get("id-parameter-scan-series");
-
-        Set<String> allKeys = options.modelConditions.keySet(); // model-Id's associated with model-conditions file
-
-        String[] keys = (String[]) allKeys.toArray(new String[allKeys.size()]);
-        ArrayList<String> models = new ArrayList(); // arraylist of models in the same series
-
-        for (int i = 0; i < keys.length; i++) {
-            String otherseriesId = options.modelConditions.get(keys[i]).get("id-parameter-scan-series");
-            if (otherseriesId.equals(seriesID)) {
-                models.add(keys[i]);
-            }
-        }
-        System.out.println("models in same series " + models.toString());
-        System.out.println("# models in " + seriesID + " series = " + models.size());
-
-        double seriesMinError = Double.MAX_VALUE;
-        double modelError = Double.MAX_VALUE;
-        String seriesOptimalModel = null;
-
-        for (int w = 0; w < models.size(); w++) {
-
-            if (map.containsKey(models.get(w))) {
-                modelError =1 - ((map.get(models.get(w)).getPerformanceValueAverage("acc"))/100);
-                  System.out.println("Model " + models.get(w) + " has error "+ modelError);
-            if (modelError < seriesMinError) {
-                seriesMinError = modelError;
-                seriesOptimalModel = models.get(w);
-            } }
-        }
-
-        System.out.println(seriesOptimalModel + " lowest error in series  " + seriesID + "  " + seriesMinError);
-
-
-
-
-
-        }
-
 
 
     public static void evaluatePerformanceMeasurePerTestSet(
@@ -229,8 +302,8 @@ public class RestatMode extends ProcessModelConditionsMode {
 
         // Collect one evaluation measure per split test set of cross-validation.
         for (int repeatId = 1; repeatId <= numberOfRepeats; repeatId++) {
-            if (predictions.containsRepeat(repeatId)) {
 
+            if (predictions.containsRepeat(repeatId)) {
                 final int maxSplitId = predictions.getNumberOfSplitsForRepeat(repeatId);
 
                 for (final int splitId : predictions.splitIdsForRepeat(repeatId)) {
@@ -266,6 +339,44 @@ public class RestatMode extends ProcessModelConditionsMode {
             }
         }
     }
+
+    public void evaluateAccuracyPerTestSet(final String modelId,
+                                           final PredictedItems predictions,
+                                           final int numberOfRepeats,
+                                           final ObjectSet<CharSequence> evaluationMeasureNames) {
+        DoubleList modelAcc = new DoubleArrayList();
+
+
+        // Collect one evaluation measure per split test set of cross-validation.
+        for (int repeatId = 1; repeatId <= numberOfRepeats; repeatId++) {
+
+            if (predictions.containsRepeat(repeatId)) {
+                final int maxSplitId = predictions.getNumberOfSplitsForRepeat(repeatId);
+                numberOfFolds = predictions.splitIdsForRepeat(repeatId).size();
+
+                for (final int splitId : predictions.splitIdsForRepeat(repeatId)) {
+                    final DoubleList decisions = new DoubleArrayList();
+                    final DoubleList trueLabels = new DoubleArrayList();
+                    final ObjectList<String> sampleIDs = new ObjectArrayList<String>();
+
+                    decisions.addAll(predictions.getDecisionsForSplit(repeatId, splitId));
+                    trueLabels.addAll(predictions.getTrueLabelsForSplit(repeatId, splitId));
+                    sampleIDs.addAll(predictions.getSampleIDsForSplit(repeatId, splitId));
+                    if (decisions.size() == 0) {
+                        LOG.fatal("cannot process empty decision list");
+                        System.exit(10);
+                    }
+                    final EvaluationMeasure allSplitsInARepeatMeasure =
+                            CrossValidation.testSetEvaluation(decisions.toDoubleArray(),
+                                    trueLabels.toDoubleArray(), evaluationMeasureNames, true);
+                    modelAcc.add(allSplitsInARepeatMeasure.getAccuracy());
+
+                }
+            }
+            acrossAllFoldsMap.put(modelId, modelAcc.toDoubleArray());
+        }
+    }
+
 
     public static void evaluatePerformanceMeasurePerRepeat(
             final PredictedItems predictions,
@@ -306,9 +417,8 @@ public class RestatMode extends ProcessModelConditionsMode {
     }
 
     private static void averageMeasuresPerReplicates
-            (
-                    final EvaluationMeasure repeatedEvaluationMeasure,
-                    final EvaluationMeasure allSplitsInARepeatMeasure) {
+            (final EvaluationMeasure repeatedEvaluationMeasure,
+             final EvaluationMeasure allSplitsInARepeatMeasure) {
         for (final CharSequence measure : evaluationMeasureNames) {
             repeatedEvaluationMeasure.addValue(measure,
                     allSplitsInARepeatMeasure.getPerformanceValueAverage(measure.toString()));
