@@ -141,9 +141,8 @@ public class RestatMode extends ProcessModelConditionsMode {
                 processOneModelIdPassOne(options, modelInSeries);
             }
 
-            // across the series, record mininum theta_k across each fold
-
-            // map that stores the minimum accuracy for each fold
+            // across the series, record accuracy obtained by model with maximum accuracy for each fold/repeat element.
+  
             Map<String, double[]> foldMins = new HashMap<String, double[]>();
             double[] accuracyArray = new double[numberOfFolds * numberOfRepeats];
             Arrays.fill(accuracyArray, Double.MIN_VALUE);
