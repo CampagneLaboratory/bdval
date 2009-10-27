@@ -136,7 +136,7 @@ public class RestatMode extends ProcessModelConditionsMode {
             ArrayList<String> models = extractSeriesModelIds(options, seriesID);
 
 
-        // for all models in a series get accuracy measures for each fold,
+            // for all models in a series get accuracy measures for each fold,
             for (int t = 0; t < models.size(); t++) {
                 processOneModelIdPassOne(options, models.get(t));
             }
@@ -147,7 +147,7 @@ public class RestatMode extends ProcessModelConditionsMode {
             Map<String, Double[]> foldMins = new HashMap<String, Double[]>();
             Double[] compare = new Double[numberOfFolds];
 
-            for (int z = 1; z < models.size(); z++) { 
+            for (int z = 1; z < models.size(); z++) {
                 int pos = 0; // maintains the position in the model accuracies array
                 double[] modelAccuracies = acrossAllFoldsMap.get(models.get(z));
 
@@ -182,18 +182,18 @@ public class RestatMode extends ProcessModelConditionsMode {
         Set<String> allKeys = options.modelConditions.keySet();
         // model-Id's associated with model-conditions file
 
-        String[] keys = (String[]) allKeys.toArray(new String[allKeys.size()]);
-        ArrayList<String> models = new ArrayList(); // arraylist of models in the same series
+        String[] keys = allKeys.toArray(new String[allKeys.size()]);
+        ArrayList<String> models = new ArrayList<String>(); // arraylist of models in the same series
 
-        for (int i = 0; i < keys.length; i++) {
-            String otherseriesId = options.modelConditions.get(keys[i]).get("id-parameter-scan-series");
+        for (String key : keys) {
+            String otherseriesId = options.modelConditions.get(key).get("id-parameter-scan-series");
             if (otherseriesId.equals(seriesID)) {
-                models.add(keys[i]);
+                models.add(key);
             }
         }
         System.out.println("models in same series " + models.toString());
         System.out.println("# models in " + seriesID + " series = " + models.size());
-         return models;
+        return models;
     }
 
     private void evaluateSeriesBias(ProcessModelConditionsOptions options, String seriesID, ArrayList<String> models, Map<String, double[]> acrossAllFoldsMap, Map<String, Double[]> foldMins) {
@@ -217,7 +217,7 @@ public class RestatMode extends ProcessModelConditionsMode {
             key++;
             bias /= numberOfRepeats;
             System.out.println("bias for " + davOptions.modelId + " is " + bias);
-            processOneModelIdPassTwo (davOptions.modelId, bias);
+            processOneModelIdPassTwo(davOptions.modelId, bias);
         }
 
 
@@ -260,7 +260,7 @@ public class RestatMode extends ProcessModelConditionsMode {
         }
     }
 
-   
+
     public void processOneModelIdPassTwo(String modelId, Double bias) {
         predictions = loadPredictions(modelId);
         if (predictions != null) {
@@ -270,16 +270,16 @@ public class RestatMode extends ProcessModelConditionsMode {
             final int numberOfFeatures = predictions.modelNumFeatures();
             repeatedEvaluationMeasure = new EvaluationMeasure();
 
-                        switch (statsEvalType) {
-                            case STATS_PER_REPEAT:
-                                evaluatePerformanceMeasurePerRepeat(predictions, null, survivalMeasuresList,
-                                        numberOfRepeats, evaluationMeasureNames, repeatedEvaluationMeasure);
-                                break;
-                            case STATS_PER_SPLIT:
-                                evaluatePerformanceMeasurePerTestSet(predictions, null, survivalMeasuresList,
-                                        numberOfRepeats, evaluationMeasureNames, repeatedEvaluationMeasure);
-                                break;
-                        }
+            switch (statsEvalType) {
+                case STATS_PER_REPEAT:
+                    evaluatePerformanceMeasurePerRepeat(predictions, null, survivalMeasuresList,
+                            numberOfRepeats, evaluationMeasureNames, repeatedEvaluationMeasure);
+                    break;
+                case STATS_PER_SPLIT:
+                    evaluatePerformanceMeasurePerTestSet(predictions, null, survivalMeasuresList,
+                            numberOfRepeats, evaluationMeasureNames, repeatedEvaluationMeasure);
+                    break;
+            }
 
             davOptions.modelId = modelId;
             repeatedEvaluationMeasure.addValue("bias", bias);
