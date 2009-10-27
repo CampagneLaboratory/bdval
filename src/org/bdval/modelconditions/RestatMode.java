@@ -142,7 +142,7 @@ public class RestatMode extends ProcessModelConditionsMode {
             }
 
             // across the series, record accuracy obtained by model with maximum accuracy for each fold/repeat element.
-  
+
             Map<String, double[]> foldMins = new HashMap<String, double[]>();
             double[] accuracyArray = new double[numberOfFolds * numberOfRepeats];
             Arrays.fill(accuracyArray, Double.MIN_VALUE);
@@ -191,30 +191,30 @@ public class RestatMode extends ProcessModelConditionsMode {
         return models;
     }
 
-    private void evaluateSeriesBias(ProcessModelConditionsOptions options, String seriesID, ArrayList<String> models, Map<String, double[]> acrossAllFoldsMap, Map<String, double[]> foldMins) {
-        double bias = 0.0;
-        for (String model : models) {
-            int key = 0;
-            for (int rpt = 0; rpt < numberOfRepeats; rpt++) {
-                for (int f = 0; f < numberOfFolds; f++) {
-                    double theta_all_k = (1 - (acrossAllFoldsMap.get(model)[key] / 100));
-                    double theta_only_k = (1.0 - (foldMins.get(seriesID)[f] / 100));
-                    bias += (theta_all_k - theta_only_k);
+    private void evaluateSeriesBias(ProcessModelConditionsOptions options, String seriesID, ArrayList<String> models,
+                                    Map<String, double[]> acrossAllFoldsMap, Map<String, double[]> foldMins) {
 
+        for (String modelId : models) {
+            double bias = 0.0;
+            int index = 0;
+            for (int repeatIndex = 0; repeatIndex < numberOfRepeats; repeatIndex++) {
+                for (int foldIndex = 0; foldIndex < numberOfFolds; foldIndex++) {
+
+                    double errorOfThisModel = (1d - (acrossAllFoldsMap.get(modelId)[index] / 100d));
+                    double thetaHatFoldK = (1.0d - (foldMins.get(seriesID)[index] / 100d));
+                    bias += (errorOfThisModel - thetaHatFoldK);
+                    ++index;
                     LOG.debug("bias total " + bias);
                 }
-                bias /= numberOfFolds;
-
-                davOptions.modelId = model;
-
-
             }
-            key++;
+
+            bias /= numberOfFolds;
             bias /= numberOfRepeats;
+            davOptions.modelId = modelId;
+
             LOG.debug("bias for " + davOptions.modelId + " is " + bias);
             processOneModelIdPassTwo(davOptions.modelId, bias);
         }
-
 
     }
 
@@ -256,7 +256,7 @@ public class RestatMode extends ProcessModelConditionsMode {
     }
 
 
-    public void processOneModelIdPassTwo(String modelId, Double bias) {
+    public void processOneModelIdPassTwo(String modelId, double bias) {
         predictions = loadPredictions(modelId);
         if (predictions != null) {
             LOG.debug("Processing predictions(second pass) for model id  " + modelId);
