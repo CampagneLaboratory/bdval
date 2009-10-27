@@ -131,49 +131,49 @@ public class RestatMode extends ProcessModelConditionsMode {
 
         // group together models that are in the same series?
         String seriesID = options.modelConditions.get(modelId).get("id-parameter-scan-series");
-        if (!(series.contains(seriesID))) {//checks whether a series has been processed before preceding
-            series.add(seriesID);
+        if (!(series.contains(seriesID))) { // This series has not been processed before.
+
+
             ArrayList<String> models = extractSeriesModelIds(options, seriesID);
 
-
             // for all models in a series get accuracy measures for each fold,
-            for (int t = 0; t < models.size(); t++) {
-                processOneModelIdPassOne(options, models.get(t));
+            for (String modelInSeries : models) {
+                processOneModelIdPassOne(options, modelInSeries);
             }
 
             // across the series, record mininum theta_k across each fold
 
-            // map that stores the minimum theta_k for each fold
-            Map<String, Double[]> foldMins = new HashMap<String, Double[]>();
-            Double[] compare = new Double[numberOfFolds];
+            // map that stores the minimum accuracy for each fold
+            Map<String, double[]> foldMins = new HashMap<String, double[]>();
+            double[] accuracyArray = new double[numberOfFolds*numberOfRepeats];
 
-            for (int z = 1; z < models.size(); z++) {
-                int pos = 0; // maintains the position in the model accuracies array
-                double[] modelAccuracies = acrossAllFoldsMap.get(models.get(z));
+            for (String modelInSeries : models) {
+                int index = 0; // maintains the index in the model accuracies array
+                double[] modelAccuracies = acrossAllFoldsMap.get(modelInSeries);
 
                 for (int r = 0; r < numberOfRepeats; r++) {
                     for (int c = 0; c < numberOfFolds; c++) {
 
-                        double now = modelAccuracies[pos];
+                        double now = modelAccuracies[index];
 
-                        if (compare[c] == null) {
-                            compare[c] = now;
-                        } else {
-                            if (now > compare[c]) {
-                                compare[c] = now;
-                            }
+
+                        if (now > accuracyArray[c]) {
+                            accuracyArray[c] = now;
                         }
-                        pos++;
+
+                        index++;
                     }
                 }
 
-                foldMins.put(seriesID, compare);
+                foldMins.put(seriesID, accuracyArray);
 
             }
 
             // now calculate bias for this  series
             evaluateSeriesBias(options, seriesID, models, acrossAllFoldsMap, foldMins);
 
+            // record that the series has already been processed:
+            series.add(seriesID);
         }
     }
 
@@ -191,12 +191,12 @@ public class RestatMode extends ProcessModelConditionsMode {
                 models.add(key);
             }
         }
-        System.out.println("models in same series " + models.toString());
-        System.out.println("# models in " + seriesID + " series = " + models.size());
+        LOG.info("models in same series " + models.toString());
+        LOG.info("# models in series " + seriesID + " = " + models.size());
         return models;
     }
 
-    private void evaluateSeriesBias(ProcessModelConditionsOptions options, String seriesID, ArrayList<String> models, Map<String, double[]> acrossAllFoldsMap, Map<String, Double[]> foldMins) {
+    private void evaluateSeriesBias(ProcessModelConditionsOptions options, String seriesID, ArrayList<String> models, Map<String, double[]> acrossAllFoldsMap, Map<String, double[]> foldMins) {
         double bias = 0.0;
         for (String model : models) {
             int key = 0;
