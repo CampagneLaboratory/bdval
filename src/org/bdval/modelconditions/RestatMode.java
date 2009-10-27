@@ -145,29 +145,22 @@ public class RestatMode extends ProcessModelConditionsMode {
 
             // map that stores the minimum accuracy for each fold
             Map<String, double[]> foldMins = new HashMap<String, double[]>();
-            double[] accuracyArray = new double[numberOfFolds*numberOfRepeats];
+            double[] accuracyArray = new double[numberOfFolds * numberOfRepeats];
+            Arrays.fill(accuracyArray, Double.MIN_VALUE);
 
             for (String modelInSeries : models) {
-                int index = 0; // maintains the index in the model accuracies array
                 double[] modelAccuracies = acrossAllFoldsMap.get(modelInSeries);
+
+                int index = 0; // maintains the index in the model accuracies array
 
                 for (int r = 0; r < numberOfRepeats; r++) {
                     for (int c = 0; c < numberOfFolds; c++) {
-
-                        double now = modelAccuracies[index];
-
-
-                        if (now > accuracyArray[c]) {
-                            accuracyArray[c] = now;
-                        }
-
-                        index++;
+                        accuracyArray[index] = Math.max(modelAccuracies[index], accuracyArray[index]);
+                        ++index;
                     }
                 }
-
-                foldMins.put(seriesID, accuracyArray);
-
             }
+            foldMins.put(seriesID, accuracyArray);
 
             // now calculate bias for this  series
             evaluateSeriesBias(options, seriesID, models, acrossAllFoldsMap, foldMins);
@@ -177,7 +170,10 @@ public class RestatMode extends ProcessModelConditionsMode {
         }
     }
 
-    private ArrayList<String> extractSeriesModelIds(ProcessModelConditionsOptions options, String seriesID) {
+    private ArrayList<String> extractSeriesModelIds
+            (ProcessModelConditionsOptions
+                    options, String
+                    seriesID) {
 
         Set<String> allKeys = options.modelConditions.keySet();
         // model-Id's associated with model-conditions file
@@ -206,7 +202,7 @@ public class RestatMode extends ProcessModelConditionsMode {
                     double theta_only_k = (1.0 - (foldMins.get(seriesID)[f] / 100));
                     bias += (theta_all_k - theta_only_k);
 
-                    System.out.println("bias total " + bias);
+                    LOG.debug("bias total " + bias);
                 }
                 bias /= numberOfFolds;
 
@@ -216,7 +212,7 @@ public class RestatMode extends ProcessModelConditionsMode {
             }
             key++;
             bias /= numberOfRepeats;
-            System.out.println("bias for " + davOptions.modelId + " is " + bias);
+            LOG.debug("bias for " + davOptions.modelId + " is " + bias);
             processOneModelIdPassTwo(davOptions.modelId, bias);
         }
 
@@ -264,7 +260,7 @@ public class RestatMode extends ProcessModelConditionsMode {
     public void processOneModelIdPassTwo(String modelId, Double bias) {
         predictions = loadPredictions(modelId);
         if (predictions != null) {
-            System.out.println("Processing predictions(second pass) for model id  " + modelId);
+            LOG.debug("Processing predictions(second pass) for model id  " + modelId);
 
 
             final int numberOfFeatures = predictions.modelNumFeatures();
