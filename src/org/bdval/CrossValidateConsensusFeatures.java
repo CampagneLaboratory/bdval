@@ -96,7 +96,7 @@ public class CrossValidateConsensusFeatures {
         final String featuresDirectoryPath = toolsArgs.resultsDirectoryPath + "/consensus-features";
         System.out.println("Will look for features in directory " + featuresDirectoryPath);
 
-        toolsArgs.optionalModelIds= GenerateFinalModels. loadProperties(toolsArgs.propertiesFilename);
+        toolsArgs.optionalModelIds = GenerateFinalModels.loadProperties(toolsArgs.propertiesFilename);
 
         final ProgressLogger pg = new ProgressLogger(LOG);
         pg.itemsName = "model conditions";
@@ -278,10 +278,13 @@ public class CrossValidateConsensusFeatures {
             if ("alpha".equals(key)) {
                 continue;
             }
+            if ("feature-selection-mode".equals(key)) {
+                continue;
+            }
             if ("evaluate-statistics".equals(key)) {
                 continue;
             }
-              if (isAnOptionalModelId(key)) {
+            if (isAnOptionalModelId(key)) {
                 continue;
             }
             newMap.put(key, map.get(key));
@@ -296,7 +299,7 @@ public class CrossValidateConsensusFeatures {
         return newMap;
     }
 
-      private boolean isAnOptionalModelId(final String key) {
+    private boolean isAnOptionalModelId(final String key) {
         for (final OptionalModelId optionalId : toolArgs.optionalModelIds) {
             if (optionalId.columnIdentifier.equalsIgnoreCase(key)) {
                 return true;

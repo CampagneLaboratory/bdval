@@ -53,6 +53,7 @@ public class CrossValidationMode extends DAVMode {
     private int cvRepeatNumber;
     final MaqciiHelper maqciiHelper = new MaqciiHelper();
     static final NumberFormat formatter;
+
     static {
         formatter = new DecimalFormat();
         formatter.setMaximumFractionDigits(2);
@@ -60,22 +61,32 @@ public class CrossValidationMode extends DAVMode {
 
     /**
      * Define command line options for this mode.
+     *
      * @param jsap the JSAP command line parser
      * @throws JSAPException if there is a problem building the options
      */
     @Override
     public void defineOptions(final JSAP jsap) throws JSAPException {
-       final Parameter cvRepeatNumberParam =
-            new FlaggedOption("cv-repeats")
-                    .setStringParser(JSAP.INTEGER_PARSER)
-                    .setDefault("1")
-                    .setRequired(false)
-                    .setLongFlag("cv-repeats")
-                    .setHelp("Number of cross validation repeats. default=1 (does one round of "
-                            + "cross-validation). Values larger than one cause the cross "
-                            + "validation to be repeated and results averaged over the rounds.");
+        final Parameter cvRepeatNumberParam =
+                new FlaggedOption("cv-repeats")
+                        .setStringParser(JSAP.INTEGER_PARSER)
+                        .setDefault("1")
+                        .setRequired(false)
+                        .setLongFlag("cv-repeats")
+                        .setHelp("Number of cross validation repeats. default=1 (does one round of "
+                                + "cross-validation). Values larger than one cause the cross "
+                                + "validation to be repeated and results averaged over the rounds.");
         jsap.registerParameter(cvRepeatNumberParam);
 
+        final Parameter foldNumber =
+                new FlaggedOption("folds")
+                        .setStringParser(JSAP.INTEGER_PARSER)
+                        .setDefault(JSAP.NO_DEFAULT)
+                        .setRequired(true)
+                        .setShortFlag('f')
+                        .setLongFlag("folds")
+                        .setHelp("Number of cross validation folds.");
+        jsap.registerParameter(foldNumber);
         maqciiHelper.defineSubmissionFileOption(jsap);
     }
 
@@ -97,7 +108,7 @@ public class CrossValidationMode extends DAVMode {
         super.process(options);
         maqciiHelper.printSubmissionHeaders(options);
         for (final ClassificationTask task : options.classificationTasks) {
-            printHeaders(options,measures,task);
+            printHeaders(options, measures, task);
 
             for (final GeneList geneList : options.geneLists) {
                 try {
@@ -117,7 +128,7 @@ public class CrossValidationMode extends DAVMode {
 
                     printAllStatResults(options, task, geneList, measure);
                     final int numberOfFeatures = processedTable.getColumnNumber() - 1;
-                    maqciiHelper. printSubmissionResults(options, measure, numberOfFeatures, cvRepeatNumber);
+                    maqciiHelper.printSubmissionResults(options, measure, numberOfFeatures, cvRepeatNumber);
                 } catch (NullPointerException e) {
                     throw e;
                 } catch (Exception e) {
@@ -167,7 +178,7 @@ public class CrossValidationMode extends DAVMode {
         options.output.print("\t");
         options.output.print("geneList");
         options.output.print('\t');
-        options.output.print(EvaluationMeasure.getHeaders('\t',measures));
+        options.output.print(EvaluationMeasure.getHeaders('\t', measures));
         options.output.print('\n');
         options.output.flush();
     }
