@@ -149,8 +149,11 @@ public class RestatMode extends ProcessModelConditionsMode {
 
             for (String modelInSeries : models) {
                 double[] modelAccuracies = acrossAllFoldsMap.get(modelInSeries);
-
-                int index = 0; // maintains the index in the model accuracies array
+                if (modelAccuracies == null) {
+                    // could not load prediction file  for this model.
+                    continue;
+                }
+                int index = 0; // maintain s the index in the model accuracies array
 
                 for (int r = 0; r < numberOfRepeats; r++) {
                     for (int c = 0; c < numberOfFolds; c++) {
@@ -197,10 +200,16 @@ public class RestatMode extends ProcessModelConditionsMode {
         for (String modelId : models) {
             double bias = 0.0;
             int index = 0;
+            if (acrossAllFoldsMap.get(modelId) == null) {
+                // could not load predictions for this model (perhaps partially built).
+                continue;
+            }
             for (int repeatIndex = 0; repeatIndex < numberOfRepeats; repeatIndex++) {
                 for (int foldIndex = 0; foldIndex < numberOfFolds; foldIndex++) {
 
-                    double errorOfThisModel = (1d - (acrossAllFoldsMap.get(modelId)[index] / 100d));
+                    final double[] modelAccuracies = acrossAllFoldsMap.get(modelId);
+                    assert modelAccuracies != null : "model accurary must have been loaded for model id " + modelId;
+                    double errorOfThisModel = (1d - (modelAccuracies[index] / 100d));
                     double thetaHatFoldK = (1.0d - (foldMins.get(seriesID)[index] / 100d));
                     bias += (errorOfThisModel - thetaHatFoldK);
                     ++index;

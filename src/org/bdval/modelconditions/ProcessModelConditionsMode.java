@@ -227,6 +227,7 @@ public class ProcessModelConditionsMode extends edu.cornell.med.icb.cli.UseModal
     public PredictedItems loadPredictions(final String modelId) {
         for (String resultDirectory : options.resultDirectories) {
             String predictionsDirectoryPath = FilenameUtils.concat(resultDirectory, "predictions");
+
             predictionsDirectoryPath = FilenameUtils.concat(predictionsDirectoryPath, getDatasetName(modelId));
             File predictionDir = new File(predictionsDirectoryPath);
             String matchingFilenames[] = predictionDir.list(new FilenameFilter() {
@@ -235,9 +236,9 @@ public class ProcessModelConditionsMode extends edu.cornell.med.icb.cli.UseModal
                 }
             });
             String predictionsFilename = "";
-            if (matchingFilenames.length == 0) {
+            if (matchingFilenames == null || matchingFilenames.length == 0) {
                 LOG.trace(String.format("no prediction file was found for modelId=%s", modelId));
-                return null;
+                continue;
             }
             if (matchingFilenames.length > 1) {
                 System.err.println(String.format("more than one prediction file was found for modelId=%s", modelId));
