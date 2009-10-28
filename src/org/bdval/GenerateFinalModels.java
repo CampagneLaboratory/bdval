@@ -532,7 +532,6 @@ public class GenerateFinalModels {
             if ("evaluate-statistics".equals(key)) {
                 continue;
             }
-
             if ("survival".equals(key)) {
                 continue;
             }
@@ -593,6 +592,9 @@ public class GenerateFinalModels {
                 continue;
             }
             if ("survival".equals(key)) {
+                continue;
+            }
+            if ("feature-selection-mode".equals(key)) {
                 continue;
             }
             if (isAnOptionalModelId(key)) {
@@ -897,6 +899,9 @@ public class GenerateFinalModels {
                 continue;
             }
             if ("evaluate-statistics".equals(key)) {
+                continue;
+            }
+            if ("feature-selection-mode".equals(key)) {
                 continue;
             }
             if (isAnOptionalModelId(key)) {
