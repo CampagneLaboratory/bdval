@@ -1446,6 +1446,7 @@
 
     <macrodef name="execute-all-endpoints" description="Run do-one-splits-all for each target">
         <sequential>
+            <echoproperties/>
             <for param="current-endpoint" delimiter=" " list="${all-endpoints}">
                 <sequential>
                     <if>
@@ -2073,53 +2074,54 @@
 
         <input addproperty="tag-description"
                message="Please provide a short description for this run (i.e., condition tested, summary of parameters)."/>
-        <echo append="false" file="${save-data-dir}/${save-data-tag}-README.txt">${tag-description}
+        <echo append="false" file="${save-data-dir}/${save-data-tag}-README.txt">
+${tag-description}
 
-            Generated with BDVal version ${bdval-version} on ${TODAY} at ${TSTAMP}
-            -----
-            Parameters used in this run were:
+Generated with BDVal version ${bdval-version} on ${TODAY} at ${TSTAMP}
+-----
+Parameters used in this run were:
 
-            eval-dataset-root: ${eval-dataset-root}
-            evaluate-statistics-after-splits: ${evaluate-statistics-after-splits}
-            do-specific-gene-lists-only: ${do-specific-gene-lists-only}
-            enable-flooring: ${enable-flooring}
-            scaler-class-name: ${scaler-class-name}
+eval-dataset-root: ${eval-dataset-root}
+evaluate-statistics-after-splits: ${evaluate-statistics-after-splits}
+do-specific-gene-lists-only: ${do-specific-gene-lists-only}
+enable-flooring: ${enable-flooring}
+scaler-class-name: ${scaler-class-name}
 
-            use-feature-selection-fold=true: ${use-feature-selection-fold=true}
-            use-feature-selection-fold=false: ${use-feature-selection-fold=false}
+use-feature-selection-fold=true: ${use-feature-selection-fold=true}
+use-feature-selection-fold=false: ${use-feature-selection-fold=false}
 
-            num-features: ${num-features}
-            max-intermediate-features: ${max-intermediate-features}
-            feature-option: ${feature-option}
+num-features: ${num-features}
+max-intermediate-features: ${max-intermediate-features}
+feature-option: ${feature-option}
 
-            external-CV-repeats: ${external-CV-repeats}
-            external-CV-folds: ${external-CV-folds}
-            internal-CV-repeats: ${internal-CV-repeats}
-            internal-CV-folds: ${internal-CV-folds}
+external-CV-repeats: ${external-CV-repeats}
+external-CV-folds: ${external-CV-folds}
+internal-CV-repeats: ${internal-CV-repeats}
+internal-CV-folds: ${internal-CV-folds}
 
-            fold-change-phi: ${fold-change-phi}
-            ttest-alpha: ${ttest-alpha}
+fold-change-phi: ${fold-change-phi}
+ttest-alpha: ${ttest-alpha}
 
-            svm-classifier: ${svm-classifier}
-            svm-parameters: ${svm-parameters}
-            use-probability: ${use-probability}
+svm-classifier: ${svm-classifier}
+svm-parameters: ${svm-parameters}
+use-probability: ${use-probability}
 
-            performance-measure-maximized-by-GA: ${performance-measure-maximized-by-GA}
-            ga-wrapper-population-size: ${ga-wrapper-population-size}
-            ga-wrapper-number-of-iterations: ${ga-wrapper-number-of-iterations}
-            ga-wrapper-roc-str: ${ga-wrapper-roc-str}
+performance-measure-maximized-by-GA: ${performance-measure-maximized-by-GA}
+ga-wrapper-population-size: ${ga-wrapper-population-size}
+ga-wrapper-number-of-iterations: ${ga-wrapper-number-of-iterations}
+ga-wrapper-roc-str: ${ga-wrapper-roc-str}
 
-            pathway-aggregation-method: ${pathway-aggregation-method}
-            human-pathways-file: ${human-pathways-file}
-            mouse-pathways-file: ${mouse-pathways-file}
-            rat-pathways-file: ${rat-pathways-file}
+pathway-aggregation-method: ${pathway-aggregation-method}
+human-pathways-file: ${human-pathways-file}
+mouse-pathways-file: ${mouse-pathways-file}
+rat-pathways-file: ${rat-pathways-file}
 
-            A value of true in the following properties indicates that the dataset/endpoint was processed in this run:
+A value of true in the following properties indicates that the dataset/endpoint was processed in this run:
         </echo>
         <for param="current-endpoint" delimiter=" " list="${all-endpoints}">
             <sequential>
                 <echo append="true" file="${save-data-dir}/${save-data-tag}-README.txt">
-                    @{current-endpoint}: ${do.@{current-endpoint}}
+@{current-endpoint}: ${do.@{current-endpoint}}
                 </echo>
             </sequential>
         </for>
@@ -2289,6 +2291,8 @@
         <attribute name="pbs-queue" default="normal" description="Name of the PBS queue for the submission"/>
         <attribute name="pbs-nodes" default="1" description="Number of nodes to request"/>
         <attribute name="target" description="The ant target to run on the cluster"/>
+        <attribute name="tag-description"/>
+        <!--<attribute name="email-address"/>-->
 
         <sequential>
             <fail message="Cannot setup a pbs job since bdval.jar cannot be found">
@@ -2298,6 +2302,9 @@
                     </not>
                 </condition>
             </fail>
+
+            <tempfile prefix="@{job-name}-" property="job-dir"/>
+            <mkdir dir="${job-dir}"/>
 
             <!-- all method possibilities -->
             <property name="do.FC+P.logitboost" value="false"/>
@@ -2364,7 +2371,8 @@
                                                                     do-endpoint="@{current-endpoint}"
                                                                     do-method="@{method}"
                                                                     feature-selection-fold="use-feature-selection-fold=@{feature-selection-fold}"
-                                                                    file="file-${counter}.properties"/>
+                                                                    file="${job-dir}/@{job-name}-${counter}.properties"
+                                                                    tag-description="@{tag-description}"/>
                                                         </then>
                                                     </if>
                                                 </sequential>
@@ -2388,9 +2396,13 @@
         <attribute name="feature-selection-fold"/>
         <attribute name="do-method"/>
         <attribute name="all-methods"/>
+        <attribute name="tag-description"/>
+
         <sequential>
             <echo level="verbose" message="Writing file: @{file}"/>
             <writeln file="@{file}" append="false" message="# Generated with BDVal version ${bdval-version} on ${TODAY} at ${TSTAMP}"/>
+            <writeln file="@{file}" message="tag-description = @{tag-description}"/>
+
             <writeln file="@{file}" message="# Endpoints"/>
             <sortlist property="sorted-endpoints" value="@{all-endpoints}" delimiter=" "/>
             <for param="current-endpoint" list="${sorted-endpoints}" delimiter=" ">
