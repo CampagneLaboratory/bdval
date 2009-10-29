@@ -63,29 +63,20 @@
     <!-- configure vm properties -->
     <!-- change these settings in the "bdval-local" property file to best match the local configuration -->
     <if>
-        <equals arg1="${computer.type}" arg2="desktop"/>
-        <then>
-            <echo level="info" message="Configuration execution for desktop."/>
-            <echo message="Configuration execution for a ${computer.type} machine."/>
-            <property name="num-threads" value="${desktop.thread-number}"/>
-            <property name="memory-flag" value="${desktop.memory}"/>
-        </then>
-        <elseif>
-            <equals arg1="${computer.type}" arg2="server"/>
+            <equals arg1="${computer.type}" arg2="desktop"/>
             <then>
-                <echo level="info" message="Configuration execution for a ${computer.type} machine."/>
+                <echo message="Configuration execution for desktop."/>
+                <echo message="Configuration execution for a ${computer.type} machine."/>
+                <property name="num-threads" value="${desktop.thread-number}"/>
+                <property name="memory-flag" value="${desktop.memory}"/>
+            </then>
+            <else>
+                <echo message="Configuration execution for a ${computer.type} machine."/>
                 <property name="num-threads" value="${server.thread-number}"/>
                 <property name="memory-flag" value="${server.memory}"/>
-            </then>
-        </elseif>
-        <else>
-            <echo level="warn" message="Using default configuration execution"/>
-            <echo level="warn" message="You should define system settings in a file called ${config}/${ant.project.name}-local.properties"/>
-            <property name="num-threads" value="1"/>
-            <property name="memory-flag" value=""/>
-        </else>
-    </if>
-
+            </else>
+        </if>
+   
     <if>
         <istrue value="${use-bdval-jar}"/>
         <then>
@@ -717,487 +708,488 @@
                 <not>
                     <istrue value="${define-splits-only}"/>
                 </not>
-            <then>
-            <if>
-                <istrue value="${do.weka-feature-selection-scan}"/>
                 <then>
-                    <for param="feature-selection-mode" delimiter=" " list="t-test fold-change min-max svm-weights">
-                        <sequential>
-                            <for param="weka-class" delimiter=" "
-                                 list="weka.classifiers.lazy.KStar weka.classifiers.trees.RandomForest weka.classifiers.functions.Logistic weka.classifiers.bayes.NaiveBayesUpdateable weka.classifiers.meta.LogitBoost">
+                    <if>
+                        <istrue value="${do.weka-feature-selection-scan}"/>
+                        <then>
+                            <for param="feature-selection-mode" delimiter=" "
+                                 list="t-test fold-change min-max svm-weights">
                                 <sequential>
-                                    <echo message="Considering doing weka scan @{feature-selection-mode} @{weka-class}"/>
+                                    <for param="weka-class" delimiter=" "
+                                         list="weka.classifiers.lazy.KStar weka.classifiers.trees.RandomForest weka.classifiers.functions.Logistic weka.classifiers.bayes.NaiveBayesUpdateable weka.classifiers.meta.LogitBoost">
+                                        <sequential>
+                                            <echo message="Considering doing weka scan @{feature-selection-mode} @{weka-class}"/>
+                                            <do-weka-feature-selection-modes
+                                                    endpoint-name="@{endpoint-name}"
+                                                    dataset-root="@{dataset-root}"
+                                                    array-params="@{array-params}"
+                                                    survival-file="${survival-file}"
+                                                    floor-param="@{floor-param}"
+                                                    weka-class="@{weka-class}"
+                                                    feature-selection-mode="@{feature-selection-mode}"
+                                                    classifier-classname="edu.cornell.med.icb.learning.weka.WekaClassifier">
+                                            </do-weka-feature-selection-modes>
+                                        </sequential>
+                                    </for>
                                     <do-weka-feature-selection-modes
                                             endpoint-name="@{endpoint-name}"
                                             dataset-root="@{dataset-root}"
                                             array-params="@{array-params}"
                                             survival-file="${survival-file}"
                                             floor-param="@{floor-param}"
-                                            weka-class="@{weka-class}"
+                                            weka-class="libSVM"
                                             feature-selection-mode="@{feature-selection-mode}"
-                                            classifier-classname="edu.cornell.med.icb.learning.weka.WekaClassifier">
+                                            classifier-classname="edu.cornell.med.icb.learning.libsvm.LibSvmClassifier">
                                     </do-weka-feature-selection-modes>
                                 </sequential>
                             </for>
-                            <do-weka-feature-selection-modes
+                        </then>
+                    </if>
+                    <if>
+                        <istrue value="${do.FC+P.logitboost}"/>
+                        <then>
+                            <execute-splits feature-selection-fold="true"
+                                            sequence-file="FC+P+logitboost.sequence"
+                                            endpoint-name="@{endpoint-name}"
+                                            dataset-root="@{dataset-root}"
+                                            floor-param="@{floor-param}"
+                                            array-params="@{array-params}"
+                                            all-classifier-parameters=" --classifier edu.cornell.med.icb.learning.weka.WekaClassifier  --classifier-parameters wekaClass=weka.classifiers.meta.LogitBoost "
+                                            other-options="--alpha ${ttest-alpha} --phi ${fold-change-phi} --weka-class weka.classifiers.meta.LogitBoost"/>
+                        </then>
+                    </if>
+                    <if>
+                        <istrue value="${do.naive-bayes}"/>
+                        <then>
+                            <do-weka
+                                    endpoint-name="@{endpoint-name}"
+                                    dataset-root="@{dataset-root}"
+                                    floor-param="@{floor-param}"
+                                    array-params="@{array-params}"
+                                    survival-file="${survival-file}"
+                                    weka-class="weka.classifiers.bayes.NaiveBayesUpdateable">
+
+                            </do-weka>
+                        </then>
+                    </if>
+                    <if>
+                        <istrue value="${do.logit-boost}"/>
+                        <then>
+                            <do-weka
                                     endpoint-name="@{endpoint-name}"
                                     dataset-root="@{dataset-root}"
                                     array-params="@{array-params}"
                                     survival-file="${survival-file}"
-                                    floor-param="@{floor-param}"
-                                    weka-class="libSVM"
-                                    feature-selection-mode="@{feature-selection-mode}"
-                                    classifier-classname="edu.cornell.med.icb.learning.libsvm.LibSvmClassifier">
-                            </do-weka-feature-selection-modes>
-                        </sequential>
-                    </for>
-                </then>
-            </if>
-            <if>
-                <istrue value="${do.FC+P.logitboost}"/>
-                <then>
-                    <execute-splits feature-selection-fold="true"
-                                    sequence-file="FC+P+logitboost.sequence"
+                                    floor-param="@{floor-param}" weka-class="weka.classifiers.meta.LogitBoost">
+                            </do-weka>
+                            <do-weka
                                     endpoint-name="@{endpoint-name}"
                                     dataset-root="@{dataset-root}"
-                                    floor-param="@{floor-param}"
                                     array-params="@{array-params}"
-                                    all-classifier-parameters=" --classifier edu.cornell.med.icb.learning.weka.WekaClassifier  --classifier-parameters wekaClass=weka.classifiers.meta.LogitBoost "
-                                    other-options="--alpha ${ttest-alpha} --phi ${fold-change-phi} --weka-class weka.classifiers.meta.LogitBoost"/>
-                </then>
-            </if>
-            <if>
-                <istrue value="${do.naive-bayes}"/>
-                <then>
-                    <do-weka
-                            endpoint-name="@{endpoint-name}"
-                            dataset-root="@{dataset-root}"
-                            floor-param="@{floor-param}"
-                            array-params="@{array-params}"
-                            survival-file="${survival-file}"
-                            weka-class="weka.classifiers.bayes.NaiveBayesUpdateable">
-
-                    </do-weka>
-                </then>
-            </if>
-            <if>
-                <istrue value="${do.logit-boost}"/>
-                <then>
-                    <do-weka
-                            endpoint-name="@{endpoint-name}"
-                            dataset-root="@{dataset-root}"
-                            array-params="@{array-params}"
-                            survival-file="${survival-file}"
-                            floor-param="@{floor-param}" weka-class="weka.classifiers.meta.LogitBoost">
-                    </do-weka>
-                    <do-weka
-                            endpoint-name="@{endpoint-name}"
-                            dataset-root="@{dataset-root}"
-                            array-params="@{array-params}"
-                            survival-file="${survival-file}"
-                            floor-param="@{floor-param}" weka-class="weka.classifiers.meta.LogitBoost">
-                    </do-weka>
-                </then>
-            </if>
-            <if>
-                <istrue value="${do.logistic}"/>
-                <then>
-                    <do-weka
-                            endpoint-name="@{endpoint-name}"
-                            dataset-root="@{dataset-root}"
-                            array-params="@{array-params}"
-                            survival-file="${survival-file}"
-                            floor-param="@{floor-param}" weka-class="weka.classifiers.functions.Logistic">
-                    </do-weka>
-                </then>
-            </if>
-            <if>
-                <istrue value="${do.random-forest}"/>
-                <then>
-                    <do-weka
-                            endpoint-name="@{endpoint-name}"
-                            dataset-root="@{dataset-root}"
-                            array-params="@{array-params}"
-                            survival-file="${survival-file}"
-                            floor-param="@{floor-param}" weka-class="weka.classifiers.trees.RandomForest">
-                    </do-weka>
-                </then>
-            </if>
-
-            <if>
-                <istrue value="${do.k-star}"/>
-                <then>
-                    <do-weka endpoint-name="@{endpoint-name}"
-                             dataset-root="@{dataset-root}"
-                             array-params="@{array-params}"
-                             survival-file="${survival-file}"
-                             floor-param="@{floor-param}" weka-class="weka.classifiers.lazy.KStar">
-                    </do-weka>
-                </then>
-            </if>
-
-
-            <if>
-                <istrue value="${do.baseline}"/>
-                <then>
-                    <execute-splits feature-selection-fold="false"
-                                    sequence-file="baseline.sequence"
+                                    survival-file="${survival-file}"
+                                    floor-param="@{floor-param}" weka-class="weka.classifiers.meta.LogitBoost">
+                            </do-weka>
+                        </then>
+                    </if>
+                    <if>
+                        <istrue value="${do.logistic}"/>
+                        <then>
+                            <do-weka
                                     endpoint-name="@{endpoint-name}"
                                     dataset-root="@{dataset-root}"
-                                    floor-param="@{floor-param}"
-                                    array-params="@{array-params}"/>
-                </then>
-            </if>
-
-            <if>
-                <istrue value="${do.whole-chip}"/>
-                <then>
-                    <execute-splits feature-selection-fold="false"
-                                    sequence-file="whole-chip.sequence"
-                                    endpoint-name="@{endpoint-name}"
-                                    dataset-root="@{dataset-root}"
-                                    floor-param="@{floor-param}"
-                                    array-params="@{array-params}"/>
-                </then>
-            </if>
-
-            <if>
-                <istrue value="${do.baseline-tune-C}"/>
-                <then>
-                    <execute-splits feature-selection-fold="false"
-                                    sequence-file="tuneC-baseline.sequence"
-                                    endpoint-name="@{endpoint-name}"
-                                    dataset-root="@{dataset-root}"
-                                    floor-param="@{floor-param}"
                                     array-params="@{array-params}"
-
-                                    extra-classifier-parameters=",C=1"/>
-                    <execute-splits feature-selection-fold="false"
-                                    sequence-file="tuneC-baseline.sequence"
+                                    survival-file="${survival-file}"
+                                    floor-param="@{floor-param}" weka-class="weka.classifiers.functions.Logistic">
+                            </do-weka>
+                        </then>
+                    </if>
+                    <if>
+                        <istrue value="${do.random-forest}"/>
+                        <then>
+                            <do-weka
                                     endpoint-name="@{endpoint-name}"
                                     dataset-root="@{dataset-root}"
-                                    floor-param="@{floor-param}"
                                     array-params="@{array-params}"
+                                    survival-file="${survival-file}"
+                                    floor-param="@{floor-param}" weka-class="weka.classifiers.trees.RandomForest">
+                            </do-weka>
+                        </then>
+                    </if>
 
-                                    extra-classifier-parameters=",C=10"/>
-                    <execute-splits feature-selection-fold="false"
-                                    sequence-file="tuneC-baseline.sequence"
-                                    endpoint-name="@{endpoint-name}"
-                                    dataset-root="@{dataset-root}"
-                                    floor-param="@{floor-param}"
-                                    array-params="@{array-params}"
+                    <if>
+                        <istrue value="${do.k-star}"/>
+                        <then>
+                            <do-weka endpoint-name="@{endpoint-name}"
+                                     dataset-root="@{dataset-root}"
+                                     array-params="@{array-params}"
+                                     survival-file="${survival-file}"
+                                     floor-param="@{floor-param}" weka-class="weka.classifiers.lazy.KStar">
+                            </do-weka>
+                        </then>
+                    </if>
 
-                                    extra-classifier-parameters=",C=.5"/>
+
+                    <if>
+                        <istrue value="${do.baseline}"/>
+                        <then>
+                            <execute-splits feature-selection-fold="false"
+                                            sequence-file="baseline.sequence"
+                                            endpoint-name="@{endpoint-name}"
+                                            dataset-root="@{dataset-root}"
+                                            floor-param="@{floor-param}"
+                                            array-params="@{array-params}"/>
+                        </then>
+                    </if>
+
+                    <if>
+                        <istrue value="${do.whole-chip}"/>
+                        <then>
+                            <execute-splits feature-selection-fold="false"
+                                            sequence-file="whole-chip.sequence"
+                                            endpoint-name="@{endpoint-name}"
+                                            dataset-root="@{dataset-root}"
+                                            floor-param="@{floor-param}"
+                                            array-params="@{array-params}"/>
+                        </then>
+                    </if>
+
+                    <if>
+                        <istrue value="${do.baseline-tune-C}"/>
+                        <then>
+                            <execute-splits feature-selection-fold="false"
+                                            sequence-file="tuneC-baseline.sequence"
+                                            endpoint-name="@{endpoint-name}"
+                                            dataset-root="@{dataset-root}"
+                                            floor-param="@{floor-param}"
+                                            array-params="@{array-params}"
+
+                                            extra-classifier-parameters=",C=1"/>
+                            <execute-splits feature-selection-fold="false"
+                                            sequence-file="tuneC-baseline.sequence"
+                                            endpoint-name="@{endpoint-name}"
+                                            dataset-root="@{dataset-root}"
+                                            floor-param="@{floor-param}"
+                                            array-params="@{array-params}"
+
+                                            extra-classifier-parameters=",C=10"/>
+                            <execute-splits feature-selection-fold="false"
+                                            sequence-file="tuneC-baseline.sequence"
+                                            endpoint-name="@{endpoint-name}"
+                                            dataset-root="@{dataset-root}"
+                                            floor-param="@{floor-param}"
+                                            array-params="@{array-params}"
+
+                                            extra-classifier-parameters=",C=.5"/>
+                        </then>
+                    </if>
+
+                    <if>
+                        <istrue value="${do.minmax-svmglobal}"/>
+                        <then>
+                            <execute-splits feature-selection-fold="true"
+                                            sequence-file="minmax-svmglobal.sequence"
+                                            endpoint-name="@{endpoint-name}"
+                                            dataset-root="@{dataset-root}"
+                                            floor-param="@{floor-param}"
+                                            array-params="@{array-params}"
+                                            other-options="--max-intermediate-features ${max-intermediate-features}"/>
+                        </then>
+                    </if>
+
+                    <if>
+                        <istrue value="${do.svmiterative}"/>
+                        <then>
+                            <execute-splits feature-selection-fold="false"
+                                            sequence-file="svmiterative.sequence"
+                                            endpoint-name="@{endpoint-name}"
+                                            dataset-root="@{dataset-root}"
+                                            floor-param="@{floor-param}"
+                                            array-params="@{array-params}"/>
+                        </then>
+                    </if>
+
+                    <if>
+                        <istrue value="${do.ttest-svmiterative}"/>
+                        <then>
+                            <execute-splits feature-selection-fold="true"
+                                            sequence-file="ttest-svmiterative.sequence"
+                                            endpoint-name="@{endpoint-name}"
+                                            dataset-root="@{dataset-root}"
+                                            other-options=" --alpha ${ttest-alpha} --max-intermediate-features ${max-intermediate-features}"
+                                            floor-param="@{floor-param}"
+                                            array-params="@{array-params}"/>
+                        </then>
+                    </if>
+
+                    <if>
+                        <istrue value="${do.ttest-svmglobal}"/>
+                        <then>
+                            <execute-splits feature-selection-fold="true"
+                                            sequence-file="ttest-svmglobal.sequence"
+                                            endpoint-name="@{endpoint-name}"
+                                            dataset-root="@{dataset-root}"
+                                            other-options=" --alpha ${ttest-alpha} --max-intermediate-features ${max-intermediate-features}"
+                                            floor-param="@{floor-param}"
+                                            array-params="@{array-params}"/>
+                        </then>
+                    </if>
+                    <if>
+                        <istrue value="${do.permutation-svmglobal}"/>
+                        <then>
+                            <execute-splits feature-selection-fold="true"
+                                            sequence-file="permutation-svmglobal.sequence"
+                                            endpoint-name="@{endpoint-name}"
+                                            dataset-root="@{dataset-root}"
+                                            other-options=" --alpha ${ttest-alpha} --max-intermediate-features ${max-intermediate-features}"
+                                            floor-param="@{floor-param}"
+                                            array-params="@{array-params}"/>
+                        </then>
+                    </if>
+
+                    <if>
+                        <istrue value="${do.coxreg-svmglobal}"/>
+                        <then>
+                            <execute-splits feature-selection-fold="true"
+                                            sequence-file="coxreg-svmglobal.sequence"
+                                            endpoint-name="@{endpoint-name}"
+                                            dataset-root="@{dataset-root}"
+                                            other-options="--alpha ${coxreg-alpha}  --max-intermediate-features ${max-intermediate-features}"
+                                            floor-param="@{floor-param}"
+                                            array-params="@{array-params}"/>
+                        </then>
+                    </if>
+
+
+                    <if>
+                        <equals arg1="@{do-process-gene-lists}" arg2="true"/>
+                        <then>
+                            <var name="endpoint-specific-genelist-names" value=""/>
+                            <for param="which-gene-list" delimiter=" "
+                                 list="@{endpoint-specific-genelist-names}">
+                                <sequential>
+                                    <echo message=">>> Processing gene list @{which-gene-list}"/>
+
+                                    <if>
+                                        <istrue value="${do.genelist-svmglobal}"/>
+                                        <then>
+                                            <execute-splits feature-selection-fold="false"
+                                                            sequence-file="genelist-svmglobal.sequence"
+                                                            endpoint-name="@{endpoint-name}"
+                                                            dataset-root="@{dataset-root}"
+                                                            other-options=" --which-gene-list @{which-gene-list}"
+                                                            floor-param="@{floor-param}"
+                                                            array-params="@{array-params}"/>
+                                        </then>
+                                    </if>
+
+                                    <if>
+                                        <istrue value="${do.genelist-svmglobal-tune-C}"/>
+                                        <then>
+                                            <execute-splits feature-selection-fold="false"
+                                                            sequence-file="genelist-svmglobal.sequence"
+                                                            endpoint-name="@{endpoint-name}"
+                                                            dataset-root="@{dataset-root}"
+                                                            other-options=" --which-gene-list @{which-gene-list}"
+                                                            extra-classifier-parameters=",C=1"
+                                                            floor-param="@{floor-param}"
+                                                            array-params="@{array-params}"/>
+                                            <execute-splits feature-selection-fold="false"
+                                                            sequence-file="genelist-svmglobal.sequence"
+                                                            endpoint-name="@{endpoint-name}"
+                                                            dataset-root="@{dataset-root}"
+                                                            other-options="--which-gene-list @{which-gene-list}"
+                                                            extra-classifier-parameters=",C=10"
+                                                            floor-param="@{floor-param}"
+                                                            array-params="@{array-params}"/>
+                                            <execute-splits feature-selection-fold="false"
+                                                            sequence-file="genelist-svmglobal.sequence"
+                                                            endpoint-name="@{endpoint-name}"
+                                                            dataset-root="@{dataset-root}"
+                                                            other-options=" --which-gene-list @{which-gene-list}"
+                                                            extra-classifier-parameters=",C=.5"
+                                                            floor-param="@{floor-param}"
+                                                            array-params="@{array-params}"/>
+                                        </then>
+                                    </if>
+
+                                    <if>
+                                        <istrue value="${do.genelist-genetic-algorithm}"/>
+                                        <then>
+                                            <execute-splits feature-selection-fold="false"
+                                                            sequence-file="genelist-genetic-algorithm.sequence"
+                                                            endpoint-name="@{endpoint-name}"
+                                                            dataset-root="@{dataset-root}"
+                                                            other-options=" --which-gene-list @{which-gene-list} --ratio 0.5 --number-of-steps ${ga-wrapper-number-of-iterations} ${internal-CV-repeats} --population-size ${ga-wrapper-population-size} --folds ${internal-CV-folds} ${ga-wrapper-roc-str} --maximize ${performance-measure-maximized-by-GA}"
+                                                            floor-param="@{floor-param}"
+                                                            array-params="@{array-params}"/>
+                                        </then>
+                                    </if>
+                                </sequential>
+                            </for>
+                        </then>
+                        <else>
+                            <echo message="NOT Processing Gene Lists for @{dataset-name}"/>
+                        </else>
+                    </if>
+
+                    <if>
+                        <istrue value="${do.foldchange-svmiterative}"/>
+                        <then>
+                            <execute-splits feature-selection-fold="true"
+                                            sequence-file="foldchange-svmiterative.sequence"
+                                            endpoint-name="@{endpoint-name}"
+                                            dataset-root="@{dataset-root}"
+                                            other-options="--phi ${fold-change-phi} --max-intermediate-features ${max-intermediate-features}"
+                                            floor-param="@{floor-param}"
+                                            array-params="@{array-params}"/>
+                        </then>
+                    </if>
+
+                    <if>
+                        <istrue value="${do.foldchange-svmglobal}"/>
+                        <then>
+                            <execute-splits feature-selection-fold="true"
+                                            sequence-file="foldchange-svmglobal.sequence"
+                                            endpoint-name="@{endpoint-name}"
+                                            dataset-root="@{dataset-root}"
+                                            other-options="--phi ${fold-change-phi} --max-intermediate-features ${max-intermediate-features}"
+                                            floor-param="@{floor-param}"
+                                            array-params="@{array-params}"/>
+                        </then>
+                    </if>
+
+                    <if>
+                        <istrue value="${do.ttest-genetic-algorithm}"/>
+                        <then>
+                            <execute-splits feature-selection-fold="true"
+                                            sequence-file="ttest-genetic-algorithm.sequence"
+                                            endpoint-name="@{endpoint-name}"
+                                            dataset-root="@{dataset-root}"
+                                            other-options="--alpha ${ttest-alpha} --max-intermediate-features ${max-intermediate-features} --ratio 0.5 --number-of-steps ${ga-wrapper-number-of-iterations} ${internal-CV-repeats} --population-size ${ga-wrapper-population-size} --folds ${internal-CV-folds} ${ga-wrapper-roc-str} --maximize ${performance-measure-maximized-by-GA}"
+                                            floor-param="@{floor-param}"
+                                            array-params="@{array-params}"/>
+                        </then>
+                    </if>
+
+                    <if>
+                        <istrue value="${do.foldchange-genetic-algorithm}"/>
+                        <then>
+                            <execute-splits feature-selection-fold="true"
+                                            sequence-file="foldchange-genetic-algorithm.sequence"
+                                            endpoint-name="@{endpoint-name}"
+                                            dataset-root="@{dataset-root}"
+                                            other-options="--phi ${fold-change-phi} --max-intermediate-features ${max-intermediate-features} --ratio 0.5 --number-of-steps ${ga-wrapper-number-of-iterations} ${internal-CV-repeats} --population-size ${ga-wrapper-population-size} --folds ${internal-CV-folds} ${ga-wrapper-roc-str} --maximize ${performance-measure-maximized-by-GA}"
+                                            floor-param="@{floor-param}"
+                                            array-params="@{array-params}"/>
+                        </then>
+                    </if>
+
+                    <if>
+                        <istrue value="${do.full-genetic-algorithm}"/>
+                        <then>
+                            <execute-splits feature-selection-fold="true"
+                                            sequence-file="genetic-algorithm.sequence"
+                                            endpoint-name="@{endpoint-name}"
+                                            dataset-root="@{dataset-root}"
+                                            other-options="--ratio 0.00001 --number-of-steps ${ga-wrapper-number-of-iterations} ${internal-CV-repeats} --population-size ${ga-wrapper-population-size} --folds ${internal-CV-folds} ${ga-wrapper-roc-str} --maximize ${performance-measure-maximized-by-GA}"
+                                            floor-param="@{floor-param}"
+                                            array-params="@{array-params}"/>
+                        </then>
+                    </if>
+
+                    <if>
+                        <istrue value="${do.pathways-build-pathway-components}"/>
+                        <then>
+                            <execute-splits feature-selection-fold="true"
+                                            sequence-file="pathways-build-pathway-components-fs=true.sequence"
+                                            endpoint-name="@{endpoint-name}"
+                                            dataset-root="@{dataset-root}"
+                                            floor-param="@{floor-param}"
+                                            array-params="@{array-params}"
+                                            other-options="@{pathway-options} "/>
+
+                            <execute-splits feature-selection-fold="false"
+                                            sequence-file="pathways-build-pathway-components-fs=false.sequence"
+                                            endpoint-name="@{endpoint-name}"
+                                            dataset-root="@{dataset-root}"
+                                            floor-param="@{floor-param}"
+                                            array-params="@{array-params}"
+                                            other-options="@{pathway-options} "/>
+                        </then>
+                    </if>
+                    <if>
+                        <istrue value="${do.pathways.baseline}"/>
+                        <then>
+                            <execute-splits feature-selection-fold="false"
+                                            sequence-file="pathways-global-svm-weights.sequence"
+                                            endpoint-name="@{endpoint-name}"
+                                            dataset-root="@{dataset-root}"
+                                            floor-param="@{floor-param}"
+                                            array-params="@{array-params}"
+                                            other-options="@{pathway-options} "/>
+                        </then>
+                    </if>
+
+                    <if>
+                        <istrue value="${do.pathways-ttest-svmglobal}"/>
+                        <then>
+                            <execute-splits feature-selection-fold="true"
+                                            sequence-file="pathways-ttest-svmglobal.sequence"
+                                            endpoint-name="@{endpoint-name}"
+                                            dataset-root="@{dataset-root}"
+                                            floor-param="@{floor-param}"
+                                            array-params="@{array-params}"
+                                            other-options=" @{pathway-options} --alpha  ${ttest-alpha} --max-intermediate-features ${max-intermediate-features}"/>
+                        </then>
+                    </if>
+
+                    <if>
+                        <istrue value="${do.pathways-coxreg-svmglobal}"/>
+                        <then>
+                            <execute-splits feature-selection-fold="true"
+                                            sequence-file="pathways-coxreg-svmglobal.sequence"
+                                            endpoint-name="@{endpoint-name}"
+                                            dataset-root="@{dataset-root}"
+                                            floor-param="@{floor-param}"
+                                            array-params="@{array-params}"
+                                            other-options="@{pathway-options} --alpha ${coxreg-alpha}  --max-intermediate-features ${max-intermediate-features}"/>
+                        </then>
+                    </if>
+
+
+                    <if>
+                        <istrue value="${do.pathways-tune-C}"/>
+                        <then>
+                            <execute-splits feature-selection-fold="false"
+                                            sequence-file="pathways-global-svm-weights.sequence"
+                                            endpoint-name="@{endpoint-name}"
+                                            dataset-root="@{dataset-root}"
+                                            floor-param="@{floor-param}"
+                                            array-params="@{array-params}"
+                                            other-options=" @{pathway-options}"
+                                            extra-classifier-parameters=",C=1"/>
+
+                            <execute-splits feature-selection-fold="false"
+                                            sequence-file="pathways-global-svm-weights.sequence"
+                                            endpoint-name="@{endpoint-name}"
+                                            dataset-root="@{dataset-root}"
+                                            floor-param="@{floor-param}"
+                                            array-params="@{array-params}"
+                                            other-options="@{pathway-options}"
+                                            extra-classifier-parameters=",C=10"/>
+
+                            <execute-splits feature-selection-fold="false"
+                                            sequence-file="pathways-global-svm-weights.sequence"
+                                            endpoint-name="@{endpoint-name}"
+                                            dataset-root="@{dataset-root}"
+                                            floor-param="@{floor-param}"
+                                            array-params="@{array-params}"
+                                            other-options=" @{pathway-options}"
+                                            extra-classifier-parameters=",C=.5"/>
+
+                        </then>
+                    </if>
                 </then>
-            </if>
-
-            <if>
-                <istrue value="${do.minmax-svmglobal}"/>
-                <then>
-                    <execute-splits feature-selection-fold="true"
-                                    sequence-file="minmax-svmglobal.sequence"
-                                    endpoint-name="@{endpoint-name}"
-                                    dataset-root="@{dataset-root}"
-                                    floor-param="@{floor-param}"
-                                    array-params="@{array-params}"
-                                    other-options="--max-intermediate-features ${max-intermediate-features}"/>
-                </then>
-            </if>
-
-            <if>
-                <istrue value="${do.svmiterative}"/>
-                <then>
-                    <execute-splits feature-selection-fold="false"
-                                    sequence-file="svmiterative.sequence"
-                                    endpoint-name="@{endpoint-name}"
-                                    dataset-root="@{dataset-root}"
-                                    floor-param="@{floor-param}"
-                                    array-params="@{array-params}"/>
-                </then>
-            </if>
-
-            <if>
-                <istrue value="${do.ttest-svmiterative}"/>
-                <then>
-                    <execute-splits feature-selection-fold="true"
-                                    sequence-file="ttest-svmiterative.sequence"
-                                    endpoint-name="@{endpoint-name}"
-                                    dataset-root="@{dataset-root}"
-                                    other-options=" --alpha ${ttest-alpha} --max-intermediate-features ${max-intermediate-features}"
-                                    floor-param="@{floor-param}"
-                                    array-params="@{array-params}"/>
-                </then>
-            </if>
-
-            <if>
-                <istrue value="${do.ttest-svmglobal}"/>
-                <then>
-                    <execute-splits feature-selection-fold="true"
-                                    sequence-file="ttest-svmglobal.sequence"
-                                    endpoint-name="@{endpoint-name}"
-                                    dataset-root="@{dataset-root}"
-                                    other-options=" --alpha ${ttest-alpha} --max-intermediate-features ${max-intermediate-features}"
-                                    floor-param="@{floor-param}"
-                                    array-params="@{array-params}"/>
-                </then>
-            </if>
-            <if>
-                <istrue value="${do.permutation-svmglobal}"/>
-                <then>
-                    <execute-splits feature-selection-fold="true"
-                                    sequence-file="permutation-svmglobal.sequence"
-                                    endpoint-name="@{endpoint-name}"
-                                    dataset-root="@{dataset-root}"
-                                    other-options=" --alpha ${ttest-alpha} --max-intermediate-features ${max-intermediate-features}"
-                                    floor-param="@{floor-param}"
-                                    array-params="@{array-params}"/>
-                </then>
-            </if>
-
-            <if>
-                <istrue value="${do.coxreg-svmglobal}"/>
-                <then>
-                    <execute-splits feature-selection-fold="true"
-                                    sequence-file="coxreg-svmglobal.sequence"
-                                    endpoint-name="@{endpoint-name}"
-                                    dataset-root="@{dataset-root}"
-                                    other-options="--alpha ${coxreg-alpha}  --max-intermediate-features ${max-intermediate-features}"
-                                    floor-param="@{floor-param}"
-                                    array-params="@{array-params}"/>
-                </then>
-            </if>
-
-
-            <if>
-                <equals arg1="@{do-process-gene-lists}" arg2="true"/>
-                <then>
-                    <var name="endpoint-specific-genelist-names" value=""/>
-                    <for param="which-gene-list" delimiter=" "
-                         list="@{endpoint-specific-genelist-names}">
-                        <sequential>
-                            <echo message=">>> Processing gene list @{which-gene-list}"/>
-
-                            <if>
-                                <istrue value="${do.genelist-svmglobal}"/>
-                                <then>
-                                    <execute-splits feature-selection-fold="false"
-                                                    sequence-file="genelist-svmglobal.sequence"
-                                                    endpoint-name="@{endpoint-name}"
-                                                    dataset-root="@{dataset-root}"
-                                                    other-options=" --which-gene-list @{which-gene-list}"
-                                                    floor-param="@{floor-param}"
-                                                    array-params="@{array-params}"/>
-                                </then>
-                            </if>
-
-                            <if>
-                                <istrue value="${do.genelist-svmglobal-tune-C}"/>
-                                <then>
-                                    <execute-splits feature-selection-fold="false"
-                                                    sequence-file="genelist-svmglobal.sequence"
-                                                    endpoint-name="@{endpoint-name}"
-                                                    dataset-root="@{dataset-root}"
-                                                    other-options=" --which-gene-list @{which-gene-list}"
-                                                    extra-classifier-parameters=",C=1"
-                                                    floor-param="@{floor-param}"
-                                                    array-params="@{array-params}"/>
-                                    <execute-splits feature-selection-fold="false"
-                                                    sequence-file="genelist-svmglobal.sequence"
-                                                    endpoint-name="@{endpoint-name}"
-                                                    dataset-root="@{dataset-root}"
-                                                    other-options="--which-gene-list @{which-gene-list}"
-                                                    extra-classifier-parameters=",C=10"
-                                                    floor-param="@{floor-param}"
-                                                    array-params="@{array-params}"/>
-                                    <execute-splits feature-selection-fold="false"
-                                                    sequence-file="genelist-svmglobal.sequence"
-                                                    endpoint-name="@{endpoint-name}"
-                                                    dataset-root="@{dataset-root}"
-                                                    other-options=" --which-gene-list @{which-gene-list}"
-                                                    extra-classifier-parameters=",C=.5"
-                                                    floor-param="@{floor-param}"
-                                                    array-params="@{array-params}"/>
-                                </then>
-                            </if>
-
-                            <if>
-                                <istrue value="${do.genelist-genetic-algorithm}"/>
-                                <then>
-                                    <execute-splits feature-selection-fold="false"
-                                                    sequence-file="genelist-genetic-algorithm.sequence"
-                                                    endpoint-name="@{endpoint-name}"
-                                                    dataset-root="@{dataset-root}"
-                                                    other-options=" --which-gene-list @{which-gene-list} --ratio 0.5 --number-of-steps ${ga-wrapper-number-of-iterations} ${internal-CV-repeats} --population-size ${ga-wrapper-population-size} --folds ${internal-CV-folds} ${ga-wrapper-roc-str} --maximize ${performance-measure-maximized-by-GA}"
-                                                    floor-param="@{floor-param}"
-                                                    array-params="@{array-params}"/>
-                                </then>
-                            </if>
-                        </sequential>
-                    </for>
-                </then>
-                <else>
-                    <echo message="NOT Processing Gene Lists for @{dataset-name}"/>
-                </else>
-            </if>
-
-            <if>
-                <istrue value="${do.foldchange-svmiterative}"/>
-                <then>
-                    <execute-splits feature-selection-fold="true"
-                                    sequence-file="foldchange-svmiterative.sequence"
-                                    endpoint-name="@{endpoint-name}"
-                                    dataset-root="@{dataset-root}"
-                                    other-options="--phi ${fold-change-phi} --max-intermediate-features ${max-intermediate-features}"
-                                    floor-param="@{floor-param}"
-                                    array-params="@{array-params}"/>
-                </then>
-            </if>
-
-            <if>
-                <istrue value="${do.foldchange-svmglobal}"/>
-                <then>
-                    <execute-splits feature-selection-fold="true"
-                                    sequence-file="foldchange-svmglobal.sequence"
-                                    endpoint-name="@{endpoint-name}"
-                                    dataset-root="@{dataset-root}"
-                                    other-options="--phi ${fold-change-phi} --max-intermediate-features ${max-intermediate-features}"
-                                    floor-param="@{floor-param}"
-                                    array-params="@{array-params}"/>
-                </then>
-            </if>
-
-            <if>
-                <istrue value="${do.ttest-genetic-algorithm}"/>
-                <then>
-                    <execute-splits feature-selection-fold="true"
-                                    sequence-file="ttest-genetic-algorithm.sequence"
-                                    endpoint-name="@{endpoint-name}"
-                                    dataset-root="@{dataset-root}"
-                                    other-options="--alpha ${ttest-alpha} --max-intermediate-features ${max-intermediate-features} --ratio 0.5 --number-of-steps ${ga-wrapper-number-of-iterations} ${internal-CV-repeats} --population-size ${ga-wrapper-population-size} --folds ${internal-CV-folds} ${ga-wrapper-roc-str} --maximize ${performance-measure-maximized-by-GA}"
-                                    floor-param="@{floor-param}"
-                                    array-params="@{array-params}"/>
-                </then>
-            </if>
-
-            <if>
-                <istrue value="${do.foldchange-genetic-algorithm}"/>
-                <then>
-                    <execute-splits feature-selection-fold="true"
-                                    sequence-file="foldchange-genetic-algorithm.sequence"
-                                    endpoint-name="@{endpoint-name}"
-                                    dataset-root="@{dataset-root}"
-                                    other-options="--phi ${fold-change-phi} --max-intermediate-features ${max-intermediate-features} --ratio 0.5 --number-of-steps ${ga-wrapper-number-of-iterations} ${internal-CV-repeats} --population-size ${ga-wrapper-population-size} --folds ${internal-CV-folds} ${ga-wrapper-roc-str} --maximize ${performance-measure-maximized-by-GA}"
-                                    floor-param="@{floor-param}"
-                                    array-params="@{array-params}"/>
-                </then>
-            </if>
-
-            <if>
-                <istrue value="${do.full-genetic-algorithm}"/>
-                <then>
-                    <execute-splits feature-selection-fold="true"
-                                    sequence-file="genetic-algorithm.sequence"
-                                    endpoint-name="@{endpoint-name}"
-                                    dataset-root="@{dataset-root}"
-                                    other-options="--ratio 0.00001 --number-of-steps ${ga-wrapper-number-of-iterations} ${internal-CV-repeats} --population-size ${ga-wrapper-population-size} --folds ${internal-CV-folds} ${ga-wrapper-roc-str} --maximize ${performance-measure-maximized-by-GA}"
-                                    floor-param="@{floor-param}"
-                                    array-params="@{array-params}"/>
-                </then>
-            </if>
-
-            <if>
-                <istrue value="${do.pathways-build-pathway-components}"/>
-                <then>
-                    <execute-splits feature-selection-fold="true"
-                                    sequence-file="pathways-build-pathway-components-fs=true.sequence"
-                                    endpoint-name="@{endpoint-name}"
-                                    dataset-root="@{dataset-root}"
-                                    floor-param="@{floor-param}"
-                                    array-params="@{array-params}"
-                                    other-options="@{pathway-options} "/>
-
-                    <execute-splits feature-selection-fold="false"
-                                    sequence-file="pathways-build-pathway-components-fs=false.sequence"
-                                    endpoint-name="@{endpoint-name}"
-                                    dataset-root="@{dataset-root}"
-                                    floor-param="@{floor-param}"
-                                    array-params="@{array-params}"
-                                    other-options="@{pathway-options} "/>
-                </then>
-            </if>
-            <if>
-                <istrue value="${do.pathways.baseline}"/>
-                <then>
-                    <execute-splits feature-selection-fold="false"
-                                    sequence-file="pathways-global-svm-weights.sequence"
-                                    endpoint-name="@{endpoint-name}"
-                                    dataset-root="@{dataset-root}"
-                                    floor-param="@{floor-param}"
-                                    array-params="@{array-params}"
-                                    other-options="@{pathway-options} "/>
-                </then>
-            </if>
-
-            <if>
-                <istrue value="${do.pathways-ttest-svmglobal}"/>
-                <then>
-                    <execute-splits feature-selection-fold="true"
-                                    sequence-file="pathways-ttest-svmglobal.sequence"
-                                    endpoint-name="@{endpoint-name}"
-                                    dataset-root="@{dataset-root}"
-                                    floor-param="@{floor-param}"
-                                    array-params="@{array-params}"
-                                    other-options=" @{pathway-options} --alpha  ${ttest-alpha} --max-intermediate-features ${max-intermediate-features}"/>
-                </then>
-            </if>
-
-            <if>
-                <istrue value="${do.pathways-coxreg-svmglobal}"/>
-                <then>
-                    <execute-splits feature-selection-fold="true"
-                                    sequence-file="pathways-coxreg-svmglobal.sequence"
-                                    endpoint-name="@{endpoint-name}"
-                                    dataset-root="@{dataset-root}"
-                                    floor-param="@{floor-param}"
-                                    array-params="@{array-params}"
-                                    other-options="@{pathway-options} --alpha ${coxreg-alpha}  --max-intermediate-features ${max-intermediate-features}"/>
-                </then>
-            </if>
-
-
-            <if>
-                <istrue value="${do.pathways-tune-C}"/>
-                <then>
-                    <execute-splits feature-selection-fold="false"
-                                    sequence-file="pathways-global-svm-weights.sequence"
-                                    endpoint-name="@{endpoint-name}"
-                                    dataset-root="@{dataset-root}"
-                                    floor-param="@{floor-param}"
-                                    array-params="@{array-params}"
-                                    other-options=" @{pathway-options}"
-                                    extra-classifier-parameters=",C=1"/>
-
-                    <execute-splits feature-selection-fold="false"
-                                    sequence-file="pathways-global-svm-weights.sequence"
-                                    endpoint-name="@{endpoint-name}"
-                                    dataset-root="@{dataset-root}"
-                                    floor-param="@{floor-param}"
-                                    array-params="@{array-params}"
-                                    other-options="@{pathway-options}"
-                                    extra-classifier-parameters=",C=10"/>
-
-                    <execute-splits feature-selection-fold="false"
-                                    sequence-file="pathways-global-svm-weights.sequence"
-                                    endpoint-name="@{endpoint-name}"
-                                    dataset-root="@{dataset-root}"
-                                    floor-param="@{floor-param}"
-                                    array-params="@{array-params}"
-                                    other-options=" @{pathway-options}"
-                                    extra-classifier-parameters=",C=.5"/>
-
-                </then>
-            </if>
-            </then>
             </if>
         </sequential>
     </macrodef>
@@ -1554,8 +1546,7 @@
     <macrodef name="cross-validation-consensus-features">
         <attribute name="model-conditions"/>
         <attribute name="results-directory"/>
-        <attribute name="output" default="@{results-directory}-CVCF-maqcii-submission.txt"/>
-
+        <attribute name="output" default="@{results-directory}/@{results-directory}-CVCF-maqcii-submission.txt"/>
         <sequential>
             <java classname="org.bdval.CrossValidateConsensusFeatures" dir="${bdval.basedir}"
                   classpathref="bdval.classpath" fork="true" failonerror="true">
@@ -2075,53 +2066,53 @@
         <input addproperty="tag-description"
                message="Please provide a short description for this run (i.e., condition tested, summary of parameters)."/>
         <echo append="false" file="${save-data-dir}/${save-data-tag}-README.txt">
-${tag-description}
+            ${tag-description}
 
-Generated with BDVal version ${bdval-version} on ${TODAY} at ${TSTAMP}
------
-Parameters used in this run were:
+            Generated with BDVal version ${bdval-version} on ${TODAY} at ${TSTAMP}
+            -----
+            Parameters used in this run were:
 
-eval-dataset-root: ${eval-dataset-root}
-evaluate-statistics-after-splits: ${evaluate-statistics-after-splits}
-do-specific-gene-lists-only: ${do-specific-gene-lists-only}
-enable-flooring: ${enable-flooring}
-scaler-class-name: ${scaler-class-name}
+            eval-dataset-root: ${eval-dataset-root}
+            evaluate-statistics-after-splits: ${evaluate-statistics-after-splits}
+            do-specific-gene-lists-only: ${do-specific-gene-lists-only}
+            enable-flooring: ${enable-flooring}
+            scaler-class-name: ${scaler-class-name}
 
-use-feature-selection-fold=true: ${use-feature-selection-fold=true}
-use-feature-selection-fold=false: ${use-feature-selection-fold=false}
+            use-feature-selection-fold=true: ${use-feature-selection-fold=true}
+            use-feature-selection-fold=false: ${use-feature-selection-fold=false}
 
-num-features: ${num-features}
-max-intermediate-features: ${max-intermediate-features}
-feature-option: ${feature-option}
+            num-features: ${num-features}
+            max-intermediate-features: ${max-intermediate-features}
+            feature-option: ${feature-option}
 
-external-CV-repeats: ${external-CV-repeats}
-external-CV-folds: ${external-CV-folds}
-internal-CV-repeats: ${internal-CV-repeats}
-internal-CV-folds: ${internal-CV-folds}
+            external-CV-repeats: ${external-CV-repeats}
+            external-CV-folds: ${external-CV-folds}
+            internal-CV-repeats: ${internal-CV-repeats}
+            internal-CV-folds: ${internal-CV-folds}
 
-fold-change-phi: ${fold-change-phi}
-ttest-alpha: ${ttest-alpha}
+            fold-change-phi: ${fold-change-phi}
+            ttest-alpha: ${ttest-alpha}
 
-svm-classifier: ${svm-classifier}
-svm-parameters: ${svm-parameters}
-use-probability: ${use-probability}
+            svm-classifier: ${svm-classifier}
+            svm-parameters: ${svm-parameters}
+            use-probability: ${use-probability}
 
-performance-measure-maximized-by-GA: ${performance-measure-maximized-by-GA}
-ga-wrapper-population-size: ${ga-wrapper-population-size}
-ga-wrapper-number-of-iterations: ${ga-wrapper-number-of-iterations}
-ga-wrapper-roc-str: ${ga-wrapper-roc-str}
+            performance-measure-maximized-by-GA: ${performance-measure-maximized-by-GA}
+            ga-wrapper-population-size: ${ga-wrapper-population-size}
+            ga-wrapper-number-of-iterations: ${ga-wrapper-number-of-iterations}
+            ga-wrapper-roc-str: ${ga-wrapper-roc-str}
 
-pathway-aggregation-method: ${pathway-aggregation-method}
-human-pathways-file: ${human-pathways-file}
-mouse-pathways-file: ${mouse-pathways-file}
-rat-pathways-file: ${rat-pathways-file}
+            pathway-aggregation-method: ${pathway-aggregation-method}
+            human-pathways-file: ${human-pathways-file}
+            mouse-pathways-file: ${mouse-pathways-file}
+            rat-pathways-file: ${rat-pathways-file}
 
-A value of true in the following properties indicates that the dataset/endpoint was processed in this run:
+            A value of true in the following properties indicates that the dataset/endpoint was processed in this run:
         </echo>
         <for param="current-endpoint" delimiter=" " list="${all-endpoints}">
             <sequential>
                 <echo append="true" file="${save-data-dir}/${save-data-tag}-README.txt">
-@{current-endpoint}: ${do.@{current-endpoint}}
+                    @{current-endpoint}: ${do.@{current-endpoint}}
                 </echo>
             </sequential>
         </for>
@@ -2373,22 +2364,24 @@ A value of true in the following properties indicates that the dataset/endpoint 
             <echo message="${all-do-properties}"/>
             <!-- convert the endpoint names to a form that can be used in a regexp -->
             <propertyregex property="endpoint-regex-property" input="${all-endpoints}" regexp=" "
-                           replace="|" casesensitive="false" />
+                           replace="|" casesensitive="false"/>
             <echo level="verbose" message="Endpoints: ${all-endpoints}"/>
 
             <!-- all properties that start with "do." but not an endpoint -->
-            <propertyselector property="all-methods" match="^do\.(?!((${endpoint-regex-property})))(.*)$" select="\3" delimiter=" "/>
+            <propertyselector property="all-methods" match="^do\.(?!((${endpoint-regex-property})))(.*)$" select="\3"
+                              delimiter=" "/>
             <echo level="verbose" message="Methods: ${all-methods}"/>
 
             <!-- Create a "README" for the job -->
             <writeln file="${job-dir}/@{job-name}-README.txt" append="false" message="@{job-name} "/>
-            <writeln file="${job-dir}/@{job-name}-README.txt" message="The following properties were set to true in this configuration"/>
+            <writeln file="${job-dir}/@{job-name}-README.txt"
+                     message="The following properties were set to true in this configuration"/>
             <for param="do-property" delimiter=" " list="${all-do-properties}">
                 <sequential>
                     <if>
                         <istrue value="${@{do-property}}"/>
                         <then>
-                             <writeln file="${job-dir}/@{job-name}-README.txt" message="@{do-property}"/>
+                            <writeln file="${job-dir}/@{job-name}-README.txt" message="@{do-property}"/>
                         </then>
                     </if>
                 </sequential>
@@ -2398,7 +2391,8 @@ A value of true in the following properties indicates that the dataset/endpoint 
                     <if>
                         <istrue value="${use-feature-selection-fold=@{feature-selection-fold}}"/>
                         <then>
-                             <writeln file="${job-dir}/@{job-name}-README.txt" message="use-feature-selection-fold\=@{feature-selection-fold}"/>
+                            <writeln file="${job-dir}/@{job-name}-README.txt"
+                                     message="use-feature-selection-fold\=@{feature-selection-fold}"/>
                         </then>
                     </if>
                 </sequential>
@@ -2421,7 +2415,8 @@ A value of true in the following properties indicates that the dataset/endpoint 
                                                     <if>
                                                         <istrue value="${do.@{method}}"/>
                                                         <then>
-                                                            <math result="counter" operation="add" operand1="${counter}" operand2="1" datatype="int"/>
+                                                            <math result="counter" operation="add" operand1="${counter}"
+                                                                  operand2="1" datatype="int"/>
                                                             <echo level="verbose" message="Counter is ${counter}"/>
 
                                                             <write-bdval-conditions
@@ -2459,7 +2454,8 @@ A value of true in the following properties indicates that the dataset/endpoint 
 
         <sequential>
             <echo level="verbose" message="Writing file: @{file}"/>
-            <writeln file="@{file}" append="false" message="# Generated with BDVal version ${bdval-version} on ${TODAY} at ${TSTAMP}"/>
+            <writeln file="@{file}" append="false"
+                     message="# Generated with BDVal version ${bdval-version} on ${TODAY} at ${TSTAMP}"/>
             <writeln file="@{file}" message="tag-description = @{tag-description}"/>
 
             <writeln file="@{file}" message="# Endpoints"/>
@@ -2469,8 +2465,12 @@ A value of true in the following properties indicates that the dataset/endpoint 
                     <var name="doit" value="false"/>
                     <if>
                         <equals arg1="@{do-endpoint}" arg2="@{current-endpoint}"/>
-                        <then><var name="doit" value="true"/></then>
-                        <else><var name="doit" value="false"/></else>
+                        <then>
+                            <var name="doit" value="true"/>
+                        </then>
+                        <else>
+                            <var name="doit" value="false"/>
+                        </else>
                     </if>
                     <writeln file="@{file}" message="do.@{current-endpoint} = ${doit}"/>
                 </sequential>
@@ -2483,8 +2483,12 @@ A value of true in the following properties indicates that the dataset/endpoint 
                     <var name="doit" value="false"/>
                     <if>
                         <equals arg1="@{do-method}" arg2="@{current-method}"/>
-                        <then><var name="doit" value="true"/></then>
-                        <else><var name="doit" value="false"/></else>
+                        <then>
+                            <var name="doit" value="true"/>
+                        </then>
+                        <else>
+                            <var name="doit" value="false"/>
+                        </else>
                     </if>
                     <writeln file="@{file}" message="do.@{current-method} = ${doit}"/>
                 </sequential>
