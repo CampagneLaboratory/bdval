@@ -10,7 +10,7 @@
         other project specific build files that utilize BDVAL.
     </description>
 
-    <var name="file-counter" value="0" description="Used to distinguish condition sets"/>
+    <var name="pbs-file-counter" value="0" description="Used to distinguish condition sets"/>
 
     <macrodef name="setup-pbs-job" description="Setup BDVAL for a PBS submission">
         <attribute name="job-name" default="${ant.project.name}" description="Name to associate with this job"/>
@@ -184,11 +184,7 @@
                                                     <if>
                                                         <istrue value="${do.@{method}}"/>
                                                         <then>
-                                                            <math result="file-counter" operation="add" operand1="${file-counter}"
-                                                                  operand2="1" datatype="int"/>
-                                                            <echo level="verbose" message="Counter is ${file-counter}"/>
-
-                                                            <write-bdval-conditions
+                                                            <collect-bdval-conditions
                                                                     all-endpoints="${all-endpoints}"
                                                                     all-methods="${all-methods}"
                                                                     do-endpoint="@{current-endpoint}"
@@ -208,11 +204,11 @@
                     </if>
                 </sequential>
             </for>
-            <echo level="info" message="Wrote a total of ${file-counter} files"/>
+            <echo level="info" message="Wrote a total of ${pbs-file-counter} files"/>
         </sequential>
     </macrodef>
 
-    <macrodef name="write-bdval-conditions" description="Write a property file containing conditions for a single run">
+    <macrodef name="collect-bdval-conditions" description="Write a property file containing conditions for a single run">
         <attribute name="file-prefix"/>
         <attribute name="do-endpoint"/>
         <attribute name="all-endpoints"/>
@@ -222,13 +218,15 @@
         <attribute name="tag-description"/>
 
         <sequential>
-            <var name="file" value="@{file-prefix}-${file-counter}.properties"/>
-            <echo level="verbose" message="Writing file: ${file}"/>
-            <writeln file="${file}" append="false"
-                     message="# Generated with BDVal version ${bdval-version} on ${TODAY} at ${TSTAMP}"/>
-            <writeln file="${file}" message="tag-description = @{tag-description}"/>
+            <!-- collect all the relevant properties (start with "my.pbs.") and store -->
+            <propertyset id="properties-starting-with-my-pbs" dynamic="true">
+                <propertyref prefix="my-pbs."/>
+                <mapper type="glob" from="my-pbs.*" to="*"/>
+            </propertyset>
 
-            <writeln file="${file}" message="# Endpoints"/>
+            <var name="my-pbs.tag-description" value="@{tag-description}"/>
+
+            <!-- Endpoints -->
             <sortlist property="sorted-endpoints" value="@{all-endpoints}" delimiter=" "/>
             <for param="current-endpoint" list="${sorted-endpoints}" delimiter=" ">
                 <sequential>
@@ -242,11 +240,11 @@
                             <var name="doit" value="false"/>
                         </else>
                     </if>
-                    <writeln file="${file}" message="do.@{current-endpoint} = ${doit}"/>
+                    <var name="my-pbs.do.@{current-endpoint}" value="${doit}"/>
                 </sequential>
             </for>
 
-            <writeln file="${file}" message="# Methods"/>
+            <!-- Methods -->
             <sortlist property="sorted-methods" value="@{all-methods}" delimiter=" "/>
             <for param="current-method" list="${sorted-methods}" delimiter=" ">
                 <sequential>
@@ -260,33 +258,69 @@
                             <var name="doit" value="false"/>
                         </else>
                     </if>
-                    <writeln file="${file}" message="do.@{current-method} = ${doit}"/>
+                    <var name="my-pbs.do.@{current-method}" value="${doit}"/>
                 </sequential>
             </for>
 
-            <writeln file="${file}" append="true" message="# Feature Selection Fold"/>
+            <!-- Feature Selection Fold -->
             <if>
                 <equals arg1="use-feature-selection-fold=true" arg2="@{feature-selection-fold}"/>
                 <then>
-                    <writeln file="${file}" message="use-feature-selection-fold\=true = true"/>
-                    <writeln file="${file}" message="use-feature-selection-fold\=false = false"/>
+                    <var name="my-pbs.use-feature-selection-fold=true" value="true"/>
+                    <var name="my-pbs.use-feature-selection-fold=false" value="false"/>
                 </then>
                 <else>
-                    <writeln file="${file}" message="use-feature-selection-fold\=true = false"/>
-                    <writeln file="${file}" message="use-feature-selection-fold\=false = true"/>
+                    <var name="my-pbs.use-feature-selection-fold=true" value="false"/>
+                    <var name="my-pbs.use-feature-selection-fold=false" value="true"/>
                 </else>
             </if>
 
-            <!-- TODO: special case for weka-feature-selection-scan -->
+            <!-- Special case for weka-feature-selection-scan -->
             <if>
                 <equals arg1="@{do-method}" arg2="weka-feature-selection-scan"/>
                 <then>
-                    <math result="file-counter" operation="add" operand1="${file-counter}"
-                          operand2="1" datatype="int"/>
+                    <!-- Iterate over the various weka options -->
+                    <for param="feature-selection-mode" delimiter=" " list="${weka-feature-selection-modes}">
+                        <sequential>
+                            <for param="weka-class" delimiter=" " list="${weka-classifiers}">
+                                <sequential>
+                                    <var name="my-pbs.weka-feature-selection-modes" value="@{feature-selection-mode}"/>
+                                    <var name="my-pbs.weka-classifiers" value="@{weka-class}"/>
+                                    <var name="my-pbs.${@{weka-class}-classifier-classname}" value="${@{weka-class}-classifier-classname}"/>
+                                    <write-pbs-property-file file-prefix="@{file-prefix}"/>
+                                </sequential>
+                            </for>
+                        </sequential>
+                    </for>
                 </then>
+                <else>
+                    <!-- Write the file with no weka settings -->
+                    <var name="my-pbs.weka-feature-selection-modes" unset="true"/>
+                    <var name="my-pbs.weka-classifiers" unset="true"/>
+                    <for param="weka-class" delimiter=" " list="${weka-classifiers}">
+                        <sequential>
+                            <var name="my-pbs.${@{weka-class}-classifier-classname}" unset="true"/>
+                        </sequential>
+                    </for>
+                    <write-pbs-property-file file-prefix="@{file-prefix}"/>
+                </else>
             </if>
+        </sequential>
+    </macrodef>
 
-            <fixcrlf file="${file}" eol="unix"/>
+    <macrodef name="write-pbs-property-file" description="Writes a java properties file pbs job properies">
+        <attribute name="file-prefix"/>
+        <sequential>
+            <math result="pbs-file-counter" operation="add" operand1="${pbs-file-counter}"
+                  operand2="1" datatype="int"/>
+            <echo message="Counter is ${pbs-file-counter}"/>
+
+            <var name="pbs-property-file" value="@{file-prefix}-${pbs-file-counter}.properties"/>
+            <echo message="Writing file: ${pbs-property-file}"/>
+
+            <echoproperties destfile="${pbs-property-file}">
+                <propertyset refid="properties-starting-with-my-pbs"/>
+            </echoproperties>
         </sequential>
     </macrodef>
 </project>
