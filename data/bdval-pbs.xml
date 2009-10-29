@@ -17,7 +17,8 @@
         <attribute name="pbs-queue" default="normal" description="Name of the PBS queue for the submission"/>
         <attribute name="pbs-nodes" default="1" description="Number of nodes to request"/>
         <attribute name="target" description="The ant target to run on the cluster"/>
-        <attribute name="tag-description"/>
+        <attribute name="tag" description="Tag for the configuration"/>
+        <attribute name="tag-description" description="Description of the configuration"/>
         <!--<attribute name="email-address"/>-->
 
         <sequential>
@@ -78,6 +79,20 @@
             </copy>
             <copy file="${bdval.basedir}/../scripts/pbs/start-rserve.sh" todir="${job-dir}"/>
 
+            <!-- Create the actual job script that will launch bdval -->
+            <copy todir="${job-dir}" file="${bdval.basedir}/../scripts/pbs/bdval-pbs.sh" filtering="true">
+                <filterset>
+                    <filter token="PROJECT" value="${ant.project.name}"/>
+                    <filter token="TARGET" value="@{target}"/>
+                    <filter token="TAG" value="@{tag}"/>
+                    <filter token="TAG-DESCRIPTION" value="@{tag-description}"/>
+                    <filter token="JOB_DIR" value="${job-dir}"/>
+                </filterset>
+            </copy>
+
+            <fixcrlf srcdir="${job-dir}" eol="unix" includes="*.sh"/>
+            <chmod dir="${job-dir}" perm="u+x" includes="*.sh"/>
+
             <mkdir dir="${job-dir}/config"/>
             <echoxml file="${job-dir}/config/RConnectionPool.xml">
                 <RConnectionPool>
@@ -122,7 +137,7 @@
                     <include name="gene-lists/**"/>
                 </fileset>
             </copy>
-            <!-- TODO
+            <!-- TODO?
                         /bin/cp -pr ${DATASET_ROOT} ${JOB_DATA_DIR}/${JOB}-data
             -->
 
