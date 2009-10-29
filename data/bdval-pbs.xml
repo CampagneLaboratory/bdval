@@ -10,6 +10,8 @@
         other project specific build files that utilize BDVAL.
     </description>
 
+    <var name="file-counter" value="0" description="Used to distinguish condition sets"/>
+
     <macrodef name="setup-pbs-job" description="Setup BDVAL for a PBS submission">
         <attribute name="job-name" default="${ant.project.name}" description="Name to associate with this job"/>
         <attribute name="pbs-queue" default="normal" description="Name of the PBS queue for the submission"/>
@@ -167,7 +169,6 @@
             </for>
 
             <!-- create "configurations" for each condition combination -->
-            <var name="counter" value="0" description="Used to distinguish condition sets"/>
             <for param="current-endpoint" delimiter=" " list="${all-endpoints}">
                 <sequential>
                     <if>
@@ -183,9 +184,9 @@
                                                     <if>
                                                         <istrue value="${do.@{method}}"/>
                                                         <then>
-                                                            <math result="counter" operation="add" operand1="${counter}"
+                                                            <math result="file-counter" operation="add" operand1="${file-counter}"
                                                                   operand2="1" datatype="int"/>
-                                                            <echo level="verbose" message="Counter is ${counter}"/>
+                                                            <echo level="verbose" message="Counter is ${file-counter}"/>
 
                                                             <write-bdval-conditions
                                                                     all-endpoints="${all-endpoints}"
@@ -193,7 +194,7 @@
                                                                     do-endpoint="@{current-endpoint}"
                                                                     do-method="@{method}"
                                                                     feature-selection-fold="use-feature-selection-fold=@{feature-selection-fold}"
-                                                                    file="${job-dir}/@{job-name}-${counter}.properties"
+                                                                    file-prefix="${job-dir}/@{job-name}"
                                                                     tag-description="@{tag-description}"/>
                                                         </then>
                                                     </if>
@@ -207,12 +208,12 @@
                     </if>
                 </sequential>
             </for>
-            <echo level="info" message="Wrote a total of ${counter} files"/>
+            <echo level="info" message="Wrote a total of ${file-counter} files"/>
         </sequential>
     </macrodef>
 
     <macrodef name="write-bdval-conditions" description="Write a property file containing conditions for a single run">
-        <attribute name="file"/>
+        <attribute name="file-prefix"/>
         <attribute name="do-endpoint"/>
         <attribute name="all-endpoints"/>
         <attribute name="feature-selection-fold"/>
@@ -221,12 +222,13 @@
         <attribute name="tag-description"/>
 
         <sequential>
-            <echo level="verbose" message="Writing file: @{file}"/>
-            <writeln file="@{file}" append="false"
+            <var name="file" value="@{file-prefix}-${file-counter}.properties"/>
+            <echo level="verbose" message="Writing file: ${file}"/>
+            <writeln file="${file}" append="false"
                      message="# Generated with BDVal version ${bdval-version} on ${TODAY} at ${TSTAMP}"/>
-            <writeln file="@{file}" message="tag-description = @{tag-description}"/>
+            <writeln file="${file}" message="tag-description = @{tag-description}"/>
 
-            <writeln file="@{file}" message="# Endpoints"/>
+            <writeln file="${file}" message="# Endpoints"/>
             <sortlist property="sorted-endpoints" value="@{all-endpoints}" delimiter=" "/>
             <for param="current-endpoint" list="${sorted-endpoints}" delimiter=" ">
                 <sequential>
@@ -240,11 +242,11 @@
                             <var name="doit" value="false"/>
                         </else>
                     </if>
-                    <writeln file="@{file}" message="do.@{current-endpoint} = ${doit}"/>
+                    <writeln file="${file}" message="do.@{current-endpoint} = ${doit}"/>
                 </sequential>
             </for>
 
-            <writeln file="@{file}" message="# Methods"/>
+            <writeln file="${file}" message="# Methods"/>
             <sortlist property="sorted-methods" value="@{all-methods}" delimiter=" "/>
             <for param="current-method" list="${sorted-methods}" delimiter=" ">
                 <sequential>
@@ -258,23 +260,33 @@
                             <var name="doit" value="false"/>
                         </else>
                     </if>
-                    <writeln file="@{file}" message="do.@{current-method} = ${doit}"/>
+                    <writeln file="${file}" message="do.@{current-method} = ${doit}"/>
                 </sequential>
             </for>
 
-            <writeln file="@{file}" append="true" message="# Feature Selection Fold"/>
+            <writeln file="${file}" append="true" message="# Feature Selection Fold"/>
             <if>
                 <equals arg1="use-feature-selection-fold=true" arg2="@{feature-selection-fold}"/>
                 <then>
-                    <writeln file="@{file}" message="use-feature-selection-fold\=true = true"/>
-                    <writeln file="@{file}" message="use-feature-selection-fold\=false = false"/>
+                    <writeln file="${file}" message="use-feature-selection-fold\=true = true"/>
+                    <writeln file="${file}" message="use-feature-selection-fold\=false = false"/>
                 </then>
                 <else>
-                    <writeln file="@{file}" message="use-feature-selection-fold\=true = false"/>
-                    <writeln file="@{file}" message="use-feature-selection-fold\=false = true"/>
+                    <writeln file="${file}" message="use-feature-selection-fold\=true = false"/>
+                    <writeln file="${file}" message="use-feature-selection-fold\=false = true"/>
                 </else>
             </if>
-            <fixcrlf file="@{file}" eol="unix"/>
+
+            <!-- TODO: special case for weka-feature-selection-scan -->
+            <if>
+                <equals arg1="@{do-method}" arg2="weka-feature-selection-scan"/>
+                <then>
+                    <math result="file-counter" operation="add" operand1="${file-counter}"
+                          operand2="1" datatype="int"/>
+                </then>
+            </if>
+
+            <fixcrlf file="${file}" eol="unix"/>
         </sequential>
     </macrodef>
 </project>
