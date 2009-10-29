@@ -1546,7 +1546,7 @@
     <macrodef name="cross-validation-consensus-features">
         <attribute name="model-conditions"/>
         <attribute name="results-directory"/>
-        <attribute name="output" default="@{results-directory}/@{results-directory}-CVCF-maqcii-submission.txt"/>
+        <attribute name="output" default="@{results-directory}/${save-data-tag}-CVCF-maqcii-submission.txt"/>
         <sequential>
             <java classname="org.bdval.CrossValidateConsensusFeatures" dir="${bdval.basedir}"
                   classpathref="bdval.classpath" fork="true" failonerror="true">
@@ -1574,7 +1574,7 @@
 
     <target name="cross-validate-consensus-features"
             description="Performs cross-validation with the consensus features corresponding to each model."
-            depends="prepare-bdval">
+            depends="prepare-bdval,tag-output-directory">
 
         <delete file="${statistics-output}"/>
         <input addproperty="model-conditions" message="Enter the model condition filename."
