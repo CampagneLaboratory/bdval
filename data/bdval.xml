@@ -60,6 +60,20 @@
     <!-- this property controls the output of the internal log4j configuration initialization -->
     <property name="log4j.debug" value="false"/>
 
+    <!-- list of feature selection modes to run when "do.weka-feature-selection" is true -->
+    <property name="weka-feature-selection-modes" value="t-test fold-change min-max svm-weights"/>
+
+    <!-- list of classifiers to run when "do.weka-feature-selection" is true -->
+    <property name="weka-classifiers" value="weka.classifiers.lazy.KStar weka.classifiers.trees.RandomForest weka.classifiers.functions.Logistic weka.classifiers.bayes.NaiveBayesUpdateable weka.classifiers.meta.LogitBoost libSVM"/>
+
+    <!-- classifier-classname for each weka-classifier -->
+    <property name="weka.classifiers.lazy.KStar-classifier-classname" value="edu.cornell.med.icb.learning.weka.WekaClassifier"/>
+    <property name="weka.classifiers.trees.RandomForest-classifier-classname" value="edu.cornell.med.icb.learning.weka.WekaClassifier"/>
+    <property name="weka.classifiers.functions.Logistic-classifier-classname" value="edu.cornell.med.icb.learning.weka.WekaClassifier"/>
+    <property name="weka.classifiers.bayes.NaiveBayesUpdateable-classifier-classname" value="edu.cornell.med.icb.learning.weka.WekaClassifier"/>
+    <property name="weka.classifiers.meta.LogitBoost-classifier-classname" value="edu.cornell.med.icb.learning.weka.WekaClassifier"/>
+    <property name="libSVM-classifier-classname" value="edu.cornell.med.icb.learning.libsvm.LibSvmClassifier"/>
+
     <!-- configure vm properties -->
     <!-- change these settings in the "bdval-local" property file to best match the local configuration -->
     <if>
@@ -712,11 +726,9 @@
                     <if>
                         <istrue value="${do.weka-feature-selection-scan}"/>
                         <then>
-                            <for param="feature-selection-mode" delimiter=" "
-                                 list="t-test fold-change min-max svm-weights">
+                            <for param="feature-selection-mode" delimiter=" " list="${weka-feature-selection-modes}">
                                 <sequential>
-                                    <for param="weka-class" delimiter=" "
-                                         list="weka.classifiers.lazy.KStar weka.classifiers.trees.RandomForest weka.classifiers.functions.Logistic weka.classifiers.bayes.NaiveBayesUpdateable weka.classifiers.meta.LogitBoost">
+                                    <for param="weka-class" delimiter=" " list="${weka-classifiers}">
                                         <sequential>
                                             <echo message="Considering doing weka scan @{feature-selection-mode} @{weka-class}"/>
                                             <do-weka-feature-selection-modes
@@ -727,20 +739,10 @@
                                                     floor-param="@{floor-param}"
                                                     weka-class="@{weka-class}"
                                                     feature-selection-mode="@{feature-selection-mode}"
-                                                    classifier-classname="edu.cornell.med.icb.learning.weka.WekaClassifier">
+                                                    classifier-classname="${@{weka-class}-classifier-classname}">
                                             </do-weka-feature-selection-modes>
                                         </sequential>
                                     </for>
-                                    <do-weka-feature-selection-modes
-                                            endpoint-name="@{endpoint-name}"
-                                            dataset-root="@{dataset-root}"
-                                            array-params="@{array-params}"
-                                            survival-file="${survival-file}"
-                                            floor-param="@{floor-param}"
-                                            weka-class="libSVM"
-                                            feature-selection-mode="@{feature-selection-mode}"
-                                            classifier-classname="edu.cornell.med.icb.learning.libsvm.LibSvmClassifier">
-                                    </do-weka-feature-selection-modes>
                                 </sequential>
                             </for>
                         </then>
