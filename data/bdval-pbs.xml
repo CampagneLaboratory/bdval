@@ -77,6 +77,7 @@
                     <include name="buildsupport/**"/>
                 </fileset>
             </copy>
+
             <copy file="${bdval.basedir}/../scripts/pbs/start-rserve.sh" todir="${job-dir}"/>
 
             <!-- Create the actual job script that will launch bdval -->
@@ -86,7 +87,17 @@
                     <filter token="TARGET" value="@{target}"/>
                     <filter token="TAG" value="@{tag}"/>
                     <filter token="TAG-DESCRIPTION" value="@{tag-description}"/>
-                    <filter token="JOB_DIR" value="${job-dir}"/>
+                    <filter token="JOB-DIR" value="${job-dir}"/>
+                </filterset>
+            </copy>
+
+            <!-- Create the PBS job submission script -->
+            <copy file="${bdval.basedir}/../scripts/pbs/bdval.qsub" tofile="@{job-name}.qsub" filtering="true">
+                <filterset>
+                    <filter token="PBS-QUEUE" value="@{pbs-queue}"/>
+                    <filter token="PBS-NODES" value="@{pbs-nodes}"/>
+                    <filter token="JOB-NAME" value="@{job-name}"/>
+                    <filter token="JOB-DIR" value="${job-dir}"/>
                 </filterset>
             </copy>
 
@@ -137,9 +148,8 @@
                     <include name="gene-lists/**"/>
                 </fileset>
             </copy>
-            <!-- TODO?
-                        /bin/cp -pr ${DATASET_ROOT} ${JOB_DATA_DIR}/${JOB}-data
-            -->
+
+            <!-- TODO? /bin/cp -pr ${DATASET_ROOT} ${JOB_DATA_DIR}/${JOB}-data -->
 
             <!-- Tell bdval not to try and compile when running -->
             <writeln file="${job-dir}/data/bdval.properties" append="false" message="use-bdval-jar=true"/>
