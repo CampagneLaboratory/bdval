@@ -112,6 +112,7 @@ public class Predict extends DAVMode {
         //jsap.unregisterParameter(jsap.getByID("conditions"));
         // there is no need for random seed.
         jsap.getByID("seed").addDefault("" + 1);
+        
         //jsap.unregisterParameter(jsap.getByID("seed"));
         // there is no need for a gene list. The model has enough information to recreate it.
         //  jsap.unregisterParameter(jsap.getByID("gene-lists"));
@@ -174,7 +175,7 @@ public class Predict extends DAVMode {
 
         maqciiHelper.defineSubmissionFileOption(jsap);
         jsap.getByID("label").addDefault("auto");
-      //  jsap.getByID("folds").addDefault("0");
+        //  jsap.getByID("folds").addDefault("0");
     }
 
     @Override
@@ -501,7 +502,7 @@ public class Predict extends DAVMode {
                 }
             }
 
-                      assert decision == 1 || decision == -1 : "decision must be binary. Assertion encountered processing model " + modelFilenamePrefix;
+            assert decision == 1 || decision == -1 : "decision must be binary. Assertion encountered processing model " + modelFilenamePrefix;
 
             final double probability = Math.max(probabilities[0], probabilities[1]);
             final String[] symbolicClassLabel = model.getSymbolicClassLabel();
