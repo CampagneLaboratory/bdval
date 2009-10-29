@@ -58,7 +58,15 @@
             <property name="do.weka-feature-selection-scan" value="false"/>
             <property name="do.whole-chip" value="false"/>
 
-            <tempfile prefix="@{job-name}-" property="job-dir"/>
+            <if>
+                <not>
+                    <isset property="job-dir"/>
+                </not>
+                <then>
+                    <tempfile prefix="@{job-name}-" property="job-dir"/>
+                </then>
+            </if>
+
             <mkdir dir="${job-dir}"/>
             <copy todir="${job-dir}">
                 <fileset dir="${bdval.basedir}/..">
@@ -77,6 +85,29 @@
                     </RConfiguration>
                 </RConnectionPool>
             </echoxml>
+
+            <!-- Two threads per node, memory size depends on node type -->
+            <dirname file="${eval-dataset-root}" property="eval-dir"/>
+            <echo message="${eval-dir}"/>
+            <writeln file="${job-dir}/config/${ant.project.name}-local.properties" append="false"
+                     message="eval-dataset-root=${eval-dataset-root}"/>
+            <writeln file="${job-dir}/config/${ant.project.name}-local.properties"
+                     message="computer.type=server"/>
+            <writeln file="${job-dir}/config/${ant.project.name}-local.properties"
+                     message="server.thread-number=2"/>
+            <if>
+                <equals arg1="@{pbs-queue}" arg2="fat"/>
+                <then>
+                    <writeln file="${job-dir}/config/${ant.project.name}-local.properties"
+                             message="server.memory=-Xmx8g"/>
+                </then>
+                <else>
+                    <writeln file="${job-dir}/config/${ant.project.name}-local.properties"
+                             message="server.memory=-Xmx2g"/>
+                </else>
+            </if>
+
+            <!-- copy log4j.properties if it exists -->
             <copy file="${config}/log4j.properties" todir="${job-dir}/config" failonerror="false"/>
 
             <mkdir dir="${job-dir}/data"/>
@@ -92,6 +123,10 @@
             <!-- TODO
                         /bin/cp -pr ${DATASET_ROOT} ${JOB_DATA_DIR}/${JOB}-data
             -->
+
+            <!-- Tell bdval not to try and compile when running -->
+            <writeln file="${job-dir}/data/bdval.properties" append="false" message="use-bdval-jar=true"/>
+            <writeln file="${job-dir}/data/bdval.properties" message="nocompile=true"/>
 
             <propertyselector property="all-do-properties" match="do\.([^\.]*)$" select="\0" delimiter=" "/>
             <echo message="${all-do-properties}"/>
