@@ -341,7 +341,7 @@
                         <arg value="--test-samples"/>
                         <arg value="${@{endpoint-name}.@{test-set-name}.test-samples}"/>
                         <arg line="${true-labels-option}"/>
-                        <arg line="--label auto --folds ${external-CV-folds}"/>
+                        <arg line="--label auto "/>
                         <arg value="-p"/>
                         <arg value="${@{endpoint-name}.platform-file}"/>
                         <arg line="-o @{output} "/>
@@ -461,7 +461,7 @@
                                     output="${split-plan-file}"
                                     floor-param="@{floor-param}"
                                     array-params="@{array-params}"
-                                    other-options="-f ${external-CV-folds} ${external-CV-repeats} --gene-list full --overwrite-output true --feature-selection-fold @{feature-selection-fold}"/>
+                                    other-options="--folds ${external-CV-folds} ${external-CV-repeats} --gene-list full --overwrite-output true --feature-selection-fold @{feature-selection-fold}"/>
                         </then>
                     </if>
                 </try>
@@ -1927,14 +1927,17 @@
 
     </target>
 
-    <target name="predict-test" depends="init,tag-output-directory" description="Predict on test set">
+    <target name="inner-evaluate-dataset-statistics" depends="prepare-bdval,tag-output-directory"
+            description="Evaluate performance statistics on a given dataset">
         <input addproperty="model-directory" message="Enter the directory where models are stored."/>
-        <input addproperty="test-set-name" message="Name of the test set (must match an entry in the property file)."
+        <input addproperty="test-set-name"
+               message="Name of the dataset for which performance statistics of existing models will be evaluated (dataset name must match an entry in the property file)."
                defaultvalue="test"/>
         <input addproperty="sample-with-replacement" message="Sample with replacement? (true/false), default false"
                defaultvalue="false"/>
         <input addproperty="evaluate-statistics" message="Evaluate statistics (true/false), default true"
                defaultvalue="true"/>
+
 
         <sequential>
             <echo message="Predicting all endpoints ${all-endpoints}"/>
@@ -2157,10 +2160,9 @@
         </sequential>
     </macrodef>
 
-    <target name="predict-validation" depends="init,tag-output-directory"
-            description="Generate prediction files for validation dataset">
-        <input addproperty="results-directory" message="Enter the results directory."
-               defaultvalue="${results-directory}"/>
+    <target name="inner-generate-dataset-predictions" depends="prepare-bdval,tag-output-directory"
+            description="Generate prediction files for a test/validation dataset">
+        <input addproperty="results-directory" message="Enter the results directory."/>
         <input addproperty="final-model-directory-name"
                defaultvalue="final-models"
                message="Enter the subdirectory that contains the final models (must exist in results directory)."/>
