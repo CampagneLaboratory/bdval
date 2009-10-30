@@ -2067,12 +2067,12 @@
             <fileset file="${config}/${ant.project.name}-local.properties"/>
         </copy>
 
-        <delete verbose="true" includeemptydirs="true">
+        <!--delete verbose="true" includeemptydirs="true">
             <fileset dir="${bdval-project.basedir}">
                 <include name="*-maqcii-submission*.txt"/>
                 <include name="*-stats.txt"/>
             </fileset>
-        </delete>
+        </delete-->
 
         <input addproperty="tag-description"
                message="Please provide a short description for this run (i.e., condition tested, summary of parameters)."/>
