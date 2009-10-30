@@ -35,7 +35,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bdval.DAVOptions;
 import org.bdval.MaqciiHelper;
-import org.bdval.Predict;
 import org.bdval.PredictedItems;
 import org.bdval.SurvivalMeasures;
 
@@ -131,6 +130,7 @@ public class RestatMode extends ProcessModelConditionsMode {
 
         // group together models that are in the same series?
         String seriesID = options.modelConditions.get(modelId).get("id-parameter-scan-series");
+
         if (!(series.contains(seriesID))) { // This series has not been processed before.
 
 
@@ -176,17 +176,19 @@ public class RestatMode extends ProcessModelConditionsMode {
             (ProcessModelConditionsOptions
                     options, String
                     seriesID) {
-
-        Set<String> allKeys = options.modelConditions.keySet();
+       if (seriesID == null){
+                return new  ArrayList<String>();
+        }
+        Set<String> modelIdKeys = options.modelConditions.keySet();
         // model-Id's associated with model-conditions file
 
-        String[] keys = allKeys.toArray(new String[allKeys.size()]);
+        //String[] keys = modelIdKeys.toArray(new String[modelIdKeys.size()]);
         ArrayList<String> models = new ArrayList<String>(); // arraylist of models in the same series
 
-        for (String key : keys) {
-            String otherseriesId = options.modelConditions.get(key).get("id-parameter-scan-series");
-            if (otherseriesId.equals(seriesID)) {
-                models.add(key);
+        for (String modelId : modelIdKeys) {
+            String otherseriesId = options.modelConditions.get(modelId).get("id-parameter-scan-series");
+            if (seriesID.equals(otherseriesId)) {
+                models.add(modelId);
             }
         }
         LOG.info("models in same series " + models.toString());
@@ -239,7 +241,7 @@ public class RestatMode extends ProcessModelConditionsMode {
         if (predictions != null) {
             numberOfFeatures = predictions.modelNumFeatures();
 
-            System.out.println("Processing predictions(first pass) for model id  " + modelId);
+            LOG.debug("Processing predictions(first pass) for model id  " + modelId);
             davOptions.crossValidationFoldNumber = predictions.getNumberOfFolds();
 
             davOptions.datasetName = getDatasetName(modelId);
