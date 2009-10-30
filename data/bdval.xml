@@ -64,32 +64,38 @@
     <property name="weka-feature-selection-modes" value="t-test fold-change min-max svm-weights"/>
 
     <!-- list of classifiers to run when "do.weka-feature-selection" is true -->
-    <property name="weka-classifiers" value="weka.classifiers.lazy.KStar weka.classifiers.trees.RandomForest weka.classifiers.functions.Logistic weka.classifiers.bayes.NaiveBayesUpdateable weka.classifiers.meta.LogitBoost libSVM"/>
+    <property name="weka-classifiers"
+              value="weka.classifiers.lazy.KStar weka.classifiers.trees.RandomForest weka.classifiers.functions.Logistic weka.classifiers.bayes.NaiveBayesUpdateable weka.classifiers.meta.LogitBoost libSVM"/>
 
     <!-- classifier-classname for each weka-classifier -->
-    <property name="weka.classifiers.lazy.KStar-classifier-classname" value="edu.cornell.med.icb.learning.weka.WekaClassifier"/>
-    <property name="weka.classifiers.trees.RandomForest-classifier-classname" value="edu.cornell.med.icb.learning.weka.WekaClassifier"/>
-    <property name="weka.classifiers.functions.Logistic-classifier-classname" value="edu.cornell.med.icb.learning.weka.WekaClassifier"/>
-    <property name="weka.classifiers.bayes.NaiveBayesUpdateable-classifier-classname" value="edu.cornell.med.icb.learning.weka.WekaClassifier"/>
-    <property name="weka.classifiers.meta.LogitBoost-classifier-classname" value="edu.cornell.med.icb.learning.weka.WekaClassifier"/>
+    <property name="weka.classifiers.lazy.KStar-classifier-classname"
+              value="edu.cornell.med.icb.learning.weka.WekaClassifier"/>
+    <property name="weka.classifiers.trees.RandomForest-classifier-classname"
+              value="edu.cornell.med.icb.learning.weka.WekaClassifier"/>
+    <property name="weka.classifiers.functions.Logistic-classifier-classname"
+              value="edu.cornell.med.icb.learning.weka.WekaClassifier"/>
+    <property name="weka.classifiers.bayes.NaiveBayesUpdateable-classifier-classname"
+              value="edu.cornell.med.icb.learning.weka.WekaClassifier"/>
+    <property name="weka.classifiers.meta.LogitBoost-classifier-classname"
+              value="edu.cornell.med.icb.learning.weka.WekaClassifier"/>
     <property name="libSVM-classifier-classname" value="edu.cornell.med.icb.learning.libsvm.LibSvmClassifier"/>
 
     <!-- configure vm properties -->
     <!-- change these settings in the "bdval-local" property file to best match the local configuration -->
     <if>
-            <equals arg1="${computer.type}" arg2="desktop"/>
-            <then>
-                <echo message="Configuration execution for desktop."/>
-                <echo message="Configuration execution for a ${computer.type} machine."/>
-                <property name="num-threads" value="${desktop.thread-number}"/>
-                <property name="memory-flag" value="${desktop.memory}"/>
-            </then>
-            <else>
-                <echo message="Configuration execution for a ${computer.type} machine."/>
-                <property name="num-threads" value="${server.thread-number}"/>
-                <property name="memory-flag" value="${server.memory}"/>
-            </else>
-        </if>
+        <equals arg1="${computer.type}" arg2="desktop"/>
+        <then>
+            <echo message="Configuration execution for desktop."/>
+            <echo message="Configuration execution for a ${computer.type} machine."/>
+            <property name="num-threads" value="${desktop.thread-number}"/>
+            <property name="memory-flag" value="${desktop.memory}"/>
+        </then>
+        <else>
+            <echo message="Configuration execution for a ${computer.type} machine."/>
+            <property name="num-threads" value="${server.thread-number}"/>
+            <property name="memory-flag" value="${server.memory}"/>
+        </else>
+    </if>
 
     <if>
         <istrue value="${use-bdval-jar}"/>
@@ -1354,7 +1360,8 @@
         <attribute name="sample-with-replacement" default="false"/>
         <attribute name="evaluate-statistics" default="true"/>
         <attribute name="output-directory" default="."/>
-        <attribute name="submission-output" default="@{endpoint-name}-@{test-set-name}-maqcii-stats.txt"/>
+        <attribute name="submission-output"
+                   default="@{output-directory}/${save-data-tag}-@{endpoint-name}-@{test-set-name}-maqcii-stats.txt"/>
         <!-- TODO: predict has issues running in parallel.  See http://icbtools.med.cornell.edu/mantis/view.php?id=1301 -->
         <attribute name="num-threads" default="1"/>
 
@@ -1925,10 +1932,11 @@
         <input addproperty="model-conditions"
                message="Enter the name of model conditions file associated with the results."
                defaultvalue="model-conditions.txt"/>
-         <input addproperty="other-measures"
+        <input addproperty="other-measures"
                message="Enter the name of additional performance measures to evaluate."
                defaultvalue="bias"/>
-        <restat results-directory="${results-directory}" model-conditions="${model-conditions}" other-measures="${other-measures}"/>
+        <restat results-directory="${results-directory}" model-conditions="${model-conditions}"
+                other-measures="${other-measures}"/>
 
         <echo message="Calculating statistics for results in ${results-directory}"/>
 
@@ -1937,7 +1945,13 @@
 
     <target name="inner-evaluate-dataset-statistics" depends="prepare-bdval,tag-output-directory"
             description="Evaluate performance statistics on a given dataset">
-        <input addproperty="model-directory" message="Enter the directory where models are stored."/>
+        <input addproperty="results-directory" message="Enter the results directory."/>
+        <input addproperty="final-model-directory-name"
+               defaultvalue="final-models"
+               message="Enter the subdirectory that contains the final models (must exist in results directory)."/>
+
+        <var name="model-directory" value="${results-directory}/${final-model-directory-name}"/>
+        <echo message="Will look for models into ${model-directory}"/>
         <input addproperty="test-set-name"
                message="Name of the dataset for which performance statistics of existing models will be evaluated (dataset name must match an entry in the property file)."
                defaultvalue="test"/>
@@ -1963,6 +1977,7 @@
                                     label="predict-set=${test-set-name}"
                                     sample-with-replacement="${sample-with-replacement}"
                                     evaluate-statistics="${evaluate-statistics}"
+                                    output-directory="${results-directory}"
                                     num-threads="1"/>
                         </then>
                     </if>
