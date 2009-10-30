@@ -439,7 +439,7 @@ public class MaqciiHelper {
         options.submissionOutput.print("\t");
         options.submissionOutput.print(details.excelColumnHeader);    //ExcelColumnHeader
         options.submissionOutput.print("\t");
-        options.submissionOutput.print(valueToString(measure.getPerformanceValueAverage("mat")));    //MCC
+        options.submissionOutput.print(valueToString(measure.getPerformanceValueAverage("MCC")));    //MCC
         options.submissionOutput.print("\t");
         options.submissionOutput.print(valueToString(measure.getPerformanceValueAverage("acc")));    //Accuracy
         options.submissionOutput.print("\t");
@@ -453,7 +453,7 @@ public class MaqciiHelper {
         options.submissionOutput.print("\t");
         options.submissionOutput.print(valueToString(measure.getPerformanceValueAverage("RMSEjava")));    //RMSE
         options.submissionOutput.print("\t");
-        options.submissionOutput.print(stdDevToString(measure.getPerformanceValueStd("mat")));    //MCC_StdDev
+        options.submissionOutput.print(stdDevToString(measure.getPerformanceValueStd("MCC")));    //MCC_StdDev
         options.submissionOutput.print("\t");
         options.submissionOutput.print(stdDevToString(measure.getPerformanceValueStd("acc")));    //Accuracy_StdDev
         options.submissionOutput.print("\t");
@@ -522,14 +522,10 @@ public class MaqciiHelper {
 
 
         }
-        options.submissionOutput.print("\t");
-        options.submissionOutput.print(valueToString(measure.getPerformanceValueAverage("MCC-zero")));    //MCC-threshold independent
-        options.submissionOutput.print("\t");
-        options.submissionOutput.print(stdDevToString(measure.getPerformanceValueStd("MCC-zero")));    //MCC-threshold independent_StdDev
-
+       
         for (final String otherMeasureName : otherMeasureNames) {
             options.submissionOutput.print("\t");
-            options.submissionOutput.print(valueToString(measure.getPerformanceValueAverage(otherMeasureName)));
+            options.submissionOutput.print(valueToString(measure.getPerformanceValueAverage(otherMeasureName),4));
             options.submissionOutput.print("\t");
             options.submissionOutput.print(stdDevToString(measure.getPerformanceValueStd(otherMeasureName)));
         }
