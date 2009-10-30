@@ -157,6 +157,9 @@ public class RestatMode extends ProcessModelConditionsMode {
 
                 for (int r = 0; r < numberOfRepeats; r++) {
                     for (int c = 0; c < numberOfFolds; c++) {
+                        if (index >= accuracyArray.length || index >= modelAccuracies.length) {
+                            break;
+                        }
                         accuracyArray[index] = Math.max(modelAccuracies[index], accuracyArray[index]);
                         ++index;
                     }
@@ -176,8 +179,8 @@ public class RestatMode extends ProcessModelConditionsMode {
             (ProcessModelConditionsOptions
                     options, String
                     seriesID) {
-       if (seriesID == null){
-                return new  ArrayList<String>();
+        if (seriesID == null) {
+            return new ArrayList<String>();
         }
         Set<String> modelIdKeys = options.modelConditions.keySet();
         // model-Id's associated with model-conditions file
@@ -206,21 +209,28 @@ public class RestatMode extends ProcessModelConditionsMode {
                 // could not load predictions for this model (perhaps partially built).
                 continue;
             }
+            int actualRepeatNumber = 0;
+            final double[] modelAccuracies = acrossAllFoldsMap.get(modelId);
             for (int repeatIndex = 0; repeatIndex < numberOfRepeats; repeatIndex++) {
+                if (index >= modelAccuracies.length) {
+                    break;
+                }
                 for (int foldIndex = 0; foldIndex < numberOfFolds; foldIndex++) {
 
-                    final double[] modelAccuracies = acrossAllFoldsMap.get(modelId);
+
                     assert modelAccuracies != null : "model accurary must have been loaded for model id " + modelId;
                     double errorOfThisModel = (1d - (modelAccuracies[index] / 100d));
                     double thetaHatFoldK = (1.0d - (foldMins.get(seriesID)[index] / 100d));
                     bias += (errorOfThisModel - thetaHatFoldK);
                     ++index;
+
                     LOG.debug("bias total " + bias);
                 }
+                ++actualRepeatNumber;
             }
 
             bias /= numberOfFolds;
-            bias /= numberOfRepeats;
+            bias /= actualRepeatNumber;
             davOptions.modelId = modelId;
 
             LOG.debug("bias for " + davOptions.modelId + " is " + bias);
