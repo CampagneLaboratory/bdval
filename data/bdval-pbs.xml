@@ -96,7 +96,8 @@
                 <filterset>
                     <filter token="PBS-QUEUE" value="@{pbs-queue}"/>
                     <filter token="PBS-NODES" value="@{pbs-nodes}"/>
-                    <filter token="JOB-NAME" value="@{job-name}"/>
+                    <!-- TODO: PBS name cannot be more than 15 chars -  replace with @{job-name} -->
+                    <filter token="JOB-NAME" value="bdval"/>
                     <filter token="JOB-DIR" value="${job-dir}"/>
                 </filterset>
             </copy>
