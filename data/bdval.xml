@@ -1893,6 +1893,7 @@
         <attribute name="results-directory"/>
         <attribute name="model-conditions" default="model-conditions.txt"/>
         <attribute name="output" default="@{results-directory}-${save-data-tag}-evaluation-stats.txt"/>
+        <attribute name="other-measures" default="bias"/>
         <sequential>
 
             <java classname="org.bdval.modelconditions.ProcessModelConditions" dir="${bdval.basedir}"
@@ -1905,6 +1906,8 @@
                 <sysproperty key="pj.nt" value="${num-threads}"/>
                 <arg value="-m"/>
                 <arg value="stats"/>
+                <arg value="--other-measures"/>
+                <arg value="@{other-measures}"/>
                 <arg value="--submission-file"/>
                 <arg value="@{output}"/>
                 <arg value="--model-conditions"/>
@@ -1922,7 +1925,10 @@
         <input addproperty="model-conditions"
                message="Enter the name of model conditions file associated with the results."
                defaultvalue="model-conditions.txt"/>
-        <restat results-directory="${results-directory}" model-conditions="${model-conditions}"/>
+         <input addproperty="other-measures"
+               message="Enter the name of additional performance measures to evaluate."
+               defaultvalue="bias"/>
+        <restat results-directory="${results-directory}" model-conditions="${model-conditions}" other-measures="${other-measures}"/>
 
         <echo message="Calculating statistics for results in ${results-directory}"/>
 
