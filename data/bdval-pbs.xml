@@ -116,10 +116,12 @@
             </echoxml>
 
             <!-- Two threads per node, memory size depends on node type -->
+<!-- TODO
             <dirname file="${eval-dataset-root}" property="eval-dir"/>
             <echo message="${eval-dir}"/>
+-->
             <writeln file="${job-dir}/config/${ant.project.name}-local.properties" append="false"
-                     message="eval-dataset-root=${eval-dataset-root}"/>
+                     message="eval-dataset-root=eval-data"/>
             <writeln file="${job-dir}/config/${ant.project.name}-local.properties"
                      message="computer.type=server"/>
             <writeln file="${job-dir}/config/${ant.project.name}-local.properties"
@@ -151,7 +153,11 @@
                 </fileset>
             </copy>
 
-            <!-- TODO? /bin/cp -pr ${DATASET_ROOT} ${JOB_DATA_DIR}/${JOB}-data -->
+            <copy todir="${job-dir}/data/eval-data">
+                <fileset dir="${eval-dataset-root}">
+                    <include name="**/*"/>
+                </fileset>
+            </copy> 
 
             <!-- Tell bdval not to try and compile when running -->
             <writeln file="${job-dir}/data/bdval.properties" append="false" message="use-bdval-jar=true"/>
