@@ -143,6 +143,7 @@
             <copy todir="${job-dir}/data">
                 <fileset dir="${bdval.basedir}/../data">
                     <include name="bdval.xml"/>
+                    <include name="bdval-pbs.xml"/>
                     <include name="${ant.project.name}.xml"/>
                     <include name="${ant.project.name}.properties"/>
                     <include name="sequences/**"/>
