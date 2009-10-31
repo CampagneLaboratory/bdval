@@ -10,7 +10,7 @@
 #PBS -j oe
 
 # Save PBS output to the result directory
-#PBS -o @JOB-DIR@-results/@JOB-NAME@.log
+#PBS -o @JOB-DIR@/@JOB-NAME@.log
 
 # Number of nodes (exclusive access)
 #PBS -l nodes=@PBS-NODES@#excl
