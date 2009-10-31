@@ -323,11 +323,12 @@ public class CandidateModelSelection implements WithProcessMethod {
             }
             System.exit(0);
 
-        }   catch (FileNotFoundException e) {
+        } catch (FileNotFoundException e) {
             e.printStackTrace();
             System.exit(1);
         }
     }
+
     private void filterGeneLists(final ModelSelectionArguments toolsArgs) {
         if (toolsArgs.excludeGeneLists) {
             // remove models built with gene lists..
@@ -408,8 +409,7 @@ public class CandidateModelSelection implements WithProcessMethod {
 
     }
 
-    private void calculateStats
-            (final Map<String, Map<String, ZScoreCalculator>> perfs) {
+    private void calculateStats(final Map<String, Map<String, ZScoreCalculator>> perfs) {
         for (final Map<String, ZScoreCalculator> calculatorMap : perfs.values()) {
             final String[] measures = {MCC, ACC, SENS, SPEC, AUC};
 
@@ -443,9 +443,7 @@ public class CandidateModelSelection implements WithProcessMethod {
 
     }
 
-    private double nanToZero
-            (
-                    final double mcc) {
+    private double nanToZero(final double mcc) {
         if (mcc != mcc) {
             return 0;
         } else {
@@ -453,9 +451,7 @@ public class CandidateModelSelection implements WithProcessMethod {
         }
     }
 
-    private void dump
-            (
-                    final ModelSelectionArguments toolsArgs) {
+    private void dump(final ModelSelectionArguments toolsArgs) {
         if (toolsArgs.dumpFilename != null) {
             System.out.println("Writing integrated dataset to " + toolsArgs.dumpFilename);
             try {
@@ -467,7 +463,7 @@ public class CandidateModelSelection implements WithProcessMethod {
                         String.format(
                                 "dataset\tendpoint\tmodelId\tnumFeaturesInModel\t" +
                                         "MCC_CV\tACC_CV\tSens_CV\tSpec_CV\tAUC_CV\t" +
-                                        "norm_MCC_CV\tnorm_ACC_CV\tnorm_Sens_CV\tnorm_Spec_CV\tnorm_AUC_CV\t" +
+                                        "norm_MCC_CV\tnorm_ACC_CV\tnorm_Sens_CV\tnorm_Spec_CV\tnorm_AUC_CV\tT&T_accuracy_bias" +
                                         "MCC_CVCF\tACC_CVCF\tSens_CVCF\tSpec_CVCF\tAUC_CVCF\t" +
                                         //   "max_MCC_CVCF\tmax_ACC_CVCF\tmax_Sens_CVCF\tmax_Spec_CVCF\tmax_AUC_CVCF\t" +
                                         "norm_MCC_CVCF\tnorm_ACC_CVCF\tnorm_Sens_CVCF\tnorm_Spec_CVCF\tnorm_AUC_CVCF\t" +
@@ -496,11 +492,11 @@ public class CandidateModelSelection implements WithProcessMethod {
                     final double deltaCVCF_CV_spec = getNormalizedMeasure(modelId, cvcfResults, cvcfNormFactorPerfs, MeasureName.SPEC) - getNormalizedMeasure(modelId, cvResults, cvNormFactorPerfs, MeasureName.SPEC);
                     final double deltaCVCF_CV_auc = getNormalizedMeasure(modelId, cvcfResults, cvcfNormFactorPerfs, MeasureName.AUC) - getNormalizedMeasure(modelId, cvResults, cvNormFactorPerfs, MeasureName.AUC);
 
-                    writer.append(String.format("%s\t%s\t%s\t%d\t%s\t%s\t%s\t%f\t%f\t%f\t%f\t%f\t%s%s\n",
+                    writer.append(String.format("%s\t%s\t%s\t%d\t%s\t%s\t%s\t%s\t%f\t%f\t%f\t%f\t%f\t%s%s\n",
                             datasetName, endpointCode, modelId,
                             numActualFeatures,
                             formatStats(modelId, this.cvResults, this.cvNormFactorPerfs),
-
+                            formatBias(cvPerf),
                             formatStats(modelId, this.cvcfResults, this.cvcfNormFactorPerfs),
                             formatStats(modelId, this.testResults, this.testNormFactorPerfs),
                             deltaCVCF_CV_mcc, deltaCVCF_CV_acc, deltaCVCF_CV_sens, deltaCVCF_CV_spec, deltaCVCF_CV_auc,
@@ -514,6 +510,15 @@ public class CandidateModelSelection implements WithProcessMethod {
                 e.printStackTrace();
             }
             System.exit(0);
+        }
+    }
+
+    private String formatBias(ModelPerformance cvPerf) {
+        if (cvPerf.bias == cvPerf.bias) {
+            return String.format("%f", cvPerf.bias);
+        } else {
+            // NaN
+            return "NaN";
         }
     }
 
@@ -1153,12 +1158,12 @@ public class CandidateModelSelection implements WithProcessMethod {
 
         double predictedPerformance = Double.NaN;
         final BMFCalibrationModel bmfModel = BMFCalibrationModel.load(toolsArgs.modelNameString);
-        final Object2DoubleMap<String> map=new Object2DoubleOpenHashMap<String>();
-        map.put("actualNumberOfFeaturesInModel",cvPerf.actualNumberOfFeaturesInModel);
-        map.put("norm_auc",norm_AUC_CV);
-        map.put("delta_auc_cvcf_cv",delta_AUC_CVCF_CV);
+        final Object2DoubleMap<String> map = new Object2DoubleOpenHashMap<String>();
+        map.put("actualNumberOfFeaturesInModel", cvPerf.actualNumberOfFeaturesInModel);
+        map.put("norm_auc", norm_AUC_CV);
+        map.put("delta_auc_cvcf_cv", delta_AUC_CVCF_CV);
 
-      predictedPerformance=  bmfModel.calibrateEstimate(toolsArgs, modelId, map);
+        predictedPerformance = bmfModel.calibrateEstimate(toolsArgs, modelId, map);
         switch (toolsArgs.modelName) {
 
             case TrainedOnACZ:
@@ -1173,7 +1178,6 @@ public class CandidateModelSelection implements WithProcessMethod {
 
         return predictedPerformance;
     }
-
 
 
     private double modelTrainedOnACZ
@@ -1208,7 +1212,6 @@ public class CandidateModelSelection implements WithProcessMethod {
         )
                 + 0.614443519922211 * delta_auc_cvcf_cv;
     }
-
 
 
     private double modelTrainedOnZ
@@ -1562,8 +1565,8 @@ AUC of CV + 0.0190346231277872 * :Name( "MCC of CV-CF" ) +
         }
     }
 
-    private void load(
-            final ModelSelectionArguments toolsArgs, final boolean filterByEndpoint) throws FileNotFoundException {
+    private void load(final ModelSelectionArguments toolsArgs,
+                      final boolean filterByEndpoint) throws FileNotFoundException {
         if (filterByEndpoint) {
 
             modelIds.clear();
@@ -1755,6 +1758,10 @@ AUC of CV + 0.0190346231277872 * :Name( "MCC of CV-CF" ) +
                             reader.getString();
                         }
                         measure.modelId = reader.getString();
+                        for (int i = 0; i < 5; i++) {
+                            reader.getString();
+                        }
+                        measure.bias = reader.getDouble();
                         modelPerfs.put(measure.modelId, measure);
                         modelIds.add(measure.modelId);
                         final MutableString modelId = new MutableString(measure.modelId);
@@ -1782,6 +1789,7 @@ AUC of CV + 0.0190346231277872 * :Name( "MCC of CV-CF" ) +
         double mcc;
         double rmse;
         String modelId;
+        double bias;
         /**
          * The actual number of features used in this model. May differ from the number of features listed in model condition files, for instance
          * for gene list based models: the gene list may overlap the chip for less probesets than the number indicated to build the model.
