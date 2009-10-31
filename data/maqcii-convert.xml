@@ -105,7 +105,7 @@
 
         <sequential>
 
-            <java classname="edu.cornell.med.icb.biomarkers.CandidateModelSelection" fork="true"
+            <java classname="org.bdval.modelselection.CandidateModelSelection" fork="true"
                   failonerror="true">
                 <jvmarg value="-ea"/>
                 <jvmarg value="${memory-flag}"/>
@@ -385,6 +385,30 @@
                 selection-strategy="CV"
                 custom-ranking-set=""
                 validation-filename="${results-directory}/predict-validation-maqcii-stats.txt"/>
+
+
+    </target>
+
+      <target name="combine-stats-bias"
+            description="Combine statistics for bias comparison runs" depends="compile">
+        <input addproperty="evaluation-data-directory"
+               message="Enter the directory where CV/CVCF/test results are stored."
+               defaultvalue="/Users/fac2003/Dropbox/projects/bias"/>
+
+        <var name="results-directory" value="${evaluation-data-directory}"/>
+        <delete file="${results-directory}/pathways-average-direct-CV-CVCF=CV-validation.txt"/>
+
+        <candidate-model-selections
+                cv-results-filename="${results-directory}/Endpoint-Iconix-results-20091030-2157-results-evaluation-stats"
+                cvcf-results-filename="${results-directory}/20091029-1916-results-CVCF-maqcii-submission"
+                model-ids=""
+                output-filename="-"
+                dump="--dump ${results-directory}/bias-CV-CVCF=CV-validation.txt --model-conditions ${results-directory}/model-conditions-columns.txt"
+                reward-performance="AUC"
+                rank-candidates-by="AUC"
+                selection-strategy="CV"
+                custom-ranking-set=""
+                validation-filename="${results-directory}/XXX.txt"/>
 
 
     </target>
