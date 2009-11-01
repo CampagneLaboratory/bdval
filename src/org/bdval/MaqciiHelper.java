@@ -437,29 +437,29 @@ public class MaqciiHelper {
         options.submissionOutput.print("\t");
         options.submissionOutput.print(details.excelColumnHeader);    //ExcelColumnHeader
         options.submissionOutput.print("\t");
-        options.submissionOutput.print(valueToString(measure.getPerformanceValueAverage("MCC")));    //MCC
+        options.submissionOutput.print(valueToString(measure.getPerformanceValueAverage("MCC-zero")));    //MCC
         options.submissionOutput.print("\t");
-        options.submissionOutput.print(valueToString(measure.getPerformanceValueAverage("Accuracy")));    //Accuracy
+        options.submissionOutput.print(valueToString(measure.getPerformanceValueAverage("Accuracy-zero")));    //Accuracy
         options.submissionOutput.print("\t");
-        options.submissionOutput.print(valueToString(measure.getPerformanceValueAverage("Sensitivity")));    //Sensitivity
+        options.submissionOutput.print(valueToString(measure.getPerformanceValueAverage("Sensitivity-zero")));    //Sensitivity
         options.submissionOutput.print("\t");
-        options.submissionOutput.print(valueToString(measure.getPerformanceValueAverage("Specificity")));    //Specificity
+        options.submissionOutput.print(valueToString(measure.getPerformanceValueAverage("Specificity-zero")));    //Specificity
         options.submissionOutput.print("\t");
         options.submissionOutput.print(valueToString(measure.getPerformanceValueAverage("AUC")));    //AUC, calculated with AreadUnderTheRocCurveCalculator
         options.submissionOutput.print("\t");
-        options.submissionOutput.print(valueToString(measure.getPerformanceValueAverage("RMSE")));    //RMSE
+        options.submissionOutput.print(valueToString(measure.getPerformanceValueAverage("RMSE-zero")));    //RMSE
         options.submissionOutput.print("\t");
-        options.submissionOutput.print(stdDevToString(measure.getPerformanceValueStd("MCC")));    //MCC_StdDev
+        options.submissionOutput.print(stdDevToString(measure.getPerformanceValueStd("MCC-zero")));    //MCC_StdDev
         options.submissionOutput.print("\t");
-        options.submissionOutput.print(stdDevToString(measure.getPerformanceValueStd("Accuracy")));    //Accuracy_StdDev
+        options.submissionOutput.print(stdDevToString(measure.getPerformanceValueStd("Accuracy-zero")));    //Accuracy_StdDev
         options.submissionOutput.print("\t");
-        options.submissionOutput.print(stdDevToString(measure.getPerformanceValueStd("Sensitivity")));    //Sensitivity_StdDev
+        options.submissionOutput.print(stdDevToString(measure.getPerformanceValueStd("Sensitivity-zero")));    //Sensitivity_StdDev
         options.submissionOutput.print("\t");
-        options.submissionOutput.print(stdDevToString(measure.getPerformanceValueStd("Specificity")));    //Specificity_StdDev
+        options.submissionOutput.print(stdDevToString(measure.getPerformanceValueStd("Specificity-zero")));    //Specificity_StdDev
         options.submissionOutput.print("\t");
         options.submissionOutput.print(stdDevToString(measure.getPerformanceValueStd("AUC")));    //AUC_StdDev calculated with AreadUnderTheRocCurveCalculator
         options.submissionOutput.print("\t");
-        options.submissionOutput.print(stdDevToString(measure.getPerformanceValueStd("RMSE")));    //RMSE_StdDev
+        options.submissionOutput.print(stdDevToString(measure.getPerformanceValueStd("RMSE-zero")));    //RMSE_StdDev
         options.submissionOutput.print("\t");
         options.submissionOutput.print("N/A");    //SummaryNormalization
         options.submissionOutput.print("\t");
