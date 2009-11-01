@@ -92,7 +92,7 @@
             </copy>
 
             <!-- Create the PBS job submission script -->
-            <copy file="${bdval.basedir}/../scripts/pbs/bdval.qsub" tofile="@{job-name}.qsub" filtering="true">
+            <copy file="${bdval.basedir}/../scripts/pbs/bdval.qsub" tofile="@{job-name}.qsub" filtering="true" overwrite="true">
                 <filterset>
                     <filter token="PBS-QUEUE" value="@{pbs-queue}"/>
                     <filter token="PBS-NODES" value="@{pbs-nodes}"/>
