@@ -97,11 +97,11 @@
     -->
 
     <!-- Normal targets (non-pathways) -->
-    <property name="do.GSE8402_FusionYesNo_TrainingSplit" value="true"/>
-    <property name="do.GSE8402_FusionYesNo_TestSplit" value="false"/>
-    <property name="do.GSE8402_FusionYesNo_Validation" value="false"/>
-    <property name="do.synthetic_8_Training" value="false"/>
-    <property name="do.GDS619" value="false"/>
+    <var name="do.GSE8402_FusionYesNo_TrainingSplit" value="true"/>
+    <var name="do.GSE8402_FusionYesNo_TestSplit" value="false"/>
+    <var name="do.GSE8402_FusionYesNo_Validation" value="false"/>
+    <var name="do.synthetic_8_Training" value="false"/>
+    <var name="do.GDS619" value="false"/>
 
     <property name="all-endpoints"
               value="synthetic_8_Training GDS619 GSE8402_FusionYesNo_TrainingSplit GSE8402_FusionYesNo_TestSplit GSE8402_FusionYesNo_Validation"/>
@@ -156,7 +156,7 @@
         <echo message="Executing with ${num-threads} threads"/>
         <sequential>
 
-            <property name="do.GSE8402_FusionYesNo" value="true"/>
+            <var name="do.GSE8402_FusionYesNo" value="true"/>
 
             <property name="use-feature-selection-fold=true" value="false"/>
             <property name="use-feature-selection-fold=false" value="true"/>
