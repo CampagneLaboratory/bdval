@@ -217,10 +217,10 @@ public class CrossValidateConsensusFeatures {
         final JSAP jsap = new JSAP();
         JSAPResult result = null;
         try {
-            final CrossValidationMode writeModel = new CrossValidationMode();
+            final CrossValidationMode crossValidationMode = new CrossValidationMode();
             final DAVMode dMode = new DAVMode();
             dMode.defineOptions(jsap);
-            writeModel.defineOptions(jsap);
+            crossValidationMode.defineOptions(jsap);
             final DAVOptions options = new DAVOptions();
 
             result = jsap.parse(args);
@@ -231,8 +231,8 @@ public class CrossValidateConsensusFeatures {
                     System.out.println(errorMessage);
                 }
             }
-            writeModel.interpretArguments(jsap, result, options);
-            writeModel.process(options);
+            crossValidationMode.interpretArguments(jsap, result, options);
+            crossValidationMode.process(options);
             System.out.println("done.");
             System.out.flush();
         } catch (JSAPException e) {

@@ -1899,7 +1899,7 @@
     <macrodef name="restat">
         <attribute name="results-directory"/>
         <attribute name="model-conditions" default="model-conditions.txt"/>
-        <attribute name="output" default="@{results-directory}-${save-data-tag}-evaluation-stats.txt"/>
+        <attribute name="output" default="@{results-directory}/${save-data-tag}-restat-maqcii-submission.txt"/>
         <attribute name="other-measures" default="bias"/>
         <sequential>
 
@@ -1925,7 +1925,7 @@
     </macrodef>
 
     <target name="restat" description="Recalculate statistics for prediction table files in a given directory"
-            depends="init,prepare-bdval,rserve-status,tag-output-directory">
+            depends="prepare-bdval,rserve-status,tag-output-directory">
 
         <input addproperty="results-directory"
                message="Enter the results directories to restat. The directories must contain a predictions directory."/>
@@ -1935,10 +1935,10 @@
         <input addproperty="other-measures"
                message="Enter the name of additional performance measures to evaluate."
                defaultvalue="bias"/>
-        <restat results-directory="${results-directory}" model-conditions="${model-conditions}"
-                other-measures="${other-measures}"/>
 
         <echo message="Calculating statistics for results in ${results-directory}"/>
+        <restat results-directory="${results-directory}" model-conditions="${model-conditions}"
+                      other-measures="${other-measures}"/>
 
 
     </target>
@@ -2090,7 +2090,8 @@
         </delete-->
 
         <input addproperty="tag-description"
-               message="Please provide a short description for this run (i.e., condition tested, summary of parameters)."/>
+               message="Please provide a short description for this run (i.e., condition tested, summary of parameters)."
+                defaultvalue="N/A"/>
         <echo append="false" file="${save-data-dir}/${save-data-tag}-README.txt">
             ${tag-description}
 

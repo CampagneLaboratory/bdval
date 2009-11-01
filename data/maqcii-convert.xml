@@ -56,7 +56,8 @@
         <sequential>
             <mkdir dir="@{output-dir}/@{date-prefix}-Cornell-Models"/>
 
-            <java classname="edu.cornell.med.icb.biomarkers.tools.convertols.convert.maqcii.PredictionsToCornell" fork="true"
+            <java classname="edu.cornell.med.icb.biomarkers.tools.convertols.convert.maqcii.PredictionsToCornell"
+                  fork="true"
                   failonerror="true">
                 <jvmarg value="${memory-flag}"/>
                 <arg line="--input-directory @{predictions-dir}"/>
@@ -67,7 +68,8 @@
                 <classpath refid="classpath"/>
             </java>
 
-            <java classname="edu.cornell.med.icb.biomarkers.tools.convertols.convert.maqcii.CornellToLeming" fork="true" failonerror="true">
+            <java classname="edu.cornell.med.icb.biomarkers.tools.convertols.convert.maqcii.CornellToLeming" fork="true"
+                  failonerror="true">
                 <jvmarg value="${memory-flag}"/>
                 <arg line="--input-file @{output-dir}/@{date-prefix}-Cornell-Models/@{date-prefix}-validation-predictions-cornell-format-all-endpoints.txt"/>
                 <arg line="--output-directory @{output-dir}/@{date-prefix}-Cornell-Models/"/>
@@ -76,7 +78,8 @@
                 <classpath refid="classpath"/>
             </java>
 
-            <java classname="edu.cornell.med.icb.biomarkers.tools.convertols.convert.maqcii.VerifyConversion" fork="true" failonerror="true">
+            <java classname="edu.cornell.med.icb.biomarkers.tools.convertols.convert.maqcii.VerifyConversion"
+                  fork="true" failonerror="true">
                 <jvmarg value="${memory-flag}"/>
                 <arg line="--predictions-directory @{predictions-dir}"/>
                 <arg line="--validations-directory @{output-dir}/@{date-prefix}-Cornell-Models/"/>
@@ -389,26 +392,26 @@
 
     </target>
 
-      <target name="combine-stats-bias"
+    <target name="combine-stats-bias"
             description="Combine statistics for bias comparison runs" depends="compile">
         <input addproperty="evaluation-data-directory"
                message="Enter the directory where CV/CVCF/test results are stored."
-               defaultvalue="/Users/fac2003/Dropbox/projects/bias"/>
+               defaultvalue="/Users/fac2003/Dropbox/BDVal Project/Iconix-results"/>
 
         <var name="results-directory" value="${evaluation-data-directory}"/>
-        <delete file="${results-directory}/pathways-average-direct-CV-CVCF=CV-validation.txt"/>
+        <delete file="${results-directory}/bias-CV-CVCF=CV-validation.txt"/>
 
         <candidate-model-selections
-                cv-results-filename="${results-directory}/Endpoint-Iconix-results-20091030-2157-results-evaluation-stats"
-                cvcf-results-filename="${results-directory}/20091029-1916-results-CVCF-maqcii-submission"
+                cv-results-filename="${results-directory}/CV.dat"
+                cvcf-results-filename="${results-directory}/CVCF.dat"
                 model-ids=""
                 output-filename="-"
                 dump="--dump ${results-directory}/bias-CV-CVCF=CV-validation.txt --model-conditions ${results-directory}/model-conditions-columns.txt"
-                reward-performance="AUC"
-                rank-candidates-by="AUC"
+                reward-performance="ACCURACY"
+                rank-candidates-by="ACCURACY"
                 selection-strategy="CV"
                 custom-ranking-set=""
-                validation-filename="${results-directory}/XXX.txt"/>
+                validation-filename="${results-directory}/validation.dat"/>
 
 
     </target>

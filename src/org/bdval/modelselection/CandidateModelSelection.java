@@ -1758,7 +1758,7 @@ AUC of CV + 0.0190346231277872 * :Name( "MCC of CV-CF" ) +
                             reader.getString();
                         }
                         measure.modelId = reader.getString();
-                        for (int i = 0; i < 5; i++) {
+                        for (int i = 0; i < 3; i++) {
                             reader.getString();
                         }
                         measure.bias = reader.getDouble();

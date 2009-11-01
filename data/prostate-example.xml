@@ -109,7 +109,8 @@
 
     <import file="bdval.xml"/>
 
-    <target name="evaluate" description="Run a complete evaluation." depends="prepare-bdval, rserve-status, tag-output-directory">
+    <target name="evaluate" description="Run a complete evaluation."
+            depends="prepare-bdval, rserve-status, tag-output-directory">
         <delete file="${statistics-output}"/>
 
         <echo message="Executing with ${num-threads} threads"/>
@@ -143,6 +144,27 @@
             <property name="do.ttest-svmiterative" value="false"/>
 
             <execute-all-endpoints/>
+
+        </sequential>
+        <antcall target="process-model-conditions"/>
+        <antcall target="zip-results"/>
+    </target>
+    
+    <target name="scan-series" description="Run a complete evaluation." depends="prepare-bdval,tag-output-directory">
+        <delete file="${statistics-output}"/>
+
+        <echo message="Executing with ${num-threads} threads"/>
+        <sequential>
+
+            <property name="do.GSE8402_FusionYesNo" value="true"/>
+
+            <property name="use-feature-selection-fold=true" value="false"/>
+            <property name="use-feature-selection-fold=false" value="true"/>
+
+            <property name="do.weka-feature-selection-scan" value="true"/>
+
+            <execute-all-endpoints/>
+
 
         </sequential>
         <antcall target="process-model-conditions"/>

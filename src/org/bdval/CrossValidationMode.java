@@ -49,7 +49,6 @@ import java.text.NumberFormat;
  */
 public class CrossValidationMode extends DAVMode {
     private static final Log LOG = LogFactory.getLog(CrossValidationMode.class);
-    final CharSequence[] measures = {"auc", "mat", "rmse", "acc", "f", "spec", "sens", "prec", "rec", "MCC"};
     private int cvRepeatNumber;
     final MaqciiHelper maqciiHelper = new MaqciiHelper();
     static final NumberFormat formatter;
@@ -108,7 +107,7 @@ public class CrossValidationMode extends DAVMode {
         super.process(options);
         maqciiHelper.printSubmissionHeaders(options);
         for (final ClassificationTask task : options.classificationTasks) {
-            printHeaders(options, measures, task);
+            printHeaders(options, Predict.MEASURES, task);
 
             for (final GeneList geneList : options.geneLists) {
                 try {
@@ -197,7 +196,7 @@ public class CrossValidationMode extends DAVMode {
         final CrossValidation crossValidation =
                 new CrossValidation(helper.classifier, helper.problem, randomEngine);
         crossValidation.setRepeatNumber(cvRepeatNumber);
-        crossValidation.evaluateMeasures(measures);
+        crossValidation.evaluateMeasures(Predict.MEASURES);
 
         crossValidation.setScalerClass(scalerClass);
 

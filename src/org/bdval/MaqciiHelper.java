@@ -277,8 +277,6 @@ public class MaqciiHelper {
         options.submissionOutput.print("\t");
         options.submissionOutput.print("RMSE");
         options.submissionOutput.print("\t");
-        options.submissionOutput.print("RMSEjava");
-        options.submissionOutput.print("\t");
         options.submissionOutput.print("MCC_StdDev");
         options.submissionOutput.print("\t");
         options.submissionOutput.print("Accuracy_StdDev");
@@ -441,29 +439,27 @@ public class MaqciiHelper {
         options.submissionOutput.print("\t");
         options.submissionOutput.print(valueToString(measure.getPerformanceValueAverage("MCC")));    //MCC
         options.submissionOutput.print("\t");
-        options.submissionOutput.print(valueToString(measure.getPerformanceValueAverage("acc")));    //Accuracy
+        options.submissionOutput.print(valueToString(measure.getPerformanceValueAverage("Accuracy")));    //Accuracy
         options.submissionOutput.print("\t");
-        options.submissionOutput.print(valueToString(measure.getPerformanceValueAverage("sens")));    //Sensitivity
+        options.submissionOutput.print(valueToString(measure.getPerformanceValueAverage("Sensitivity")));    //Sensitivity
         options.submissionOutput.print("\t");
-        options.submissionOutput.print(valueToString(measure.getPerformanceValueAverage("spec")));    //Specificity
+        options.submissionOutput.print(valueToString(measure.getPerformanceValueAverage("Specificity")));    //Specificity
         options.submissionOutput.print("\t");
         options.submissionOutput.print(valueToString(measure.getPerformanceValueAverage("AUC")));    //AUC, calculated with AreadUnderTheRocCurveCalculator
         options.submissionOutput.print("\t");
-        options.submissionOutput.print(valueToString(measure.getPerformanceValueAverage("rmse")));    //RMSE
-        options.submissionOutput.print("\t");
-        options.submissionOutput.print(valueToString(measure.getPerformanceValueAverage("RMSEjava")));    //RMSE
+        options.submissionOutput.print(valueToString(measure.getPerformanceValueAverage("RMSE")));    //RMSE
         options.submissionOutput.print("\t");
         options.submissionOutput.print(stdDevToString(measure.getPerformanceValueStd("MCC")));    //MCC_StdDev
         options.submissionOutput.print("\t");
-        options.submissionOutput.print(stdDevToString(measure.getPerformanceValueStd("acc")));    //Accuracy_StdDev
+        options.submissionOutput.print(stdDevToString(measure.getPerformanceValueStd("Accuracy")));    //Accuracy_StdDev
         options.submissionOutput.print("\t");
-        options.submissionOutput.print(stdDevToString(measure.getPerformanceValueStd("sens")));    //Sensitivity_StdDev
+        options.submissionOutput.print(stdDevToString(measure.getPerformanceValueStd("Sensitivity")));    //Sensitivity_StdDev
         options.submissionOutput.print("\t");
-        options.submissionOutput.print(stdDevToString(measure.getPerformanceValueStd("spec")));    //Specificity_StdDev
+        options.submissionOutput.print(stdDevToString(measure.getPerformanceValueStd("Specificity")));    //Specificity_StdDev
         options.submissionOutput.print("\t");
         options.submissionOutput.print(stdDevToString(measure.getPerformanceValueStd("AUC")));    //AUC_StdDev calculated with AreadUnderTheRocCurveCalculator
         options.submissionOutput.print("\t");
-        options.submissionOutput.print(stdDevToString(measure.getPerformanceValueStd("rmse")));    //RMSE_StdDev
+        options.submissionOutput.print(stdDevToString(measure.getPerformanceValueStd("RMSE")));    //RMSE_StdDev
         options.submissionOutput.print("\t");
         options.submissionOutput.print("N/A");    //SummaryNormalization
         options.submissionOutput.print("\t");
@@ -608,10 +604,10 @@ public class MaqciiHelper {
     }
 
     private double getCompositeMeasure(final EvaluationMeasure measure) {
-        final double mcc = measure.getPerformanceValueAverage("mat");
-        final double mccStd = measure.getPerformanceValueStd("mat");
-        final double auc = measure.getPerformanceValueAverage("auc");
-        final double aucStd = measure.getPerformanceValueStd("auc");
+        final double mcc = measure.getPerformanceValueAverage("MCC");
+        final double mccStd = measure.getPerformanceValueStd("MCC");
+        final double auc = measure.getPerformanceValueAverage("AUC");
+        final double aucStd = measure.getPerformanceValueStd("AUC");
         return mcc + auc - mccStd - aucStd;
     }
 
