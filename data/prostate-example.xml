@@ -108,6 +108,7 @@
     <!-- end of the endpoint definitions -->
 
     <import file="bdval.xml"/>
+    <import file="bdval-pbs.xml"/>
 
     <target name="evaluate" description="Run a complete evaluation."
             depends="prepare-bdval, rserve-status, tag-output-directory">
@@ -144,7 +145,6 @@
             <property name="do.ttest-svmiterative" value="false"/>
 
             <execute-all-endpoints/>
-
         </sequential>
         <antcall target="process-model-conditions"/>
         <antcall target="zip-results"/>
@@ -171,6 +171,15 @@
         <antcall target="zip-results"/>
     </target>
 
+    <target name="foo">
+        <!-- change values to "true" below in order to run the condition listed -->
+        <property name="use-feature-selection-fold=true" value="true"/>
+        <property name="use-feature-selection-fold=false" value="true"/>
+        <property name="do.baseline" value="true"/>
+        <property name="do.weka-feature-selection-scan" value="true"/>
+
+        <setup-pbs-job target="evaluate" tag="foobar" tag-description="how now brown cow"/>
+    </target>
 
     <target name="pathways" description="Run pathways." depends="prepare-bdval, tag-output-directory">
         <delete file="${statistics-output}"/>

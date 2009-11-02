@@ -14,6 +14,7 @@
 
     <macrodef name="setup-pbs-job" description="Setup BDVAL for a PBS submission">
         <attribute name="job-name" default="${ant.project.name}" description="Name to associate with this job"/>
+        <attribute name="pbs-master-node" default="master01" description="Name of the PBS head node"/>
         <attribute name="pbs-queue" default="normal" description="Name of the PBS queue for the submission"/>
         <attribute name="pbs-nodes" default="1" description="Number of nodes to request"/>
         <attribute name="target" description="The ant target to run on the cluster"/>
@@ -88,6 +89,7 @@
                     <filter token="TAG" value="@{tag}"/>
                     <filter token="TAG-DESCRIPTION" value="@{tag-description}"/>
                     <filter token="JOB-DIR" value="${job-dir}"/>
+                    <filter token="MASTER-NODE" value="@{pbs-master-node}"/>
                 </filterset>
             </copy>
 
@@ -99,6 +101,7 @@
                     <!-- TODO: PBS name cannot be more than 15 chars -  replace with @{job-name} -->
                     <filter token="JOB-NAME" value="bdval"/>
                     <filter token="JOB-DIR" value="${job-dir}"/>
+                    <filter token="MASTER-NODE" value="@{pbs-master-node}"/>
                 </filterset>
             </copy>
 

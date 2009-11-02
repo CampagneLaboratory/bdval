@@ -21,6 +21,8 @@
 # TODO Mail to user specified
 ##PBS -M mas2062@med.cornell.edu
 
+# TODO submit as a job array
+
 #
 # Output some useful job information
 #
@@ -46,7 +48,7 @@ do
   echo "=============================================="
   echo "Copying files to $node"
   echo "=============================================="
-  scp -pr @master01:@JOB-DIR@ @$node:$TMPDIR
+  scp -pr @@MASTER-NODE@:@JOB-DIR@ @$node:$TMPDIR
 done
 
 #
