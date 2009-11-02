@@ -21,7 +21,8 @@
 # TODO Mail to user specified
 ##PBS -M mas2062@med.cornell.edu
 
-# TODO submit as a job array (right now we do it from the command line)
+# Submit as a job array
+#PBS -J 1-@PBS-TASKS@
 
 #
 # Output some useful job information

@@ -116,17 +116,6 @@
                 </filterset>
             </copy>
 
-            <!-- Create the PBS job submission script -->
-            <copy file="${bdval.basedir}/../scripts/pbs/bdval.qsub" tofile="@{job-name}.qsub" filtering="true" overwrite="true">
-                <filterset>
-                    <filter token="PBS-QUEUE" value="@{pbs-queue}"/>
-                    <filter token="PBS-NODES" value="@{pbs-nodes}"/>
-                    <filter token="JOB-NAME" value="@{job-name}"/>
-                    <filter token="JOB-DIR" value="${job-dir}"/>
-                    <filter token="MASTER-NODE" value="@{pbs-master-node}"/>
-                </filterset>
-            </copy>
-
             <fixcrlf srcdir="${job-dir}" eol="unix" includes="*.sh"/>
             <chmod dir="${job-dir}" perm="u+x" includes="*.sh"/>
 
@@ -264,6 +253,19 @@
                 </sequential>
             </for>
             <echo level="info" message="Wrote a total of ${pbs-file-counter} files"/>
+
+            <!-- Create the PBS job submission script -->
+            <!-- TODO: need to handle the case where there is only on job to run - an array job is then invalid -->
+            <copy file="${bdval.basedir}/../scripts/pbs/bdval.qsub" tofile="@{job-name}.qsub" filtering="true" overwrite="true">
+                <filterset>
+                    <filter token="PBS-QUEUE" value="@{pbs-queue}"/>
+                    <filter token="PBS-NODES" value="@{pbs-nodes}"/>
+                    <filter token="PBS-TASKS" value="${pbs-file-counter}"/>
+                    <filter token="JOB-NAME" value="@{job-name}"/>
+                    <filter token="JOB-DIR" value="${job-dir}"/>
+                    <filter token="MASTER-NODE" value="@{pbs-master-node}"/>
+                </filterset>
+            </copy>
         </sequential>
     </macrodef>
 
