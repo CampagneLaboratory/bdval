@@ -15,6 +15,9 @@
 # Number of nodes (exclusive access)
 #PBS -l nodes=@PBS-NODES@#excl
 
+# Number of cpus
+#PBS -l ncpus=@PBS-CPUS@
+
 # Mail job status at completion
 #PBS -m ae
 
@@ -37,7 +40,10 @@ echo PBS: working directory is $PBS_O_WORKDIR
 echo PBS: execution mode is $PBS_ENVIRONMENT
 echo PBS: job identifier is $PBS_JOBID
 echo PBS: job name is $PBS_JOBNAME
+echo PBS: task number is $PBS_TASKNUM
+echo PBS: node number is $PBS_NODENUM
 echo PBS: node file is $PBS_NODEFILE
+echo PBS: array index is $PBS_ARRAY_INDEX
 echo PBS: current home directory is $PBS_O_HOME
 echo PBS: PATH = $PBS_O_PATH
 echo ------------------------------------------------------
