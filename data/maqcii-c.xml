@@ -84,7 +84,6 @@
     <!-- end of the endpoint definitions -->
 
     <import file="bdval.xml"/>
-    <import file="bdval-pbs.xml"/>
 
     <target name="evaluate-dataset-statistics" description="Evaluate performance statistics on a given dataset">
         <property name="do.Iconix" value="true"/>
@@ -298,29 +297,6 @@
         </sequential>
         <antcall target="process-model-conditions"/>
         <antcall target="zip-results"/>
-    </target>
-
-    <target name="setup-pbs-job" description="Run a complete evaluation.">
-        <property name="do.Iconix" value="true"/>
-        <property name="do.HamnerWithControl" value="false"/>
-        <property name="do.Cologne_OS_MO" value="true"/>
-        <property name="do.Cologne_EFS_MO" value="true"/>
-        <property name="do.Cologne_NEP_R" value="false"/>
-        <property name="do.Cologne_NEP_S" value="false"/>
-        <property name="do.NIEHS" value="true"/>
-        <property name="do.MDACC_PCR" value="true"/>
-        <property name="do.MDACC_ERPOS" value="true"/>
-        <property name="do.UAMS_EFS_MO" value="false"/>
-        <property name="do.UAMS_OS_MO" value="false"/>
-        <property name="do.UAMS_CPR1" value="false"/>
-        <property name="do.UAMS_CPS1" value="false"/>
-        <property name="do.GSE8402_FusionYesNo" value="true"/>
-
-        <property name="use-feature-selection-fold=true" value="false"/>
-        <property name="use-feature-selection-fold=false" value="true"/>
-
-        <property name="do.weka-feature-selection-scan" value="true"/>
-        <setup-pbs-job target="evaluate" tag-description="Testing pbs"/>
     </target>
 
     <target name="best-practices" description="Run a complete evaluation." depends="prepare-bdval,tag-output-directory">
