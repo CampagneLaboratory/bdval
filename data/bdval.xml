@@ -700,6 +700,7 @@
                    default="--pathways ${@{endpoint-name}.pathways-file} --gene-to-probes ${@{endpoint-name}.gene-to-probes-file}"/>
         <attribute name="endpoint-specific-genelist-names"
                    default="Merged HM200 NC01-2000 GDS1070 GDS183 GDS232 NuttAO NuttGBM POMEROY-0 POMEROY-1 POMEROY-2 POMEROY-3 POMEROY-4 POMEROY-400 Rhodes2004 "/>
+        <attribute name="define-splits-only" default="false"/>
 
         <sequential>
             <!-- define survival file, with default value of "-" -->
@@ -726,7 +727,7 @@
 
             <if>
                 <not>
-                    <istrue value="${define-splits-only}"/>
+                    <istrue value="@{define-splits-only}"/>
                 </not>
                 <then>
                     <if>
@@ -1204,6 +1205,7 @@
 
     <macrodef name="do-one-splits-all" description="Running process-splits-all for one dataset.">
         <attribute name="endpoint-name"/>
+        <attribute name="define-splits-only" default="false"/>
         <sequential>
             <trycatch>
                 <try>
@@ -1271,7 +1273,8 @@
                             do-process-gene-lists="${@{endpoint-name}.do-process-gene-lists}"
                             endpoint-specific-genelist-names="${endpoint-specific-genelist-names}"
                             floor-param="${floor-param}"
-                            array-params="${array-params}"/>
+                            array-params="${array-params}"
+                            define-splits-only="@{define-splits-only}" />
                 </try>
                 <catch>
                     <echo message="CAUGHT FAILED BUILD"/>
@@ -1446,6 +1449,7 @@
     </macrodef>
 
     <macrodef name="execute-all-endpoints" description="Run do-one-splits-all for each target">
+        <attribute name="define-splits-only" default="false"/>
         <sequential>
             <echoproperties/>
             <for param="current-endpoint" delimiter=" " list="${all-endpoints}">
@@ -1453,7 +1457,7 @@
                     <if>
                         <istrue value="${do.@{current-endpoint}}"/>
                         <then>
-                            <do-one-splits-all endpoint-name="@{current-endpoint}"/>
+                            <do-one-splits-all endpoint-name="@{current-endpoint}" define-splits-only="@{define-splits-only}"/>
                         </then>
                     </if>
                 </sequential>

@@ -62,6 +62,9 @@
             <property name="do.weka-feature-selection-scan" value="false"/>
             <property name="do.whole-chip" value="false"/>
 
+            <!-- make sure all the splits are defined so that the job submission uses the same plan -->
+            <execute-all-endpoints define-splits-only="true"/>
+
             <if>
                 <not>
                     <isset property="job-dir"/>
