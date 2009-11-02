@@ -9,7 +9,7 @@ SCRIPT_DIR=`dirname $SCRIPT`
 # Run bdval job
 cd $SCRIPT_DIR/data
 
-ant -propertyfile=@PROJECT@.$PBS_ARRAY_INDEX.properties -Dsave-data-tag=@TAG@ -Dtag-description="@TAG-DESCRIPTION@" -f @PROJECT@.xml @TARGET@
+ant -propertyfile=@PROJECT@-$PBS_ARRAY_INDEX.properties -Dsave-data-tag=@TAG@ -Dtag-description="@TAG-DESCRIPTION@" -f @PROJECT@.xml @TARGET@
 
 # Copy results back to the master node when we are done
 JOB_RESULTS_DIR=@JOB-DIR@-results/${HOSTNAME}
