@@ -3,6 +3,8 @@
     <dirname property="bdval.basedir" file="${ant.file.bdval-pbs}"/>
     <property file="${bdval.basedir}/bdval.properties"/>
     <import file="${bdval.basedir}/../buildsupport/build.xml"/>
+    <import file="${bdval.basedir}/bdval.xml"/>
+
     <description>
         This build file defines macros and tasks used by the Biomarker
         Discovery and VALidation (BDVAL) framework. This file is not
@@ -13,10 +15,12 @@
     <var name="pbs-file-counter" value="0" description="Used to distinguish condition sets"/>
 
     <macrodef name="setup-pbs-job" description="Setup BDVAL for a PBS submission">
-        <attribute name="job-name" default="${ant.project.name}" description="Name to associate with this job"/>
+        <attribute name="job-name" default="${ant.project.name}"
+                   description="Name to associate with this job (must not be longer than 15 characters"/>
         <attribute name="pbs-master-node" default="master01" description="Name of the PBS head node"/>
         <attribute name="pbs-queue" default="normal" description="Name of the PBS queue for the submission"/>
         <attribute name="pbs-nodes" default="1" description="Number of nodes to request"/>
+        <attribute name="tasks-per-node" default="1" description="Number of tasks to run per node"/>
         <attribute name="target" description="The ant target to run on the cluster"/>
         <attribute name="tag" description="Tag for the configuration"/>
         <attribute name="tag-description" description="Description of the configuration"/>
@@ -30,6 +34,29 @@
                     </not>
                 </condition>
             </fail>
+
+            <fail message="Job name (@{job-name}) must not be longer than 15 characters">
+                <condition>
+                    <length string="@{job-name}" when="greater" length="15"/>
+                </condition>
+            </fail>
+
+            <if>
+                <or>
+                    <available file="@{job-name}" type="dir"/>
+                    <available file="@{job-name}.qsub"/>
+                </or>
+                <then>
+                    <input message="Submission with the name @{job-name} already exists. Overwrite? (y/n)"
+                           validargs="y,n" addproperty="input-result"/>
+                    <condition property="ok-to-continue">
+                        <equals arg1="y" arg2="${input-result}"/>
+                    </condition>
+                    <fail unless="ok-to-continue">Build aborted by user.</fail>
+                    <delete dir="@{job-name}"/>
+                    <delete file="@{job-name}.qsub"/>
+                </then>
+            </if>
 
             <!-- all method possibilities -->
             <property name="do.FC+P.logitboost" value="false"/>
@@ -65,15 +92,7 @@
             <!-- make sure all the splits are defined so that the job submission uses the same plan -->
             <execute-all-endpoints define-splits-only="true"/>
 
-            <if>
-                <not>
-                    <isset property="job-dir"/>
-                </not>
-                <then>
-                    <tempfile prefix="@{job-name}-" property="job-dir"/>
-                </then>
-            </if>
-
+            <property name="job-dir" location="@{job-name}"/>
             <mkdir dir="${job-dir}"/>
             <copy todir="${job-dir}">
                 <fileset dir="${bdval.basedir}/..">
@@ -102,8 +121,7 @@
                 <filterset>
                     <filter token="PBS-QUEUE" value="@{pbs-queue}"/>
                     <filter token="PBS-NODES" value="@{pbs-nodes}"/>
-                    <!-- TODO: PBS name cannot be more than 15 chars -  replace with @{job-name} -->
-                    <filter token="JOB-NAME" value="bdval"/>
+                    <filter token="JOB-NAME" value="@{job-name}"/>
                     <filter token="JOB-DIR" value="${job-dir}"/>
                     <filter token="MASTER-NODE" value="@{pbs-master-node}"/>
                 </filterset>
@@ -354,10 +372,11 @@
         <sequential>
             <math result="pbs-file-counter" operation="add" operand1="${pbs-file-counter}"
                   operand2="1" datatype="int"/>
-            <echo message="Counter is ${pbs-file-counter}"/>
+            <echo level="verbose" message="Counter is ${pbs-file-counter}"/>
+            <writeln file="@{file-prefix}.pbs-tasks" message="${pbs-file-counter}"/>
 
             <var name="pbs-property-file" value="@{file-prefix}-${pbs-file-counter}.properties"/>
-            <echo message="Writing file: ${pbs-property-file}"/>
+            <echo level="info" message="Writing file: ${pbs-property-file}"/>
 
             <echoproperties destfile="${pbs-property-file}">
                 <propertyset refid="properties-starting-with-my-pbs"/>

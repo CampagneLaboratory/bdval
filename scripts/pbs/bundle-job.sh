@@ -209,5 +209,5 @@ EOF
 echo
 echo "Job tag is $JOB_TAG"
 echo "Submit the job by executing \"qsub $JOB_TAG.qsub\""
-echo "Once submitted check status with \"qstat -fnu $USER\""
+echo "Once submitted check status with \"qstat -fntu $USER\""
 echo "Results will placed in ${JOB_RESULTS_DIR}"
