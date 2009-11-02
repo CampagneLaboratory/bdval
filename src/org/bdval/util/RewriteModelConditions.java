@@ -34,6 +34,7 @@ import java.io.PrintWriter;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Describe class here.
@@ -47,9 +48,10 @@ public class RewriteModelConditions {
 
     /**
      * Main method, starts the work.
+     *
      * @param args the command line arguments
      * @throws JSAPException problem parsing the command line
-     * @throws IOException problem read/writing the files
+     * @throws IOException   problem read/writing the files
      */
     public static void main(final String[] args) throws JSAPException, IOException {
         final RewriteModelConditions work = new RewriteModelConditions();
@@ -59,9 +61,10 @@ public class RewriteModelConditions {
 
     /**
      * Process the command line, read the input file, write the output file.
+     *
      * @param args the command line arguments
      * @throws JSAPException problem parsing the command line
-     * @throws IOException problem read/writing the files
+     * @throws IOException   problem read/writing the files
      */
     @SuppressWarnings("unchecked")
     private void process(final String[] args) throws JSAPException, IOException {
@@ -85,7 +88,7 @@ public class RewriteModelConditions {
         final List<String> columns = new LinkedList<String>();
         for (final String line : lines) {
             final LinkedHashMap<String, String> data = readData(line);
-            for (final String column : data.keySet()) {
+            for (final String column : sortColumns(data.keySet())) {
                 if (!columns.contains(column)) {
                     columns.add(column);
                 }
@@ -99,9 +102,24 @@ public class RewriteModelConditions {
         outputWriter.flush();
         IOUtils.closeQuietly(outputWriter);
     }
+    // Force model-id to be the very first column..
+
+    private String[] sortColumns(Set<String> strings) {
+        String[] result = new String[strings.size()];
+        if (strings.contains("model-id")) {
+            result[0] = "model-id";
+            strings.remove("model-id");
+        }
+        int i = 1;
+        for (String columnId : strings) {
+            result[i++] = columnId;
+        }
+        return result;
+    }
 
     /**
      * Parse the data from a line of input to an (ordered) Map of results.
+     *
      * @param line the line to parse
      * @return the pased line of data
      */
@@ -117,8 +135,9 @@ public class RewriteModelConditions {
 
     /**
      * Write the headers for the output file.
+     *
      * @param outputWriter the writer to write to
-     * @param columns the columns to write as headers
+     * @param columns      the columns to write as headers
      */
     private void writeHeaders(final PrintWriter outputWriter, final List<String> columns) {
         int colNum = 0;
@@ -133,9 +152,10 @@ public class RewriteModelConditions {
 
     /**
      * Write a line of data to the output file.
+     *
      * @param outputWriter the writer to write to
-     * @param columns the columns that exist in the output file
-     * @param data the line of data to write to the output file
+     * @param columns      the columns that exist in the output file
+     * @param data         the line of data to write to the output file
      */
     private void writeData(
             final PrintWriter outputWriter,
@@ -160,6 +180,7 @@ public class RewriteModelConditions {
     /**
      * Process the command line. If this returns true, the command line
      * was parsed and all options have been read and set.
+     *
      * @param args the command line arguments
      * @return true of the command line parsed without problems.
      * @throws JSAPException problem parsing the command line
@@ -186,7 +207,7 @@ public class RewriteModelConditions {
         jsap.registerParameter(outputFilenameOption);
 
         final JSAPResult result = jsap.parse(args);
-        if(!result.success()) {
+        if (!result.success()) {
             System.err.println(jsap.getHelp());
             return false;
         }

@@ -435,16 +435,11 @@ public class RestatMode extends ProcessModelConditionsMode {
     private static void averageMeasuresPerReplicates
             (final EvaluationMeasure repeatedEvaluationMeasure,
              final EvaluationMeasure allSplitsInARepeatMeasure) {
-        for (final CharSequence measure : evaluationMeasureNames) {
+
+        for (final CharSequence measure : allSplitsInARepeatMeasure.getMeasureNames()) {
             repeatedEvaluationMeasure.addValue(measure,
                     allSplitsInARepeatMeasure.getPerformanceValueAverage(measure.toString()));
 
-            final String binaryName = ("binary-" + measure).intern();
-            repeatedEvaluationMeasure.addValue(binaryName,
-                    allSplitsInARepeatMeasure.getPerformanceValueAverage(binaryName));
-            final String zeroThresholdName = (measure + "-zero").intern();
-            repeatedEvaluationMeasure.addValue(binaryName,
-                    allSplitsInARepeatMeasure.getPerformanceValueAverage(zeroThresholdName));
         }
     }
 
