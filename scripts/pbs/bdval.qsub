@@ -15,16 +15,13 @@
 # Number of nodes (exclusive access)
 #PBS -l nodes=@PBS-NODES@#excl
 
-# Number of cpus
-#PBS -l ncpus=@PBS-CPUS@
-
 # Mail job status at completion
 #PBS -m ae
 
 # TODO Mail to user specified
 ##PBS -M mas2062@med.cornell.edu
 
-# TODO submit as a job array
+# TODO submit as a job array (right now we do it from the command line)
 
 #
 # Output some useful job information

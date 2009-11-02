@@ -23,8 +23,6 @@
         <!--<attribute name="email-address"/>-->
 
         <sequential>
-            <!-- TODO: 8 for fat nodes or rascals -->
-            <math result="pbs-cpus" operation="multiply" operand1="@{pbs-nodes}" operand2="2" datatype="int"/>
             <fail message="Cannot setup a pbs job since bdval.jar cannot be found">
                 <condition>
                     <not>
@@ -101,7 +99,6 @@
                 <filterset>
                     <filter token="PBS-QUEUE" value="@{pbs-queue}"/>
                     <filter token="PBS-NODES" value="@{pbs-nodes}"/>
-                    <filter token="PBS-CPUS" value="${pbs-cpus}"/>
                     <!-- TODO: PBS name cannot be more than 15 chars -  replace with @{job-name} -->
                     <filter token="JOB-NAME" value="bdval"/>
                     <filter token="JOB-DIR" value="${job-dir}"/>
