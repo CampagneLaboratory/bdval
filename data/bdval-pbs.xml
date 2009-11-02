@@ -80,6 +80,7 @@
             </copy>
 
             <copy file="${bdval.basedir}/../scripts/pbs/start-rserve.sh" todir="${job-dir}"/>
+            <copy file="${bdval.basedir}/../scripts/pbs/stop-rserve.sh" todir="${job-dir}"/>
 
             <!-- Create the actual job script that will launch bdval -->
             <copy todir="${job-dir}" file="${bdval.basedir}/../scripts/pbs/bdval-pbs.sh" filtering="true">
@@ -109,6 +110,7 @@
             <chmod dir="${job-dir}" perm="u+x" includes="*.sh"/>
 
             <mkdir dir="${job-dir}/config"/>
+            <!-- TODO - start instances based on the number of cpus -->
             <echoxml file="${job-dir}/config/RConnectionPool.xml">
                 <RConnectionPool>
                     <RConfiguration>
@@ -160,7 +162,7 @@
                 <fileset dir="${eval-dataset-root}">
                     <include name="**/*"/>
                 </fileset>
-            </copy> 
+            </copy>
 
             <!-- Tell bdval not to try and compile when running -->
             <writeln file="${job-dir}/data/bdval.properties" append="false" message="use-bdval-jar=true"/>
