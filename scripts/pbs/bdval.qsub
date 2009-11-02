@@ -48,7 +48,7 @@ do
   echo "=============================================="
   echo "Copying files to $node"
   echo "=============================================="
-  scp -pr @@MASTER-NODE@:@JOB-DIR@ @$node:$TMPDIR
+  scp -pr @@MASTER-NODE@:@JOB-DIR@ @$node:$TMPDIR/@JOB-NAME@
 done
 
 #
