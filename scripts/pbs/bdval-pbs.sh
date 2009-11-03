@@ -16,7 +16,7 @@ else
     PBS_ANT_PROPERTY_FILE=@PROJECT@-$PBS_ARRAY_INDEX.properties
 fi
 
-ant -propertyfile=$PBS_ANT_PROPERTY_FILE -Dsave-data-tag=@TAG@ -Dtag-description="@TAG-DESCRIPTION@" -f @PROJECT@.xml @TARGET@
+ant -propertyfile $PBS_ANT_PROPERTY_FILE -Dsave-data-tag=@TAG@ -Dtag-description="@TAG-DESCRIPTION@" -f @PROJECT@.xml @TARGET@
 
 # Copy results back to the master node when we are done
 JOB_RESULTS_DIR=@JOB-DIR@-results/${HOSTNAME}
