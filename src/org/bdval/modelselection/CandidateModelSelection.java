@@ -50,6 +50,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Collections;
 import java.util.Map;
+import java.util.HashMap;
+import java.util.ArrayList;
 
 /**
  * Selects candidate models for replication in different validation datasets. Various model candidate
@@ -229,6 +231,7 @@ public class CandidateModelSelection implements WithProcessMethod {
             reverseIndex = new DoubleIndexedIdentifier(modelIdIndices);
             readeModelConditions(toolsArgs);
             filterGeneLists(toolsArgs);
+
             dump(toolsArgs);
             toolsArgs.modelName = ModelName.valueOf(toolsArgs.modelNameString);
             toolsArgs.rankStrategy = RankStrategy.valueOf(toolsArgs.rankStrategyName);
@@ -355,10 +358,44 @@ public class CandidateModelSelection implements WithProcessMethod {
             addFeatureSelectionFoldColumn(toolsArgs.modelConditions);
             addFeatureSelectionStatTypeColumn(toolsArgs.modelConditions);
             addFeatureClassifierTypeColumn(toolsArgs.modelConditions);
+            addOptimalModelColumn(toolsArgs.modelConditions);
         } else {
             System.out.println("Model condition file not specified.");
         }
     }
+
+    HashMap<String, Double> seriesMaxAccuracy = new HashMap<String, Double>();
+    // HashMap that contains the maximum accuracy value for each series
+
+    private void addOptimalModelColumn(Map<String, Map<String, String>> modelConditions) {
+        if (modelConditions == null) {
+            return;
+        }
+        for (final Map<String, String> modelCondition : modelConditions.values()) {
+            String modelId = modelCondition.get("model-id");
+            String seriesId = modelCondition.get("id-parameter-scan-series");
+            double Acc = cvResults.get(modelId).accuracy;
+            if (seriesMaxAccuracy.containsKey(seriesId)) {
+                seriesMaxAccuracy.put(seriesId, (Math.max(seriesMaxAccuracy.get(seriesId), Acc)));
+            } else {
+
+                seriesMaxAccuracy.put(seriesId, Acc);
+            }
+
+        }
+
+        String optimalModel = "false";
+        for (final Map<String, String> modelCondition : modelConditions.values()) {
+            double modelAcc = cvResults.get(modelCondition.get("model-id")).accuracy;
+            String seriesId = modelCondition.get("id-parameter-scan-series");
+            if (seriesMaxAccuracy.get(seriesId) == modelAcc) {
+                optimalModel = "true";
+            }
+            modelCondition.put("optimalModel", optimalModel);
+            optimalModel = "false";
+        }
+    }
+
 
     private void addFeatureClassifierTypeColumn(final Map<String, Map<String, String>> modelConditions) {
         if (modelConditions == null) {
@@ -473,6 +510,7 @@ public class CandidateModelSelection implements WithProcessMethod {
                                         "norm_MCC_validation\tnorm_ACC_validation\tnorm_Sens_validation\tnorm_Spec_validation\tnorm_AUC_validation\t" +
                                         "delta_MCC_CVCF_CV\tdelta_ACC_CVCF_CV\tdelta_Sens_CVCF_CV\tdelta_Spec_CVCF_CV\tdelta_AUC_CVCF_CV\t" +
                                         "MCC_CV_stdev\tACC_CV_stdev\tSens_CV_stdev\tSpec_CV_stdev\tAUC_CV_stdev" +          // no tab intended
+
                                         getModelConditionHeaders(toolsArgs.modelConditions, modelConditionColumnNames) + "\n"
                         ));
                 for (final String modelId : modelIds) {
