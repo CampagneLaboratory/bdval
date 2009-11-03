@@ -13,7 +13,7 @@
 #PBS -o @JOB-DIR@/../@JOB-NAME@.log
 
 # Number of nodes (exclusive access)
-#PBS -l nodes=@PBS-NODES@#excl
+#PBS -l nodes=1#excl
 
 # Mail job status at completion
 #PBS -m ae
@@ -76,12 +76,6 @@ done
 
 # launch bdval on each node
 pbsdsh -v $TMPDIR/@JOB-NAME@/bdval-pbs.sh
-
-# TODO - remove this block - just double checking stuff here
-for node in `sort $PBS_NODEFILE | uniq`
-do
-  ssh $node "ls -R /tmp"
-done
 
 #
 # Start instances of Rserve on each node in the cluster

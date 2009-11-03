@@ -19,7 +19,6 @@
                    description="Name to associate with this job (must not be longer than 15 characters"/>
         <attribute name="pbs-master-node" default="master01" description="Name of the PBS head node"/>
         <attribute name="pbs-queue" default="normal" description="Name of the PBS queue for the submission"/>
-        <attribute name="pbs-nodes" default="1" description="Number of nodes to request"/>
         <attribute name="tasks-per-node" default="1" description="Number of tasks to run per node"/>
         <attribute name="target" description="The ant target to run on the cluster"/>
         <attribute name="tag" description="Tag for the configuration"/>
@@ -243,7 +242,6 @@
             <copy file="${bdval.basedir}/../scripts/pbs/bdval.qsub" tofile="@{job-name}.qsub" filtering="true" overwrite="true">
                 <filterset>
                     <filter token="PBS-QUEUE" value="@{pbs-queue}"/>
-                    <filter token="PBS-NODES" value="@{pbs-nodes}"/>
                     <filter token="PBS-TASKS" value="${pbs-file-counter}"/>
                     <filter token="JOB-NAME" value="@{job-name}"/>
                     <filter token="JOB-DIR" value="${job-dir}"/>
