@@ -108,6 +108,7 @@
     <!-- end of the endpoint definitions -->
 
     <import file="bdval.xml"/>
+    <import file="bdval-pbs.xml"/>
 
     <target name="evaluate" description="Run a complete evaluation."
             depends="prepare-bdval, rserve-status, tag-output-directory">
@@ -163,13 +164,10 @@
             <property name="do.weka-feature-selection-scan" value="true"/>
 
             <execute-all-endpoints/>
-
-
         </sequential>
         <antcall target="process-model-conditions"/>
         <antcall target="zip-results"/>
     </target>
-
 
     <target name="pathways" description="Run pathways." depends="prepare-bdval, tag-output-directory">
         <delete file="${statistics-output}"/>
@@ -283,5 +281,33 @@
         <!-- change the list of result directories to match your results -->
         <generate-final-models-from-list
                 results-list="20080420-1649-results 20080423-0837-results 20080423-2226-results 20080423-2228-results 20080424-1910-results 20080425-0812-results 20080425-1413-results 20080426-0913-results 20080426-1358-results 20080427-1228-results 20080428-1151-results 20080429-1052-results 20080430-0911-results 20080430-1350-results"/>
+    </target>
+
+    <target name="setup-pbs-job-wulf" description="setup a pbs job to run on direwulf/redwulf">
+        <!-- change values to "true" below in order to run the condition listed -->
+        <property name="use-feature-selection-fold=true" value="true"/>
+        <property name="use-feature-selection-fold=false" value="true"/>
+        <property name="do.baseline" value="true"/>
+        <property name="pbs-job-name" value="prostate-pbs"/>
+        <property name="pbs-job-tag" value="prostate-baseline"/>
+        <property name="pbs-job-description" value="Demonstrating BDVAL on a PBS cluster"/>
+
+        <!-- default setup is for direwulf -->
+        <setup-pbs-job target="evaluate" job-name="${pbs-job-name}"
+                       tag="${pbs-job-tag}" tag-description="${pbs-job-description}"/>
+    </target>
+
+    <target name="setup-pbs-job-rascals" description="setup a pbs job to run on the rascals">
+        <!-- change values to "true" below in order to run the condition listed -->
+        <property name="use-feature-selection-fold=true" value="true"/>
+        <property name="use-feature-selection-fold=false" value="true"/>
+        <property name="do.baseline" value="true"/>
+        <property name="pbs-job-name" value="prostate-pbs"/>
+        <property name="pbs-job-tag" value="prostate-baseline"/>
+        <property name="pbs-job-description" value="Demonstrating BDVAL on a PBS cluster"/>
+
+        <!-- specify master node is chico -->
+        <setup-pbs-job target="evaluate" job-name="${pbs-job-name}" pbs-master-node="chico"
+                       tag="${pbs-job-tag}" tag-description="${pbs-job-description}"/>
     </target>
 </project>

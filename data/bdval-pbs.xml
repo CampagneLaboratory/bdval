@@ -16,14 +16,14 @@
 
     <macrodef name="setup-pbs-job" description="Setup BDVAL for a PBS submission">
         <attribute name="job-name" default="${ant.project.name}"
-                   description="Name to associate with this job (must not be longer than 15 characters"/>
+                   description="Name to associate with this job (must not be longer than 15 characters)"/>
         <attribute name="pbs-master-node" default="master01" description="Name of the PBS head node"/>
         <attribute name="pbs-queue" default="normal" description="Name of the PBS queue for the submission"/>
         <attribute name="tasks-per-node" default="1" description="Number of tasks to run per node"/>
         <attribute name="target" description="The ant target to run on the cluster"/>
         <attribute name="tag" description="Tag for the configuration"/>
         <attribute name="tag-description" description="Description of the configuration"/>
-        <!--<attribute name="email-address"/>-->
+        <!-- TODO: <attribute name="email-address"/>-->
 
         <sequential>
             <fail message="Cannot setup a pbs job since bdval.jar cannot be found">

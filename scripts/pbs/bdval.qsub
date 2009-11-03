@@ -18,9 +18,10 @@
 # Mail job status at completion
 #PBS -m ae
 
-# TODO Mail to user specified
+# TODO - Mail to user specified
 ##PBS -M mas2062@med.cornell.edu
 
+# TODO - Handle the case where there is only one task which cannot be an array
 # Submit as a job array
 #PBS -J 1-@PBS-TASKS@
 
