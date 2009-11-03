@@ -131,16 +131,13 @@
             </echoxml>
 
             <!-- Two threads per node, memory size depends on node type -->
-<!-- TODO
-            <dirname file="${eval-dataset-root}" property="eval-dir"/>
-            <echo message="${eval-dir}"/>
--->
             <write-pbs-local-property-file file="${job-dir}/config/${ant.project.name}-local.properties"
                     pbs-master-node="@{pbs-master-node}" pbs-queue="@{pbs-queue}"/>
 
             <!-- copy log4j.properties if it exists -->
             <copy file="${config}/log4j.properties" todir="${job-dir}/config" failonerror="false"/>
 
+            <!-- copy the build scripts, properties and fixed data -->
             <mkdir dir="${job-dir}/data"/>
             <copy todir="${job-dir}/data">
                 <fileset dir="${bdval.basedir}/../data">
@@ -153,6 +150,8 @@
                 </fileset>
             </copy>
 
+            <!-- Copy data needed for the job -->
+            <!-- TODO: we could be smarter about this and only copy what is needed -->
             <copy todir="${job-dir}/data/eval-data">
                 <fileset dir="${eval-dataset-root}">
                     <include name="**/*"/>
