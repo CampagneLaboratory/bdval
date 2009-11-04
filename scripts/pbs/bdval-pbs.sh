@@ -19,6 +19,6 @@ fi
 ant -propertyfile $PBS_ANT_PROPERTY_FILE -Dsave-data-tag=@TAG@ -Dtag-description="@TAG-DESCRIPTION@" -f @PROJECT@.xml @TARGET@
 
 # Copy results back to the master node when we are done
-JOB_RESULTS_DIR=@JOB-DIR@-results/${HOSTNAME}
+JOB_RESULTS_DIR=@JOB-DIR@-results/@PROJECT@-$PBS_ARRAY_INDEX
 ssh @MASTER-NODE@ "/bin/mkdir -p ${JOB_RESULTS_DIR}"
 scp -r *.zip logs @@MASTER-NODE@:${JOB_RESULTS_DIR}
