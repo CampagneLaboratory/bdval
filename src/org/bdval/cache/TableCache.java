@@ -289,8 +289,8 @@ public class TableCache {
     }
 
     private void resize(final ArrayTable result, final int numRows) {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Resizing table to " + numRows + 1);
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Resizing table to " + numRows + 1);
         }
         result.setInitialSize(numRows + 1);
         result.setChunk(numRows + 1);
