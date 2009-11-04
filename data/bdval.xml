@@ -16,7 +16,8 @@
     -->
     <property name="do-specific-gene-lists-only" value="true"/>
     <property name="enable-flooring" value="true"/>
-    <property name="evaluate-statistics-after-splits" value="true"/>
+    <!-- TODO: evaluate-statistics-after-splits changed to false due to mantis issue #1343 -->
+    <property name="evaluate-statistics-after-splits" value="false"/>
     <property name="ga-wrapper-population-size" value="200"/>
     <property name="ga-wrapper-number-of-iterations" value="20"/>
     <property name="ga-wrapper-roc-str" value=""/>
