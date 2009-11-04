@@ -70,17 +70,22 @@ echo "=============================================="
 pbsdsh -v $TMPDIR/@JOB-NAME@/start-rserve.sh 6311
 pbsdsh -v $TMPDIR/@JOB-NAME@/start-rserve.sh 6312
 
-# TODO - remove this block it's just for testing (bdval will do this anyway)
-for node in `sort $PBS_NODEFILE | uniq`
-do
-  ssh $node "java -jar /home/marko/RUtils/icb-rutils.jar --port 6311 --validate"
-  ssh $node "java -jar /home/marko/RUtils/icb-rutils.jar --port 6312 --validate"
+# Run bdval job
+cd $TMPDIR/@JOB-NAME@/data
 
-  ssh $node "ps -elf | grep $USER"
-done
+# see if the job is running as an array job submission
+if [ -z "$PBS_ARRAY_INDEX" ]; then
+    PBS_ANT_PROPERTY_FILE=@JOB-NAME@-1.properties
+else
+    PBS_ANT_PROPERTY_FILE=@JOB-NAME@-$PBS_ARRAY_INDEX.properties
+fi
 
-# launch bdval on each node
-pbsdsh -v $TMPDIR/@JOB-NAME@/bdval-pbs.sh
+ant -propertyfile $PBS_ANT_PROPERTY_FILE -Dsave-data-tag=@TAG@ -Dtag-description="@TAG-DESCRIPTION@" -f @PROJECT@.xml @TARGET@
+
+# Copy results back to the master node when we are done
+JOB_RESULTS_DIR=@JOB-DIR@-results/@PROJECT@-$PBS_ARRAY_INDEX
+ssh @MASTER-NODE@ "/bin/mkdir -p ${JOB_RESULTS_DIR}"
+scp -r *.zip logs @@MASTER-NODE@:${JOB_RESULTS_DIR}
 
 #
 # Start instances of Rserve on each node in the cluster
