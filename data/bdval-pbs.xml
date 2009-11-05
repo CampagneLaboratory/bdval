@@ -104,7 +104,6 @@
             <copy file="${bdval.basedir}/../scripts/pbs/stop-rserve.sh" todir="${job-dir}"/>
 
             <!-- Create the actual job script that will launch bdval -->
-            <!-- TODO Seems like we have to do everything from the qsub script -presumably due to a bug :-( 
             <copy todir="${job-dir}" file="${bdval.basedir}/../scripts/pbs/bdval-pbs.sh" filtering="true">
                 <filterset>
                     <filter token="PROJECT" value="${ant.project.name}"/>
@@ -115,7 +114,6 @@
                     <filter token="MASTER-NODE" value="@{pbs-master-node}"/>
                 </filterset>
             </copy>
-            -->
 
             <fixcrlf srcdir="${job-dir}" eol="unix" includes="*.sh"/>
             <chmod dir="${job-dir}" perm="u+x" includes="*.sh"/>
@@ -135,8 +133,7 @@
             <write-pbs-local-property-file file="${job-dir}/config/${ant.project.name}-local.properties"
                     pbs-master-node="@{pbs-master-node}" pbs-queue="@{pbs-queue}"/>
 
-            <!-- copy log4j.properties if it exists -->
-            <copy file="${config}/log4j.properties" todir="${job-dir}/config" failonerror="false"/>
+            <copy file="${config}/log4j.properties.sample"  todir="${job-dir}/config" failonerror="false"/>
 
             <!-- copy the build scripts, properties and fixed data -->
             <mkdir dir="${job-dir}/data"/>
@@ -249,11 +246,6 @@
                     <filter token="JOB-NAME" value="@{job-name}"/>
                     <filter token="JOB-DIR" value="${job-dir}"/>
                     <filter token="MASTER-NODE" value="@{pbs-master-node}"/>
-                    <filter token="PROJECT" value="${ant.project.name}"/>
-                    <filter token="TARGET" value="@{target}"/>
-                    <filter token="TAG" value="@{tag}"/>
-                    <filter token="TAG-DESCRIPTION" value="@{tag-description}"/>
-
                 </filterset>
             </copy>
         </sequential>

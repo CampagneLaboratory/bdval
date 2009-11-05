@@ -12,7 +12,7 @@
 # Save PBS output to the result directory
 #PBS -o @JOB-DIR@/../@JOB-NAME@.^array_index^.log
 
-# Number of nodes (exclusive access)
+# One node with exclusive access
 #PBS -l nodes=1#excl
 
 # Mail job status at completion
@@ -26,7 +26,7 @@
 #PBS -J 1-@PBS-TASKS@
 
 # TODO - use stagein/stageout
-##PBS -W stagein=dat1@server:/u/user1/grid.dat
+##PBS -W stagein=@JOB-DIR@@@MASTER-NODE@:$TMPDIR/@JOB-NAME@
 
 #
 # Output some useful job information
@@ -67,25 +67,12 @@ echo "=============================================="
 echo "Starting Rserve instances"
 echo "=============================================="
 # TODO - start instances based on the number of cpus
-pbsdsh -v $TMPDIR/@JOB-NAME@/start-rserve.sh 6311
-pbsdsh -v $TMPDIR/@JOB-NAME@/start-rserve.sh 6312
+. $TMPDIR/@JOB-NAME@/start-rserve.sh 6311
+. $TMPDIR/@JOB-NAME@/start-rserve.sh 6312
 
 # Run bdval job
-cd $TMPDIR/@JOB-NAME@/data
-
-# see if the job is running as an array job submission
-if [ -z "$PBS_ARRAY_INDEX" ]; then
-    PBS_ANT_PROPERTY_FILE=../@JOB-NAME@-1.properties
-else
-    PBS_ANT_PROPERTY_FILE=../@JOB-NAME@-$PBS_ARRAY_INDEX.properties
-fi
-
-ant -propertyfile $PBS_ANT_PROPERTY_FILE -Dsave-data-tag=@TAG@ -Dtag-description="@TAG-DESCRIPTION@" -f @PROJECT@.xml @TARGET@
-
-# Copy results back to the master node when we are done
-JOB_RESULTS_DIR=@JOB-DIR@-results/@PROJECT@-$PBS_ARRAY_INDEX
-ssh @MASTER-NODE@ "/bin/mkdir -p ${JOB_RESULTS_DIR}"
-scp -r *.zip logs @@MASTER-NODE@:${JOB_RESULTS_DIR}
+#. $TMPDIR/@JOB-NAME@/bdval-pbs.sh
+ls -lR $TMPDIR
 
 #
 # Start instances of Rserve on each node in the cluster
@@ -93,5 +80,5 @@ scp -r *.zip logs @@MASTER-NODE@:${JOB_RESULTS_DIR}
 echo "=============================================="
 echo "Stopping Rserve instances"
 echo "=============================================="
-pbsdsh -v $TMPDIR/@JOB-NAME@/stop-rserve.sh 6311
-pbsdsh -v $TMPDIR/@JOB-NAME@/stop-rserve.sh 6312
+. $TMPDIR/@JOB-NAME@/stop-rserve.sh 6311
+. $TMPDIR/@JOB-NAME@/stop-rserve.sh 6312
