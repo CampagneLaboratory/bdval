@@ -647,14 +647,20 @@
         <attribute name="survival-file" default="-"/>
         <attribute name="feature-selection-mode" default="t-test"/>
         <sequential>
-
             <loadfile property="file-content-@{classifier-classname}-@{weka-class}"
-                      srcfile="${bdval.basedir}/../data/sequences/scan-options/@{classifier-classname}/@{weka-class}.scan-options"/>
-            <echo message="file content: ${file-content-@{classifier-classname}-@{weka-class}}"/>
+                      srcfile="${bdval.basedir}/../data/sequences/scan-options/@{classifier-classname}/@{weka-class}.scan-options">
+                <filterchain>
+                    <striplinecomments>
+                        <comment value="#"/>
+                    </striplinecomments>
+                </filterchain>
+            </loadfile>
+            <echo message="begin file content:"/>
+            <echo message=" ${file-content-@{classifier-classname}-@{weka-class}}"/>
+            <echo message="end file content:"/>
 
             <!-- one scan option per line: -->
             <for param="scan-options" delimiter="&#xA;" list="${file-content-@{classifier-classname}-@{weka-class}}">
-
                 <sequential>
                     <if>
                         <equals arg1="@{weka-class}" arg2="libSVM"/>
