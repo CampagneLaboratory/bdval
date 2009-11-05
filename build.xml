@@ -150,21 +150,22 @@
                 <exclude name="org/bdval/modelselection/bmf/**"/>
             </packageset>
             <link href="http://java.sun.com/javase/6/docs/api/"/>
-            <link href="http://castor.codehaus.org/javadoc/"/>
-            <link href="http://mg4j.dsi.unimi.it/docs/"/>
             <link href="http://fastutil.dsi.unimi.it/docs/"/>
             <link href="http://dsiutils.dsi.unimi.it/docs/"/>
             <link href="http://jakarta.apache.org/commons/cli/api-release/"/>
             <link href="http://jakarta.apache.org/commons/collections/api-release/"/>
             <link href="http://jakarta.apache.org/commons/configuration/apidocs/"/>
             <link href="http://jakarta.apache.org/commons/io/apidocs/"/>
+            <link href="http://commons.apache.org/lang/apidocs/"/>
             <link href="http://jakarta.apache.org/commons/logging/apidocs/"/>
+            <link href="http://commons.apache.org/math/api-2.0/"/>
             <link href="http://dsd.lbl.gov/~hoschek/colt/api/"/>
             <link href="http://junit.sourceforge.net/javadoc_40/"/>
             <link href="http://www.cs.rit.edu/~ark/pj/doc/"/>
             <link href="http://icbtools.med.cornell.edu/javadocs/qtclustering/"/>
             <link href="http://icbtools.med.cornell.edu/javadocs/icb-utils/"/>
             <link href="http://martiansoftware.com/jsap/doc/javadoc/"/>
+            <link href="http://weka.sourceforge.net/doc/"/>
             <classpath refid="classpath"/>
             <bottom>
                 <![CDATA[<i>Copyright &#169; 2007-${year} Institute for Computational Biomedicine, All Rights Reserved.</i>]]></bottom>
@@ -236,7 +237,7 @@
     </target>
 
     <target name="cruisecontrol"
-            depends="clean, cobertura-setup, jar, jar-compound-file-tool, test, javadoc, pmd, findbugs, cobertura-report"
+            depends="clean, jar, jar-compound-file-tool, test, javadoc, pmd, findbugs"
             description="Run CruiseControl Build and Tests"/>
 
     <target name="jar-compound-file-tool" description="creates compound-file-tool.jar" depends="compile">
