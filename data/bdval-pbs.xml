@@ -138,7 +138,7 @@
             <write-pbs-local-property-file file="${job-dir}/config/${ant.project.name}-local.properties"
                     pbs-master-node="@{pbs-master-node}" pbs-queue="@{pbs-queue}"/>
 
-            <copy file="${config}/log4j.properties.sample"  todir="${job-dir}/config" failonerror="false"/>
+            <copy file="${config}/log4j.properties.sample" tofile="${job-dir}/config/log4j.properties" failonerror="false"/>
 
             <!-- copy the build scripts, properties and fixed data -->
             <mkdir dir="${job-dir}/data"/>
