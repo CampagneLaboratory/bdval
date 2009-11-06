@@ -1851,7 +1851,7 @@
         <attribute name="include-split-models" default="true"/>
         <attribute name="include-predictions" default="true"/>
         <attribute name="include-final-models" default="true"/>
-        <attribute name="label" default="all"/>
+        <attribute name="label" default=""/>
         <sequential>
             <concat destfile="${save-data-dir}/${save-data-tag}-all-maqcii-submission.txt">
                 <fileset dir="${save-data-dir}" file="*maqcii-submission*.txt"/>
@@ -1878,7 +1878,7 @@
                 <istrue value="@{include-final-models}"/>
             </condition>
 
-            <zip destfile="${bdval.basedir}/${save-data-tag}-@{label}.zip"
+            <zip destfile="${bdval.basedir}/${save-data-tag}@{label}.zip"
                  comment="${ant.project.name} results from ${save-data-tag}">
                 <fileset dir="${bdval.basedir}">
                     <exclude name="${save-data-tag}/features/**" unless="include-split-models"/>
@@ -2280,7 +2280,7 @@
                     include-predictions="false"
                     include-split-models="false"
                     include-final-models="true"
-                    label="final-models-and-stats"/>
+                    label="-final-models-and-stats"/>
         </sequential>
     </macrodef>
 
