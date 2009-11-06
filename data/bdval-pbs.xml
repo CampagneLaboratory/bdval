@@ -111,6 +111,7 @@
                     <filter token="TAG" value="@{tag}"/>
                     <filter token="TAG-DESCRIPTION" value="@{tag-description}"/>
                     <filter token="JOB-DIR" value="${job-dir}"/>
+                    <filter token="JOB-NAME" value="@{job-name}"/>
                     <filter token="MASTER-NODE" value="@{pbs-master-node}"/>
                 </filterset>
             </copy>
