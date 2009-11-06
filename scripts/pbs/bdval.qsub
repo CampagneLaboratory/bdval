@@ -25,9 +25,6 @@
 # Submit as a job array
 #PBS -J 1-@PBS-TASKS@
 
-# TODO - use stagein/stageout
-##PBS -W stagein=@JOB-DIR@@@MASTER-NODE@:$TMPDIR/@JOB-NAME@
-
 #
 # Output some useful job information
 #
@@ -71,8 +68,8 @@ echo "=============================================="
 . $TMPDIR/@JOB-NAME@/start-rserve.sh 6312
 
 # Run bdval job
-#. $TMPDIR/@JOB-NAME@/bdval-pbs.sh
-ls -lR $TMPDIR
+cd $TMPDIR/@JOB-NAME@/data
+./bdval-pbs.sh
 
 #
 # Start instances of Rserve on each node in the cluster
