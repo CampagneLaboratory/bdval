@@ -68,7 +68,7 @@ echo "=============================================="
 . $TMPDIR/@JOB-NAME@/start-rserve.sh 6312
 
 # Run bdval job
-cd $TMPDIR/@JOB-NAME@/data
+cd $TMPDIR/@JOB-NAME@
 ./bdval-pbs.sh
 
 #
