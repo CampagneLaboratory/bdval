@@ -101,7 +101,11 @@
             </copy>
 
             <copy file="${bdval.basedir}/../scripts/pbs/start-rserve.sh" todir="${job-dir}"/>
-            <copy file="${bdval.basedir}/../scripts/pbs/stop-rserve.sh" todir="${job-dir}"/>
+            <copy file="${bdval.basedir}/../scripts/pbs/stop-rserve.sh" todir="${job-dir}">
+                <filterset>
+                    <filter token="JOB-DIR" value="${job-dir}"/>
+                </filterset>
+            </copy>
 
             <!-- Create the actual job script that will launch bdval -->
             <copy todir="${job-dir}" file="${bdval.basedir}/../scripts/pbs/bdval-pbs.sh" filtering="true">
