@@ -103,7 +103,7 @@
             <copy file="${bdval.basedir}/../scripts/pbs/start-rserve.sh" todir="${job-dir}"/>
             <copy file="${bdval.basedir}/../scripts/pbs/stop-rserve.sh" todir="${job-dir}">
                 <filterset>
-                    <filter token="JOB-DIR" value="${job-dir}"/>
+                    <filter token="JOB-NAME" value="@{job-name}"/>
                 </filterset>
             </copy>
 
