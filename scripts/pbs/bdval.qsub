@@ -51,7 +51,7 @@ echo ------------------------------------------------------
 #
 # Start instances of Rserve on each node in the cluster
 #
-start-rserve() {
+start_rserve() {
     echo "=============================================="
     echo "Starting Rserve instances"
     echo "=============================================="
@@ -63,7 +63,7 @@ start-rserve() {
 #
 # Stop instances of Rserve on each node in the cluster
 #
-stop-rserve() {
+stop_rserve() {
     echo "=============================================="
     echo "Stopping Rserve instances"
     echo "=============================================="
@@ -71,7 +71,7 @@ stop-rserve() {
     . $TMPDIR/@JOB-NAME@/stop-rserve.sh 6312
 }
 
-trap stop-rserve 2 9 15
+trap 'stop_rserve' 2 9 15
 
 # Copy needed files from master node to each worker
 for node in `sort $PBS_NODEFILE | uniq`
@@ -82,10 +82,10 @@ do
   scp -pr @@MASTER-NODE@:@JOB-DIR@ @$node:$TMPDIR/@JOB-NAME@
 done
 
-start-rserve
+start_rserve
 
 # Run bdval job
 cd $TMPDIR/@JOB-NAME@
 ./bdval-pbs.sh
 
-stop-rserve
+stop_rserve
