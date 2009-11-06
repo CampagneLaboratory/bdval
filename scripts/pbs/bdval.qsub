@@ -48,6 +48,31 @@ echo PBS: scratch directory is $TMPDIR
 echo PBS: PATH = $PBS_O_PATH
 echo ------------------------------------------------------
 
+#
+# Start instances of Rserve on each node in the cluster
+#
+start-rserve() {
+    echo "=============================================="
+    echo "Starting Rserve instances"
+    echo "=============================================="
+    # TODO - start instances based on the number of cpus
+    . $TMPDIR/@JOB-NAME@/start-rserve.sh 6311
+    . $TMPDIR/@JOB-NAME@/start-rserve.sh 6312
+}
+
+#
+# Stop instances of Rserve on each node in the cluster
+#
+stop-rserve() {
+    echo "=============================================="
+    echo "Stopping Rserve instances"
+    echo "=============================================="
+    . $TMPDIR/@JOB-NAME@/stop-rserve.sh 6311
+    . $TMPDIR/@JOB-NAME@/stop-rserve.sh 6312
+}
+
+trap stop-rserve 2 9 15
+
 # Copy needed files from master node to each worker
 for node in `sort $PBS_NODEFILE | uniq`
 do
@@ -57,25 +82,10 @@ do
   scp -pr @@MASTER-NODE@:@JOB-DIR@ @$node:$TMPDIR/@JOB-NAME@
 done
 
-#
-# Start instances of Rserve on each node in the cluster
-#
-echo "=============================================="
-echo "Starting Rserve instances"
-echo "=============================================="
-# TODO - start instances based on the number of cpus
-. $TMPDIR/@JOB-NAME@/start-rserve.sh 6311
-. $TMPDIR/@JOB-NAME@/start-rserve.sh 6312
+start-rserve
 
 # Run bdval job
 cd $TMPDIR/@JOB-NAME@
 ./bdval-pbs.sh
 
-#
-# Start instances of Rserve on each node in the cluster
-#
-echo "=============================================="
-echo "Stopping Rserve instances"
-echo "=============================================="
-. $TMPDIR/@JOB-NAME@/stop-rserve.sh 6311
-. $TMPDIR/@JOB-NAME@/stop-rserve.sh 6312
+stop-rserve
