@@ -217,14 +217,18 @@ public class RestatMode extends ProcessModelConditionsMode {
                 }
                 for (int foldIndex = 0; foldIndex < numberOfFolds; foldIndex++) {
 
-
+                try{
                     assert modelAccuracies != null : "model accurary must have been loaded for model id " + modelId;
-                    double errorOfThisModel = (1d - (modelAccuracies[index] / 100d));
+                    double errorOfThisModel = (1.0d - (modelAccuracies[index] / 100d));
                     double thetaHatFoldK = (1.0d - (foldMins.get(seriesID)[index] / 100d));
                     bias += (errorOfThisModel - thetaHatFoldK);
                     ++index;
 
                     LOG.debug("bias total " + bias);
+                } catch(IndexOutOfBoundsException e){
+                       LOG.info("Error in number of model accuracies assessed ", e);
+                        //System.exit(10);
+                    }
                 }
                 ++actualRepeatNumber;
             }
