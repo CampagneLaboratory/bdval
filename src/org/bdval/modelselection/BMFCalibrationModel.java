@@ -37,10 +37,10 @@ public abstract class BMFCalibrationModel {
             e.printStackTrace();
             return null;
         } catch (IllegalAccessException e) {
-            System.err.println("Cannot instanciate BMF calibration implementation.");
+            System.err.println("Cannot instantiate BMF calibration implementation.");
             e.printStackTrace();
         } catch (InstantiationException e) {
-            System.err.println("Cannot instanciate BMF calibration implementation.");
+            System.err.println("Cannot instantiate BMF calibration implementation.");
             e.printStackTrace();
         }
         return null;
