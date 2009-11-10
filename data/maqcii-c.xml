@@ -330,6 +330,36 @@
                        pbs-master-node="chico"/>
     </target>
 
+    <target name="setup-NEIHS-pbs-job" description="Setup a job to run on PBS.">
+        <property name="do.Iconix" value="false"/>
+        <property name="do.HamnerWithControl" value="false"/>
+        <property name="do.Cologne_OS_MO" value="false"/>
+        <property name="do.Cologne_EFS_MO" value="false"/>
+        <property name="do.Cologne_NEP_R" value="false"/>
+        <property name="do.Cologne_NEP_S" value="false"/>
+        <property name="do.NIEHS" value="true"/>
+        <property name="do.MDACC_PCR" value="false"/>
+        <property name="do.MDACC_ERPOS" value="false"/>
+        <property name="do.UAMS_EFS_MO" value="false"/>
+        <property name="do.UAMS_OS_MO" value="false"/>
+        <property name="do.UAMS_CPR1" value="false"/>
+        <property name="do.UAMS_CPS1" value="false"/>
+        <property name="do.GSE8402_FusionYesNo" value="false"/>
+
+        <property name="use-feature-selection-fold=true" value="false"/>
+        <property name="use-feature-selection-fold=false" value="true"/>
+
+        <property name="do.weka-feature-selection-scan" value="true"/>
+
+        <property name="pbs-job-name" value="maqcii-c-neihs"/>
+        <property name="pbs-job-tag" value="maqcii-c-neihs-weka-scan"/>
+        <property name="pbs-job-description" value="MAQCII-C NEIHS weka feature selection scan"/>
+
+        <setup-pbs-job target="evaluate" job-name="${pbs-job-name}"
+                       tag="${pbs-job-tag}" tag-description="${pbs-job-description}"
+                       pbs-master-node="chico"/>
+    </target>
+
     <target name="best-practices" description="Run a complete evaluation." depends="prepare-bdval,tag-output-directory">
         <delete file="${statistics-output}"/>
 
