@@ -109,9 +109,14 @@ public class RewriteModelConditions {
         if (strings.contains("model-id")) {
             result[0] = "model-id";
             strings.remove("model-id");
+        } else{
+            System.err.println("Each line of the model conditions file must contain a model-id");
+            System.exit(10);
         }
         int i = 1;
+
         for (String columnId : strings) {
+            assert i<result.length;
             result[i++] = columnId;
         }
         return result;
