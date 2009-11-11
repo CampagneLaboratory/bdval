@@ -23,6 +23,7 @@
         <attribute name="target" description="The ant target to run on the cluster"/>
         <attribute name="tag" description="Tag for the configuration"/>
         <attribute name="tag-description" description="Description of the configuration"/>
+        <attribute name="output-directory" default="." description="Location for the job submission files"/>
         <!-- TODO: <attribute name="email-address"/>-->
 
         <sequential>
@@ -40,20 +41,21 @@
                 </condition>
             </fail>
 
+            <property name="job-dir" location="@{output-directory}/@{job-name}"/>
+
             <if>
                 <or>
-                    <available file="@{job-name}" type="dir"/>
-                    <available file="@{job-name}.qsub"/>
+                    <available file="${job-dir}" type="dir"/>
+                    <available file="${job-dir}/@{job-name}.qsub"/>
                 </or>
                 <then>
-                    <input message="Submission with the name @{job-name} already exists. Overwrite? (y/n)"
+                    <input message="Submission with the name @{job-name} at ${job-dir} already exists. Overwrite? (y/n)"
                            validargs="y,n" addproperty="input-result"/>
                     <condition property="ok-to-continue">
                         <equals arg1="y" arg2="${input-result}"/>
                     </condition>
                     <fail unless="ok-to-continue">Build aborted by user.</fail>
-                    <delete dir="@{job-name}"/>
-                    <delete file="@{job-name}.qsub"/>
+                    <delete dir="${job-dir}"/>
                 </then>
             </if>
 
@@ -91,7 +93,6 @@
             <!-- make sure all the splits are defined so that the job submission uses the same plan -->
             <execute-all-endpoints define-splits-only="true"/>
 
-            <property name="job-dir" location="@{job-name}"/>
             <mkdir dir="${job-dir}"/>
             <copy todir="${job-dir}">
                 <fileset dir="${bdval.basedir}/..">
@@ -244,7 +245,7 @@
 
             <!-- Create the PBS job submission script -->
             <!-- TODO: need to handle the case where there is only on job to run - an array job is then invalid -->
-            <copy file="${bdval.basedir}/../scripts/pbs/bdval.qsub" tofile="@{job-name}.qsub" filtering="true" overwrite="true">
+            <copy file="${bdval.basedir}/../scripts/pbs/bdval.qsub" tofile="${job-dir}/../@{job-name}.qsub" filtering="true" overwrite="true">
                 <filterset>
                     <filter token="PBS-QUEUE" value="@{pbs-queue}"/>
                     <filter token="PBS-TASKS" value="${pbs-file-counter}"/>
