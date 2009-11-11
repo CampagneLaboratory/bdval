@@ -374,27 +374,36 @@ public class CandidateModelSelection implements WithProcessMethod {
         for (final Map<String, String> modelCondition : modelConditions.values()) {
             String modelId = modelCondition.get("model-id");
             String seriesId = modelCondition.get("id-parameter-scan-series");
-            double Acc = cvResults.get(modelId).accuracy;
+
+            if(cvResults.containsKey(modelId)){
+            double Acc= cvResults.get(modelId).accuracy;
+
             if (seriesMaxAccuracy.containsKey(seriesId)) {
                 seriesMaxAccuracy.put(seriesId, (Math.max(seriesMaxAccuracy.get(seriesId), Acc)));
             } else {
 
                 seriesMaxAccuracy.put(seriesId, Acc);
             }
+            }
 
         }
 
+
         String optimalModel = "false";
         for (final Map<String, String> modelCondition : modelConditions.values()) {
+            if(cvResults.containsKey(modelCondition.get("model-id"))){
             double modelAcc = cvResults.get(modelCondition.get("model-id")).accuracy;
             String seriesId = modelCondition.get("id-parameter-scan-series");
             if (seriesMaxAccuracy.get(seriesId) == modelAcc) {
                 optimalModel = "true";
             }
+            }
             modelCondition.put("optimalModel", optimalModel);
             optimalModel = "false";
+   
         }
     }
+    
 
 
     private void addFeatureClassifierTypeColumn(final Map<String, Map<String, String>> modelConditions) {
@@ -552,12 +561,14 @@ public class CandidateModelSelection implements WithProcessMethod {
     }
 
     private String formatBias(ModelPerformance cvPerf) {
+       if (cvPerf !=null){
         if (cvPerf.bias == cvPerf.bias) {
             return String.format("%f", cvPerf.bias);
         } else {
             // NaN
             return "NaN";
-        }
+        }    }
+        return "NaN";
     }
 
     private void addFeatureSelectionFoldColumn
@@ -1611,7 +1622,7 @@ AUC of CV + 0.0190346231277872 * :Name( "MCC of CV-CF" ) +
         }
         modelIdIndices = new IndexedIdentifier();
         cvResults = loadStatistics(toolsArgs.cvResultsFilename, true, filterByEndpoint, toolsArgs);
-        cvcfResults = loadStatistics(toolsArgs.cvcfResultsFilename, true, filterByEndpoint, toolsArgs);
+        cvcfResults = loadStatisticsCVCF(toolsArgs.cvcfResultsFilename, true, filterByEndpoint, toolsArgs);
 
         if (toolsArgs.testFilename != null) {
             if (toolsArgs.modelIdMapFile == null) {
@@ -1800,6 +1811,86 @@ AUC of CV + 0.0190346231277872 * :Name( "MCC of CV-CF" ) +
                             reader.getString();
                         }
                         measure.bias = reader.getDouble();
+                        modelPerfs.put(measure.modelId, measure);
+                        modelIds.add(measure.modelId);
+                        final MutableString modelId = new MutableString(measure.modelId);
+                        modelIdIndices.registerIdentifier(modelId);
+                    }
+
+                }
+            }
+            return modelPerfs;
+        } catch (IOException e) {
+            System.err.println("Cannot read file " + filename);
+            System.exit(1);
+            return null;
+        }
+    }
+
+        private Object2ObjectMap<String, ModelPerformance> loadStatisticsCVCF
+            (
+                    final String filename,
+                    final boolean readDatasetEndpoint,
+                    final boolean filterByEndpoint,
+                    final ModelSelectionArguments toolsArgs) throws FileNotFoundException {
+        if (modelIds == null) {
+            modelIds = new ObjectOpenHashSet<String>();
+        }
+
+        if (datasetNames == null) {
+            datasetNames = new ObjectOpenHashSet<String>();
+        }
+        if (endpointNames == null) {
+            endpointNames = new ObjectOpenHashSet<String>();
+        }
+
+        final Object2ObjectMap<String, ModelPerformance> modelPerfs = new Object2ObjectOpenHashMap<String, ModelPerformance>();
+        final TSVReader reader = new TSVReader(new FileReader(filename), '\t');
+        reader.setCommentPrefix("OrganizationCode");
+        try {
+            while (reader.hasNext()) {
+                if (reader.isCommentLine()) {
+                    reader.skip();
+                } else {
+                    reader.next();
+                    reader.getString();
+                    final ModelPerformance measure = new ModelPerformance();
+
+                    measure.dataset = reader.getString();
+
+                    measure.endpoint = reader.getString();
+                    if (filterByEndpoint && measure.dataset.equals(toolsArgs.datasetName) && measure.endpoint.equals(toolsArgs.endpointName) ||
+                            !filterByEndpoint) {
+                        if (readDatasetEndpoint) {
+                            datasetNames.add(measure.dataset);
+                        }
+                        if (readDatasetEndpoint) {
+                            endpointNames.add(measure.endpoint);
+                        }
+                        measure.excel = reader.getString();
+                        measure.mcc = reader.getDouble();
+                        measure.accuracy = reader.getDouble();
+                        measure.sens = reader.getDouble();
+                        measure.spec = reader.getDouble();
+                        measure.auc = reader.getDouble();
+                        measure.rmse = reader.getDouble();
+                        measure.mccStd = reader.getDouble();
+                        measure.accuracyStd = reader.getDouble();
+                        measure.sensStd = reader.getDouble();
+                        measure.specStd = reader.getDouble();
+                        measure.aucStd = reader.getDouble();
+                        measure.rmseStd = reader.getDouble();
+                        reader.getString();
+                        reader.getString();
+                        measure.actualNumberOfFeaturesInModel = reader.getInt();
+                        for (int i = 0; i < 4; i++) {
+                            reader.getString();
+                        }
+                        measure.modelId = reader.getString();
+                        for (int i = 0; i < 3; i++) {
+                            reader.getString();
+                        }
+                        //measure.bias = reader.getDouble();
                         modelPerfs.put(measure.modelId, measure);
                         modelIds.add(measure.modelId);
                         final MutableString modelId = new MutableString(measure.modelId);
