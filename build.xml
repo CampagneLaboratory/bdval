@@ -81,8 +81,8 @@
                 <include name="commons-io-1.4.jar"/>
                 <include name="commons-lang-2.4.jar"/>
                 <include name="commons-logging-1.1.1.jar"/>
-                <include name="commons-math-*.jar"/>
-                <include name="dsiutils-1.0.9.jar"/>
+                <include name="commons-math-2.0.jar"/>
+                <include name="dsiutils-1.0.10.jar"/>
                 <include name="edu.mssm.crover.cli.jar"/>
                 <include name="edu.mssm.crover.tables.jar"/>
                 <include name="fastutil-5.1.5.jar"/>
@@ -98,7 +98,7 @@
                 <include name="pj20071021.jar"/>
                 <include name="tisim-api.jar"/>
                 <include name="weka-3.5.6.jar"/>
-                <include name="ant/*.jar"/>
+                <include name="ant/*.jar"/>        <!-- needed for "formal" releases -->
                 <include name="Rserve/*.jar"/>
             </zipgroupfileset>
         </jar>
