@@ -261,6 +261,8 @@
                     <filter token="JOB-NAME" value="@{job-name}"/>
                 </filterset>
             </copy>
+            <fixcrlf srcdir="${job-dir}/.." eol="unix" includes="extract-results.sh"/>
+            <chmod dir="${job-dir}/.." perm="u+x" includes="extract-results.sh"/>
         </sequential>
     </macrodef>
 
