@@ -1,18 +1,33 @@
 #!/bin/sh
 
+#
+# This script will combine the output from a BDVAL PBS array job into a form
+# that can be used directly by the "generate final models" targets,  This is
+# needed since the PBS sub-jobs all run independently of one another and only
+# the zipped results are output
+#
+# The only input required is the output destination for the results
+#
+
 # Absolute path to this script.
 SCRIPT=$(readlink -f $0)
 # Absolute path this script is in.
 SCRIPT_DIR=`dirname $SCRIPT`
 
+if [ "$1" = "" ]; then
+    echo "No output directory specified!"
+    echo "Usage: $0 directory"
+    exit 1
+fi
+
 # Base name of the BDVAL project file without the ".xml" (i.e., prostate-example, maqcii-c, etc.)
-ANT_PROJECT_NAME=prostate-example
-PBS_JOB_NAME=prostate-pbs
+ANT_PROJECT_NAME=@PROJECT@
+PBS_JOB_NAME=@JOB-NAME@
 BASE_DIR=${SCRIPT_DIR}
 EXECUTION_DIR=${BASE_DIR}/${PBS_JOB_NAME}
 RESULTS_DIR=${BASE_DIR}/${PBS_JOB_NAME}-results
 
-OUTPUT_BASE=/home/marko/foobar
+OUTPUT_BASE=$1
 DATA_DIR=${OUTPUT_BASE}/data
 CONFIG_DIR=${OUTPUT_BASE}/config
 OUTPUT_DIR=${DATA_DIR}/${PBS_JOB_NAME}-results
@@ -66,7 +81,7 @@ do
   done
   /bin/rmdir ${OUTPUT_DIR}/${NAME}
 
-  # extract the model conditions
+  # extract the model conditions (replacing the temporary property file path used for PBS)
   /usr/bin/unzip -p $ZIPFILE ${NAME}/${NAME}-README.txt > ${OUTPUT_DIR}/${NAME}-$RUN-README.txt
   /usr/bin/unzip -p $ZIPFILE ${NAME}/model-conditions.txt \
       | sed -e "s|properties=.*/${ANT_PROJECT_NAME}.properties|properties=${DATA_DIR}/${ANT_PROJECT_NAME}.properties|g" \

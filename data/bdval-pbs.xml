@@ -254,6 +254,13 @@
                     <filter token="MASTER-NODE" value="@{pbs-master-node}"/>
                 </filterset>
             </copy>
+
+            <copy file="${bdval.basedir}/../scripts/pbs/extract-results.sh" todir="${job-dir}/.." filtering="true">
+                <filterset>
+                    <filter token="PROJECT" value="${ant.project.name}"/>
+                    <filter token="JOB-NAME" value="@{job-name}"/>
+                </filterset>
+            </copy>
         </sequential>
     </macrodef>
 
