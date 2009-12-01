@@ -108,6 +108,7 @@ public class DiscoverAndValidate implements WithProcessMethod {
         davMode.registerMode("svm-weights", DiscoverWithSvmWeights.class);
         davMode.registerMode("svm-weights-iterative", DiscoverWithSvmWeightsIterative.class);
         davMode.registerMode("t-test", DiscoverWithTTest.class);
+        davMode.registerMode("hubs", DiscoverWithHubs.class);
         davMode.registerMode("fold-change", DiscoverWithFoldChange.class);
         davMode.registerMode("kendal-tau", DiscoverWithKendallTau.class);
         davMode.registerMode("ga-wrapper", DiscoverWithGeneticAlgorithm.class);
@@ -126,6 +127,7 @@ public class DiscoverAndValidate implements WithProcessMethod {
         davMode.registerMode("rserve-status", RserveStatusMode.class);
         davMode.registerMode("cox-regression", DiscoverWithCoxRegression.class);
         davMode.registerMode("to-ranks", ToRanksMode.class);
+        davMode.registerMode("permutation", DiscoverWithPermutation.class);
 
         final TimeLoggingService timeService = new TimeLoggingService(args);
         timeService.start();
