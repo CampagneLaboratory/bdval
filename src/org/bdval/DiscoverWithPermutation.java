@@ -1,20 +1,21 @@
 /*
-* Copyright (C) 2007-2009 Institute for Computational Biomedicine,
-*                         Weill Medical College of Cornell University
-*
-*  This program is free software; you can redistribute it and/or modify
-*  it under the terms of the GNU General Public License as published by
-*  the Free Software Foundation; either version 3 of the License, or
-*  (at your option) any later version.
-*
-*  This program is distributed in the hope that it will be useful,
-*  but WITHOUT ANY WARRANTY; without even the implied warranty of
-*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*  GNU General Public License for more details.
-*
-*  You should have received a copy of the GNU General Public License
-*  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ * Copyright (C) 2009 Institute for Computational Biomedicine,
+ *                    Weill Medical College of Cornell University
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.bdval;
 
 import com.martiansoftware.jsap.FlaggedOption;
@@ -30,7 +31,11 @@ import edu.cornell.med.icb.geo.tools.MicroarrayTrainEvaluate;
 import edu.cornell.med.icb.tissueinfo.similarity.ScoredTranscriptBoundedSizeQueue;
 import edu.cornell.med.icb.tissueinfo.similarity.TranscriptScore;
 import edu.cornell.med.icb.util.RandomAdapter;
-import edu.mssm.crover.tables.*;
+import edu.mssm.crover.tables.ArrayTable;
+import edu.mssm.crover.tables.ColumnTypeException;
+import edu.mssm.crover.tables.InvalidColumnException;
+import edu.mssm.crover.tables.Table;
+import edu.mssm.crover.tables.TypeMismatchException;
 import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
 import it.unimi.dsi.fastutil.doubles.DoubleList;
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
@@ -39,18 +44,19 @@ import it.unimi.dsi.lang.MutableString;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.util.*;
-
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Univariate feature selection with Permutation Test.
- * We compare each feature individually for evidence of differential distribution in the two prediction classes.
- * If the adhoc test statistic p-Value is less than
+ * We compare each feature individually for evidence of differential distribution in the two
+ * prediction classes.  If the ad hoc test statistic p-Value is less than
  * the confidence interval, then the feature is selected as an informative biomarker.
  *
  * @author Nyasha Chambwe Date: Sep 16, 2009 Time: 3:34:53 PM
  */
-
 public class DiscoverWithPermutation extends DAVMode {
 
     private static final Log LOG = LogFactory.getLog(DiscoverWithPermutation.class);
@@ -85,8 +91,7 @@ public class DiscoverWithPermutation extends DAVMode {
      * Define command line options for this mode.
      *
      * @param jsap the JSAP command line parser
-     * @throws com.martiansoftware.jsap.JSAPException
-     *          if there is a problem building the options
+     * @throws JSAPException if there is a problem building the options
      */
     @Override
     public void defineOptions(final JSAP jsap) throws JSAPException {

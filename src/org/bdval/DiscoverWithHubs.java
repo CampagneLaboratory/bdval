@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2007-2009 Institute for Computational Biomedicine,
- *                         Weill Medical College of Cornell University
+ * Copyright (C) 2009 Institute for Computational Biomedicine,
+ *                    Weill Medical College of Cornell University
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -46,7 +46,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Univariate feasture selection with T-Test. We compare each feature individually for evidence of
+ * Univariate feature selection with T-Test. We compare each feature individually for evidence of
  * differential distribution in the two prediction classes. If the T-Test p-Value is less than
  * the confidence interval, then the feature is selected as an informative biomarker.
  *
@@ -83,8 +83,7 @@ public class DiscoverWithHubs extends DAVMode {
      * Define command line options for this mode.
      *
      * @param jsap the JSAP command line parser
-     * @throws com.martiansoftware.jsap.JSAPException
-     *          if there is a problem building the options
+     * @throws JSAPException if there is a problem building the options
      */
     @Override
     public void defineOptions(final JSAP jsap) throws JSAPException {
