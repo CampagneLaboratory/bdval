@@ -1,21 +1,20 @@
 /*
- * Copyright (C) 2009-2010 Institute for Computational Biomedicine,
- *                         Weill Medical College of Cornell University
- *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
+* Copyright (C) 2007-2009 Institute for Computational Biomedicine,
+*                         Weill Medical College of Cornell University
+*
+*  This program is free software; you can redistribute it and/or modify
+*  it under the terms of the GNU General Public License as published by
+*  the Free Software Foundation; either version 3 of the License, or
+*  (at your option) any later version.
+*
+*  This program is distributed in the hope that it will be useful,
+*  but WITHOUT ANY WARRANTY; without even the implied warranty of
+*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*  GNU General Public License for more details.
+*
+*  You should have received a copy of the GNU General Public License
+*  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 package org.bdval;
 
 import com.martiansoftware.jsap.FlaggedOption;
@@ -31,11 +30,8 @@ import edu.cornell.med.icb.geo.tools.MicroarrayTrainEvaluate;
 import edu.cornell.med.icb.tissueinfo.similarity.ScoredTranscriptBoundedSizeQueue;
 import edu.cornell.med.icb.tissueinfo.similarity.TranscriptScore;
 import edu.cornell.med.icb.util.RandomAdapter;
-import edu.mssm.crover.tables.ArrayTable;
-import edu.mssm.crover.tables.ColumnTypeException;
-import edu.mssm.crover.tables.InvalidColumnException;
-import edu.mssm.crover.tables.Table;
-import edu.mssm.crover.tables.TypeMismatchException;
+import edu.cornell.med.icb.stat.AreaUnderTheRocCurveCalculator;
+import edu.mssm.crover.tables.*;
 import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
 import it.unimi.dsi.fastutil.doubles.DoubleList;
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
@@ -44,19 +40,18 @@ import it.unimi.dsi.lang.MutableString;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+
 
 /**
  * Univariate feature selection with Permutation Test.
- * We compare each feature individually for evidence of differential distribution in the two
- * prediction classes.  If the ad hoc test statistic p-Value is less than
+ * We compare each feature individually for evidence of differential distribution in the two prediction classes.
+ * If the adhoc test statistic p-Value is less than
  * the confidence interval, then the feature is selected as an informative biomarker.
  *
  * @author Nyasha Chambwe Date: Sep 16, 2009 Time: 3:34:53 PM
  */
+
 public class DiscoverWithPermutation extends DAVMode {
 
     private static final Log LOG = LogFactory.getLog(DiscoverWithPermutation.class);
@@ -66,7 +61,6 @@ public class DiscoverWithPermutation extends DAVMode {
     private double alpha;
     final Object2DoubleMap<MutableString> probesetPvalues =
             new Object2DoubleOpenHashMap<MutableString>();
-
 
 
     @Override
@@ -91,7 +85,8 @@ public class DiscoverWithPermutation extends DAVMode {
      * Define command line options for this mode.
      *
      * @param jsap the JSAP command line parser
-     * @throws JSAPException if there is a problem building the options
+     * @throws com.martiansoftware.jsap.JSAPException
+     *          if there is a problem building the options
      */
     @Override
     public void defineOptions(final JSAP jsap) throws JSAPException {
@@ -125,8 +120,7 @@ public class DiscoverWithPermutation extends DAVMode {
         super.process(options);
 
         for (final ClassificationTask task : options.classificationTasks) {
-            // classification task is synonymous with the endpoints eg. GSE-fusion-YesNo
-            //i.e. for every endpoint defined in the task file
+            // classification task = endpoint eg. GSE-fusion-YesNo
 
             for (final GeneList geneList : options.geneLists) {
 
@@ -149,11 +143,9 @@ public class DiscoverWithPermutation extends DAVMode {
                 final ArrayTable.ColumnDescription labelColumn =
                         processedTable.getColumnValues(0);
 
-                //System.out.println(processedTable.toString(processedTable,false));
-
                 assert labelColumn.type == String.class : "label must have type String";
 
-                final String[] labels = labelColumn.getStrings(); // labels are the sampleIDs
+                String[] labels = labelColumn.getStrings(); // labels are the sampleIDs
 
                 final List<Set<String>> labelValueGroups =
                         MicroarrayTrainEvaluate.calculateLabelValueGroups(task);
@@ -164,48 +156,15 @@ public class DiscoverWithPermutation extends DAVMode {
                 // for all probesets across all samples
                 for (int featureIndex = 2; featureIndex < processedTable.getColumnNumber(); featureIndex++) {
                     final int probesetIndex = featureIndex - 1;
-                    final double testStatistic;
-                    testStatistic = evaluateStatisticForLabels(processedTable, labels, labelValueGroups, featureIndex);
+                    double testStatistic = evaluateStatisticForLabels(processedTable, labels, labelValueGroups, featureIndex);
 
-                    final DoubleList permutedStatsList = new DoubleArrayList();
-                    // double arraylist to store all permuted test statistics
+                    DoubleList permutedStatsList = new DoubleArrayList();
+                    // stores test statistic for all permutations
 
+                    Permute(options, processedTable, labels, labelValueGroups, featureIndex, permutedStatsList);
 
-                    int i = 0;
-                    double permutedStatistic;
-                    final List<String> labelsList = Arrays.asList(labels);
-                    RandomAdapter randomAdapter;
-
-                    while (i < 1000) {
-
-                        // now need to shuffle the labels
-                        randomAdapter = new RandomAdapter(options.randomGenerator);
-                        Collections.shuffle(labelsList, randomAdapter);
-
-                        final String[] shuffledLabels = (String[]) labelsList.toArray();
-                        permutedStatistic = evaluateStatisticForLabels(processedTable, shuffledLabels, labelValueGroups, featureIndex);
-                        permutedStatsList.add(permutedStatistic);
-                        i++;
-                    }
-
-                    double pValue;
-                    // calculate pvalue
-                    double frequency = 0;
-                    int z = 0;
-                    while (z < permutedStatsList.size()) {
-                       // System.out.println("RandomStat " + permutedStatsList.get(z) + " Teststat " + testStatistic);
-                        if (permutedStatsList.get(z) > testStatistic) {
-                            frequency++;
-                        }
-                        z++;
-                    }
-                   // System.out.println("frequency " + frequency);
-                    pValue = frequency/1000;
-
-                    if (pValue != pValue) {
-                        //NaN
-                        pValue = 1;
-                    }
+                    double pValue= 0.0;
+                    pValue = pValueDetermination(testStatistic, permutedStatsList);
 
                     // save in probesetPValues map
                     final MutableString probesetId = options.getProbesetIdentifier(probesetIndex);
@@ -234,52 +193,67 @@ public class DiscoverWithPermutation extends DAVMode {
         }
     }
 
-    private double evaluateStatisticForLabels(final Table processedTable, final String[] labels, final List<Set<String>> labelValueGroups, final int featureIndex) {
+    private void Permute(DAVOptions options, Table processedTable, String[] labels, List<Set<String>> labelValueGroups, int featureIndex, DoubleList permutedStatsList) {
+        int i = 0;
+        double permutedStatistic;
+        List<String> labelsList = Arrays.asList(labels);
+        RandomAdapter randomAdapter;
+
+        while (i < 1000) {
+
+            // shuffle the labels
+            randomAdapter = new RandomAdapter(options.randomGenerator);
+            Collections.shuffle(labelsList, randomAdapter);
+
+            String[] shuffledLabels = (String[]) labelsList.toArray();
+            permutedStatistic = evaluateStatisticForLabels(processedTable, shuffledLabels, labelValueGroups, featureIndex);
+            permutedStatsList.add(permutedStatistic);
+            i++;
+        }
+    }
+
+    private double pValueDetermination(double testStatistic, DoubleList permutedStatsList) {
+        double pValue;
+        double frequency = 0;
+        int z = 0;
+        while (z < permutedStatsList.size()) {
+            if (permutedStatsList.get(z) > testStatistic) {
+                frequency++;
+            }
+            z++;
+        }
+
+        pValue = frequency / 1000;
+
+        if (pValue != pValue) {//NaN
+            pValue = 1;
+        }
+        return pValue;
+    }
+
+    private double evaluateStatisticForLabels(Table processedTable, String[] labels, List<Set<String>> labelValueGroups, int featureIndex) {
         final ArrayTable.ColumnDescription cd = processedTable.getColumnValues(featureIndex);
         assert cd.type == double.class : "features must have type double";
         final double[] values = cd.getDoubles();
-        final DoubleList positiveLabelValues = new DoubleArrayList();
-        final DoubleList negativeLabelValues = new DoubleArrayList();
-        int index = 0;
+        final DoubleList binaryLabelValues = new DoubleArrayList();
 
         for (final String label : labels) {
             if (labelValueGroups.get(0).contains(label)) {
-                negativeLabelValues.add(values[index]);
+                binaryLabelValues.add(Double.valueOf("-1"));
             } else {
                 if (labelValueGroups.get(1).contains(label)) {
-                    positiveLabelValues.add(values[index]);
+                    binaryLabelValues.add(Double.valueOf("1"));
                 }
             }
-            index++;
-        }
 
-        final double[] valuesForPositiveLabel = positiveLabelValues.toDoubleArray();
-        final double[] valuesForNegativeLabel = negativeLabelValues.toDoubleArray();
-        return evaluateStatistic(valuesForPositiveLabel, valuesForNegativeLabel);
+        }
+        double[] binaryLabelValuesArray = binaryLabelValues.toDoubleArray();
+        AreaUnderTheRocCurveCalculator auc = new AreaUnderTheRocCurveCalculator();
+        double aucresult = auc.evaluateStatistic(values, binaryLabelValuesArray);
+        return aucresult;
     }
 
-    private double evaluateStatistic(final double[] valuesForPositiveLabel, final double[] valuesForNegativeLabel) {
-
-        // sum of expression values for positive label
-        double sumPositiveLabelValues = 0;
-
-        for (final double positiveValue : valuesForPositiveLabel) {
-            sumPositiveLabelValues += positiveValue;
-        }
-        final double avgPositiveLabelValues = (sumPositiveLabelValues) / valuesForPositiveLabel.length;
-
-        double sumNegativeLabelValues = 0;
-        for (final double negativeValues : valuesForNegativeLabel) {
-            sumNegativeLabelValues += negativeValues;
-        }
-
-        final double avgNegativeLabelValues = sumNegativeLabelValues / valuesForNegativeLabel.length;
-
-        return Math.abs(avgPositiveLabelValues - avgNegativeLabelValues);
-    }
-
-
-    private void error(final Exception e) {
+    private void error(Exception e) {
         System.err.println("Cannot processTable. Details may be provided below.");
         e.printStackTrace();
         System.exit(10);
