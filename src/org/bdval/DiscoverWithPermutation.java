@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2009 Institute for Computational Biomedicine,
- *                    Weill Medical College of Cornell University
+ * Copyright (C) 2009-2010 Institute for Computational Biomedicine,
+ *                         Weill Medical College of Cornell University
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -153,7 +153,7 @@ public class DiscoverWithPermutation extends DAVMode {
 
                 assert labelColumn.type == String.class : "label must have type String";
 
-                String[] labels = labelColumn.getStrings(); // labels are the sampleIDs
+                final String[] labels = labelColumn.getStrings(); // labels are the sampleIDs
 
                 final List<Set<String>> labelValueGroups =
                         MicroarrayTrainEvaluate.calculateLabelValueGroups(task);
@@ -164,16 +164,16 @@ public class DiscoverWithPermutation extends DAVMode {
                 // for all probesets across all samples
                 for (int featureIndex = 2; featureIndex < processedTable.getColumnNumber(); featureIndex++) {
                     final int probesetIndex = featureIndex - 1;
-                    double testStatistic;
+                    final double testStatistic;
                     testStatistic = evaluateStatisticForLabels(processedTable, labels, labelValueGroups, featureIndex);
 
-                    DoubleList permutedStatsList = new DoubleArrayList();
+                    final DoubleList permutedStatsList = new DoubleArrayList();
                     // double arraylist to store all permuted test statistics
 
 
                     int i = 0;
                     double permutedStatistic;
-                    List<String> labelsList = Arrays.asList(labels);
+                    final List<String> labelsList = Arrays.asList(labels);
                     RandomAdapter randomAdapter;
 
                     while (i < 1000) {
@@ -182,7 +182,7 @@ public class DiscoverWithPermutation extends DAVMode {
                         randomAdapter = new RandomAdapter(options.randomGenerator);
                         Collections.shuffle(labelsList, randomAdapter);
 
-                        String[] shuffledLabels = (String[]) labelsList.toArray();
+                        final String[] shuffledLabels = (String[]) labelsList.toArray();
                         permutedStatistic = evaluateStatisticForLabels(processedTable, shuffledLabels, labelValueGroups, featureIndex);
                         permutedStatsList.add(permutedStatistic);
                         i++;
@@ -234,7 +234,7 @@ public class DiscoverWithPermutation extends DAVMode {
         }
     }
 
-    private double evaluateStatisticForLabels(Table processedTable, String[] labels, List<Set<String>> labelValueGroups, int featureIndex) {
+    private double evaluateStatisticForLabels(final Table processedTable, final String[] labels, final List<Set<String>> labelValueGroups, final int featureIndex) {
         final ArrayTable.ColumnDescription cd = processedTable.getColumnValues(featureIndex);
         assert cd.type == double.class : "features must have type double";
         final double[] values = cd.getDoubles();
@@ -253,33 +253,33 @@ public class DiscoverWithPermutation extends DAVMode {
             index++;
         }
 
-        double[] valuesForPositiveLabel = positiveLabelValues.toDoubleArray();
-        double[] valuesForNegativeLabel = negativeLabelValues.toDoubleArray();
+        final double[] valuesForPositiveLabel = positiveLabelValues.toDoubleArray();
+        final double[] valuesForNegativeLabel = negativeLabelValues.toDoubleArray();
         return evaluateStatistic(valuesForPositiveLabel, valuesForNegativeLabel);
     }
 
-    private double evaluateStatistic(double[] valuesForPositiveLabel, double[] valuesForNegativeLabel) {
+    private double evaluateStatistic(final double[] valuesForPositiveLabel, final double[] valuesForNegativeLabel) {
 
         // sum of expression values for positive label
         double sumPositiveLabelValues = 0;
 
-        for (double positiveValue : valuesForPositiveLabel) {
+        for (final double positiveValue : valuesForPositiveLabel) {
             sumPositiveLabelValues += positiveValue;
         }
-        double avgPositiveLabelValues = (sumPositiveLabelValues) / valuesForPositiveLabel.length;
+        final double avgPositiveLabelValues = (sumPositiveLabelValues) / valuesForPositiveLabel.length;
 
         double sumNegativeLabelValues = 0;
-        for (double negativeValues : valuesForNegativeLabel) {
+        for (final double negativeValues : valuesForNegativeLabel) {
             sumNegativeLabelValues += negativeValues;
         }
 
-        double avgNegativeLabelValues = sumNegativeLabelValues / valuesForNegativeLabel.length;
+        final double avgNegativeLabelValues = sumNegativeLabelValues / valuesForNegativeLabel.length;
 
         return Math.abs(avgPositiveLabelValues - avgNegativeLabelValues);
     }
 
 
-    private void error(Exception e) {
+    private void error(final Exception e) {
         System.err.println("Cannot processTable. Details may be provided below.");
         e.printStackTrace();
         System.exit(10);

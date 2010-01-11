@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2009 Institute for Computational Biomedicine,
+ * Copyright (C) 2007-2010 Institute for Computational Biomedicine,
  *                         Weill Medical College of Cornell University
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -20,8 +20,8 @@ package edu.cornell.med.icb.geo;
 
 import edu.cornell.med.icb.geo.binaryarray.ArrayReader;
 import edu.cornell.med.icb.geo.binaryarray.ArrayWriter;
-import edu.cornell.med.icb.svd.SVDFactory;
 import edu.cornell.med.icb.identifier.IndexedIdentifier;
+import edu.cornell.med.icb.svd.SVDFactory;
 import edu.mssm.crover.cli.CLI;
 import it.unimi.dsi.fastutil.io.TextIO;
 import it.unimi.dsi.fastutil.objects.ObjectList;

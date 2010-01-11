@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2009 Institute for Computational Biomedicine,
+ * Copyright (C) 2008-2010 Institute for Computational Biomedicine,
  *                         Weill Medical College of Cornell University
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -191,7 +191,7 @@ public class StatsMode extends Predict {
 
     }
 
-    private void evaluateStats(final DAVOptions options, String predictionsFilename) {
+    private void evaluateStats(final DAVOptions options, final String predictionsFilename) {
         PredictedItems predictions=null;
         try {
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2009 Institute for Computational Biomedicine,
+ * Copyright (C) 2007-2010 Institute for Computational Biomedicine,
  *                         Weill Medical College of Cornell University
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -18,8 +18,8 @@
 
 package edu.cornell.med.icb.geo;
 
-import edu.cornell.med.icb.tissueinfo.similarity.GeneTranscriptRelationships;
 import edu.cornell.med.icb.identifier.IndexedIdentifier;
+import edu.cornell.med.icb.tissueinfo.similarity.GeneTranscriptRelationships;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import it.unimi.dsi.lang.MutableString;
 

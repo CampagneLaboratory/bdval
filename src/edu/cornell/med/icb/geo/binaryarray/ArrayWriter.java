@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2009 Institute for Computational Biomedicine,
+ * Copyright (C) 2007-2010 Institute for Computational Biomedicine,
  *                         Weill Medical College of Cornell University
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -40,7 +40,7 @@ import java.io.PrintWriter;
 public class ArrayWriter {
     DataOutput dataOutput;
     private final String sampleListFilename;
-    private FastBufferedOutputStream out;
+    private final FastBufferedOutputStream out;
 
     public ArrayWriter(final String basename, final GEOPlatformIndexed platform) throws IOException {
         super();

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2009 Institute for Computational Biomedicine,
+ * Copyright (C) 2007-2010 Institute for Computational Biomedicine,
  *                         Weill Medical College of Cornell University
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -32,7 +32,7 @@ public class AffySnpChipCountsSampleDataCallback extends SampleDataCallback<Geno
         super(platform, new GenotypeSampleData(platform));
     }
 
-    final Pattern spaceSplitter = Pattern.compile("[ \t]+");
+    private final Pattern spaceSplitter = Pattern.compile("[ \t]+");
 
     @Override
     public void parse(final MutableString line) {

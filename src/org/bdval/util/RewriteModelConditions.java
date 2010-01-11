@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2009 Institute for Computational Biomedicine,
+ * Copyright (C) 2008-2010 Institute for Computational Biomedicine,
  *                         Weill Medical College of Cornell University
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -104,8 +104,8 @@ public class RewriteModelConditions {
     }
     // Force model-id to be the very first column..
 
-    private String[] sortColumns(Set<String> strings) {
-        String[] result = new String[strings.size()];
+    private String[] sortColumns(final Set<String> strings) {
+        final String[] result = new String[strings.size()];
         if (strings.contains("model-id")) {
             result[0] = "model-id";
             strings.remove("model-id");
@@ -115,7 +115,7 @@ public class RewriteModelConditions {
         }
         int i = 1;
 
-        for (String columnId : strings) {
+        for (final String columnId : strings) {
             assert i<result.length;
             result[i++] = columnId;
         }

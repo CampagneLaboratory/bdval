@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2009 Institute for Computational Biomedicine,
+ * Copyright (C) 2008-2010 Institute for Computational Biomedicine,
  *                         Weill Medical College of Cornell University
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -58,7 +58,7 @@ public class PredictionsToCornellOptions {
     /**
      * The sample ids map.
      */
-    private Map<String, String> sampleIdsMap;
+    private final Map<String, String> sampleIdsMap;
 
     /**
      * The model ids map file as a file.
@@ -68,7 +68,7 @@ public class PredictionsToCornellOptions {
     /**
      * The model ids map.
      */
-    private Map<String, String> modelIdsMap;
+    private final Map<String, String> modelIdsMap;
 
     /**
      * The model ids map.

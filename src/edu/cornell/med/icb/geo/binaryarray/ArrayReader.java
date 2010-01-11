@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2009 Institute for Computational Biomedicine,
+ * Copyright (C) 2007-2010 Institute for Computational Biomedicine,
  *                         Weill Medical College of Cornell University
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -18,6 +18,7 @@
 
 package edu.cornell.med.icb.geo.binaryarray;
 
+import edu.cornell.med.icb.identifier.IndexedIdentifier;
 import it.unimi.dsi.fastutil.floats.FloatIterator;
 import it.unimi.dsi.fastutil.io.BinIO;
 import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
@@ -34,23 +35,21 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 
-import edu.cornell.med.icb.identifier.IndexedIdentifier;
-
 /**
  * Reads signals from an array, stored in binary format.
  *
  * @author Fabien Campagne Date: Aug 25, 2007 Time: 11:29:02 AM
  */
 public class ArrayReader {
-    private DataInput dataInput;
-    private IndexedIdentifier probesetIds;
+    private final DataInput dataInput;
+    private final IndexedIdentifier probesetIds;
     private IndexedIdentifier sampleIds;
-    private InputStream stream;
+    private final InputStream stream;
     private ObjectList<MutableString> sampleIdList;
     public static final String ARRAY_DATA_BIN_SUFFIX = "-array-data.bin";
     public static final String ARRAY_SAMPLES_TXT_SUFFIX = "-array-samples.txt";
     public static final String ARRAYS_PROBESETIDS_IO_SUFFIX = "-arrays-probesetids.io";
-    private FloatIterator signalIterator;
+    private final FloatIterator signalIterator;
 
     /**
      * Get sample ids for this array, in the order in which they were written.

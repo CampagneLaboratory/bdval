@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2009 Institute for Computational Biomedicine,
- *                    Weill Medical College of Cornell University
+ * Copyright (C) 2009-2010 Institute for Computational Biomedicine,
+ *                         Weill Medical College of Cornell University
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -20,7 +20,8 @@ package org.bdval;
 
 import cern.colt.Timer;
 import edu.mssm.crover.cli.CLI;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * @author Fabien Campagne
@@ -28,9 +29,11 @@ import org.apache.log4j.Logger;
  *         Time: 1:20:42 PM
  */
 public class TimeLoggingService {
-    private static final Logger LOGGER = Logger.getLogger(TimeLoggingService.class);
-    private String mode;
+    private static final Log LOG = LogFactory.getLog(TimeLoggingService.class);
+    private final String mode;
     private String modelId;
+    private Timer timer;
+
 
     public TimeLoggingService(final String[] args) {
         mode = CLI.getOption(args, "--mode", CLI.getOption(args, "-m", "no-mode-argument"));
@@ -43,7 +46,6 @@ public class TimeLoggingService {
     }
 
     public TimeLoggingService(final String mode) {
-
         this.mode = mode;
     }
 
@@ -51,21 +53,18 @@ public class TimeLoggingService {
         this.modelId = modelId;
     }
 
-    Timer timer;
-
     public void start() {
         timer = new Timer();
-        LOGGER.trace("TIMING:modelId:" + modelId + ":MODE:" + mode + ":START");
+        LOG.trace("TIMING:modelId:" + modelId + ":MODE:" + mode + ":START");
         timer.start();
     }
 
     public void stop() {
-
-        LOGGER.trace("TIMING:modelId:" + modelId + ":MODE:" + mode + ":STOP");
+        LOG.trace("TIMING:modelId:" + modelId + ":MODE:" + mode + ":STOP");
 
         timer.stop();
-        LOGGER.trace("TIMING:modelId:" + modelId + ":MODE:" + mode + ":DURATION_SECONDS:" + timer.seconds());
-        LOGGER.trace("TIMING:modelId:" + modelId + ":MODE:" + mode + ":DURATION_MINUTES:" + timer.minutes());
+        LOG.trace("TIMING:modelId:" + modelId + ":MODE:" + mode + ":DURATION_SECONDS:" + timer.seconds());
+        LOG.trace("TIMING:modelId:" + modelId + ":MODE:" + mode + ":DURATION_MINUTES:" + timer.minutes());
 
     }
 }

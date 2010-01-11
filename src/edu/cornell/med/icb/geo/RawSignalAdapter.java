@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2009 Institute for Computational Biomedicine,
+ * Copyright (C) 2007-2010 Institute for Computational Biomedicine,
  *                         Weill Medical College of Cornell University
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -36,7 +36,7 @@ import java.util.Comparator;
  *
  */
 public class RawSignalAdapter implements FormatAdapter {
-    private Comparator<? super ProbeSignal> comparator = new Comparator<ProbeSignal>() {
+    private final Comparator<? super ProbeSignal> comparator = new Comparator<ProbeSignal>() {
         public int compare(final ProbeSignal o1, final ProbeSignal o2) {
             return Double.compare(o1.signal, o2.signal);
         }

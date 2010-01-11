@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2009 Institute for Computational Biomedicine,
+ * Copyright (C) 2008-2010 Institute for Computational Biomedicine,
  *                         Weill Medical College of Cornell University
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -23,27 +23,26 @@ import com.martiansoftware.jsap.JSAP;
 import com.martiansoftware.jsap.JSAPException;
 import com.martiansoftware.jsap.JSAPResult;
 import com.martiansoftware.jsap.Parameter;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.*;
-
 import edu.cornell.med.icb.io.TsvToFromMap;
 import edu.cornell.med.icb.iterators.TextFileLineIterator;
 import edu.cornell.med.icb.maps.LinkedHashToMultiTypeMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import org.apache.commons.io.IOUtils;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Split classifier parameters into distinct columns. This program takes as input a tab delimited file with
  * modelId, classifier-type and classifier-parameter columns and splits the classifier-type column into
- * separate columns, whose id is prefixed with the classifier-type column value. 
+ * separate columns, whose id is prefixed with the classifier-type column value.
  *
  * @author Fabien Campagne
  */
@@ -97,19 +96,19 @@ public class NormalizeClassifierParameters {
                 new FileWriter(outputFile));
 
 
-        Object2ObjectMap<String, Object2ObjectMap<String, String>> map = new Object2ObjectOpenHashMap<String, Object2ObjectMap<String, String>>();
+        final Object2ObjectMap<String, Object2ObjectMap<String, String>> map = new Object2ObjectOpenHashMap<String, Object2ObjectMap<String, String>>();
 
         int lineNumber = 0;
-        ObjectArrayList<String> modelIds = new ObjectArrayList<String>();
+        final ObjectArrayList<String> modelIds = new ObjectArrayList<String>();
 
         for (final String line : new TextFileLineIterator(inputFilename)) {
             if (lineNumber > 0) {
-                LinkedHashToMultiTypeMap<String> data = tsvToFromMap.readDataToMap(line);
+                final LinkedHashToMultiTypeMap<String> data = tsvToFromMap.readDataToMap(line);
                 System.out.println("data: " + data);
                 final String modelId = data.get("modelId");
                 modelIds.add(modelId);
-                for (String column : data.keySet()) {
-                    Object2ObjectMap<String, String> columnMap = setupColumnMap(map, column);
+                for (final String column : data.keySet()) {
+                    final Object2ObjectMap<String, String> columnMap = setupColumnMap(map, column);
 
                     columnMap.put(modelId, data.get(column));
 
@@ -123,17 +122,19 @@ public class NormalizeClassifierParameters {
         List<String> columns;
 
         columns = tsvToFromMap.getColumnHeaders();
-        for (String modelId : modelIds) {
-            String params = map.get("classifier-parameters").get(modelId);
-            String classifier = map.get("classifier-type").get(modelId);
-            String[] tokens = params.split("[,]");
-            for (String token : tokens) {
-                String key_value[] = token.split("[=]");
+        for (final String modelId : modelIds) {
+            final String params = map.get("classifier-parameters").get(modelId);
+            final String classifier = map.get("classifier-type").get(modelId);
+            final String[] tokens = params.split("[,]");
+            for (final String token : tokens) {
+                final String[] key_value = token.split("[=]");
 
-                String key = key_value[0];
-                if (key.equals("wekaClass")) continue;
-                String value = key_value.length > 1 ? key_value[1] : "DEFINED";
-                Object2ObjectMap<String, String> columnMap = setupColumnMap(map, classifier + key);
+                final String key = key_value[0];
+                if (key.equals("wekaClass")) {
+                    continue;
+                }
+                final String value = key_value.length > 1 ? key_value[1] : "DEFINED";
+                final Object2ObjectMap<String, String> columnMap = setupColumnMap(map, classifier + key);
                 columnMap.put(modelId, value);
 
             }
@@ -150,7 +151,7 @@ public class NormalizeClassifierParameters {
         IOUtils.closeQuietly(outputWriter);
     }
 
-    private Object2ObjectMap<String, String> setupColumnMap(Object2ObjectMap<String, Object2ObjectMap<String, String>> map, String column) {
+    private Object2ObjectMap<String, String> setupColumnMap(final Object2ObjectMap<String, Object2ObjectMap<String, String>> map, final String column) {
         Object2ObjectMap<String, String> columnMap = map.get(column);
         if (columnMap == null) {
             columnMap = new Object2ObjectOpenHashMap<String, String>();
@@ -170,11 +171,11 @@ public class NormalizeClassifierParameters {
      */
     private void writeData(final PrintWriter outputWriter,
                            final List<String> columns,
-                           ObjectArrayList<String> modelIds,
+                           final ObjectArrayList<String> modelIds,
                            final Object2ObjectMap<String, Object2ObjectMap<String, String>> valueMap) {
 
         int colNum = 0;
-        for (String column : columns) {
+        for (final String column : columns) {
             if (colNum++ > 0) {
                 outputWriter.print("\t");
             }
@@ -182,14 +183,14 @@ public class NormalizeClassifierParameters {
         }
         outputWriter.println();
 
-        for (String modelId : modelIds) {
+        for (final String modelId : modelIds) {
             colNum = 0;
             for (final String column : columns) {
                 if (colNum++ > 0) {
                     outputWriter.print("\t");
                 }
 
-                Object2ObjectMap<String, String> columnData = valueMap.get(column);
+                final Object2ObjectMap<String, String> columnData = valueMap.get(column);
 
                 if (columnData == null) {
                     outputWriter.print("");

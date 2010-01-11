@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2009 Institute for Computational Biomedicine,
+ * Copyright (C) 2008-2010 Institute for Computational Biomedicine,
  *                         Weill Medical College of Cornell University
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -18,6 +18,7 @@
 
 package edu.cornell.med.icb.geo;
 
+import edu.cornell.med.icb.identifier.IndexedIdentifier;
 import it.unimi.dsi.lang.MutableString;
 import org.apache.commons.lang.StringUtils;
 import static org.junit.Assert.assertEquals;
@@ -29,8 +30,6 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-
-import edu.cornell.med.icb.identifier.IndexedIdentifier;
 
 /**
  * Validates the functionality of the {@link edu.cornell.med.icb.identifier.IndexedIdentifier}

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2009 Institute for Computational Biomedicine,
+ * Copyright (C) 2008-2010 Institute for Computational Biomedicine,
  *                         Weill Medical College of Cornell University
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -45,8 +45,9 @@ public class BaseSignalQualityCalculator implements Closeable {
     private PrintWriter outputWriter;
 
     /** Translation from 0/1, LT/NLT, etc. to a specified value. */
-    public static final String[] CLASS_TRANSLATION = new String[] {
-        "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P"};
+    public static final String[] CLASS_TRANSLATION = {
+        "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P"
+    };
 
     /** The output filename. */
     private String outputFilename;

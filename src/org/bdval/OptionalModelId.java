@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2009 Institute for Computational Biomedicine,
- *                    Weill Medical College of Cornell University
+ * Copyright (C) 2009-2010 Institute for Computational Biomedicine,
+ *                         Weill Medical College of Cornell University
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ public class OptionalModelId {
     /**
      * The name of the column that will hold this optional model id.
      */
-    String columnIdentifier;
+    final String columnIdentifier;
 
 
     public OptionalModelId(final String columnIdentifier) {
@@ -53,12 +53,12 @@ public class OptionalModelId {
     /**
      * Name of arguments to exclude from command line when calculating hash code modelid.
      */
-    ObjectList<String> excludeArgumentNames;
+    final ObjectList<String> excludeArgumentNames;
     /**
      * The number of arguments that follow the command line arguments to ignore when creating
      * the hash key for this optional model id.
      */
-    IntArrayList skipValueForArgumentName;
+    final IntArrayList skipValueForArgumentName;
 
     public void addExcludeArgument(final String excludeArgumentName, final int skipForArgument) {
         excludeArgumentNames.add(excludeArgumentName);

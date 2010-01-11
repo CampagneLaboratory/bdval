@@ -1,25 +1,29 @@
 package org.bdval.modelconditions;
 
-import com.martiansoftware.jsap.*;
+import com.martiansoftware.jsap.FlaggedOption;
+import com.martiansoftware.jsap.JSAP;
+import com.martiansoftware.jsap.JSAPException;
+import com.martiansoftware.jsap.JSAPResult;
+import com.martiansoftware.jsap.Parameter;
+import com.martiansoftware.jsap.UnflaggedOption;
+import edu.cornell.med.icb.io.TsvToFromMap;
+import edu.cornell.med.icb.iterators.TextFileLineIterator;
+import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
+import it.unimi.dsi.lang.MutableString;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.bdval.GenerateFinalModels;
 import org.bdval.PredictedItems;
 import org.bdval.modelselection.CandidateModelSelectionAllTeams;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
-import it.unimi.dsi.lang.MutableString;
-import edu.cornell.med.icb.io.TsvToFromMap;
-import edu.cornell.med.icb.iterators.TextFileLineIterator;
 
 
 /**
@@ -67,7 +71,8 @@ public class ProcessModelConditionsMode extends edu.cornell.med.icb.cli.UseModal
         jsap.registerParameter(modelconditionsOption);
     }
 
-    public void interpretArguments(JSAP jsap, JSAPResult jsapResult, ProcessModelConditionsOptions options) {
+    @Override
+    public void interpretArguments(final JSAP jsap, final JSAPResult jsapResult, final ProcessModelConditionsOptions options) {
         final String[] resultDirectories = jsapResult.getStringArray("result-directory");
         options.resultDirectories = resultDirectories;
         options.modelConditionsFilename = jsapResult.getString("model-conditions");
@@ -90,10 +95,11 @@ public class ProcessModelConditionsMode extends edu.cornell.med.icb.cli.UseModal
 
     }
 
-    public void process(ProcessModelConditionsOptions options) {
+    @Override
+    public void process(final ProcessModelConditionsOptions options) {
         this.options = options;
 
-        for (String modelId : options.modelConditions.keySet()) {
+        for (final String modelId : options.modelConditions.keySet()) {
             processSeries(options, modelId);
         }
     }
@@ -104,7 +110,7 @@ public class ProcessModelConditionsMode extends edu.cornell.med.icb.cli.UseModal
      * @param options
      * @param modelId
      */
-    public void processSeries(ProcessModelConditionsOptions options, String modelId) {
+    public void processSeries(final ProcessModelConditionsOptions options, final String modelId) {
     }
 
 
@@ -114,7 +120,7 @@ public class ProcessModelConditionsMode extends edu.cornell.med.icb.cli.UseModal
      *
      * @param modelId
      */
-    public void processOneModelIdPassOne(ProcessModelConditionsOptions options, String modelId) {
+    public void processOneModelIdPassOne(final ProcessModelConditionsOptions options, final String modelId) {
     }
 
     /**
@@ -124,7 +130,7 @@ public class ProcessModelConditionsMode extends edu.cornell.med.icb.cli.UseModal
      * @param modelId
      */
 
-    public void processOneModelIdPassTwo(ProcessModelConditionsOptions options, String modelId) {
+    public void processOneModelIdPassTwo(final ProcessModelConditionsOptions options, final String modelId) {
     }
 
 
@@ -225,13 +231,13 @@ public class ProcessModelConditionsMode extends edu.cornell.med.icb.cli.UseModal
      * @return
      */
     public PredictedItems loadPredictions(final String modelId) {
-        for (String resultDirectory : options.resultDirectories) {
+        for (final String resultDirectory : options.resultDirectories) {
             String predictionsDirectoryPath = FilenameUtils.concat(resultDirectory, "predictions");
 
             predictionsDirectoryPath = FilenameUtils.concat(predictionsDirectoryPath, getDatasetName(modelId));
-            File predictionDir = new File(predictionsDirectoryPath);
-            String matchingFilenames[] = predictionDir.list(new FilenameFilter() {
-                public boolean accept(File file, String name) {
+            final File predictionDir = new File(predictionsDirectoryPath);
+            final String[] matchingFilenames = predictionDir.list(new FilenameFilter() {
+                public boolean accept(final File file, final String name) {
                     return (name.contains(modelId));
                 }
             });
@@ -243,7 +249,7 @@ public class ProcessModelConditionsMode extends edu.cornell.med.icb.cli.UseModal
             if (matchingFilenames.length > 1) {
                 System.err.println(String.format("more than one prediction file was found for modelId=%s", modelId));
                 System.out.println("Filenames were : ");
-                for (String filename : matchingFilenames) {
+                for (final String filename : matchingFilenames) {
                     System.out.println(filename);
                 }
                 System.out.flush();
@@ -252,7 +258,7 @@ public class ProcessModelConditionsMode extends edu.cornell.med.icb.cli.UseModal
                 predictionsFilename = FilenameUtils.concat(predictionsDirectoryPath, matchingFilenames[0]);
             }
             try {
-                PredictedItems predictions = new PredictedItems();
+                final PredictedItems predictions = new PredictedItems();
                 predictions.load(predictionsFilename);
                 return predictions;
             } catch (IOException e) {
@@ -264,21 +270,27 @@ public class ProcessModelConditionsMode extends edu.cornell.med.icb.cli.UseModal
         return null;
     }
 
-    protected String getDatasetName(String modelId) {
+    protected String getDatasetName(final String modelId) {
         return options.modelConditions.get(modelId).get("dataset-name");
     }
 
-    protected String constructLabel(String modelId) {
-        String classifierType = options.modelConditions.get(modelId).get("classifier-type");
-        String featureSelectionType = options.modelConditions.get(modelId).get("feature-selection-type");
-        String featureSelectionMode = options.modelConditions.get(modelId).get("feature-selection-mode");
+    protected String constructLabel(final String modelId) {
+        final String classifierType = options.modelConditions.get(modelId).get("classifier-type");
+        final String featureSelectionType = options.modelConditions.get(modelId).get("feature-selection-type");
+        final String featureSelectionMode = options.modelConditions.get(modelId).get("feature-selection-mode");
         String featureSelection = "unknown";
-        if (featureSelectionMode != null) featureSelection = featureSelectionMode;
-        if (featureSelectionType != null) featureSelection = featureSelectionType;
-        String classifierParameters = options.modelConditions.get(modelId).get("classifier-parameters");
+        if (featureSelectionMode != null) {
+            featureSelection = featureSelectionMode;
+        }
+        if (featureSelectionType != null) {
+            featureSelection = featureSelectionType;
+        }
+        final String classifierParameters = options.modelConditions.get(modelId).get("classifier-parameters");
         int removeThat = classifierParameters.lastIndexOf(",wekaClass");
-        if (removeThat == -1) removeThat = classifierParameters.length();
-        String parameters = classifierParameters.substring(0, removeThat);
+        if (removeThat == -1) {
+            removeThat = classifierParameters.length();
+        }
+        final String parameters = classifierParameters.substring(0, removeThat);
         return classifierType + '-' + featureSelection + '-' + parameters;
     }
 

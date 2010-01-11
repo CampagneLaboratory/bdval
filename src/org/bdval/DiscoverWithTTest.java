@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2009 Institute for Computational Biomedicine,
+ * Copyright (C) 2007-2010 Institute for Computational Biomedicine,
  *                         Weill Medical College of Cornell University
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -159,11 +159,15 @@ public class DiscoverWithTTest extends DAVMode {
                         double pValue;
                         // T-Test cannot be applied to sets of numbers with less than two elements.
                         // In such cases, consider that no feature is significant.
-                        if (positiveLabelValues.size() < 2 || negativeLabelValues.size() < 2) pValue = Double.NaN;
+                        if (positiveLabelValues.size() < 2 || negativeLabelValues.size() < 2) {
+                            pValue = Double.NaN;
+                        }
 
-                        else pValue = tester.tTest(
-                                positiveLabelValues.toDoubleArray(),
-                                negativeLabelValues.toDoubleArray());
+                        else {
+                            pValue = tester.tTest(
+                                    positiveLabelValues.toDoubleArray(),
+                                    negativeLabelValues.toDoubleArray());
+                        }
 
                         if (pValue != pValue) {
                             // NaN

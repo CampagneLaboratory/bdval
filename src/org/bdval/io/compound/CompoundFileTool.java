@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2009 Institute for Computational Biomedicine,
+ * Copyright (C) 2008-2010 Institute for Computational Biomedicine,
  *                         Weill Medical College of Cornell University
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -19,13 +19,13 @@
 package org.bdval.io.compound;
 
 import com.martiansoftware.jsap.JSAP;
+import com.martiansoftware.jsap.JSAPException;
+import com.martiansoftware.jsap.JSAPResult;
 import com.martiansoftware.jsap.Switch;
 import com.martiansoftware.jsap.UnflaggedOption;
-import com.martiansoftware.jsap.JSAPResult;
-import com.martiansoftware.jsap.JSAPException;
 
-import java.io.IOException;
 import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 
 /**

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2009 Institute for Computational Biomedicine,
+ * Copyright (C) 2008-2010 Institute for Computational Biomedicine,
  *                         Weill Medical College of Cornell University
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -21,12 +21,12 @@ package org.bdval.io.compound;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.io.IOException;
-import java.io.EOFException;
-import java.io.RandomAccessFile;
 import java.io.ByteArrayInputStream;
-import java.io.ObjectInputStream;
 import java.io.DataInput;
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.RandomAccessFile;
 
 /**
  * A DataOutput object that also supports writeObject.
@@ -46,7 +46,7 @@ public class CompoundDataInput implements DataInput {
     /**
      * The delegate DataInput object.
      */
-    private RandomAccessFile dataInput;
+    private final RandomAccessFile dataInput;
     private long fileSize;
 
     /**
@@ -54,7 +54,7 @@ public class CompoundDataInput implements DataInput {
      *
      * @param input the current reader stream
      */
-    CompoundDataInput(final RandomAccessFile input, long fileSize) {
+    CompoundDataInput(final RandomAccessFile input, final long fileSize) {
         this.dataInput = input;
         this.fileSize = fileSize;
     }
@@ -64,7 +64,9 @@ public class CompoundDataInput implements DataInput {
      */
     public void readFully(final byte[] b) throws IOException {
         fileSize -= b.length;
-        if (fileSize < 0) throw new EOFException();
+        if (fileSize < 0) {
+            throw new EOFException();
+        }
         dataInput.readFully(b);
     }
 
@@ -73,7 +75,9 @@ public class CompoundDataInput implements DataInput {
      */
     public void readFully(final byte[] b, final int off, final int len) throws IOException {
         fileSize -= len;
-        if (fileSize < 0) throw new EOFException();
+        if (fileSize < 0) {
+            throw new EOFException();
+        }
 
         dataInput.readFully(b, off, len);
     }
@@ -83,7 +87,9 @@ public class CompoundDataInput implements DataInput {
      */
     public int skipBytes(final int n) throws IOException {
         fileSize -= n;
-        if (fileSize < 0) throw new EOFException();
+        if (fileSize < 0) {
+            throw new EOFException();
+        }
         return dataInput.skipBytes(n);
     }
 
@@ -92,7 +98,9 @@ public class CompoundDataInput implements DataInput {
      */
     public boolean readBoolean() throws IOException {
         fileSize -= 1;
-        if (fileSize < 0) throw new EOFException();
+        if (fileSize < 0) {
+            throw new EOFException();
+        }
         return dataInput.readBoolean();
     }
 
@@ -100,10 +108,13 @@ public class CompoundDataInput implements DataInput {
      * {@inheritDoc}
      */
     public byte readByte() throws IOException {
-     
         --fileSize;
-        if (fileSize < 0) throw new EOFException();
-        else return dataInput.readByte();
+        if (fileSize < 0) {
+            throw new EOFException();
+        }
+        else {
+            return dataInput.readByte();
+        }
     }
 
     /**
@@ -111,7 +122,9 @@ public class CompoundDataInput implements DataInput {
      */
     public int readUnsignedByte() throws IOException {
         --fileSize;
-        if (fileSize < 0) throw new EOFException();
+        if (fileSize < 0) {
+            throw new EOFException();
+        }
         return dataInput.readUnsignedByte();
     }
 
@@ -120,7 +133,9 @@ public class CompoundDataInput implements DataInput {
      */
     public short readShort() throws IOException {
         fileSize -= 2;
-        if (fileSize < 0) throw new EOFException();
+        if (fileSize < 0) {
+            throw new EOFException();
+        }
         return dataInput.readShort();
     }
 
@@ -129,7 +144,9 @@ public class CompoundDataInput implements DataInput {
      */
     public int readUnsignedShort() throws IOException {
         fileSize -= Short.SIZE;
-        if (fileSize < 0) throw new EOFException();
+        if (fileSize < 0) {
+            throw new EOFException();
+        }
         return dataInput.readUnsignedShort();
     }
 
@@ -138,7 +155,9 @@ public class CompoundDataInput implements DataInput {
      */
     public char readChar() throws IOException {
         fileSize -= 1;
-        if (fileSize < 0) throw new EOFException();
+        if (fileSize < 0) {
+            throw new EOFException();
+        }
         return dataInput.readChar();
     }
 
@@ -148,7 +167,9 @@ public class CompoundDataInput implements DataInput {
     public int readInt() throws IOException {
 
         fileSize -= 4;
-        if (fileSize < 0) throw new EOFException();
+        if (fileSize < 0) {
+            throw new EOFException();
+        }
         return dataInput.readInt();
     }
 
@@ -157,7 +178,9 @@ public class CompoundDataInput implements DataInput {
      */
     public long readLong() throws IOException {
         fileSize -= 8;
-        if (fileSize < 0) throw new EOFException();
+        if (fileSize < 0) {
+            throw new EOFException();
+        }
         return dataInput.readLong();
     }
 
@@ -166,7 +189,9 @@ public class CompoundDataInput implements DataInput {
      */
     public float readFloat() throws IOException {
         fileSize -= 4;
-        if (fileSize < 0) throw new EOFException();
+        if (fileSize < 0) {
+            throw new EOFException();
+        }
         return dataInput.readFloat();
     }
 
@@ -175,7 +200,9 @@ public class CompoundDataInput implements DataInput {
      */
     public double readDouble() throws IOException {
         fileSize -= 8;
-        if (fileSize < 0) throw new EOFException();
+        if (fileSize < 0) {
+            throw new EOFException();
+        }
         return dataInput.readDouble();
     }
 
@@ -184,7 +211,7 @@ public class CompoundDataInput implements DataInput {
      */
 
     public String readLine() throws IOException {
-        StringBuffer line = new StringBuffer();
+        final StringBuffer line = new StringBuffer();
         byte b = -1;
         while (b != '\n') {
             b = readByte();
@@ -198,15 +225,17 @@ public class CompoundDataInput implements DataInput {
      * {@inheritDoc}
      */
     public String readUTF() throws IOException {
-        String token;
+        final String token;
 
         // peek ahead to determine the length of the String:
-        
-        long position=dataInput.getChannel().position();
-        int stringLength = readShort();     
+
+        final long position=dataInput.getChannel().position();
+        final int stringLength = readShort();
         dataInput.seek(position);
         fileSize -= stringLength;
-        if (fileSize < 0) throw new EOFException();
+        if (fileSize < 0) {
+            throw new EOFException();
+        }
 
         token = dataInput.readUTF();
         return token;

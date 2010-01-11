@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2009 Institute for Computational Biomedicine,
+ * Copyright (C) 2007-2010 Institute for Computational Biomedicine,
  *                         Weill Medical College of Cornell University
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -34,7 +34,13 @@ import org.apache.commons.logging.LogFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -445,27 +451,27 @@ public class SequenceMode extends DAVMode {
      */
     public static String jsapOptionToString(final JSAPResult jsapResult, final FlaggedOption flagOpt) {
         final StringParser parser = flagOpt.getStringParser();
-        ArrayList<String> listOfStrings = new ArrayList<String>();
+        final ArrayList<String> listOfStrings = new ArrayList<String>();
         final String id = flagOpt.getID();
         if (parser == JSAP.INTEGER_PARSER) {
-            for (int value : jsapResult.getIntArray(id)) {
+            for (final int value : jsapResult.getIntArray(id)) {
                 listOfStrings.add(String.valueOf(value));
             }
         } else if (parser == JSAP.DOUBLE_PARSER) {
-            for (double value : jsapResult.getDoubleArray(id)) {
+            for (final double value : jsapResult.getDoubleArray(id)) {
                 listOfStrings.add(String.valueOf(value));
             }
         } else if (parser == JSAP.BOOLEAN_PARSER) {
-            for (boolean value : jsapResult.getBooleanArray(id)) {
+            for (final boolean value : jsapResult.getBooleanArray(id)) {
                 listOfStrings.add(String.valueOf(value));
             }
         } else if (parser == JSAP.CLASS_PARSER) {
-            for (Class value : jsapResult.getClassArray(id)) {
+            for (final Class value : jsapResult.getClassArray(id)) {
                 listOfStrings.add(value.getCanonicalName());
             }
         } else {
             // assume strings:
-            for (String value : jsapResult.getStringArray(id)) {
+            for (final String value : jsapResult.getStringArray(id)) {
                 listOfStrings.add(String.valueOf(value));
             }
         }
@@ -473,34 +479,36 @@ public class SequenceMode extends DAVMode {
 
         replacementValue = listOfStrings.get(0);
 
-        for (int i = 1; i < listOfStrings.size(); i++) replacementValue += " --" + id + " " + listOfStrings.get(i);
+        for (int i = 1; i < listOfStrings.size(); i++) {
+            replacementValue += " --" + id + " " + listOfStrings.get(i);
+        }
 
         return replacementValue;
     }
 
-    public static String jsapOptionToConcatenatedString(final JSAPResult jsapResult, final FlaggedOption flagOpt, char delimiter) {
+    public static String jsapOptionToConcatenatedString(final JSAPResult jsapResult, final FlaggedOption flagOpt, final char delimiter) {
         final StringParser parser = flagOpt.getStringParser();
-        ArrayList<String> listOfStrings = new ArrayList<String>();
+        final ArrayList<String> listOfStrings = new ArrayList<String>();
         final String id = flagOpt.getID();
         if (parser == JSAP.INTEGER_PARSER) {
-            for (int value : jsapResult.getIntArray(id)) {
+            for (final int value : jsapResult.getIntArray(id)) {
                 listOfStrings.add(String.valueOf(value));
             }
         } else if (parser == JSAP.DOUBLE_PARSER) {
-            for (double value : jsapResult.getDoubleArray(id)) {
+            for (final double value : jsapResult.getDoubleArray(id)) {
                 listOfStrings.add(String.valueOf(value));
             }
         } else if (parser == JSAP.BOOLEAN_PARSER) {
-            for (boolean value : jsapResult.getBooleanArray(id)) {
+            for (final boolean value : jsapResult.getBooleanArray(id)) {
                 listOfStrings.add(String.valueOf(value));
             }
         } else if (parser == JSAP.CLASS_PARSER) {
-            for (Class value : jsapResult.getClassArray(id)) {
+            for (final Class value : jsapResult.getClassArray(id)) {
                 listOfStrings.add(value.getCanonicalName());
             }
         } else {
             // assume strings:
-            for (String value : jsapResult.getStringArray(id)) {
+            for (final String value : jsapResult.getStringArray(id)) {
                 listOfStrings.add(String.valueOf(value));
             }
         }
@@ -508,7 +516,9 @@ public class SequenceMode extends DAVMode {
 
         replacementValue = listOfStrings.get(0);
 
-        for (int i = 1; i < listOfStrings.size(); i++) replacementValue += delimiter + listOfStrings.get(i);
+        for (int i = 1; i < listOfStrings.size(); i++) {
+            replacementValue += delimiter + listOfStrings.get(i);
+        }
 
         return replacementValue;
     }

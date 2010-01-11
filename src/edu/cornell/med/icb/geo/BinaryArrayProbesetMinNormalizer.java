@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2009 Institute for Computational Biomedicine,
+ * Copyright (C) 2007-2010 Institute for Computational Biomedicine,
  *                         Weill Medical College of Cornell University
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -20,11 +20,11 @@ package edu.cornell.med.icb.geo;
 
 import edu.cornell.med.icb.geo.binaryarray.ArrayReader;
 import edu.cornell.med.icb.geo.binaryarray.ArrayWriter;
+import edu.cornell.med.icb.identifier.IndexedIdentifier;
 import edu.cornell.med.icb.tissueinfo.annotations.AnnotationParser;
 import edu.cornell.med.icb.tissueinfo.annotations.AnnotationSet;
 import edu.cornell.med.icb.tissueinfo.similarity.ScoredTranscriptBoundedSizeQueue;
 import edu.cornell.med.icb.tissueinfo.similarity.TranscriptScore;
-import edu.cornell.med.icb.identifier.IndexedIdentifier;
 import edu.mssm.crover.cli.CLI;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
@@ -191,8 +191,8 @@ public class BinaryArrayProbesetMinNormalizer implements FormatAdapter {
             progressLogger.expectedUpdates = sampleIds.size();
             progressLogger.start("Starting estimateMinValueForProbesets");
             final float[] minSignalAveragePerProbeset = new float[maxProbeIndex];
-            // Create one queue per probeset where the signal values will be enqueued. Capacity is set to k, and largest
-            // values are kept.
+            // Create one queue per probeset where the signal values will be enqueued.
+            // Capacity is set to k, and largest values are kept.
             final ScoredTranscriptBoundedSizeQueue[] smallestSignalValuesForProbesets =
                     new ScoredTranscriptBoundedSizeQueue[maxProbeIndex];
             for (int i = 0; i < smallestSignalValuesForProbesets.length; i++) {

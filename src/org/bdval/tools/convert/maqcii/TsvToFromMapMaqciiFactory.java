@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2009 Institute for Computational Biomedicine,
+ * Copyright (C) 2008-2010 Institute for Computational Biomedicine,
  *                         Weill Medical College of Cornell University
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -33,41 +33,41 @@ public class TsvToFromMapMaqciiFactory {
     }
 
     /** The columns for a TSV file in PREDICTION format. */
-    public static final String[] PREDICTION_FORMAT_COLUMSN = new String[] {
+    public static final String[] PREDICTION_FORMAT_COLUMSN = {
             "#splitId", "splitType", "repeatId", "modelFilenamePrefix", "sampleIndex", "sampleId",
             "probabilityOfClass1", "predictedSymbolicLabel", "probabilityOfPredictedClass",
             "probabilityClass1", "trueLabel", "numericTrueLabel", "correct", "modelNumFeatures"
     };
 
     /** The columns for a TSV file in CORNELL format. */
-    public static final String[] CORNELL_FORMAT_COLUMNS = new String[] {
+    public static final String[] CORNELL_FORMAT_COLUMNS = {
             "SampleID1", "SampleID2", "OrganizationCode", "DatasetCode", "EndpointCode",
             "MAQCII ModelID", "OrganizationSpecificModelID", "DecisionValue",
             "SymbolicClassPrediction", "Threshold"
     };
 
     /** The columns for a LEMING (non-Cologne) format. */
-    public static final String[] LEMING_FORMAT_STANDARD_COLUMNS = new String[] {
+    public static final String[] LEMING_FORMAT_STANDARD_COLUMNS = {
             "Column Heading (in the Normalized Array Data File)",
             "Raw Array Data File",
             "OrganizationCode", "DatasetCode", "EndpointCode"
     };
 
     /** The columns for a LEMING-COLOGNE format. */
-    public static final String[] LEMING_FORMAT_COLOGNE_COLUMNS = new String[] {
+    public static final String[] LEMING_FORMAT_COLOGNE_COLUMNS = {
             "PatientID", "Column Heading in the Normalized Array Data File",
             "Array_A01_FileName (S3R5)", "Array_A02_FileName (R3S5)",
             "OrganizationCode", "DatasetCode", "EndpointCode"
     };
 
     /** The columns for a Cologne-Sample-Multimap format. */
-    public static final String[] COLOGNE_SAMPLE_MULTIMAP_COLUMNS = new String[] {
+    public static final String[] COLOGNE_SAMPLE_MULTIMAP_COLUMNS = {
             "PatientID", "Column Heading in the Normalized Array Data File",
             "Array_A01_FileName (S3R5)", "Array_A02_FileName (R3S5)"
     };
 
     /** The columns for a Cologne-Sample-Multimap format. */
-    public static final String[] TRUE_LABELS_COLUMS = new String[] {
+    public static final String[] TRUE_LABELS_COLUMS = {
             "SampleId1", "SampleId2", "ClassLabel", "DatasetCode", "EndpointCode"
     };
 

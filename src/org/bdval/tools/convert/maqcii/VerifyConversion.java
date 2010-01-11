@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2009 Institute for Computational Biomedicine,
+ * Copyright (C) 2008-2010 Institute for Computational Biomedicine,
  *                         Weill Medical College of Cornell University
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -38,7 +38,7 @@ import java.util.Map;
 public class VerifyConversion {
 
     /** The options. */
-    private VerifyConversionOptions options;
+    private final VerifyConversionOptions options;
 
     /** cornell_model_id + cornell_sample_id (key) to decision value map. */
     private final Object2DoubleOpenHashMap<String> modelSampleToDecisionMap =

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2009 Institute for Computational Biomedicine,
+ * Copyright (C) 2008-2010 Institute for Computational Biomedicine,
  *                         Weill Medical College of Cornell University
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -22,15 +22,15 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.Closeable;
-import java.util.Map;
-import java.util.LinkedHashMap;
-import java.util.Set;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Read a compound file.

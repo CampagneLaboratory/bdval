@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2009 Institute for Computational Biomedicine,
+ * Copyright (C) 2008-2010 Institute for Computational Biomedicine,
  *                         Weill Medical College of Cornell University
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -49,8 +49,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.bdval.signalquality.BaseSignalQualityCalculator;
 import org.bdval.modelconditions.ProcessModelConditionsMode;
+import org.bdval.signalquality.BaseSignalQualityCalculator;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -115,7 +115,7 @@ public class DistributionDifferenceByFeatureMode extends DAVMode {
     /**
      * Cache tables by filename in memory.
      */
-    private Map<String, Table> tableCache = new Object2ObjectOpenHashMap<String, Table>();
+    private final Map<String, Table> tableCache = new Object2ObjectOpenHashMap<String, Table>();
 
     /**
      * Models to exclude from processing.
@@ -140,7 +140,7 @@ public class DistributionDifferenceByFeatureMode extends DAVMode {
     /**
      * Cache of the filenames to ClassificationTask maps.
      */
-    private Map<String, ClassificationTask> filenamesToClassificationTaskMap =
+    private final Map<String, ClassificationTask> filenamesToClassificationTaskMap =
             new Object2ObjectOpenHashMap<String, ClassificationTask>();
 
     /**

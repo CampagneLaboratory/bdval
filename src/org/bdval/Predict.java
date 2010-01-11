@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2009 Institute for Computational Biomedicine,
+ * Copyright (C) 2007-2010 Institute for Computational Biomedicine,
  *                         Weill Medical College of Cornell University
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -83,7 +83,7 @@ public class Predict extends DAVMode {
     private String survivalFileName;
     private ObjectSet<String> testSampleIds;
 
-    static public final CharSequence[] MEASURES = {
+    public static final CharSequence[] MEASURES = {
          "AUC",  "RMSE", "Accuracy", "Specificity", "Sensitivity", "MCC",
     };
 
@@ -112,7 +112,7 @@ public class Predict extends DAVMode {
         //jsap.unregisterParameter(jsap.getByID("conditions"));
         // there is no need for random seed.
         jsap.getByID("seed").addDefault("" + 1);
-        
+
         //jsap.unregisterParameter(jsap.getByID("seed"));
         // there is no need for a gene list. The model has enough information to recreate it.
         //  jsap.unregisterParameter(jsap.getByID("gene-lists"));
@@ -489,7 +489,7 @@ public class Predict extends DAVMode {
             double decision = model.predict(sampleIndex, probabilities);
 
             if (decision != decision) {     //decision is not a number
-                double randomdecision = options.randomGenerator.nextDouble();
+                final double randomdecision = options.randomGenerator.nextDouble();
                 probabilities[0] = randomdecision;
 
                 // replace NaN with a random decision centered around 0

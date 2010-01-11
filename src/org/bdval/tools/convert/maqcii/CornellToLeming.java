@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2009 Institute for Computational Biomedicine,
+ * Copyright (C) 2008-2010 Institute for Computational Biomedicine,
  *                         Weill Medical College of Cornell University
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -42,13 +42,13 @@ public class CornellToLeming {
 
 
     /** The options. */
-    private CornellToLemingOptions options;
+    private final CornellToLemingOptions options;
 
     /** The fromCornell TSV reader. */
     private TsvToFromMap fromCornellTsv;
 
     /** Map of endpoint to a IDataFormatter object. */
-    private Map<String, IDataFormatter> endpointToDataFormatterMap;
+    private final Map<String, IDataFormatter> endpointToDataFormatterMap;
 
     /**
      * Convert a set of predictions files to cornell format.

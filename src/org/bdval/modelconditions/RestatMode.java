@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2009 Institute for Computational Biomedicine,
+ * Copyright (C) 2008-2010 Institute for Computational Biomedicine,
  *                         Weill Medical College of Cornell University
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -39,7 +39,12 @@ import org.bdval.PredictedItems;
 import org.bdval.SurvivalMeasures;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Calculates statistics from model conditions and a set of results directories.
@@ -116,39 +121,39 @@ public class RestatMode extends ProcessModelConditionsMode {
     }
 
 
-    ArrayList<String> series = new ArrayList(); // list of series that have been processed
+    final ArrayList<String> series = new ArrayList<String>(); // list of series that have been processed
     EvaluationMeasure repeatedEvaluationMeasure = new EvaluationMeasure();
     PredictedItems predictions;
     int numberOfRepeats;
     final List<SurvivalMeasures> survivalMeasuresList = new ArrayList<SurvivalMeasures>();
-    static Map<String, double[]> acrossAllFoldsMap = new HashMap<String, double[]>();
-    int numberOfFeatures = 0;
-    static int numberOfFolds = 0;
+    static final Map<String, double[]> acrossAllFoldsMap = new HashMap<String, double[]>();
+    int numberOfFeatures;
+    static int numberOfFolds;
 
     @Override
-    public void processSeries(ProcessModelConditionsOptions options, String modelId) {
+    public void processSeries(final ProcessModelConditionsOptions options, final String modelId) {
 
         // group together models that are in the same series?
-        String seriesID = options.modelConditions.get(modelId).get("id-parameter-scan-series");
+        final String seriesID = options.modelConditions.get(modelId).get("id-parameter-scan-series");
 
         if (!(series.contains(seriesID))) { // This series has not been processed before.
 
 
-            ArrayList<String> models = extractSeriesModelIds(options, seriesID);
+            final ArrayList<String> models = extractSeriesModelIds(options, seriesID);
 
             // for all models in a series get accuracy measures for each fold,
-            for (String modelInSeries : models) {
+            for (final String modelInSeries : models) {
                 processOneModelIdPassOne(options, modelInSeries);
             }
 
             // across the series, record accuracy obtained by model with maximum accuracy for each fold/repeat element.
 
-            Map<String, double[]> foldMins = new HashMap<String, double[]>();
-            double[] accuracyArray = new double[numberOfFolds * numberOfRepeats];
+            final Map<String, double[]> foldMins = new HashMap<String, double[]>();
+            final double[] accuracyArray = new double[numberOfFolds * numberOfRepeats];
             Arrays.fill(accuracyArray, Double.MIN_VALUE);
 
-            for (String modelInSeries : models) {
-                double[] modelAccuracies = acrossAllFoldsMap.get(modelInSeries);
+            for (final String modelInSeries : models) {
+                final double[] modelAccuracies = acrossAllFoldsMap.get(modelInSeries);
                 if (modelAccuracies == null) {
                     // could not load prediction file  for this model.
                     continue;
@@ -176,20 +181,20 @@ public class RestatMode extends ProcessModelConditionsMode {
     }
 
     private ArrayList<String> extractSeriesModelIds
-            (ProcessModelConditionsOptions
-                    options, String
+            (final ProcessModelConditionsOptions
+                    options, final String
                     seriesID) {
         if (seriesID == null) {
             return new ArrayList<String>();
         }
-        Set<String> modelIdKeys = options.modelConditions.keySet();
+        final Set<String> modelIdKeys = options.modelConditions.keySet();
         // model-Id's associated with model-conditions file
 
         //String[] keys = modelIdKeys.toArray(new String[modelIdKeys.size()]);
-        ArrayList<String> models = new ArrayList<String>(); // arraylist of models in the same series
+        final ArrayList<String> models = new ArrayList<String>(); // arraylist of models in the same series
 
-        for (String modelId : modelIdKeys) {
-            String otherseriesId = options.modelConditions.get(modelId).get("id-parameter-scan-series");
+        for (final String modelId : modelIdKeys) {
+            final String otherseriesId = options.modelConditions.get(modelId).get("id-parameter-scan-series");
             if (seriesID.equals(otherseriesId)) {
                 models.add(modelId);
             }
@@ -199,10 +204,10 @@ public class RestatMode extends ProcessModelConditionsMode {
         return models;
     }
 
-    private void evaluateSeriesBias(ProcessModelConditionsOptions options, String seriesID, ArrayList<String> models,
-                                    Map<String, double[]> acrossAllFoldsMap, Map<String, double[]> foldMins) {
+    private void evaluateSeriesBias(final ProcessModelConditionsOptions options, final String seriesID, final ArrayList<String> models,
+                                    final Map<String, double[]> acrossAllFoldsMap, final Map<String, double[]> foldMins) {
 
-        for (String modelId : models) {
+        for (final String modelId : models) {
             double bias = 0.0;
             int index = 0;
             if (acrossAllFoldsMap.get(modelId) == null) {
@@ -219,8 +224,8 @@ public class RestatMode extends ProcessModelConditionsMode {
 
                 try{
                     assert modelAccuracies != null : "model accurary must have been loaded for model id " + modelId;
-                    double errorOfThisModel = (1.0d - (modelAccuracies[index] / 100d));
-                    double thetaHatFoldK = (1.0d - (foldMins.get(seriesID)[index] / 100d));
+                    final double errorOfThisModel = (1.0d - (modelAccuracies[index] / 100d));
+                    final double thetaHatFoldK = (1.0d - (foldMins.get(seriesID)[index] / 100d));
                     bias += (errorOfThisModel - thetaHatFoldK);
                     ++index;
 
@@ -281,7 +286,7 @@ public class RestatMode extends ProcessModelConditionsMode {
     }
 
 
-    public void processOneModelIdPassTwo(String modelId, double bias) {
+    public void processOneModelIdPassTwo(final String modelId, final double bias) {
         predictions = loadPredictions(modelId);
         if (predictions != null) {
             LOG.debug("Processing predictions(second pass) for model id  " + modelId);
@@ -364,7 +369,7 @@ public class RestatMode extends ProcessModelConditionsMode {
                                            final PredictedItems predictions,
                                            final int numberOfRepeats,
                                            final ObjectSet<CharSequence> evaluationMeasureNames) {
-        DoubleList modelAcc = new DoubleArrayList();
+        final DoubleList modelAcc = new DoubleArrayList();
 
 
         // Collect one evaluation measure per split test set of cross-validation.

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2009 Institute for Computational Biomedicine,
+ * Copyright (C) 2008-2010 Institute for Computational Biomedicine,
  *                         Weill Medical College of Cornell University
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -306,7 +306,7 @@ public class MaqciiHelper {
         options.submissionOutput.print("ModelId");
         options.submissionOutput.print("\t");
         options.submissionOutput.print("Model-Series-Id");
-        options.submissionOutput.print("\t");      
+        options.submissionOutput.print("\t");
         options.submissionOutput.print("Label");
         options.submissionOutput.print("\t");
         options.submissionOutput.print("combinedPerformance");   // MCC+ AUC - MCC_std - AUC_std
@@ -518,7 +518,7 @@ public class MaqciiHelper {
 
 
         }
-       
+
         for (final String otherMeasureName : otherMeasureNames) {
             options.submissionOutput.print("\t");
             options.submissionOutput.print(valueToString(measure.getPerformanceValueAverage(otherMeasureName),4));

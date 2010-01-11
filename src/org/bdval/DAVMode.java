@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2009 Institute for Computational Biomedicine,
+ * Copyright (C) 2007-2010 Institute for Computational Biomedicine,
  *                         Weill Medical College of Cornell University
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -810,12 +810,12 @@ public class DAVMode extends UseModality<DAVOptions> {
 
     protected void setupClassifier(final JSAPResult result, final DAVOptions options) {
         options.classiferClass = result.getClass("classifier");
-        final String parameters[] = result.getStringArray("classifier-parameters");
+        final String[] parameters = result.getStringArray("classifier-parameters");
         // combine multiple occurences of --classifier-parameters on the command line into one parameter string,
         // separating occurences by a comma.
-        StringBuffer parameterCollected = new StringBuffer();
+        final StringBuffer parameterCollected = new StringBuffer();
         int i = 0;
-        for (String params : parameters) {
+        for (final String params : parameters) {
             parameterCollected.append(params);
             if (i != parameters.length - 1) {
                 parameterCollected.append(",");

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2009 Institute for Computational Biomedicine,
+ * Copyright (C) 2008-2010 Institute for Computational Biomedicine,
  *                         Weill Medical College of Cornell University
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -49,9 +49,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Collections;
-import java.util.Map;
 import java.util.HashMap;
-import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * Selects candidate models for replication in different validation datasets. Various model candidate
@@ -103,14 +102,14 @@ public class CandidateModelSelection implements WithProcessMethod {
 
     IndexedIdentifier modelIdIndices;
     DoubleIndexedIdentifier reverseIndex;
-    private double zScoreThreshold = 2.0;
+    private final double zScoreThreshold = 2.0;
     private boolean verbose;
     private static final String MCC = "MCC";
     private static final String ACC = "ACC";
     private static final String SENS = "SENS";
     private static final String SPEC = "SPEC";
     private static final String AUC = "AUC";
-    private boolean evaluateNormFactorAsMean = true;
+    private final boolean evaluateNormFactorAsMean = true;
 
 
     public CandidateModelSelection() {
@@ -367,16 +366,16 @@ public class CandidateModelSelection implements WithProcessMethod {
     HashMap<String, Double> seriesMaxAccuracy = new HashMap<String, Double>();
     // HashMap that contains the maximum accuracy value for each series
 
-    private void addOptimalModelColumn(Map<String, Map<String, String>> modelConditions) {
+    private void addOptimalModelColumn(final Map<String, Map<String, String>> modelConditions) {
         if (modelConditions == null) {
             return;
         }
         for (final Map<String, String> modelCondition : modelConditions.values()) {
-            String modelId = modelCondition.get("model-id");
-            String seriesId = modelCondition.get("id-parameter-scan-series");
+            final String modelId = modelCondition.get("model-id");
+            final String seriesId = modelCondition.get("id-parameter-scan-series");
 
             if(cvResults.containsKey(modelId)){
-            double Acc= cvResults.get(modelId).accuracy;
+            final double Acc= cvResults.get(modelId).accuracy;
 
             if (seriesMaxAccuracy.containsKey(seriesId)) {
                 seriesMaxAccuracy.put(seriesId, (Math.max(seriesMaxAccuracy.get(seriesId), Acc)));
@@ -392,18 +391,18 @@ public class CandidateModelSelection implements WithProcessMethod {
         String optimalModel = "false";
         for (final Map<String, String> modelCondition : modelConditions.values()) {
             if(cvResults.containsKey(modelCondition.get("model-id"))){
-            double modelAcc = cvResults.get(modelCondition.get("model-id")).accuracy;
-            String seriesId = modelCondition.get("id-parameter-scan-series");
+            final double modelAcc = cvResults.get(modelCondition.get("model-id")).accuracy;
+            final String seriesId = modelCondition.get("id-parameter-scan-series");
             if (seriesMaxAccuracy.get(seriesId) == modelAcc) {
                 optimalModel = "true";
             }
             }
             modelCondition.put("optimalModel", optimalModel);
             optimalModel = "false";
-   
+
         }
     }
-    
+
 
 
     private void addFeatureClassifierTypeColumn(final Map<String, Map<String, String>> modelConditions) {
@@ -560,7 +559,7 @@ public class CandidateModelSelection implements WithProcessMethod {
         }
     }
 
-    private String formatBias(ModelPerformance cvPerf) {
+    private String formatBias(final ModelPerformance cvPerf) {
        if (cvPerf !=null){
         if (cvPerf.bias == cvPerf.bias) {
             return String.format("%f", cvPerf.bias);

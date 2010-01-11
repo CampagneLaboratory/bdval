@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2009 Institute for Computational Biomedicine,
+ * Copyright (C) 2008-2010 Institute for Computational Biomedicine,
  *                         Weill Medical College of Cornell University
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -112,7 +112,7 @@ public class CandidateModelSelectionAllTeams implements WithProcessMethod {
 
     IndexedIdentifier modelIdIndices;
     DoubleIndexedIdentifier reverseIndex;
-    private double zScoreThreshold = 2.0;
+    private final double zScoreThreshold = 2.0;
     private boolean verbose;
     private static final String MCC = "MCC";
     private static final String ACC = "ACC";
@@ -120,9 +120,9 @@ public class CandidateModelSelectionAllTeams implements WithProcessMethod {
     private static final String SPEC = "SPEC";
     private static final String AUC = "AUC";
     private static final String RMSE = "RMSE";
-    private boolean evaluateNormFactorAsMean = true;
+    private final boolean evaluateNormFactorAsMean = true;
     private ObjectSet<String> organizationCodes;
-    private Object2BooleanMap<String> combination = new Object2BooleanOpenHashMap<String>();
+    private final Object2BooleanMap<String> combination = new Object2BooleanOpenHashMap<String>();
 
 
     public CandidateModelSelectionAllTeams() {

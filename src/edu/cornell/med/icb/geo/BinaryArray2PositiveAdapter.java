@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2009 Institute for Computational Biomedicine,
+ * Copyright (C) 2007-2010 Institute for Computational Biomedicine,
  *                         Weill Medical College of Cornell University
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -180,8 +180,7 @@ public class BinaryArray2PositiveAdapter implements FormatAdapter {
                         negatives[i] = matrix[sampleIndex][i] < 0 ? -matrix[sampleIndex][i] : 0;
                         assert negatives[i] >= 0 : "all elements must be positive, element value was not :"+negatives[i] ;
                         matrix[sampleIndex][i] = matrix[sampleIndex][i] >= 0 ? matrix[sampleIndex][i] : 0;
-                        assert matrix[sampleIndex][i] >= 0 : "all elements must be positive, element value was not :"+matrix[sampleIndex][i] ;
-
+                        assert matrix[sampleIndex][i] >= 0 : "all elements must be positive, element value was not :" + matrix[sampleIndex][i];
                     }
 
                     arrayWriter.appendSample(negatives, new MutableString(sampleIds.get(sampleIndex) + "_negative"));
