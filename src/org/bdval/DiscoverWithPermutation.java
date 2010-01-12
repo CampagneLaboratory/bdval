@@ -156,14 +156,15 @@ public class DiscoverWithPermutation extends DAVMode {
                 // for all probesets across all samples
                 for (int featureIndex = 2; featureIndex < processedTable.getColumnNumber(); featureIndex++) {
                     final int probesetIndex = featureIndex - 1;
-                    double testStatistic = evaluateStatisticForLabels(processedTable, labels, labelValueGroups, featureIndex);
+                    double testStatistic = Math.abs(evaluateStatisticForLabels
+                            (processedTable, labels, labelValueGroups, featureIndex) - 0.5);
 
                     DoubleList permutedStatsList = new DoubleArrayList();
                     // stores test statistic for all permutations
 
-                    Permute(options, processedTable, labels, labelValueGroups, featureIndex, permutedStatsList);
+                    permute(options, processedTable, labels, labelValueGroups, featureIndex, permutedStatsList);
 
-                    double pValue= 0.0;
+                    double pValue;
                     pValue = pValueDetermination(testStatistic, permutedStatsList);
 
                     // save in probesetPValues map
@@ -193,20 +194,17 @@ public class DiscoverWithPermutation extends DAVMode {
         }
     }
 
-    private void Permute(DAVOptions options, Table processedTable, String[] labels, List<Set<String>> labelValueGroups, int featureIndex, DoubleList permutedStatsList) {
+    private void permute(DAVOptions options, Table processedTable, String[] labels,
+                         List<Set<String>> labelValueGroups, int featureIndex, DoubleList permutedStatsList) {
         int i = 0;
         double permutedStatistic;
         List<String> labelsList = Arrays.asList(labels);
-        RandomAdapter randomAdapter;
-
-        while (i < 1000) {
-
+        RandomAdapter randomAdapter = new RandomAdapter(options.randomGenerator);
+       while (i < 1000) {
             // shuffle the labels
-            randomAdapter = new RandomAdapter(options.randomGenerator);
             Collections.shuffle(labelsList, randomAdapter);
-
             String[] shuffledLabels = (String[]) labelsList.toArray();
-            permutedStatistic = evaluateStatisticForLabels(processedTable, shuffledLabels, labelValueGroups, featureIndex);
+            permutedStatistic = Math.abs(evaluateStatisticForLabels(processedTable, shuffledLabels, labelValueGroups, featureIndex) - 0.5);
             permutedStatsList.add(permutedStatistic);
             i++;
         }
