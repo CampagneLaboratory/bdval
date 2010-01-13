@@ -61,6 +61,7 @@ public class DiscoverWithPermutation extends DAVMode {
     private double alpha;
     final Object2DoubleMap<MutableString> probesetPvalues =
             new Object2DoubleOpenHashMap<MutableString>();
+    private int numOfPermutations;
 
 
     @Override
@@ -79,6 +80,7 @@ public class DiscoverWithPermutation extends DAVMode {
             LOG.info("Output will be restricted to the " + maxProbesToReport
                     + " probesets with smaller p-value.");
         }
+        numOfPermutations = result.getInt("numberOfPermutations");
     }
 
     /**
@@ -99,6 +101,16 @@ public class DiscoverWithPermutation extends DAVMode {
                 .setHelp("The significance level for the permutation test p-value. "
                         + "Default 0.05/5% confidence level.");
         jsap.registerParameter(numFeatureParam);
+
+        final Parameter numPermutations = new FlaggedOption("numberOfPermutations")
+                .setStringParser(JSAP.INTEGER_PARSER)
+                .setDefault("1000")
+                .setRequired(true)
+                .setLongFlag("numberOfPermutations")
+                .setShortFlag('z')
+                .setHelp("The number of permutation iterations. "
+                        + "Default 1000.");
+        jsap.registerParameter(numPermutations);
 
 
         final Parameter outputGeneList = new Switch("output-gene-list")
@@ -154,15 +166,16 @@ public class DiscoverWithPermutation extends DAVMode {
                         new ScoredTranscriptBoundedSizeQueue(maxProbesToReport);
 
                 // for all probesets across all samples
-                for (int featureIndex = 2; featureIndex < processedTable.getColumnNumber(); featureIndex++) {
+
+                for (int featureIndex = 1; featureIndex < processedTable.getColumnNumber(); featureIndex++) {
                     final int probesetIndex = featureIndex - 1;
-                    double testStatistic = Math.abs(evaluateStatisticForLabels
-                            (processedTable, labels, labelValueGroups, featureIndex) - 0.5);
+                    double testStatistic = evaluateStatisticForLabels(processedTable, labels, labelValueGroups, featureIndex);
 
                     DoubleList permutedStatsList = new DoubleArrayList();
                     // stores test statistic for all permutations
 
-                    permute(options, processedTable, labels, labelValueGroups, featureIndex, permutedStatsList);
+                    RandomAdapter randomAdapter = new RandomAdapter(options.randomGenerator);
+                    permute(processedTable, labels, labelValueGroups, featureIndex, permutedStatsList, randomAdapter);
 
                     double pValue;
                     pValue = pValueDetermination(testStatistic, permutedStatsList);
@@ -194,17 +207,15 @@ public class DiscoverWithPermutation extends DAVMode {
         }
     }
 
-    private void permute(DAVOptions options, Table processedTable, String[] labels,
-                         List<Set<String>> labelValueGroups, int featureIndex, DoubleList permutedStatsList) {
-        int i = 0;
+    private void permute(Table processedTable, String[] labels,
+                         List<Set<String>> labelValueGroups, int featureIndex, DoubleList permutedStatsList, RandomAdapter randomAdapter) {
         double permutedStatistic;
         List<String> labelsList = Arrays.asList(labels);
-        RandomAdapter randomAdapter = new RandomAdapter(options.randomGenerator);
-       while (i < 1000) {
+        for(int i=0; i < numOfPermutations; i++) {
             // shuffle the labels
             Collections.shuffle(labelsList, randomAdapter);
             String[] shuffledLabels = (String[]) labelsList.toArray();
-            permutedStatistic = Math.abs(evaluateStatisticForLabels(processedTable, shuffledLabels, labelValueGroups, featureIndex) - 0.5);
+            permutedStatistic = evaluateStatisticForLabels(processedTable, shuffledLabels, labelValueGroups, featureIndex);
             permutedStatsList.add(permutedStatistic);
             i++;
         }
@@ -213,15 +224,13 @@ public class DiscoverWithPermutation extends DAVMode {
     private double pValueDetermination(double testStatistic, DoubleList permutedStatsList) {
         double pValue;
         double frequency = 0;
-        int z = 0;
-        while (z < permutedStatsList.size()) {
-            if (permutedStatsList.get(z) > testStatistic) {
+        for (final double permutedStat : permutedStatsList) {
+            if (permutedStat > testStatistic) {
                 frequency++;
             }
-            z++;
         }
 
-        pValue = frequency / 1000;
+        pValue = frequency / numOfPermutations;
 
         if (pValue != pValue) {//NaN
             pValue = 1;
@@ -248,7 +257,7 @@ public class DiscoverWithPermutation extends DAVMode {
         double[] binaryLabelValuesArray = binaryLabelValues.toDoubleArray();
         AreaUnderTheRocCurveCalculator auc = new AreaUnderTheRocCurveCalculator();
         double aucresult = auc.evaluateStatistic(values, binaryLabelValuesArray);
-        return aucresult;
+        return Math.abs(aucresult-0.5);
     }
 
     private void error(Exception e) {
