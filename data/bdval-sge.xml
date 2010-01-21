@@ -1,6 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<project name="bdval-pbs" basedir=".">
-    <dirname property="bdval.basedir" file="${ant.file.bdval-pbs}"/>
+<!--
+  ~ Copyright (C) 2010 Institute for Computational Biomedicine,
+  ~                    Weill Medical College of Cornell University
+  ~
+  ~  This program is free software; you can redistribute it and/or modify
+  ~  it under the terms of the GNU General Public License as published by
+  ~  the Free Software Foundation; either version 3 of the License, or
+  ~  (at your option) any later version.
+  ~
+  ~  This program is distributed in the hope that it will be useful,
+  ~  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~  GNU General Public License for more details.
+  ~
+  ~  You should have received a copy of the GNU General Public License
+  ~  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<project name="bdval-sge" basedir=".">
+    <dirname property="bdval.basedir" file="${ant.file.bdval-sge}"/>
     <property file="${bdval.basedir}/bdval.properties"/>
     <import file="${bdval.basedir}/../buildsupport/build.xml"/>
     <import file="${bdval.basedir}/bdval.xml"/>
@@ -12,13 +30,11 @@
         other project specific build files that utilize BDVAL.
     </description>
 
-    <var name="pbs-file-counter" value="0" description="Used to distinguish condition sets"/>
+    <var name="sge-file-counter" value="0" description="Used to distinguish condition sets"/>
 
-    <macrodef name="setup-pbs-job" description="Setup BDVAL for a PBS submission">
-        <attribute name="job-name" default="${ant.project.name}"
-                   description="Name to associate with this job (must not be longer than 15 characters)"/>
-        <attribute name="pbs-master-node" default="master01" description="Name of the PBS head node"/>
-        <attribute name="pbs-queue" default="normal" description="Name of the PBS queue for the submission"/>
+    <macrodef name="setup-sge-job" description="Setup BDVAL for a SGE submission">
+        <attribute name="sge-master-node" default="rodin" description="Name of the SGE head node"/>
+        <attribute name="job-name" default="${ant.project.name}" description="Name to associate with this job"/>
         <attribute name="tasks-per-node" default="1" description="Number of tasks to run per node"/>
         <attribute name="target" description="The ant target to run on the cluster"/>
         <attribute name="tag" description="Tag for the configuration"/>
@@ -27,7 +43,7 @@
         <!-- TODO: <attribute name="email-address"/>-->
 
         <sequential>
-            <fail message="Cannot setup a pbs job since bdval.jar cannot be found">
+            <fail message="Cannot setup a sge job since bdval.jar cannot be found">
                 <condition>
                     <not>
                         <available file="${bdval.basedir}/../bdval.jar"/>
@@ -109,7 +125,7 @@
             </copy>
 
             <!-- Create the actual job script that will launch bdval -->
-            <copy todir="${job-dir}" file="${bdval.basedir}/../scripts/pbs/bdval-pbs.sh" filtering="true">
+            <copy todir="${job-dir}" file="${bdval.basedir}/../scripts/sge/bdval-sge.sh" filtering="true">
                 <filterset>
                     <filter token="PROJECT" value="${ant.project.name}"/>
                     <filter token="TARGET" value="@{target}"/>
@@ -117,7 +133,7 @@
                     <filter token="TAG-DESCRIPTION" value="@{tag-description}"/>
                     <filter token="JOB-DIR" value="${job-dir}"/>
                     <filter token="JOB-NAME" value="@{job-name}"/>
-                    <filter token="MASTER-NODE" value="@{pbs-master-node}"/>
+                    <filter token="MASTER-NODE" value="@{sge-master-node}"/>
                 </filterset>
             </copy>
 
@@ -136,8 +152,8 @@
             </echoxml>
 
             <!-- Two threads per node, memory size depends on node type -->
-            <write-pbs-local-property-file file="${job-dir}/config/${ant.project.name}-local.properties"
-                    pbs-master-node="@{pbs-master-node}" pbs-queue="@{pbs-queue}"/>
+            <write-sge-local-property-file file="${job-dir}/config/${ant.project.name}-local.properties"
+                    sge-master-node="@{sge-master-node}" sge-queue="@{sge-queue}"/>
 
             <copy file="${config}/log4j.properties.sample" tofile="${job-dir}/config/log4j.properties" failonerror="false"/>
 
@@ -146,7 +162,7 @@
             <copy todir="${job-dir}/data">
                 <fileset dir="${bdval.basedir}/../data">
                     <include name="bdval.xml"/>
-                    <include name="bdval-pbs.xml"/>
+                    <include name="bdval-sge.xml"/>
                     <include name="${ant.project.name}.xml"/>
                     <include name="${ant.project.name}.properties"/>
                     <include name="sequences/**"/>
@@ -241,21 +257,21 @@
                     </if>
                 </sequential>
             </for>
-            <echo level="info" message="Wrote a total of ${pbs-file-counter} files"/>
+            <echo level="info" message="Wrote a total of ${sge-file-counter} files"/>
 
-            <!-- Create the PBS job submission script -->
+            <!-- Create the SGE job submission script -->
             <!-- TODO: need to handle the case where there is only on job to run - an array job is then invalid -->
-            <copy file="${bdval.basedir}/../scripts/pbs/bdval.qsub" tofile="${job-dir}/../@{job-name}.qsub" filtering="true" overwrite="true">
+            <copy file="${bdval.basedir}/../scripts/sge/bdval.qsub" tofile="${job-dir}/../@{job-name}.qsub" filtering="true" overwrite="true">
                 <filterset>
-                    <filter token="PBS-QUEUE" value="@{pbs-queue}"/>
-                    <filter token="PBS-TASKS" value="${pbs-file-counter}"/>
+                    <filter token="SGE-QUEUE" value="@{sge-queue}"/>
+                    <filter token="SGE-TASKS" value="${sge-file-counter}"/>
                     <filter token="JOB-NAME" value="@{job-name}"/>
                     <filter token="JOB-DIR" value="${job-dir}"/>
-                    <filter token="MASTER-NODE" value="@{pbs-master-node}"/>
+                    <filter token="MASTER-NODE" value="@{sge-master-node}"/>
                 </filterset>
             </copy>
 
-            <copy file="${bdval.basedir}/../scripts/pbs/extract-results.sh" todir="${job-dir}/.." filtering="true">
+            <copy file="${bdval.basedir}/../scripts/sge/extract-results.sh" todir="${job-dir}/.." filtering="true">
                 <filterset>
                     <filter token="PROJECT" value="${ant.project.name}"/>
                     <filter token="JOB-NAME" value="@{job-name}"/>
@@ -276,13 +292,13 @@
         <attribute name="tag-description"/>
 
         <sequential>
-            <!-- collect all the relevant properties (start with "my.pbs.") and store -->
-            <propertyset id="properties-starting-with-my-pbs" dynamic="true">
-                <propertyref prefix="my-pbs."/>
-                <mapper type="glob" from="my-pbs.*" to="*"/>
+            <!-- collect all the relevant properties (start with "my.sge.") and store -->
+            <propertyset id="properties-starting-with-my-sge" dynamic="true">
+                <propertyref prefix="my-sge."/>
+                <mapper type="glob" from="my-sge.*" to="*"/>
             </propertyset>
 
-            <var name="my-pbs.tag-description" value="@{tag-description}"/>
+            <var name="my-sge.tag-description" value="@{tag-description}"/>
 
             <!-- Endpoints -->
             <sortlist property="sorted-endpoints" value="@{all-endpoints}" delimiter=" "/>
@@ -298,7 +314,7 @@
                             <var name="doit" value="false"/>
                         </else>
                     </if>
-                    <var name="my-pbs.do.@{current-endpoint}" value="${doit}"/>
+                    <var name="my-sge.do.@{current-endpoint}" value="${doit}"/>
                 </sequential>
             </for>
 
@@ -316,7 +332,7 @@
                             <var name="doit" value="false"/>
                         </else>
                     </if>
-                    <var name="my-pbs.do.@{current-method}" value="${doit}"/>
+                    <var name="my-sge.do.@{current-method}" value="${doit}"/>
                 </sequential>
             </for>
 
@@ -324,12 +340,12 @@
             <if>
                 <equals arg1="use-feature-selection-fold=true" arg2="@{feature-selection-fold}"/>
                 <then>
-                    <var name="my-pbs.use-feature-selection-fold=true" value="true"/>
-                    <var name="my-pbs.use-feature-selection-fold=false" value="false"/>
+                    <var name="my-sge.use-feature-selection-fold=true" value="true"/>
+                    <var name="my-sge.use-feature-selection-fold=false" value="false"/>
                 </then>
                 <else>
-                    <var name="my-pbs.use-feature-selection-fold=true" value="false"/>
-                    <var name="my-pbs.use-feature-selection-fold=false" value="true"/>
+                    <var name="my-sge.use-feature-selection-fold=true" value="false"/>
+                    <var name="my-sge.use-feature-selection-fold=false" value="true"/>
                 </else>
             </if>
 
@@ -342,10 +358,10 @@
                         <sequential>
                             <for param="weka-class" delimiter=" " list="${weka-classifiers}">
                                 <sequential>
-                                    <var name="my-pbs.weka-feature-selection-modes" value="@{feature-selection-mode}"/>
-                                    <var name="my-pbs.weka-classifiers" value="@{weka-class}"/>
-                                    <var name="my-pbs.${@{weka-class}-classifier-classname}" value="${@{weka-class}-classifier-classname}"/>
-                                    <write-pbs-property-file file-prefix="@{file-prefix}"/>
+                                    <var name="my-sge.weka-feature-selection-modes" value="@{feature-selection-mode}"/>
+                                    <var name="my-sge.weka-classifiers" value="@{weka-class}"/>
+                                    <var name="my-sge.${@{weka-class}-classifier-classname}" value="${@{weka-class}-classifier-classname}"/>
+                                    <write-sge-property-file file-prefix="@{file-prefix}"/>
                                 </sequential>
                             </for>
                         </sequential>
@@ -353,77 +369,77 @@
                 </then>
                 <else>
                     <!-- Write the file with no weka settings -->
-                    <var name="my-pbs.weka-feature-selection-modes" unset="true"/>
-                    <var name="my-pbs.weka-classifiers" unset="true"/>
+                    <var name="my-sge.weka-feature-selection-modes" unset="true"/>
+                    <var name="my-sge.weka-classifiers" unset="true"/>
                     <for param="weka-class" delimiter=" " list="${weka-classifiers}">
                         <sequential>
-                            <var name="my-pbs.${@{weka-class}-classifier-classname}" unset="true"/>
+                            <var name="my-sge.${@{weka-class}-classifier-classname}" unset="true"/>
                         </sequential>
                     </for>
-                    <write-pbs-property-file file-prefix="@{file-prefix}"/>
+                    <write-sge-property-file file-prefix="@{file-prefix}"/>
                 </else>
             </if>
         </sequential>
     </macrodef>
 
-    <macrodef name="write-pbs-property-file" description="Writes a java properties file pbs job properies">
+    <macrodef name="write-sge-property-file" description="Writes a java properties file sge job properies">
         <attribute name="file-prefix"/>
         <sequential>
-            <math result="pbs-file-counter" operation="add" operand1="${pbs-file-counter}"
+            <math result="sge-file-counter" operation="add" operand1="${sge-file-counter}"
                   operand2="1" datatype="int"/>
-            <echo level="verbose" message="Counter is ${pbs-file-counter}"/>
-            <writeln file="@{file-prefix}.pbs-tasks" message="${pbs-file-counter}"/>
+            <echo level="verbose" message="Counter is ${sge-file-counter}"/>
+            <writeln file="@{file-prefix}.sge-tasks" message="${sge-file-counter}"/>
 
-            <var name="pbs-property-file" value="@{file-prefix}-${pbs-file-counter}.properties"/>
-            <echo level="info" message="Writing file: ${pbs-property-file}"/>
+            <var name="sge-property-file" value="@{file-prefix}-${sge-file-counter}.properties"/>
+            <echo level="info" message="Writing file: ${sge-property-file}"/>
 
-            <echoproperties destfile="${pbs-property-file}">
-                <propertyset refid="properties-starting-with-my-pbs"/>
+            <echoproperties destfile="${sge-property-file}">
+                <propertyset refid="properties-starting-with-my-sge"/>
             </echoproperties>
         </sequential>
     </macrodef>
 
-    <macrodef name="write-pbs-local-property-file" description="Writes a bdval local-properties file">
+    <macrodef name="write-sge-local-property-file" description="Writes a bdval local-properties file">
         <attribute name="file"/>
-        <attribute name="pbs-master-node"/>
-        <attribute name="pbs-queue"/>
+        <attribute name="sge-master-node"/>
+        <attribute name="sge-queue"/>
 
         <sequential>
-            <!-- collect all the relevant properties (start with "my.pbs.") and store -->
-            <propertyset id="properties-starting-with-my-pbs-local" dynamic="true">
-                <propertyref prefix="my-pbs-local."/>
-                <mapper type="glob" from="my-pbs-local.*" to="*"/>
+            <!-- collect all the relevant properties (start with "my.sge.") and store -->
+            <propertyset id="properties-starting-with-my-sge-local" dynamic="true">
+                <propertyref prefix="my-sge-local."/>
+                <mapper type="glob" from="my-sge-local.*" to="*"/>
             </propertyset>
 
-            <property name="my-pbs-local.eval-dataset-root" location="${eval-dataset-root}"/>
-            <property name="my-pbs-local.computer.type" value="server"/>
+            <property name="my-sge-local.eval-dataset-root" location="${eval-dataset-root}"/>
+            <property name="my-sge-local.computer.type" value="server"/>
 
             <if>
-                <equals arg1="@{pbs-master-node}" arg2="chico"/>
+                <equals arg1="@{sge-master-node}" arg2="chico"/>
                 <then>
-                    <property name="my-pbs-local.server.thread-number" value="8"/>
+                    <property name="my-sge-local.server.thread-number" value="8"/>
                 </then>
                 <else>
-                    <property name="my-pbs-local.server.thread-number" value="2"/>
+                    <property name="my-sge-local.server.thread-number" value="2"/>
                 </else>
             </if>
 
             <if>
                 <or>
-                    <equals arg1="@{pbs-queue}" arg2="fat"/>
-                    <equals arg1="@{pbs-master-node}" arg2="chico"/>
+                    <equals arg1="@{sge-queue}" arg2="fat"/>
+                    <equals arg1="@{sge-master-node}" arg2="chico"/>
                 </or>
                 <then>
-                    <property name="my-pbs-local.server.memory" value="-Xmx8g"/>
+                    <property name="my-sge-local.server.memory" value="-Xmx8g"/>
                 </then>
                 <else>
-                    <property name="my-pbs-local.server.memory" value="-Xmx2g"/>
+                    <property name="my-sge-local.server.memory" value="-Xmx2g"/>
                 </else>
             </if>
 
             <echo level="info" message="Writing file: @{file}"/>
             <echoproperties destfile="@{file}">
-                <propertyset refid="properties-starting-with-my-pbs-local"/>
+                <propertyset refid="properties-starting-with-my-sge-local"/>
             </echoproperties>
         </sequential>
     </macrodef>

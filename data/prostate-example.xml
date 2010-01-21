@@ -109,6 +109,7 @@
 
     <import file="bdval.xml"/>
     <import file="bdval-pbs.xml"/>
+    <import file="bdval-sge.xml"/>
 
     <target name="evaluate" description="Run a complete evaluation."
             depends="prepare-bdval, rserve-status, tag-output-directory">
@@ -294,5 +295,18 @@
 
         <setup-pbs-job target="evaluate" job-name="${pbs-job-name}"
                        tag="${pbs-job-tag}" tag-description="${pbs-job-description}"/>
+    </target>
+
+    <target name="setup-sge-job" description="setup a sge job to run on a sge cluster">
+        <!-- change values to "true" below in order to run the condition listed -->
+        <property name="use-feature-selection-fold=true" value="true"/>
+        <property name="use-feature-selection-fold=false" value="true"/>
+        <property name="do.baseline" value="true"/>
+        <property name="sge-job-name" value="prostate-sge"/>
+        <property name="sge-job-tag" value="prostate-baseline"/>
+        <property name="sge-job-description" value="Demonstrating BDVAL on a SGE cluster"/>
+
+        <setup-sge-job target="evaluate" job-name="${sge-job-name}" sge-master-node="rodin.med.cornell.edu"
+                       tag="${sge-job-tag}" tag-description="${sge-job-description}"/>
     </target>
 </project>
