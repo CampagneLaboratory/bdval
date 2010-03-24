@@ -181,9 +181,9 @@
             <echo message="${all-do-properties}"/>
             <!-- convert the endpoint names to a form that can be used in a regexp -->
             <propertyregex property="endpoint-regex-property" input="${all-endpoints}" regexp=" "
-                           replace="|" casesensitive="false"/>
+                           replace="|" casesensitive="false" defaultValue="${all-endpoints}"/>
             <echo level="verbose" message="Endpoints: ${all-endpoints}"/>
-
+            <echo level="verbose" message="Endpoint regexp: ${endpoint-regex-property}"/>
             <!-- all properties that start with "do." but not an endpoint -->
             <propertyselector property="all-methods" match="^do\.(?!((${endpoint-regex-property})))(.*)$" select="\3"
                               delimiter=" "/>
