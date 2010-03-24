@@ -73,7 +73,7 @@ trap 'stop_rserve' 2 9 15
 echo "=============================================="
 echo "Copying files to $HOSTNAME"
 echo "=============================================="
-scp -pr @@MASTER-NODE@:@JOB-DIR@ $TMPDIR/@JOB-NAME@
+/bin/cp -pr @JOB-DIR@ $TMPDIR/@JOB-NAME@
 
 start_rserve
 
