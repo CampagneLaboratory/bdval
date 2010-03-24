@@ -6,7 +6,7 @@
         as opposed to "bdval.basedir" which is where "bdval.xml" is located.
         This file should typically be located in the same directory as bdval.xml
      -->
-    <dirname property="bdval-project.basedir" file="${ant.file.bdval-template}"/>
+    <dirname property="bdval-project.basedir" file="${ant.file.lung-cancer-stage}"/>
     <import file="${bdval-project.basedir}/../buildsupport/build.xml"/>
 
     <!-- be sure to load the "local" property file first to override any global values -->
@@ -27,7 +27,7 @@
     <property name="internal-CV-repeats" value="--cv-repeats 5"/>
     <property name="internal-CV-folds" value="3"/>
 
-    <property name="external-CV-repeats-number" value="10"/>
+    <property name="external-CV-repeats-number" value="5"/>
     <property name="external-CV-repeats" value="--cv-repeats ${external-CV-repeats-number} "/>
     <property name="external-CV-folds" value="5"/>
 
@@ -38,7 +38,7 @@
          or integers separated by commas. When it is a list, models are generated with each
          number of feature indicated.
     -->
-    <property name="num-features" value="5,10,20,30"/>
+    <property name="num-features" value="30"/>
 
     <!--
          Maximum number of features to keep after the first step of two-steps feature
@@ -106,17 +106,20 @@
 
     <!-- name following "do." must match the names in the corresponding properties file -->
     <property name="do.lung-cancer-stage" value="true"/>
+    <property name="do.dummy" value="false"/>
 
     <!-- CONFIGURE THIS
          All endpoints to be run should be listed here by their symbol, separated by a space -->
     <!-- note that the "do." is NOT listed here, only the endpoint symbol.
          The symbol used must match an endpoint symbol defined in the project properties file. -->
-    <property name="all-endpoints" value="lung-cancer-stage"/>
+    <property name="all-endpoints" value="lung-cancer-stage dummy"/>
     <!--<property name="all-endpoints" value="<endpoint-symbol1> <endpoint-symbol2> <endpoint-symbol3>"/>-->
 
     <!-- end of the endpoint definitions -->
 
     <import file="bdval.xml"/>
+    <!-- <import file="bdval-pbs.xml"/> -->
+    <import file="bdval-sge.xml"/>
 
     <target name="evaluate" description="Run a complete evaluation." depends="prepare-bdval, rserve-status, tag-output-directory">
         <delete file="${statistics-output}"/>
@@ -128,36 +131,53 @@
             <property name="use-feature-selection-fold=false" value="true"/>
 
             <property name="do.baseline" value="true"/>
-            <property name="do.naive-bayes" value="false"/>
-            <property name="do.logit-boost" value="false"/>
-            <property name="do.logistic" value="false"/>
-            <property name="do.random-forest" value="false"/>
-            <property name="do.k-star" value="false"/>
-            <property name="do.whole-chip" value="false"/>
-            <property name="do.baseline-tune-C" value="false"/>
+            <property name="do.naive-bayes" value="true"/>
+            <property name="do.logit-boost" value="true"/>
+            <property name="do.logistic" value="true"/>
+            <property name="do.random-forest" value="true"/>
+            <property name="do.k-star" value="true"/>
+            <property name="do.whole-chip" value="true"/>
+            <property name="do.baseline-tune-C" value="true"/>
             <property name="do.foldchange-genetic-algorithm" value="false"/>
-            <property name="do.foldchange-svmglobal" value="false"/>
-            <property name="do.foldchange-svmiterative" value="false"/>
+            <property name="do.foldchange-svmglobal" value="true"/>
+            <property name="do.foldchange-svmiterative" value="true"/>
             <property name="do.full-genetic-algorithm" value="false"/>
             <property name="do.genelist-genetic-algorithm" value="false"/>
-            <property name="do.genelist-svmglobal" value="false"/>
+            <property name="do.genelist-svmglobal" value="true"/>
             <property name="do.genelist-svmglobal-tune-C" value="false"/>
             <property name="do.minmax-svmglobal" value="false"/>
             <property name="do.pathways-ttest-svmglobal" value="false"/>
             <property name="do.pathways-tune-C" value="false"/>
             <property name="do.pathways.baseline" value="false"/>
-            <property name="do.svmiterative" value="false"/>
+            <property name="do.svmiterative" value="true"/>
             <property name="do.ttest-genetic-algorithm" value="false"/>
-            <property name="do.ttest-svmglobal" value="false"/>
-            <property name="do.ttest-svmiterative" value="false"/>
+            <property name="do.ttest-svmglobal" value="true"/>
+            <property name="do.ttest-svmiterative" value="true"/>
 
             <execute-all-endpoints/>
-
         </sequential>
         <antcall target="process-model-conditions"/>
         <antcall target="zip-results"/>
     </target>
 
+    <target name="scan-series" description="Run a complete evaluation." depends="prepare-bdval,tag-output-directory">
+        <delete file="${statistics-output}"/>
+
+        <echo message="Executing with ${num-threads} threads"/>
+        <sequential>
+
+            <var name="do.lung-cancer-stage" value="true"/>
+
+            <property name="use-feature-selection-fold=true" value="false"/>
+            <property name="use-feature-selection-fold=false" value="true"/>
+
+            <property name="do.weka-feature-selection-scan" value="true"/>
+
+            <execute-all-endpoints/>
+        </sequential>
+        <antcall target="process-model-conditions"/>
+        <antcall target="zip-results"/>
+    </target>
 
     <target name="pathways" description="Run pathways." depends="prepare-bdval, tag-output-directory">
         <delete file="${statistics-output}"/>
@@ -271,5 +291,49 @@
         <!-- change the list of result directories to match your results -->
         <generate-final-models-from-list
                 results-list="20080420-1649-results 20080423-0837-results 20080423-2226-results 20080423-2228-results 20080424-1910-results 20080425-0812-results 20080425-1413-results 20080426-0913-results 20080426-1358-results 20080427-1228-results 20080428-1151-results 20080429-1052-results 20080430-0911-results 20080430-1350-results"/>
+    </target>
+
+    <target name="setup-pbs-job" description="setup a pbs job to run on a pbs cluster">
+        <!-- change values to "true" below in order to run the condition listed -->
+        <property name="use-feature-selection-fold=true" value="true"/>
+        <property name="use-feature-selection-fold=false" value="true"/>
+        <property name="do.baseline" value="true"/>
+        <property name="pbs-job-name" value="prostate-pbs"/>
+        <property name="pbs-job-tag" value="prostate-baseline"/>
+        <property name="pbs-job-description" value="Demonstrating BDVAL on a PBS cluster"/>
+
+        <setup-pbs-job target="evaluate" job-name="${pbs-job-name}"
+                       tag="${pbs-job-tag}" tag-description="${pbs-job-description}"/>
+    </target>
+
+    <target name="setup-sge-job" description="setup a sge job to run on a sge cluster">
+        <!-- change values to "true" below in order to run the condition listed -->
+        <property name="use-feature-selection-fold=true"  value="true"/>
+        <property name="use-feature-selection-fold=false" value="true"/>
+        <property name="do.baseline"                      value="true"/>
+        <property name="do.naive-bayes"                   value="true"/>
+        <property name="do.logit-boost"                   value="true"/>
+        <property name="do.logistic"                      value="true"/>
+        <property name="do.random-forest"                 value="true"/>
+        <property name="do.k-star"                        value="true"/>
+        <property name="do.baseline-tune-C"               value="true"/>
+        <property name="do.whole-chip"                    value="true"/>
+        <property name="do.foldchange-svmglobal"          value="true"/>
+        <property name="do.foldchange-svmiterative"       value="true"/>
+        <property name="do.genelist-svmglobal"            value="true"/>
+        <property name="do.svmiterative"                  value="true"/>
+        <property name="do.ttest-svmglobal"               value="true"/>
+        <property name="do.ttest-svmiterative"            value="true"/>
+
+        <property name="sge-job-name" value="lung-cancer-stage-nf30"/>
+        <property name="sge-job-tag" value="lung-cancer-stage-nf30"/>
+        <!-- 
+        <property name="sge-job-name" value="lung-cancer-stage-d"/>
+        <property name="sge-job-tag" value="lung-cancer-stage-d"/>
+        -->
+        <property name="sge-job-description" value="Demonstrating BDVAL on a SGE cluster"/>
+
+        <setup-sge-job target="evaluate" job-name="${sge-job-name}" sge-master-node="rodin.med.cornell.edu"
+                       tag="${sge-job-tag}" tag-description="${sge-job-description}"/>
     </target>
 </project>
