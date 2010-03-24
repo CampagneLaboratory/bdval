@@ -51,12 +51,6 @@
                 </condition>
             </fail>
 
-            <fail message="Job name (@{job-name}) must not be longer than 15 characters">
-                <condition>
-                    <length string="@{job-name}" when="greater" length="15"/>
-                </condition>
-            </fail>
-
             <property name="job-dir" location="@{output-directory}/@{job-name}"/>
 
             <if>
