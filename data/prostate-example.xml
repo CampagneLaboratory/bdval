@@ -295,7 +295,7 @@
         <!-- for purposes of setup we don't care where the save-data-dir is -->
         <tempfile property="save-data-dir" destdir="${java.io.tmpdir}"/>
 
-        <setup-sge-job target="evaluate" job-name="${sge-job-name}" sge-master-node="rodin.med.cornell.edu"
+        <setup-sge-job target="evaluate" job-name="${sge-job-name}" 
                        tag="${sge-job-tag}" tag-description="${sge-job-description}"/>
     </target>
 </project>

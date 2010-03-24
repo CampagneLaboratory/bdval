@@ -15,6 +15,12 @@
 # Resource requirements - One node with exclusive access
 #$ -l excl=true
 
+# Memory resource requirements
+#$ -l virtual_free=@SGE_MEMORY@
+
+# Number of cpus needed
+#$ -pe smp @SGE_NUMBER_OF_CPUS@
+
 # Mail job begin status
 #$ -m b
 

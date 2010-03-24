@@ -33,13 +33,14 @@
     <var name="sge-file-counter" value="0" description="Used to distinguish condition sets"/>
 
     <macrodef name="setup-sge-job" description="Setup BDVAL for a SGE submission">
-        <attribute name="sge-master-node" default="rodin" description="Name of the SGE head node"/>
         <attribute name="job-name" default="${ant.project.name}" description="Name to associate with this job"/>
         <attribute name="tasks-per-node" default="1" description="Number of tasks to run per node"/>
         <attribute name="target" description="The ant target to run on the cluster"/>
         <attribute name="tag" description="Tag for the configuration"/>
         <attribute name="tag-description" description="Description of the configuration"/>
         <attribute name="output-directory" default="." description="Location for the job submission files"/>
+        <attribute name="number-of-threads" default="8" description="Number of threads per job"/>
+        <attribute name="max-memory" default="8g" description="The memory to allocate per job"/>
         <!-- TODO: <attribute name="email-address"/>-->
 
         <sequential>
@@ -127,7 +128,6 @@
                     <filter token="TAG-DESCRIPTION" value="@{tag-description}"/>
                     <filter token="JOB-DIR" value="${job-dir}"/>
                     <filter token="JOB-NAME" value="@{job-name}"/>
-                    <filter token="MASTER-NODE" value="@{sge-master-node}"/>
                 </filterset>
             </copy>
 
@@ -147,7 +147,7 @@
 
             <!-- Two threads per node, memory size depends on node type -->
             <write-sge-local-property-file file="${job-dir}/config/${ant.project.name}-local.properties"
-                    sge-master-node="@{sge-master-node}" sge-queue="@{sge-queue}"/>
+                    thread-number="@{number-of-threads}" memory="@{max-memory}"/>
 
             <copy file="${config}/log4j.properties.sample" tofile="${job-dir}/config/log4j.properties" failonerror="false"/>
 
@@ -254,14 +254,13 @@
             <echo level="info" message="Wrote a total of ${sge-file-counter} files"/>
 
             <!-- Create the SGE job submission script -->
-            <!-- TODO: need to handle the case where there is only on job to run - an array job is then invalid -->
             <copy file="${bdval.basedir}/../scripts/sge/bdval.qsub" tofile="${job-dir}/../@{job-name}.qsub" filtering="true" overwrite="true">
                 <filterset>
-                    <filter token="SGE-QUEUE" value="@{sge-queue}"/>
                     <filter token="SGE-TASKS" value="${sge-file-counter}"/>
                     <filter token="JOB-NAME" value="@{job-name}"/>
                     <filter token="JOB-DIR" value="${job-dir}"/>
-                    <filter token="MASTER-NODE" value="@{sge-master-node}"/>
+                    <filter token="SGE_MEMORY" value="@{max-memory}"/>
+                    <filter token="SGE_NUMBER_OF_CPUS" value="@{number-of-threads}"/>
                 </filterset>
             </copy>
 
@@ -394,9 +393,9 @@
     </macrodef>
 
     <macrodef name="write-sge-local-property-file" description="Writes a bdval local-properties file">
-        <attribute name="file"/>
-        <attribute name="sge-master-node"/>
-        <attribute name="sge-queue"/>
+        <attribute name="file" description="name of the file to write"/>
+        <attribute name="thread-number" default="8" description="The number of threads per job"/>
+        <attribute name="memory" default="8g" description="The memory to allocate per job"/>
 
         <sequential>
             <!-- collect all the relevant properties (start with "my.sge.") and store -->
@@ -407,29 +406,8 @@
 
             <property name="my-sge-local.eval-dataset-root" location="${eval-dataset-root}"/>
             <property name="my-sge-local.computer.type" value="server"/>
-
-            <if>
-                <equals arg1="@{sge-master-node}" arg2="chico"/>
-                <then>
-                    <property name="my-sge-local.server.thread-number" value="8"/>
-                </then>
-                <else>
-                    <property name="my-sge-local.server.thread-number" value="2"/>
-                </else>
-            </if>
-
-            <if>
-                <or>
-                    <equals arg1="@{sge-queue}" arg2="fat"/>
-                    <equals arg1="@{sge-master-node}" arg2="chico"/>
-                </or>
-                <then>
-                    <property name="my-sge-local.server.memory" value="-Xmx8g"/>
-                </then>
-                <else>
-                    <property name="my-sge-local.server.memory" value="-Xmx2g"/>
-                </else>
-            </if>
+            <property name="my-sge-local.server.thread-number" value="@{thread-number}"/>
+            <property name="my-sge-local.server.memory" value="-Xmx@{memory}"/>
 
             <echo level="info" message="Writing file: @{file}"/>
             <echoproperties destfile="@{file}">

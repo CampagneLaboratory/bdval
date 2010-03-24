@@ -327,13 +327,13 @@
 
         <property name="sge-job-name" value="lung-cancer-stage-nf30"/>
         <property name="sge-job-tag" value="lung-cancer-stage-nf30"/>
-        <!-- 
+        <!--
         <property name="sge-job-name" value="lung-cancer-stage-d"/>
         <property name="sge-job-tag" value="lung-cancer-stage-d"/>
         -->
         <property name="sge-job-description" value="Demonstrating BDVAL on a SGE cluster"/>
 
-        <setup-sge-job target="evaluate" job-name="${sge-job-name}" sge-master-node="rodin.med.cornell.edu"
+        <setup-sge-job target="evaluate" job-name="${sge-job-name}"
                        tag="${sge-job-tag}" tag-description="${sge-job-description}"/>
     </target>
 </project>
