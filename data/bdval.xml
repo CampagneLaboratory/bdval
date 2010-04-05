@@ -2061,7 +2061,7 @@
                message="Name of OUTPUT model conditions file (in columns)?"
                defaultvalue="model-conditions-columns.txt"/>
 
-        <java classname="org.bdval.util.RewriteModelConditionslConditions" dir="${bdval.basedir}"
+        <java classname="org.bdval.util.RewriteModelConditions" dir="${bdval.basedir}"
               classpathref="bdval.classpath" fork="true" failonerror="true">
             <jvmarg value="-ea"/>
             <jvmarg value="${memory-flag}"/>
