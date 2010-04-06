@@ -263,6 +263,7 @@
                 </filterset>
             </copy>
 
+            <!-- TODO: what happens when extract-results.sh already exists in job-dir, and is this desired? --> 
             <copy file="${bdval.basedir}/../scripts/sge/extract-results.sh" todir="${job-dir}/.." filtering="true">
                 <filterset>
                     <filter token="PROJECT" value="${ant.project.name}"/>
