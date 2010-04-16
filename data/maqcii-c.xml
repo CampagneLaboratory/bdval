@@ -84,6 +84,7 @@
     <!-- end of the endpoint definitions -->
 
     <import file="bdval.xml"/>
+    <import file="bdval-sge.xml"/>
 
     <target name="evaluate-dataset-statistics" description="Evaluate performance statistics on a given dataset">
         <property name="do.Iconix" value="true"/>
@@ -148,7 +149,7 @@
             <property name="do.baseline" value="false"/>
             <property name="do.naive-bayes" value="false"/>
             <property name="do.logit-boost" value="false"/>
-            <property name="do.do.FC+P.logitboost" value="false"/>
+            <property name="do.FC+P.logitboost" value="false"/>
             <property name="do.logistic" value="false"/>
             <property name="do.random-forest" value="false"/>
             <property name="do.k-star" value="false"/>
@@ -202,7 +203,7 @@
             <property name="do.baseline" value="true"/>
             <property name="do.naive-bayes" value="false"/>
             <property name="do.logit-boost" value="false"/>
-            <property name="do.do.FC+P.logitboost" value="false"/>
+            <property name="do.FC+P.logitboost" value="false"/>
             <property name="do.logistic" value="false"/>
             <property name="do.random-forest" value="false"/>
             <property name="do.k-star" value="false"/>
@@ -412,5 +413,19 @@
                 results-list="20080420-1649-results 20080423-0837-results 20080423-2226-results 20080423-2228-results 20080424-1910-results 20080425-0812-results 20080425-1413-results 20080426-0913-results 20080426-1358-results 20080427-1228-results 20080428-1151-results 20080429-1052-results 20080430-0911-results 20080430-1350-results"/>
     </target>
 
+    <target name="setup-sge-job" description="setup a sge job to run on a sge cluster">
+        <!-- change values to "true" below in order to run the condition listed -->
+        <property name="use-feature-selection-fold=true" value="true"/>
+        <property name="use-feature-selection-fold=false" value="true"/>
+        <property name="do.baseline" value="true"/>
+        <property name="sge-job-name" value="maqcii-c-baseline-sge"/>
+        <property name="sge-job-tag" value="maqcii-c-baseline"/>
+        <property name="sge-job-description" value="BDVAL on a SGE cluster"/>
 
+        <!-- for purposes of setup we don't care where the save-data-dir is -->
+        <tempfile property="save-data-dir" destdir="${java.io.tmpdir}"/>
+
+        <setup-sge-job target="evaluate" job-name="${sge-job-name}"
+                       tag="${sge-job-tag}" tag-description="${sge-job-description}"/>
+    </target>
 </project>

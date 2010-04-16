@@ -104,7 +104,7 @@
             <property name="do.baseline" value="false"/>
             <property name="do.naive-bayes" value="false"/>
             <property name="do.logit-boost" value="false"/>
-            <property name="do.do.FC+P.logitboost" value="false"/>
+            <property name="do.FC+P.logitboost" value="false"/>
             <property name="do.logistic" value="false"/>
             <property name="do.random-forest" value="false"/>
             <property name="do.k-star" value="false"/>
