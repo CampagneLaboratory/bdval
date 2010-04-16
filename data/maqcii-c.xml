@@ -177,6 +177,7 @@
         <antcall target="process-model-conditions"/>
         <antcall target="zip-results"/>
     </target>
+
     <target name="fast" description="Run a complete evaluation." depends="prepare-bdval,tag-output-directory">
         <delete file="${statistics-output}"/>
 
