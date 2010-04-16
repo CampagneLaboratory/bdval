@@ -40,7 +40,8 @@
         <attribute name="tag-description" description="Description of the configuration"/>
         <attribute name="output-directory" default="." description="Location for the job submission files"/>
         <attribute name="number-of-threads" default="8" description="Number of threads per job"/>
-        <attribute name="max-memory" default="8g" description="The memory to allocate per job"/>
+        <attribute name="jvm-max-memory" default="8g" description="The memory to allocate to the JVM per job"/>
+        <attribute name="sge-max-memory" default="10g" description="The memory to allocate per job"/>
         <!-- TODO: <attribute name="email-address"/>-->
 
         <sequential>
@@ -147,7 +148,7 @@
 
             <!-- Two threads per node, memory size depends on node type -->
             <write-sge-local-property-file file="${job-dir}/config/${ant.project.name}-local.properties"
-                    thread-number="@{number-of-threads}" memory="@{max-memory}"/>
+                    thread-number="@{number-of-threads}" jvm-max-memory="@{jvm-max-memory}"/>
 
             <copy file="${config}/log4j.properties.sample" tofile="${job-dir}/config/log4j.properties" failonerror="false"/>
 
@@ -263,7 +264,7 @@
                 </filterset>
             </copy>
 
-            <!-- TODO: what happens when extract-results.sh already exists in job-dir, and is this desired? --> 
+            <!-- TODO: what happens when extract-results.sh already exists in job-dir, and is this desired? -->
             <copy file="${bdval.basedir}/../scripts/sge/extract-results.sh" todir="${job-dir}/.." filtering="true">
                 <filterset>
                     <filter token="PROJECT" value="${ant.project.name}"/>
@@ -395,7 +396,7 @@
     <macrodef name="write-sge-local-property-file" description="Writes a bdval local-properties file">
         <attribute name="file" description="name of the file to write"/>
         <attribute name="thread-number" default="8" description="The number of threads per job"/>
-        <attribute name="memory" default="8g" description="The memory to allocate per job"/>
+        <attribute name="jvm-max-memory" default="8g" description="The memory to allocate to the JVM per job"/>
 
         <sequential>
             <!-- collect all the relevant properties (start with "my.sge.") and store -->
@@ -407,7 +408,7 @@
             <property name="my-sge-local.eval-dataset-root" location="${eval-dataset-root}"/>
             <property name="my-sge-local.computer.type" value="server"/>
             <property name="my-sge-local.server.thread-number" value="@{thread-number}"/>
-            <property name="my-sge-local.server.memory" value="-Xmx@{memory}"/>
+            <property name="my-sge-local.server.memory" value="-Xmx@{jvm-max-memory}"/>
 
             <echo level="info" message="Writing file: @{file}"/>
             <echoproperties destfile="@{file}">
