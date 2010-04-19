@@ -314,7 +314,7 @@
         <tempfile property="save-data-dir" destdir="${java.io.tmpdir}"/>
 
         <setup-sge-job target="evaluate" job-name="${sge-job-name}"
-                       jvm-max-memory"16g" sge-max-memory="20g"
+                       jvm-max-memory="16g" sge-max-memory="20g"
                        tag="${sge-job-tag}" tag-description="${sge-job-description}"/>
     </target>
 </project>
