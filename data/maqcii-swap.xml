@@ -266,8 +266,8 @@
     </target>
 
     <target name="setup-sge-job" description="setup a sge job to run on a sge cluster">
-        <property name="sge-job-name" value="maqcii-Blind"/>
-        <property name="sge-job-tag" value="maqcii-Blind"/>
+        <property name="sge-job-name" value="maqcii-Blind-swap"/>
+        <property name="sge-job-tag" value="maqcii-Blind-swap"/>
         <property name="sge-job-description" value="BDVAL on a SGE cluster"/>
 
         <!-- endpoints -->
