@@ -40,8 +40,8 @@
         <attribute name="tag-description" description="Description of the configuration"/>
         <attribute name="output-directory" default="." description="Location for the job submission files"/>
         <attribute name="number-of-threads" default="8" description="Number of threads per job"/>
-        <attribute name="jvm-max-memory" default="8g" description="The memory to allocate to the JVM per job"/>
-        <attribute name="sge-max-memory" default="10g" description="The memory to allocate per job"/>
+        <attribute name="jvm-max-memory" default="16g" description="The memory to allocate to the JVM per job"/>
+        <attribute name="sge-max-memory" default="20g" description="The memory to allocate per job"/>
         <!-- TODO: <attribute name="email-address"/>-->
 
         <sequential>
