@@ -266,24 +266,24 @@
     </target>
 
     <target name="setup-sge-job" description="setup a sge job to run on a sge cluster">
-        <property name="sge-job-name" value="maqcii-Blind-swap"/>
+        <property name="sge-job-name" value="maqcii-Blind-swap2"/>
         <property name="sge-job-tag" value="maqcii-Blind-swap"/>
         <property name="sge-job-description" value="BDVAL on a SGE cluster"/>
 
         <!-- endpoints -->
-        <property name="do.IconixSwap" value="true"/>
-        <property name="do.HamnerWithControlSwap" value="true"/>
-        <property name="do.Cologne_OS_MOSwap" value="true"/>
-        <property name="do.Cologne_EFS_MOSwap" value="true"/>
-        <property name="do.Cologne_NEP_RSwap" value="false"/>
-        <property name="do.Cologne_NEP_SSwap" value="false"/>
-        <property name="do.NIEHSSwap" value="true"/>
-        <property name="do.MDACC_PCRSwap" value="true"/>
-        <property name="do.MDACC_ERPOSSwap" value="true"/>
-        <property name="do.UAMS_EFS_MOSwap" value="false"/>
-        <property name="do.UAMS_OS_MOSwap" value="false"/>
-        <property name="do.UAMS_CPR1Swap" value="false"/>
-        <property name="do.UAMS_CPS1Swap" value="false"/>
+        <property name="do.IconixSwap" value="false"/>
+        <property name="do.HamnerWithControlSwap" value="false"/>
+        <property name="do.Cologne_OS_MOSwap" value="false"/>
+        <property name="do.Cologne_EFS_MOSwap" value="false"/>
+        <property name="do.Cologne_NEP_RSwap" value="true"/>
+        <property name="do.Cologne_NEP_SSwap" value="true"/>
+        <property name="do.NIEHSSwap" value="false"/>
+        <property name="do.MDACC_PCRSwap" value="false"/>
+        <property name="do.MDACC_ERPOSSwap" value="false"/>
+        <property name="do.UAMS_EFS_MOSwap" value="true"/>
+        <property name="do.UAMS_OS_MOSwap" value="true"/>
+        <property name="do.UAMS_CPR1Swap" value="true"/>
+        <property name="do.UAMS_CPS1Swap" value="true"/>
         <!--<property name="do.GSE8402_FusionYesNoSwap" value="true"/>-->
 
         <!-- change values to "true" below in order to run the condition listed -->
@@ -314,7 +314,6 @@
         <tempfile property="save-data-dir" destdir="${java.io.tmpdir}"/>
 
         <setup-sge-job target="evaluate" job-name="${sge-job-name}"
-                       jvm-max-memory="16g" sge-max-memory="20g"
                        tag="${sge-job-tag}" tag-description="${sge-job-description}"/>
     </target>
 </project>
