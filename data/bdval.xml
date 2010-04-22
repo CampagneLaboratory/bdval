@@ -2226,6 +2226,25 @@
         </java>
     </target>
 
+    <target name="rserve-start" description="Start Rserve instances defined in a configuration file">
+        <java classname="edu.cornell.med.icb.R.RUtils" fork="true" failonerror="true">
+            <classpath refid="bdval.classpath"/>
+            <arg value="--startup"/>
+            <arg value="--configuration"/>
+            <arg value="${config}/RConnectionPool.xml"/>
+        </java>
+    </target>
+
+    <target name="rserve-stop" description="Shut down Rserve instances defined in a configuration file">
+        <java classname="edu.cornell.med.icb.R.RUtils" fork="true" failonerror="true">
+            <classpath refid="bdval.classpath"/>
+            <arg value="--shutdown"/>
+            <arg value="--configuration"/>
+            <arg value="${config}/RConnectionPool.xml"/>
+        </java>
+    </target>
+
+
     <macrodef name="collect-statistics">
         <attribute name="save-data-dir"/>
         <sequential>
