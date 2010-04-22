@@ -28,7 +28,7 @@ SGE_JOB_NAME=@JOB-NAME@
 BASE_DIR=${SCRIPT_DIR}/../${SGE_JOB_NAME}
 CONFIG_DIR=${BASE_DIR}/config
 DATA_DIR=${BASE_DIR}/data
-RESULTS_DIR=${BASE_DIR}/${SGE_JOB_NAME}-results
+RESULTS_DIR=${BASE_DIR}/../${SGE_JOB_NAME}-results
 
 # corresponding directories to write results to
 OUTPUT_BASE_DIR=$1
