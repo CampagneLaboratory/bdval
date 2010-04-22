@@ -23,21 +23,25 @@ fi
 # Base name of the BDVAL project file without the ".xml" (i.e., prostate-example, maqcii-c, etc.)
 ANT_PROJECT_NAME=@PROJECT@
 SGE_JOB_NAME=@JOB-NAME@
-BASE_DIR=${SCRIPT_DIR}/..
-EXECUTION_DIR=${BASE_DIR}/${SGE_JOB_NAME}
+
+# directories to extract results from
+BASE_DIR=${SCRIPT_DIR}/../${SGE_JOB_NAME}
+CONFIG_DIR=${BASE_DIR}/config
+DATA_DIR=${BASE_DIR}/data
 RESULTS_DIR=${BASE_DIR}/${SGE_JOB_NAME}-results
 
-OUTPUT_BASE=$1
-OUTPUT_DATA_DIR=${OUTPUT_BASE}/data
-OUTPUT_CONFIG_DIR=${OUTPUT_BASE}/config
+# corresponding directories to write results to
+OUTPUT_BASE_DIR=$1
+OUTPUT_CONFIG_DIR=${OUTPUT_BASE_DIR}/config
+OUTPUT_DATA_DIR=${OUTPUT_BASE_DIR}/data
 OUTPUT_RESULTS_DIR=${OUTPUT_DATA_DIR}/results
 
-/bin/mkdir -p ${OUTPUT_DATA_DIR} ${OUTPUT_RESULTS_DIR} ${OUTPUT_CONFIG_DIR}
+/bin/mkdir -p {OUTPUT_BASE_DIR} ${OUTPUT_DATA_DIR} ${OUTPUT_RESULTS_DIR} ${OUTPUT_CONFIG_DIR}
 
-# Copy the files used to exectute the runs
-/bin/cp -r ${EXECUTION_DIR}/bdval.jar ${EXECUTION_DIR}/buildsupport ${OUTPUT_BASE}
-/bin/cp ${EXECUTION_DIR}/config/${ANT_PROJECT_NAME}-local.properties ${EXECUTION_DIR}/config/log4j.properties ${OUTPUT_CONFIG_DIR}
-/bin/cp -r ${EXECUTION_DIR}/data/* ${OUTPUT_BASE}/data
+# Copy the files used to execute the runs
+/bin/cp -r ${BASE_DIR}/bdval.jar ${BASE_DIR}/buildsupport ${OUTPUT_BASE_DIR}
+/bin/cp ${CONFIG_DIR}/${ANT_PROJECT_NAME}-local.properties ${CONFIG_DIR}/log4j.properties ${CONFIG_DIR}/RConnectionPool.xml ${OUTPUT_CONFIG_DIR}
+/bin/cp -r ${DATA_DIR}/* ${OUTPUT_DATA_DIR}
 
 # extract all the features, models and predictions along with the model conditions
 /bin/mkdir -p ${OUTPUT_RESULTS_DIR}/features ${OUTPUT_RESULTS_DIR}/models ${OUTPUT_RESULTS_DIR}/predictions
