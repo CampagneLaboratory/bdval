@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 #
 # This script will combine the output from a BDVAL SGE array job into a form
@@ -28,24 +28,24 @@ EXECUTION_DIR=${BASE_DIR}/${SGE_JOB_NAME}
 RESULTS_DIR=${BASE_DIR}/${SGE_JOB_NAME}-results
 
 OUTPUT_BASE=$1
-DATA_DIR=${OUTPUT_BASE}/data
-CONFIG_DIR=${OUTPUT_BASE}/config
-OUTPUT_DIR=${DATA_DIR}/${SGE_JOB_NAME}-results
+OUTPUT_DATA_DIR=${OUTPUT_BASE}/data
+OUTPUT_CONFIG_DIR=${OUTPUT_BASE}/config
+OUTPUT_RESULTS_DIR=${OUTPUT_DATA_DIR}/results
 
-/bin/mkdir -p ${OUTPUT_DIR} ${CONFIG_DIR} ${OUTPUT_DIR}
+/bin/mkdir -p ${OUTPUT_DATA_DIR} ${OUTPUT_RESULTS_DIR} ${OUTPUT_CONFIG_DIR}
 
 # Copy the files used to exectute the runs
 /bin/cp -r ${EXECUTION_DIR}/bdval.jar ${EXECUTION_DIR}/buildsupport ${OUTPUT_BASE}
-/bin/cp ${EXECUTION_DIR}/config/${ANT_PROJECT_NAME}-local.properties ${EXECUTION_DIR}/config/log4j.properties ${CONFIG_DIR}
+/bin/cp ${EXECUTION_DIR}/config/${ANT_PROJECT_NAME}-local.properties ${EXECUTION_DIR}/config/log4j.properties ${OUTPUT_CONFIG_DIR}
 /bin/cp -r ${EXECUTION_DIR}/data/* ${OUTPUT_BASE}/data
 
 # extract all the features, models and predictions along with the model conditions
-/bin/mkdir -p ${OUTPUT_DIR}/features ${OUTPUT_DIR}/models ${OUTPUT_DIR}/predictions
+/bin/mkdir -p ${OUTPUT_RESULTS_DIR}/features ${OUTPUT_RESULTS_DIR}/models ${OUTPUT_RESULTS_DIR}/predictions
 for ZIPFILE in ${RESULTS_DIR}/*.zip; do
-    echo Processing $ZIPFILE
+    echo Processing ${ZIPFILE}
 
     # get the file name without the .zip part
-    FILE=`basename $ZIPFILE .zip`
+    FILE=`basename ${ZIPFILE} .zip`
 
     # get the basedir of the zip contents (everything before the last "-")
     NAME=${FILE%-*}
@@ -54,37 +54,37 @@ for ZIPFILE in ${RESULTS_DIR}/*.zip; do
     RUN=${FILE##*-}
 
     # copy the property file used for the run
-    /bin/cp ${SGE_JOB_NAME}-${RUN}.properties ${OUTPUT_DIR}/${NAME}-${RUN}.properties
+    /bin/cp ${SGE_JOB_NAME}-${RUN}.properties ${OUTPUT_RESULTS_DIR}/${NAME}-${RUN}.properties
 
     # test for existence of model conditions file
-    /usr/bin/unzip -l -qq $ZIPFILE ${NAME}/model-conditions.txt
+    /usr/bin/unzip -t -qq ${ZIPFILE} ${NAME}/model-conditions.txt
     # proceed only if model-conditions.txt exists in zip file
     if [ $? -eq 0 ]; then
         # extract all the features, models and predictions
-        /usr/bin/unzip -q $ZIPFILE "${NAME}/features/*" "${NAME}/models/*" "${NAME}/predictions/*" -d ${OUTPUT_DIR}
+        /usr/bin/unzip -q ${ZIPFILE} "${NAME}/features/*" "${NAME}/models/*" "${NAME}/predictions/*" -d ${OUTPUT_RESULTS_DIR}
 
         # move files around so they are all together
-        # source files: ${OUTPUT_DIR}/${NAME}/${RESULT}/*
-        # destination: ${OUTPUT_DIR}/${RESULT}/
+        # source files: ${OUTPUT_RESULTS_DIR}/${NAME}/${RESULT}/*
+        # destination: ${OUTPUT_RESULTS_DIR}/${RESULT}/
         for RESULT in features models predictions; do
-            for ENDPOINT_DIR in ${OUTPUT_DIR}/${NAME}/${RESULT}/*; do
+            for ENDPOINT_DIR in ${OUTPUT_RESULTS_DIR}/${NAME}/${RESULT}/*; do
                 ENDPOINT=`basename ${ENDPOINT_DIR}`
-                /bin/mkdir -p ${OUTPUT_DIR}/${RESULT}/${ENDPOINT}
+                /bin/mkdir -p ${OUTPUT_RESULTS_DIR}/${RESULT}/${ENDPOINT}
                 # TODO: handle case where there are too many files to move
-                /bin/mv ${ENDPOINT_DIR}/* ${OUTPUT_DIR}/${RESULT}/${ENDPOINT}
+                /bin/mv ${ENDPOINT_DIR}/* ${OUTPUT_RESULTS_DIR}/${RESULT}/${ENDPOINT}
                 /bin/rmdir ${ENDPOINT_DIR}
             done
-            /bin/rmdir ${OUTPUT_DIR}/${NAME}/${RESULT}
+            /bin/rmdir ${OUTPUT_RESULTS_DIR}/${NAME}/${RESULT}
         done
-        /bin/rmdir ${OUTPUT_DIR}/${NAME}
+        /bin/rmdir ${OUTPUT_RESULTS_DIR}/${NAME}
 
         # extract the model conditions (replacing the temporary paths used for SGE)
-        /usr/bin/unzip -p $ZIPFILE ${NAME}/${NAME}-README.txt > ${OUTPUT_DIR}/${NAME}-$RUN-README.txt
-        /usr/bin/unzip -p $ZIPFILE ${NAME}/model-conditions.txt \
+        /usr/bin/unzip -p ${ZIPFILE} ${NAME}/${NAME}-README.txt > ${OUTPUT_RESULTS_DIR}/${NAME}-${RUN}-README.txt
+        /usr/bin/unzip -p ${ZIPFILE} ${NAME}/model-conditions.txt \
             | sed -e "s|properties=.*/${ANT_PROJECT_NAME}.properties|properties=${ANT_PROJECT_NAME}.properties|g" \
             | sed -e "s|sequence-file=.*/sequences|sequence-file=sequences|g" \
-                >> ${DATA_DIR}/model-conditions.txt
+                >> ${OUTPUT_DATA_DIR}/model-conditions.txt
     else
-        echo Skipped $ZIPFILE since no model-conditions file was found
+        echo Skipped ${ZIPFILE} since no model-conditions file was found
     fi
 done
