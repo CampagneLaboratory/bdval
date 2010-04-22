@@ -36,7 +36,7 @@ OUTPUT_CONFIG_DIR=${OUTPUT_BASE_DIR}/config
 OUTPUT_DATA_DIR=${OUTPUT_BASE_DIR}/data
 OUTPUT_RESULTS_DIR=${OUTPUT_DATA_DIR}/results
 
-/bin/mkdir -p {OUTPUT_BASE_DIR} ${OUTPUT_DATA_DIR} ${OUTPUT_RESULTS_DIR} ${OUTPUT_CONFIG_DIR}
+/bin/mkdir -p ${OUTPUT_BASE_DIR} ${OUTPUT_DATA_DIR} ${OUTPUT_RESULTS_DIR} ${OUTPUT_CONFIG_DIR}
 
 # Copy the files used to execute the runs
 /bin/cp -r ${BASE_DIR}/bdval.jar ${BASE_DIR}/buildsupport ${OUTPUT_BASE_DIR}
