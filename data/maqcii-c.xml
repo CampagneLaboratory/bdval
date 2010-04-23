@@ -396,7 +396,16 @@
         <!-- for purposes of setup we don't care where the save-data-dir is -->
         <tempfile property="save-data-dir" destdir="${java.io.tmpdir}"/>
 
-        <setup-sge-job target="evaluate" job-name="${sge-job-name}"
+        <setup-sge-job target="sge-job" job-name="${sge-job-name}"
                        tag="${sge-job-tag}" tag-description="${sge-job-description}"/>
+    </target>
+
+    <target name="sge-job" description="Tasks to run on SGE cluster.  Properties are defined in the setup">
+        <delete file="${statistics-output}"/>
+        <echo message="Executing with ${num-threads} threads"/>
+        <execute-all-endpoints/>
+        <antcall target="process-model-conditions"/>
+        <antcall target="generate-final-models"/>
+        <antcall target="zip-results"/>
     </target>
 </project>
