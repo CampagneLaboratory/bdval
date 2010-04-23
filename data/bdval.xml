@@ -1281,7 +1281,7 @@
                             endpoint-specific-genelist-names="${endpoint-specific-genelist-names}"
                             floor-param="${floor-param}"
                             array-params="${array-params}"
-                            define-splits-only="@{define-splits-only}" />
+                            define-splits-only="@{define-splits-only}"/>
                 </try>
                 <catch>
                     <echo message="CAUGHT FAILED BUILD"/>
@@ -1464,7 +1464,8 @@
                     <if>
                         <istrue value="${do.@{current-endpoint}}"/>
                         <then>
-                            <do-one-splits-all endpoint-name="@{current-endpoint}" define-splits-only="@{define-splits-only}"/>
+                            <do-one-splits-all endpoint-name="@{current-endpoint}"
+                                               define-splits-only="@{define-splits-only}"/>
                         </then>
                     </if>
                 </sequential>
@@ -1949,7 +1950,7 @@
 
         <echo message="Calculating statistics for results in ${results-directory}"/>
         <restat results-directory="${results-directory}" model-conditions="${model-conditions}"
-                      other-measures="${other-measures}"/>
+                other-measures="${other-measures}"/>
 
 
     </target>
@@ -1971,8 +1972,8 @@
         <input addproperty="evaluate-statistics" message="Evaluate statistics (true/false), default true"
                defaultvalue="true"/>
         <!-- force continue after failure so that we can get the stats for all the models that work. -->
-        <property  name="continue-after-fail" value="true"/>
-        
+        <property name="continue-after-fail" value="true"/>
+
         <sequential>
             <echo message="Predicting all endpoints ${all-endpoints}"/>
 
@@ -2103,7 +2104,7 @@
 
         <input addproperty="tag-description"
                message="Please provide a short description for this run (i.e., condition tested, summary of parameters)."
-                defaultvalue="N/A"/>
+               defaultvalue="N/A"/>
         <echo append="false" file="${save-data-dir}/${save-data-tag}-README.txt">
             ${tag-description}
 
@@ -2286,6 +2287,20 @@
     </macrodef>
 
     <target name="finish-pipeline" description="collect statistics for a results directory built previously">
+        <property name="do.Iconix" value="true"/>
+        <property name="do.HamnerWithControl" value="true"/>
+        <property name="do.Cologne_OS_MO" value="true"/>
+        <property name="do.Cologne_EFS_MO" value="true"/>
+        <property name="do.Cologne_NEP_R" value="true"/>
+        <property name="do.Cologne_NEP_S" value="true"/>
+        <property name="do.NIEHS" value="true"/>
+        <property name="do.MDACC_PCR" value="true"/>
+        <property name="do.MDACC_ERPOS" value="true"/>
+        <property name="do.UAMS_EFS_MO" value="true"/>
+        <property name="do.UAMS_OS_MO" value="true"/>
+        <property name="do.UAMS_CPR1" value="true"/>
+        <property name="do.UAMS_CPS1" value="true"/>
+        <property name="do.GSE8402_FusionYesNo" value="true"/>
         <input addproperty="save-data-dir"
                message="Enter the directory where results are stored (features subdirectory must exist in the results directory)."/>
         <basename property="save-data-tag" file="${save-data-dir}"/>
