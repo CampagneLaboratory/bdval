@@ -2227,7 +2227,51 @@
             <arg value="${config}/RConnectionPool.xml"/>
         </java>
     </target>
+    <!-- do not generate direct final models. -->
+      <macrodef name="collect-statistics-no-direct">
+        <attribute name="save-data-dir"/>
+        <sequential>
+            <restat results-directory="@{save-data-dir}"
+                    output="@{save-data-dir}/CV.txt"/>
+            <generate-final-models
+                    model-conditions="model-conditions.txt"
+                    results-directory="@{save-data-dir}"/>
 
+
+
+            <cross-validation-consensus-features
+                    model-conditions="model-conditions.txt"
+                    results-directory="@{save-data-dir}"
+                    output="@{save-data-dir}/CVCF.txt"/>
+
+            <predict-dataset
+                    num-threads="1"
+                    test-set-name="validation"
+                    evaluate-stats="true"
+                    submission-output="@{save-data-dir}/validation.txt"
+                    model-directory="@{save-data-dir}/final-models"
+                    output-directory="@{save-data-dir}"/>
+
+
+            <antcall target="process-model-conditions"/>
+            <rewrite-model-conditions input="model-conditions.txt"
+                                      output="@{save-data-dir}/model-conditions-column.txt"/>
+
+            <combine-statistics
+                    cv-statistics="@{save-data-dir}/CV.txt"
+                    cvcf-statistics="@{save-data-dir}/CVCF.txt"
+                    validation-statistics="@{save-data-dir}/validation.txt"
+                    output="@{save-data-dir}/CV_CVCF_validation.txt"
+                    model-conditions="@{save-data-dir}/model-conditions-column.txt"/>
+
+
+            <zip-results
+                    include-predictions="false"
+                    include-split-models="false"
+                    include-final-models="true"
+                    label="-final-models-and-stats"/>
+        </sequential>
+    </macrodef>
     <macrodef name="collect-statistics">
         <attribute name="save-data-dir"/>
         <sequential>
@@ -2306,6 +2350,28 @@
         <basename property="save-data-tag" file="${save-data-dir}"/>
 
         <collect-statistics save-data-dir="${save-data-dir}"/>
+    </target>
+
+     <target name="finish-pipeline-no-direct" description="collect statistics for a results directory built previously">
+        <property name="do.Iconix" value="true"/>
+        <property name="do.HamnerWithControl" value="true"/>
+        <property name="do.Cologne_OS_MO" value="true"/>
+        <property name="do.Cologne_EFS_MO" value="true"/>
+        <property name="do.Cologne_NEP_R" value="true"/>
+        <property name="do.Cologne_NEP_S" value="true"/>
+        <property name="do.NIEHS" value="true"/>
+        <property name="do.MDACC_PCR" value="true"/>
+        <property name="do.MDACC_ERPOS" value="true"/>
+        <property name="do.UAMS_EFS_MO" value="true"/>
+        <property name="do.UAMS_OS_MO" value="true"/>
+        <property name="do.UAMS_CPR1" value="true"/>
+        <property name="do.UAMS_CPS1" value="true"/>
+        <property name="do.GSE8402_FusionYesNo" value="true"/>
+        <input addproperty="save-data-dir"
+               message="Enter the directory where results are stored (features subdirectory must exist in the results directory)."/>
+        <basename property="save-data-tag" file="${save-data-dir}"/>
+
+        <collect-statistics-no-direct  save-data-dir="${save-data-dir}"/>
     </target>
 
     <target name="best-practices-full-pipeline" description="Run a complete pipeline"
