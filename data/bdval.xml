@@ -1841,7 +1841,7 @@
                     <echo message="Processing directory @{results-directory}"/>
                     <var name="results-directory" value="${inspect-directory}/@{results-directory}"/>
 
-                    <antcall target="predict-validation" inheritall="true"/>
+                    <antcall target="inner-evaluate-dataset-statistics" inheritall="true"/>
                 </sequential>
             </for>
         </sequential>
@@ -1970,8 +1970,9 @@
                defaultvalue="false"/>
         <input addproperty="evaluate-statistics" message="Evaluate statistics (true/false), default true"
                defaultvalue="true"/>
-
-
+        <!-- force continue after failure so that we can get the stats for all the models that work. -->
+        <property  name="continue-after-fail" value="true"/>
+        
         <sequential>
             <echo message="Predicting all endpoints ${all-endpoints}"/>
 
@@ -2225,25 +2226,6 @@
             <arg value="${config}/RConnectionPool.xml"/>
         </java>
     </target>
-
-    <target name="rserve-start" description="Start Rserve instances defined in a configuration file">
-        <java classname="edu.cornell.med.icb.R.RUtils" fork="true" failonerror="true">
-            <classpath refid="bdval.classpath"/>
-            <arg value="--startup"/>
-            <arg value="--configuration"/>
-            <arg value="${config}/RConnectionPool.xml"/>
-        </java>
-    </target>
-
-    <target name="rserve-stop" description="Shut down Rserve instances defined in a configuration file">
-        <java classname="edu.cornell.med.icb.R.RUtils" fork="true" failonerror="true">
-            <classpath refid="bdval.classpath"/>
-            <arg value="--shutdown"/>
-            <arg value="--configuration"/>
-            <arg value="${config}/RConnectionPool.xml"/>
-        </java>
-    </target>
-
 
     <macrodef name="collect-statistics">
         <attribute name="save-data-dir"/>
