@@ -39,9 +39,10 @@ public class TrainedMAQCIIBlindOnApril24_2010 extends BMFCalibrationModel {
 
                 + match(value(toolsArgs, modelId, "feature-selection-fold"),
                 "false", -0.0114757109328514,
-                "true", 0.0114757109328514
+                "true", 0.0114757109328514 )
 
-        ) + 0.2170548590021 * delta_auc_cvcf_cv +
+                + 0.2170548590021 * delta_auc_cvcf_cv +
+
                 match(value(toolsArgs, modelId, "classifier-type"),
                         "KStar", -0.00369535805064768,
                         "LibSVM", 0.00193546217956395,
