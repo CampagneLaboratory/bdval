@@ -329,6 +329,83 @@
             </sequential>
         </for>
     </target>
+    <target name="combine-stats-April-20-2010"
+            description="Combine statistics for best practices run" depends="compile">
+        <input addproperty="evaluation-data-directory"
+               message="Enter the directory where CV/CVCF/test results are stored."
+               defaultvalue="/Users/fac2003/IdeaProjects/bdval/data"/>
+
+        <delete file="${results-directory}/April-20-2010-consensus-CV-CVCF-validation.txt"/>
+
+
+        <var name="results-directory" value="${evaluation-data-directory}/for-transfer"/>
+        <candidate-model-selections
+                cv-results-filename="${results-directory}/CV.txt"
+                cvcf-results-filename="${results-directory}/CVCF.txt"
+                model-ids=""
+                output-filename="-"
+                dump="--dump ${results-directory}/April-20-2010-consensus-CV-CVCF-validation.txt --model-conditions ${results-directory}/model-conditions-column.txt"
+                reward-performance="AUC"
+                rank-candidates-by="AUC"
+                selection-strategy="CV"
+                custom-ranking-set=""
+                validation-filename="${results-directory}/validation.txt"/>
+        <delete file="${results-directory}/ranks-ALL-April20-2010.txt"/>
+        <candidate-model-selections
+                cv-results-filename="${results-directory}/CV.txt"
+                cvcf-results-filename="${results-directory}/CVCF.txt"
+                model-ids=""
+                output-filename="-"
+                rank-output-filename="${results-directory}/ranks-ALL-April20-2010.txt"
+                dump=" --model-conditions ${evaluation-data-directory}/model-conditions-column.txt --model-name TrainedMAQCIIBlindOnApril24_2010"
+                k="10000"
+                reward-performance="AUC"
+                rank-candidates-by="AUC"
+                selection-strategy="MODEL"
+                custom-ranking-set=""
+                validation-filename="${results-directory}/validation.txt"/>
+         <candidate-model-selections
+                cv-results-filename="${results-directory}/CV.txt"
+                cvcf-results-filename="${results-directory}/CVCF.txt"
+                model-ids=""
+                output-filename="-"
+                rank-output-filename="${results-directory}/ranks-ALL-April20-2010.txt"
+                dump=" --model-conditions ${evaluation-data-directory}/model-conditions-column.txt"
+                k="10000"
+                reward-performance="AUC"
+                rank-candidates-by="AUC"
+                selection-strategy="CV"
+                custom-ranking-set=""
+                validation-filename="${results-directory}/validation.txt"/>
+           <delete file="${results-directory}/ranks-ALL-2009.txt"/>
+         <candidate-model-selections
+                cv-results-filename="${results-directory}/CV.txt"
+                cvcf-results-filename="${results-directory}/CVCF.txt"
+                model-ids=""
+                output-filename="-"
+                rank-output-filename="${results-directory}/ranks-ALL-2009.txt"
+                dump=" --model-conditions ${evaluation-data-directory}/model-conditions-column.txt "
+                k="10000"
+                reward-performance="AUC"
+                rank-candidates-by="AUC"
+                selection-strategy="MODEL"
+                custom-ranking-set=""
+                validation-filename="${results-directory}/validation.txt"/>
+         <candidate-model-selections
+                cv-results-filename="${results-directory}/CV.txt"
+                cvcf-results-filename="${results-directory}/CVCF.txt"
+                model-ids=""
+                output-filename="-"
+                rank-output-filename="${results-directory}/ranks-ALL-2009.txt"
+                dump=" --model-conditions ${evaluation-data-directory}/model-conditions-column.txt"
+                k="10000"
+                reward-performance="AUC"
+                rank-candidates-by="AUC"
+                selection-strategy="CV"
+                custom-ranking-set=""
+                validation-filename="${results-directory}/validation.txt"/>
+    </target>
+
     <target name="combine-stats-best-practices"
             description="Combine statistics for best practices run" depends="compile">
         <input addproperty="evaluation-data-directory"

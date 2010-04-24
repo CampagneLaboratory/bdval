@@ -232,7 +232,6 @@ public class CandidateModelSelection implements WithProcessMethod {
             filterGeneLists(toolsArgs);
 
             dump(toolsArgs);
-            toolsArgs.modelName = ModelName.valueOf(toolsArgs.modelNameString);
             toolsArgs.rankStrategy = RankStrategy.valueOf(toolsArgs.rankStrategyName);
             System.out.println(String.format("Processing --rank-by %s  --rank-candidates-by %s --reward-performance %s --test %s --cv %s --cvcf %s --model-conditions %s --exclude-gene-lists %s",
                     toolsArgs.rankStrategy, toolsArgs.rankBy, toolsArgs.rewardPerformance,
@@ -374,15 +373,15 @@ public class CandidateModelSelection implements WithProcessMethod {
             final String modelId = modelCondition.get("model-id");
             final String seriesId = modelCondition.get("id-parameter-scan-series");
 
-            if(cvResults.containsKey(modelId)){
-            final double Acc= cvResults.get(modelId).accuracy;
+            if (cvResults.containsKey(modelId)) {
+                final double Acc = cvResults.get(modelId).accuracy;
 
-            if (seriesMaxAccuracy.containsKey(seriesId)) {
-                seriesMaxAccuracy.put(seriesId, (Math.max(seriesMaxAccuracy.get(seriesId), Acc)));
-            } else {
+                if (seriesMaxAccuracy.containsKey(seriesId)) {
+                    seriesMaxAccuracy.put(seriesId, (Math.max(seriesMaxAccuracy.get(seriesId), Acc)));
+                } else {
 
-                seriesMaxAccuracy.put(seriesId, Acc);
-            }
+                    seriesMaxAccuracy.put(seriesId, Acc);
+                }
             }
 
         }
@@ -390,19 +389,18 @@ public class CandidateModelSelection implements WithProcessMethod {
 
         String optimalModel = "false";
         for (final Map<String, String> modelCondition : modelConditions.values()) {
-            if(cvResults.containsKey(modelCondition.get("model-id"))){
-            final double modelAcc = cvResults.get(modelCondition.get("model-id")).accuracy;
-            final String seriesId = modelCondition.get("id-parameter-scan-series");
-            if (seriesMaxAccuracy.get(seriesId) == modelAcc) {
-                optimalModel = "true";
-            }
+            if (cvResults.containsKey(modelCondition.get("model-id"))) {
+                final double modelAcc = cvResults.get(modelCondition.get("model-id")).accuracy;
+                final String seriesId = modelCondition.get("id-parameter-scan-series");
+                if (seriesMaxAccuracy.get(seriesId) == modelAcc) {
+                    optimalModel = "true";
+                }
             }
             modelCondition.put("optimalModel", optimalModel);
             optimalModel = "false";
 
         }
     }
-
 
 
     private void addFeatureClassifierTypeColumn(final Map<String, Map<String, String>> modelConditions) {
@@ -560,13 +558,14 @@ public class CandidateModelSelection implements WithProcessMethod {
     }
 
     private String formatBias(final ModelPerformance cvPerf) {
-       if (cvPerf !=null){
-        if (cvPerf.bias == cvPerf.bias) {
-            return String.format("%f", cvPerf.bias);
-        } else {
-            // NaN
-            return "NaN";
-        }    }
+        if (cvPerf != null) {
+            if (cvPerf.bias == cvPerf.bias) {
+                return String.format("%f", cvPerf.bias);
+            } else {
+                // NaN
+                return "NaN";
+            }
+        }
         return "NaN";
     }
 
@@ -1212,19 +1211,10 @@ public class CandidateModelSelection implements WithProcessMethod {
         map.put("delta_auc_cvcf_cv", delta_AUC_CVCF_CV);
 
         predictedPerformance = bmfModel.calibrateEstimate(toolsArgs, modelId, map);
-        switch (toolsArgs.modelName) {
-
-            case TrainedOnACZ:
-                predictedPerformance = modelTrainedOnACZ(toolsArgs, cvPerf.actualNumberOfFeaturesInModel,
-                        modelId, norm_AUC_CV, delta_AUC_CVCF_CV);
-                break;
-
-            default:
-                System.err.println("Model name must be specified.");
-                System.exit(1);
-        }
 
         return predictedPerformance;
+
+
     }
 
 
@@ -1809,7 +1799,12 @@ AUC of CV + 0.0190346231277872 * :Name( "MCC of CV-CF" ) +
                         for (int i = 0; i < 3; i++) {
                             reader.getString();
                         }
-                        measure.bias = reader.getDouble();
+                        if (reader.numTokens() >= 29) {
+                            measure.bias = reader.getDouble();
+
+                        } else {
+                            measure.bias = Double.NaN;
+                        }
                         modelPerfs.put(measure.modelId, measure);
                         modelIds.add(measure.modelId);
                         final MutableString modelId = new MutableString(measure.modelId);
@@ -1826,7 +1821,7 @@ AUC of CV + 0.0190346231277872 * :Name( "MCC of CV-CF" ) +
         }
     }
 
-        private Object2ObjectMap<String, ModelPerformance> loadStatisticsCVCF
+    private Object2ObjectMap<String, ModelPerformance> loadStatisticsCVCF
             (
                     final String filename,
                     final boolean readDatasetEndpoint,
