@@ -330,7 +330,7 @@
         </for>
     </target>
     <target name="combine-stats-April-20-2010"
-            description="Combine statistics for best practices run" depends="compile">
+            description="Combine statistics for April 20 Blind run" depends="compile">
         <input addproperty="evaluation-data-directory"
                message="Enter the directory where CV/CVCF/test results are stored."
                defaultvalue="/Users/fac2003/IdeaProjects/bdval/data"/>

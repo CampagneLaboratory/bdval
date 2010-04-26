@@ -2330,49 +2330,7 @@
         </sequential>
     </macrodef>
 
-    <target name="finish-pipeline" description="collect statistics for a results directory built previously">
-        <property name="do.Iconix" value="true"/>
-        <property name="do.HamnerWithControl" value="true"/>
-        <property name="do.Cologne_OS_MO" value="true"/>
-        <property name="do.Cologne_EFS_MO" value="true"/>
-        <property name="do.Cologne_NEP_R" value="true"/>
-        <property name="do.Cologne_NEP_S" value="true"/>
-        <property name="do.NIEHS" value="true"/>
-        <property name="do.MDACC_PCR" value="true"/>
-        <property name="do.MDACC_ERPOS" value="true"/>
-        <property name="do.UAMS_EFS_MO" value="true"/>
-        <property name="do.UAMS_OS_MO" value="true"/>
-        <property name="do.UAMS_CPR1" value="true"/>
-        <property name="do.UAMS_CPS1" value="true"/>
-        <property name="do.GSE8402_FusionYesNo" value="true"/>
-        <input addproperty="save-data-dir"
-               message="Enter the directory where results are stored (features subdirectory must exist in the results directory)."/>
-        <basename property="save-data-tag" file="${save-data-dir}"/>
-
-        <collect-statistics save-data-dir="${save-data-dir}"/>
-    </target>
-
-     <target name="finish-pipeline-no-direct" description="collect statistics for a results directory built previously">
-        <property name="do.Iconix" value="true"/>
-        <property name="do.HamnerWithControl" value="true"/>
-        <property name="do.Cologne_OS_MO" value="true"/>
-        <property name="do.Cologne_EFS_MO" value="true"/>
-        <property name="do.Cologne_NEP_R" value="true"/>
-        <property name="do.Cologne_NEP_S" value="true"/>
-        <property name="do.NIEHS" value="true"/>
-        <property name="do.MDACC_PCR" value="true"/>
-        <property name="do.MDACC_ERPOS" value="true"/>
-        <property name="do.UAMS_EFS_MO" value="true"/>
-        <property name="do.UAMS_OS_MO" value="true"/>
-        <property name="do.UAMS_CPR1" value="true"/>
-        <property name="do.UAMS_CPS1" value="true"/>
-        <property name="do.GSE8402_FusionYesNo" value="true"/>
-        <input addproperty="save-data-dir"
-               message="Enter the directory where results are stored (features subdirectory must exist in the results directory)."/>
-        <basename property="save-data-tag" file="${save-data-dir}"/>
-
-        <collect-statistics-no-direct  save-data-dir="${save-data-dir}"/>
-    </target>
+  
 
     <target name="best-practices-full-pipeline" description="Run a complete pipeline"
             depends="prepare-bdval,tag-output-directory">

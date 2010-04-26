@@ -244,7 +244,7 @@
                 results-list="20080420-1649-results 20080423-0837-results 20080423-2226-results 20080423-2228-results 20080424-1910-results 20080425-0812-results 20080425-1413-results 20080426-0913-results 20080426-1358-results 20080427-1228-results 20080428-1151-results 20080429-1052-results 20080430-0911-results 20080430-1350-results"/>
     </target>
 
-    <target name="predict-list-validation"   depends="init,tag-output-directory"
+    <target name="predict-list-validation" depends="init,tag-output-directory"
             description="Predict validation set for a list of result directories.">
         <input addproperty="tag-description"
                message="Please provide a short description for this run (i.e., condition tested, summary of parameters)."/>
@@ -263,6 +263,51 @@
 
         <predict-validation-from-list
                 results-list="20081111-1004-results-makeuprunforEP_HLM 20081111-1420-results-makeuprunforEP_I 20081111-1450-results-makeup5features"/>
+    </target>
+
+    <target name="finish-pipeline" description="collect statistics for a results directory built previously">
+        <!-- endpoints -->
+        <property name="do.IconixSwap" value="false"/>
+        <property name="do.HamnerWithControlSwap" value="false"/>
+        <property name="do.Cologne_OS_MOSwap" value="false"/>
+        <property name="do.Cologne_EFS_MOSwap" value="false"/>
+        <property name="do.Cologne_NEP_RSwap" value="true"/>
+        <property name="do.Cologne_NEP_SSwap" value="true"/>
+        <property name="do.NIEHSSwap" value="false"/>
+        <property name="do.MDACC_PCRSwap" value="false"/>
+        <property name="do.MDACC_ERPOSSwap" value="false"/>
+        <property name="do.UAMS_EFS_MOSwap" value="true"/>
+        <property name="do.UAMS_OS_MOSwap" value="true"/>
+        <property name="do.UAMS_CPR1Swap" value="true"/>
+        <property name="do.UAMS_CPS1Swap" value="true"/>
+        
+        <input addproperty="save-data-dir"
+               message="Enter the directory where results are stored (features subdirectory must exist in the results directory)."/>
+        <basename property="save-data-tag" file="${save-data-dir}"/>
+
+        <collect-statistics save-data-dir="${save-data-dir}"/>
+    </target>
+
+    <target name="finish-pipeline-no-direct" description="collect statistics for a results directory built previously">
+        <!-- endpoints -->
+        <property name="do.IconixSwap" value="false"/>
+        <property name="do.HamnerWithControlSwap" value="false"/>
+        <property name="do.Cologne_OS_MOSwap" value="false"/>
+        <property name="do.Cologne_EFS_MOSwap" value="false"/>
+        <property name="do.Cologne_NEP_RSwap" value="true"/>
+        <property name="do.Cologne_NEP_SSwap" value="true"/>
+        <property name="do.NIEHSSwap" value="false"/>
+        <property name="do.MDACC_PCRSwap" value="false"/>
+        <property name="do.MDACC_ERPOSSwap" value="false"/>
+        <property name="do.UAMS_EFS_MOSwap" value="true"/>
+        <property name="do.UAMS_OS_MOSwap" value="true"/>
+        <property name="do.UAMS_CPR1Swap" value="true"/>
+        <property name="do.UAMS_CPS1Swap" value="true"/>
+        <input addproperty="save-data-dir"
+               message="Enter the directory where results are stored (features subdirectory must exist in the results directory)."/>
+        <basename property="save-data-tag" file="${save-data-dir}"/>
+
+        <collect-statistics-no-direct save-data-dir="${save-data-dir}"/>
     </target>
 
     <target name="setup-sge-job" description="setup a sge job to run on a sge cluster">
