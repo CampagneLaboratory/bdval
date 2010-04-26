@@ -98,7 +98,7 @@ public class GenerateFinalModels {
         tool.process(args);
     }
 
-    public String getDirectExtension() {
+    public String getDirectExtension(ConsensusMethod consensusMethod) {
         return consensusMethod == ConsensusMethod.DIRECT_METHOD ? "-direct" : "";
     }
 
@@ -249,6 +249,7 @@ public class GenerateFinalModels {
                                 final String modelsOutputDirectoryPath, final ProgressLogger pg, final String conditionLine) {
         final String[] tokens = conditionLine.split("[\t]");
         final Object2ObjectMap<String, String> map = new Object2ObjectOpenHashMap<String, String>();
+        ConsensusMethod consensusMethodThisLine = consensusMethod;
 
         if (tokens.length > 0) {
             parse(tokens, map);
@@ -259,10 +260,11 @@ public class GenerateFinalModels {
                     // default pathway aggregation methods when some MAQCII runs were performed),
                     // build model consensus:
                     System.out.println("Detected pathway model, activating generation of model consensus.");
-                    consensusMethod = ConsensusMethod.MODEL_CONSENSUS;
+                    consensusMethodThisLine = ConsensusMethod.MODEL_CONSENSUS;
+
                 } else {
                     // Otherwise, build feature consensus:
-                    consensusMethod = ConsensusMethod.FEATURE_CONSENSUS;
+                    consensusMethodThisLine = ConsensusMethod.FEATURE_CONSENSUS;
                 }
             }
 
@@ -271,11 +273,11 @@ public class GenerateFinalModels {
             final String datasetName = map.get("dataset-name");
             if (featureFilenames != null) {
 
-                if (!finalModelExists(modelsOutputDirectoryPath, datasetName, modelId)) {
+                if (!finalModelExists(modelsOutputDirectoryPath, datasetName, modelId, consensusMethodThisLine)) {
                     final int numFeatures = Integer.parseInt(map.get("num-features"));
                     final String label = extractLabel(datasetName, featureFilenames, modelId);
                     if (label != null) {
-                        if (consensusMethod == ConsensusMethod.FEATURE_CONSENSUS) {
+                        if (consensusMethodThisLine == ConsensusMethod.FEATURE_CONSENSUS) {
                             final String featureConsensusOutputFilename = String.format("%s/%s/%s-%s-%s-consensus-features.txt",
                                     featuresOutputDirectoryPath, datasetName, datasetName, label, modelId);
 
@@ -305,9 +307,9 @@ public class GenerateFinalModels {
                                     modelsOutputDirectoryPath, datasetName);
                             forceCreateDir(datasetSpecificFinalModelDir);
 
-                            trainFinalModel(modelsOutputDirectoryPath, map, featureConsensusOutputFilename, label);
+                            trainFinalModel(modelsOutputDirectoryPath, map, featureConsensusOutputFilename, label,consensusMethodThisLine);
                             pg.update();
-                        } else if (consensusMethod == ConsensusMethod.MODEL_CONSENSUS) {
+                        } else if (consensusMethodThisLine == ConsensusMethod.MODEL_CONSENSUS) {
                             final ObjectSet<String> modelComponentPrefixes = collectFeatureFilenames(modelsDirectoryPath, map);
                             PrintWriter writer = null;
                             try {
@@ -330,14 +332,14 @@ public class GenerateFinalModels {
                                         modelsOutputDirectoryPath, datasetName);
                                 forceCreateDir(datasetSpecificFinalModelDir);
 
-                                trainFinalModel(modelsOutputDirectoryPath, map, modelListTmpFile.getCanonicalPath(), label);
+                                trainFinalModel(modelsOutputDirectoryPath, map, modelListTmpFile.getCanonicalPath(), label,consensusMethod);
                             } catch (IOException e) {
                                 System.out.println("Fatal error: cannot create temporary file to store list of model components..");
                                 System.exit(1);
                             } finally {
                                 IOUtils.closeQuietly(writer);
                             }
-                        } else if (consensusMethod == ConsensusMethod.DIRECT_METHOD) {
+                        } else if (consensusMethodThisLine == ConsensusMethod.DIRECT_METHOD) {
                             try {
                                 // Build final feature and model filenames:
                                 final String datasetSpecificConsensusFeatureDir = String.format("%s-direct/%s",
@@ -388,8 +390,8 @@ public class GenerateFinalModels {
 
     private boolean finalModelExists(final String modelsOutputDirectoryPath,
                                      final String datasetName,
-                                     final String modelId) {
-        final File dir = new File(modelsOutputDirectoryPath + getDirectExtension() + "/" + datasetName);
+                                     final String modelId, ConsensusMethod consensusMethod) {
+        final File dir = new File(modelsOutputDirectoryPath + getDirectExtension(consensusMethod) + "/" + datasetName);
         if (!dir.exists() || !dir.isDirectory()) {
             return false;
         }
@@ -416,9 +418,10 @@ public class GenerateFinalModels {
     private void trainFinalModel(final String modelsOutputDirectoryPath,
                                  final Object2ObjectMap<String, String> map,
                                  final String consensusFeaturesFilename,
-                                 final String label) {
+                                 final String label,
+                                 final ConsensusMethod consensusMethod) {
         System.out.print("Training final model..");
-        final String[] args = generateWriteModelParameters(modelsOutputDirectoryPath, map, label, consensusFeaturesFilename);
+        final String[] args = generateWriteModelParameters(modelsOutputDirectoryPath, map, label, consensusFeaturesFilename, consensusMethod);
         final JSAP jsap = new JSAP();
         JSAPResult result = null;
         try {
@@ -493,9 +496,10 @@ public class GenerateFinalModels {
     private String[] generateWriteModelParameters(final String modelsOutputDirectoryPath,
                                                   final Object2ObjectMap<String, String> map,
                                                   final String label,
-                                                  final String consensusFeaturesFilename) {
+                                                  final String consensusFeaturesFilename,
+                                                  ConsensusMethod consensusMethod) {
         final Object2ObjectMap<String, String> ttestMap =
-                filterMapForWriteModel(modelsOutputDirectoryPath, map, label, consensusFeaturesFilename);
+                filterMapForWriteModel(modelsOutputDirectoryPath, map, label, consensusFeaturesFilename, consensusMethod);
         return convertToArgs(ttestMap);
     }
 
@@ -565,7 +569,7 @@ public class GenerateFinalModels {
             final String modelsOutputDirectoryPath,
             final Object2ObjectMap<String, String> map,
             final String label,
-            final String consensusFeaturesFilename) {
+            final String consensusFeaturesFilename, ConsensusMethod consensusMethod) {
         final Object2ObjectMap<String, String> newMap = new Object2ObjectOpenHashMap<String, String>();
         boolean libSVMModel = true;
         for (final String key : map.keySet()) {
