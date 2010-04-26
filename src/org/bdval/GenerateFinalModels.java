@@ -227,9 +227,14 @@ public class GenerateFinalModels {
                 @Override
                 public void run(final int startIndex, final int endIndex) {
                     for (int lineIndex = startIndex; lineIndex <= endIndex; ++lineIndex) {
+                     try {
                         processOneLine(featuresDirectoryPath, featuresOutputDirectoryPath, modelsOutputDirectoryPath,
                                 pg,
                                 lines[lineIndex]);
+                     } catch (Exception e)  {
+                         LOG.error(e);
+                         LOG.info("Ignoring the previous error. Processing continues with the next model. ");
+                     }
 
                     }
                 }
