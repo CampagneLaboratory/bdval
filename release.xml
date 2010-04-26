@@ -53,6 +53,9 @@
     		<export srcUrl="${tagUrl}" destPath="${exportdir}/${tag}"/>
             <export srcUrl="https://${svnhost}/public/svn/icb/data/bdval" destPath="${exportdir}/${tag}/data/bdval"/>
         </svn>
+
+        <!-- Create a "version" file which contains the release number -->
+        <writeln file="${exportdir}/${tag}/VERSION.txt" message="${tag}" append="false"/>
     </target>
 
     <target name="release" description="Tag and release build"
@@ -64,8 +67,20 @@
 	    <symlink link="${releasedir}/bdval-data.zip" resource="${tag}-data.zip"/>
         <symlink link="${releasedir}/bdval.zip" resource="${tag}-bdval.zip"/>
 
-        <!-- copy the changes file to the release directory -->
-        <copy todir="${releasedir}" file="${exportdir}/${tag}/CHANGES.txt"/>
+        <!-- copy the changes and version info files to the release directory -->
+        <copy todir="${releasedir}">
+            <fileset dir="${exportdir}/${tag}">
+                <include name="CHANGES.txt"/>
+                <include name="VERSION.txt"/>
+            </fileset>
+        </copy>
+
+        <!-- bundle everything up so it can be easily transferred to the release site -->
+        <tar destfile="release-${tag}.tgz" compression="gzip">
+            <tarfileset dir="${basedir}">
+                <include name="${releasedir}/**"/>
+            </tarfileset>
+        </tar>
 
         <!-- copy the zip to the web folder -->
         <!-- todo -->
@@ -186,6 +201,7 @@
         	<fileset dir="${exportdir}">
                 <include name="${tag}/README-BDVal.txt"/>
                 <include name="${tag}/CHANGES.txt"/>
+                <include name="${tag}/VERSION.txt"/>
                 <include name="${tag}/data/bdval/**"/>
                 <include name="${tag}/data/sequences/**"/>
                 <include name="${tag}/data/templates/**"/>
@@ -199,6 +215,8 @@
                 <include name="${tag}/config/prostate-example-local.properties"/>
                 <include name="${tag}/config/synthetic-local.properties"/>
                 <include name="${tag}/config/RConnectionPool.xml"/>
+                <include name="${tag}/scripts/**"/>
+                <exclude name="${tag}/**/*.groovy"/>
             </fileset>
         </zip>
     </target>
