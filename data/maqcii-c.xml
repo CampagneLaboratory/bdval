@@ -450,7 +450,15 @@
         <echo message="Executing with ${num-threads} threads"/>
         <execute-all-endpoints/>
         <antcall target="process-model-conditions"/>
-        <antcall target="generate-final-models"/>
+        <if>
+            <available file="model-conditions.txt"/>
+            <then>
+                <antcall target="generate-final-models"/>
+            </then>
+            <else>
+                <echo level="warning" message="No final models created since no model-conditions were produced"/>
+            </else>
+        </if>
         <antcall target="zip-results"/>
     </target>
 </project>
