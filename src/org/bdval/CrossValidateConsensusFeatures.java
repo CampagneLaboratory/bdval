@@ -187,7 +187,12 @@ public class CrossValidateConsensusFeatures {
                 final String label = extractLabel(datasetName, featureFilenames);
                 this.toolArgs = toolArgs;
                 final String consensusFeatureFilename = featureFilenames.iterator().next();
+             try {
                 crossValidate(featuresDirectoryPath, map, label, consensusFeatureFilename);
+             } catch (Exception e) {
+                 LOG.error(e);
+                 // continue nethertheless. We need to process the other models in the intput.
+             }
             }
         }
     }
