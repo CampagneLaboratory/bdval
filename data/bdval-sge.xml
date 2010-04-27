@@ -268,6 +268,7 @@
                     <filter token="JOB-NAME" value="@{job-name}"/>
                     <filter token="JOB-DIR" value="${job-dir}"/>
                     <filter token="SGE_MEMORY" value="@{sge-max-memory}"/>
+                    <filter token="SGE_NUMBER_OF_THREADS" value="@{number-of-threads}"/>
                 </filterset>
             </copy>
         </sequential>
