@@ -65,7 +65,9 @@ for ZIPFILE in ${RESULTS_DIR}/*.zip; do
     # proceed only if model-conditions.txt exists in zip file
     if [ $? -eq 0 ]; then
         # extract all the features, models and predictions
-        /usr/bin/unzip -q ${ZIPFILE} "${NAME}/features/*" "${NAME}/models/*" "${NAME}/predictions/*" -d ${OUTPUT_RESULTS_DIR}
+        /usr/bin/unzip -q ${ZIPFILE} "${NAME}/consensus-features/*" "${NAME}/features/*" \
+            "${NAME}/final-models/*" "${NAME}/models/*" "${NAME}/predictions/*" \
+            -d ${OUTPUT_RESULTS_DIR}
 
         # move files around so they are all together
         # source files: ${OUTPUT_RESULTS_DIR}/${NAME}/${RESULT}/*
