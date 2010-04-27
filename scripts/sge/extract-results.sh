@@ -77,6 +77,8 @@ for ZIPFILE in ${RESULTS_DIR}/*.zip; do
                 ENDPOINT=`basename ${ENDPOINT_DIR}`
                 /bin/mkdir -p ${OUTPUT_RESULTS_DIR}/${RESULT}/${ENDPOINT}
                 /usr/bin/find ${ENDPOINT_DIR} -mindepth 1 -maxdepth 1 -exec /bin/mv {} ${OUTPUT_RESULTS_DIR}/${RESULT}/${ENDPOINT} \;
+
+                # if the rmdir fails we know that not everything was processed
                 /bin/rmdir ${ENDPOINT_DIR}
             done
             /bin/rmdir ${OUTPUT_RESULTS_DIR}/${NAME}/${RESULT}
