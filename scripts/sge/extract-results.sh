@@ -76,8 +76,7 @@ for ZIPFILE in ${RESULTS_DIR}/*.zip; do
             for ENDPOINT_DIR in ${OUTPUT_RESULTS_DIR}/${NAME}/${RESULT}/*; do
                 ENDPOINT=`basename ${ENDPOINT_DIR}`
                 /bin/mkdir -p ${OUTPUT_RESULTS_DIR}/${RESULT}/${ENDPOINT}
-                # TODO: handle case where there are too many files to move
-                /bin/mv ${ENDPOINT_DIR}/* ${OUTPUT_RESULTS_DIR}/${RESULT}/${ENDPOINT}
+        		/usr/bin/find ${ENDPOINT_DIR} -mindepth 1 -maxdepth 1 -exec /bin/mv {} ${OUTPUT_RESULTS_DIR}/${RESULT}/${ENDPOINT} \;
                 /bin/rmdir ${ENDPOINT_DIR}
             done
             /bin/rmdir ${OUTPUT_RESULTS_DIR}/${NAME}/${RESULT}
