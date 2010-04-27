@@ -61,7 +61,7 @@ for ZIPFILE in ${RESULTS_DIR}/*.zip; do
     /bin/cp ${SGE_JOB_NAME}-${RUN}.properties ${OUTPUT_RESULTS_DIR}/${NAME}-${RUN}.properties
 
     # test for existence of model conditions file
-    /usr/bin/unzip -t -qq ${ZIPFILE} ${NAME}/model-conditions.txt
+    /usr/bin/unzip -t -qq ${ZIPFILE} ${NAME}/model-conditions.txt &> /dev/null
     # proceed only if model-conditions.txt exists in zip file
     if [ $? -eq 0 ]; then
         # extract all the features, models and predictions
@@ -72,7 +72,7 @@ for ZIPFILE in ${RESULTS_DIR}/*.zip; do
         # move files around so they are all together
         # source files: ${OUTPUT_RESULTS_DIR}/${NAME}/${RESULT}/*
         # destination: ${OUTPUT_RESULTS_DIR}/${RESULT}/
-        for RESULT in features models predictions; do
+        for RESULT in consensus-features features final-models models predictions; do
             for ENDPOINT_DIR in ${OUTPUT_RESULTS_DIR}/${NAME}/${RESULT}/*; do
                 ENDPOINT=`basename ${ENDPOINT_DIR}`
                 /bin/mkdir -p ${OUTPUT_RESULTS_DIR}/${RESULT}/${ENDPOINT}
