@@ -9,7 +9,8 @@ SGE_ANT_PROPERTY_FILE=../@JOB-NAME@-${SGE_TASK_ID}.properties
 ant -propertyfile $SGE_ANT_PROPERTY_FILE \
     -Dsave-data-tag="@TAG@" \
     -Dtag-description="@TAG-DESCRIPTION@" \
-    -Dresults-directory=results -Dmodel-conditions=model-conditions.txt \
+    -Dresults-directory="@TAG@" \
+    -Dmodel-conditions="model-conditions.txt" \
     -f @PROJECT@.xml @TARGET@
 
 # Copy results back to the master node when we are done

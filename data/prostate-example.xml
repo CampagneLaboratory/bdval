@@ -296,10 +296,13 @@
         <tempfile property="save-data-dir" destdir="${java.io.tmpdir}"/>
 
         <setup-sge-job target="sge-job" job-name="${sge-job-name}"
-                       tag="${sge-job-tag}" tag-description="${sge-job-description}"/>
+                       tag="${sge-job-tag}" tag-description="${sge-job-description}"
+                       number-of-threads="2" jvm-max-memory="1600m" sge-max-memory="2g"/>
     </target>
 
-    <target name="sge-job" description="Tasks to run on SGE cluster.  Properties are defined in the setup">
+    <!-- notice that this does exactly what "evaluate" followed by "generate-final-models" does -->
+    <target name="sge-job" depends="prepare-bdval, rserve-status, tag-output-directory"
+            description="Tasks to run on SGE cluster.  Properties are defined in the setup">
         <delete file="${statistics-output}"/>
         <echo message="Executing with ${num-threads} threads"/>
         <execute-all-endpoints/>
