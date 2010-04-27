@@ -23,7 +23,7 @@
 #$ -l h_vmem=@SGE_MEMORY@
 
 # Number of threads/cpus
-#$ -pe smp @SGE_NUMBER_OF_THREADS@
+##$ -pe smp @SGE_NUMBER_OF_THREADS@
 
 # Mail job begin status
 #$ -m b
