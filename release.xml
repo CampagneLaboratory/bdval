@@ -205,7 +205,7 @@
                 <include name="${tag}/data/bdval/**"/>
                 <include name="${tag}/data/sequences/**"/>
                 <include name="${tag}/data/templates/**"/>
-                <include name="${tag}/data/bdval.*"/>
+                <include name="${tag}/data/bdval*.*"/>
                 <include name="${tag}/data/gene-lists/**"/>
                 <include name="${tag}/data/prostate-example.*"/>
                 <include name="${tag}/data/synthetic.*"/>
