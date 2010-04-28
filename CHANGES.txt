@@ -3,7 +3,7 @@
 - Support for running BDVal on Sun/Oracle Grid Engine
   (http://www.sun.com/software/sge/).
 
-- Upgraded common-math to version 2.0. Commons-math provides the
+- Upgraded commons-math to version 2.0. Commons-math provides the
   T-Test implementation used by the t-test mode.
 
 - Make T-Test calculation dependent on --logged-array parameter.
