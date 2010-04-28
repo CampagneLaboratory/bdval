@@ -76,11 +76,16 @@
         </copy>
 
         <!-- bundle everything up so it can be easily transferred to the release site -->
+<!-- Ant tar task doesn't seem to handle softlinks properly but just makes duplicate copies :-(
         <tar destfile="release-${tag}.tgz" compression="gzip">
-            <tarfileset dir="${basedir}">
+            <tarfileset dir="">
                 <include name="${releasedir}/**"/>
             </tarfileset>
         </tar>
+-->
+        <shellscript shell="bash" dir="${basedir}">
+            tar zcvf release-${tag}.tgz ${releasedir}
+        </shellscript>
 
         <!-- copy the zip to the web folder -->
         <!-- todo -->
