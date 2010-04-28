@@ -283,6 +283,10 @@
                 results-list="20080420-1649-results 20080423-0837-results 20080423-2226-results 20080423-2228-results 20080424-1910-results 20080425-0812-results 20080425-1413-results 20080426-0913-results 20080426-1358-results 20080427-1228-results 20080428-1151-results 20080429-1052-results 20080430-0911-results 20080430-1350-results"/>
     </target>
 
+    <target name="evaluate-dataset-statistics" description="Evaluate performance statistics on a given dataset">
+        <antcall target="inner-evaluate-dataset-statistics"/>
+    </target>
+
     <target name="setup-sge-job" description="setup a sge job to run on a sge cluster">
         <!-- change values to "true" below in order to run the condition listed -->
         <property name="use-feature-selection-fold=true" value="true"/>
