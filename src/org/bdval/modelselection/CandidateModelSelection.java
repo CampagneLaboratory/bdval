@@ -174,6 +174,7 @@ public class CandidateModelSelection implements WithProcessMethod {
         toolsArgs.rankFilename = CLI.getOption(args, "-or", "-");
         toolsArgs.dumpFilename = CLI.getOption(args, "--dump", null);
         toolsArgs.excludeGeneLists = CLI.isKeywordGiven(args, "--exclude-gene-lists");
+        toolsArgs.noPValueEstimation = CLI.isKeywordGiven(args, "--no-p-values");
         toolsArgs.modelNameString = CLI.getOption(args, "--model-name", ModelName.TrainedOnABCDEGJKZ.toString());
         toolsArgs.modelConditionsFilename = CLI.getOption(args, "--model-conditions", null);
         // list of model ids, comma separated.
@@ -307,7 +308,9 @@ public class CandidateModelSelection implements WithProcessMethod {
                         final ObjectList<String> rankedList = rankModels(toolsArgs, toolsArgs.datasetName, toolsArgs.endpointName);
                         if (toolsArgs.hasTestSet() && testResults.size() > 0) {
                             // estimate P-value of selection:
-                            pValueEstimation(toolsArgs, rankedList);
+                            if (!toolsArgs.noPValueEstimation) {
+                                pValueEstimation(toolsArgs, rankedList);
+                            }
                         } else {
                             System.out.println("Cannot evaluate p-values for " + endpointName + " " + datasetName + " no test data.");
                         }
@@ -515,7 +518,7 @@ public class CandidateModelSelection implements WithProcessMethod {
                                         //    "max_MCC_validation\tmax_ACC_validation\tmax_Sens_validation\tmax_Spec_validation\tmax_AUC_validation\t" +
                                         "norm_MCC_validation\tnorm_ACC_validation\tnorm_Sens_validation\tnorm_Spec_validation\tnorm_AUC_validation\t" +
                                         "delta_MCC_CVCF_CV\tdelta_ACC_CVCF_CV\tdelta_Sens_CVCF_CV\tdelta_Spec_CVCF_CV\tdelta_AUC_CVCF_CV\t" +
-                                        "MCC_CV_stdev\tACC_CV_stdev\tSens_CV_stdev\tSpec_CV_stdev\tAUC_CV_stdev" +          // no tab intended
+                                        "MCC_CV_stdev\tACC_CV_stdev\tSens_CV_stdev\tSpec_CV_stdev\tAUC_CV_stdev\tmodel-name\tpair-wise-cal-AUC" +          // no tab intended
 
                                         getModelConditionHeaders(toolsArgs.modelConditions, modelConditionColumnNames) + "\n"
                         ));
@@ -536,7 +539,9 @@ public class CandidateModelSelection implements WithProcessMethod {
                     final double deltaCVCF_CV_spec = getNormalizedMeasure(modelId, cvcfResults, cvcfNormFactorPerfs, MeasureName.SPEC) - getNormalizedMeasure(modelId, cvResults, cvNormFactorPerfs, MeasureName.SPEC);
                     final double deltaCVCF_CV_auc = getNormalizedMeasure(modelId, cvcfResults, cvcfNormFactorPerfs, MeasureName.AUC) - getNormalizedMeasure(modelId, cvResults, cvNormFactorPerfs, MeasureName.AUC);
 
-                    writer.append(String.format("%s\t%s\t%s\t%d\t%s\t%s\t%s\t%s\t%f\t%f\t%f\t%f\t%f\t%s%s\n",
+                    final double pairWiseCal_auc = getModelRankingPerformance(toolsArgs, cvPerf, cvcfPerf);
+
+                    writer.append(String.format("%s\t%s\t%s\t%d\t%s\t%s\t%s\t%s\t%f\t%f\t%f\t%f\t%f\t%s\t%s\t%f%s\n",
                             datasetName, endpointCode, modelId,
                             numActualFeatures,
                             formatStats(modelId, this.cvResults, this.cvNormFactorPerfs),
@@ -545,6 +550,8 @@ public class CandidateModelSelection implements WithProcessMethod {
                             formatStats(modelId, this.testResults, this.testNormFactorPerfs),
                             deltaCVCF_CV_mcc, deltaCVCF_CV_acc, deltaCVCF_CV_sens, deltaCVCF_CV_spec, deltaCVCF_CV_auc,
                             formatStdev(modelId, this.cvResults),
+                            toolsArgs.modelNameString,
+                            pairWiseCal_auc,
                             getModelConditionColumns(modelId, modelConditionColumnNames, toolsArgs.modelConditions)));
                 }
                 writer.flush();
@@ -814,6 +821,7 @@ public class CandidateModelSelection implements WithProcessMethod {
             (
                     final ModelSelectionArguments toolsArgs,
                     final ObjectList<String> rankedList) {
+
         final int numModels = modelIds.size();
         final MersenneTwister randomGenerator = new MersenneTwister();
         int counterScoreOrder = 0;

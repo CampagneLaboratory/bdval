@@ -59,6 +59,7 @@ public class ModelSelectionArguments {
     public PrintWriter rankOutput;
     public String modelNameString;
     public CandidateModelSelection.ModelName modelName;
+    public boolean noPValueEstimation;
     //      public boolean useAllModelsForNull;
 
     public ObjectList<String> getCustomModelRankingList(final String dataset, final String endpoint) {
