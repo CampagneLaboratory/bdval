@@ -179,13 +179,7 @@ public class DiscoverWithTTest extends DAVMode {
                         probesetPvalues.put(probesetId.copy().compact(), pValue);
 
                         if (pValue <= alpha) {
-                            /* System.out.println("featureIndex:" + featureIndex);
-                         final MutableString probesetId =
-                                 options.getProbesetIdentifier(featureIndex - 1);
-                         System.out.println("featureId:" + probesetId);
-                         System.out.println("pValue:" + pValue);
-                         System.out.println("positive: " + positiveLabelValues.toString());
-                         System.out.println("negative: " + negativeLabelValues.toString());*/
+                            
                             // The queue keeps items with larger score. Transform the pValue accordingly.
                             selectedProbesets.enqueue(new TranscriptScore(1 - pValue, probesetIndex));
                         }
