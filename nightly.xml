@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (C) 2010 Institute for Computational Biomedicine,
+  ~                    Weill Medical College of Cornell University
+  ~
+  ~  This program is free software; you can redistribute it and/or modify
+  ~  it under the terms of the GNU General Public License as published by
+  ~  the Free Software Foundation; either version 3 of the License, or
+  ~  (at your option) any later version.
+  ~
+  ~  This program is distributed in the hope that it will be useful,
+  ~  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~  GNU General Public License for more details.
+  ~
+  ~  You should have received a copy of the GNU General Public License
+  ~  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<project name="bdval-nightly" basedir="." default="nightly">
+    <description>
+        This build file is used to test the Biomarker Discovery and VALidation (BDVAL) framework.
+    </description>
+
+    <import file="${basedir}/build.xml"/>
+
+    <makeurl file="${config}/log4j.properties" property="log4j.config.url" validate="false"/>
+
+    <!-- timeout (in milliseconds) to prevent jobs getting "stuck" indefinitely -->
+    <property name="timeout" value="1800000"/>          <!-- 30 minutes -->
+
+    <!-- memory used per step -->
+    <property name="max.memory" value="3g"/>
+
+    <!-- Directory that contains the data for the nightly tests -->
+    <property name="tutorial-data-dir" location="${basedir}/data/bdval/GSE8402"/>
+
+    <target name="clean" depends="bdval-build.clean">
+        <delete dir="logs"/>
+        <delete dir="${tutorial-data-dir}"/>
+        <delete dir="${basedir}">
+            <include name="*dataset-name*.txt"/>
+            <include name="*dataset-name*.zip"/>
+            <include name="baseline-maqcii-submission.txt"/>
+            <include name="model-conditions.txt"/>
+            <include name="reformatted-output.csv"/>
+        </delete>
+    </target>
+
+    <target name="tutorial-data">
+        <mkdir dir="${tutorial-data-dir}/.."/>
+        <svn>
+            <export srcUrl="https://${svnhost}/public/svn/icb/data/bdval/GSE8402" destPath="${tutorial-data-dir}"/>
+        </svn>
+    </target>
+
+    <target name="tutorial" depends="jar-bdval, tutorial-data">
+        <!-- 5.3 Loading the dataset -->
+        <java jar="${bdval-jarfile}" fork="true" failonerror="true"
+              maxmemory="${max.memory}" timeout="${timeout}">
+            <assertions enablesystemassertions="true"/>
+            <sysproperty key="log4j.debug" value="${log4j.debug}"/>
+            <sysproperty key="log4j.configuration" value="${log4j.config.url}"/>
+            <arg value="-m"/>
+            <arg value="reformat"/>
+            <arg value="-p"/>
+            <arg value="${tutorial-data-dir}/platforms/GPL5474_family.soft.gz"/>
+            <arg value="-i"/>
+            <arg value="${tutorial-data-dir}/norm-data/GSE8402_family.soft.gz"/>
+            <arg value="-c"/>
+            <arg value="${tutorial-data-dir}/cids/GSE8402-FusionYesNo-TrainingSplit.cids"/>
+            <arg value="-t"/>
+            <arg value="${tutorial-data-dir}/tasks/GSE8402-FusionYesNo-TrainingSplit.tasks"/>
+            <arg value="-o"/>
+            <arg value="reformatted-output.csv"/>
+        </java>
+
+        <!-- 5.4 Defining an evaluation plan -->
+        <java jar="${bdval-jarfile}" fork="true" failonerror="true"
+              maxmemory="${max.memory}" timeout="${timeout}">
+            <assertions enablesystemassertions="true"/>
+            <sysproperty key="log4j.debug" value="${log4j.debug}"/>
+            <sysproperty key="log4j.configuration" value="${log4j.config.url}"/>
+            <arg value="-m"/>
+            <arg value="define-splits"/>
+            <arg value="--folds"/>
+            <arg value="5"/>
+            <arg value="--stratification"/>
+            <arg value="true"/>
+            <arg value="--cv-repeats"/>
+            <arg value="10"/>
+            <arg value="-o"/>
+            <arg value="${tutorial-data-dir}/splits/fusion-cv-5-fs=false.split"/>
+            <arg value="-p"/>
+            <arg value="${tutorial-data-dir}/platforms/GPL5474_family.soft.gz"/>
+            <arg value="-i"/>
+            <arg value="${tutorial-data-dir}/norm-data/GSE8402_family.soft.gz"/>
+            <arg value="-c"/>
+            <arg value="${tutorial-data-dir}/cids/GSE8402-FusionYesNo-TrainingSplit.cids"/>
+            <arg value="-t"/>
+            <arg value="${tutorial-data-dir}/tasks/GSE8402-FusionYesNo-TrainingSplit.tasks"/>
+        </java>
+
+        <!-- 5.5 Evaluating a feature selection strategy -->
+        <java jar="${bdval-jarfile}" fork="true" failonerror="true"
+              maxmemory="${max.memory}" timeout="${timeout}">
+            <assertions enablesystemassertions="true"/>
+            <sysproperty key="log4j.debug" value="${log4j.debug}"/>
+            <sysproperty key="log4j.configuration" value="${log4j.config.url}"/>
+            <arg value="-m"/>
+            <arg value="execute-splits"/>
+            <arg value="--splits"/>
+            <arg value="${tutorial-data-dir}/splits/fusion-cv-5-fs=false.split"/>
+            <arg value="--sequence-file"/>
+            <arg value="data/sequences/baseline.sequence"/>
+            <arg value="--num-features"/>
+            <arg value="10"/>
+            <arg value="-p"/>
+            <arg value="${tutorial-data-dir}/platforms/GPL5474_family.soft.gz"/>
+            <arg value="-i"/>
+            <arg value="${tutorial-data-dir}/norm-data/GSE8402_family.soft.gz"/>
+            <arg value="-c"/>
+            <arg value="${tutorial-data-dir}/cids/GSE8402-FusionYesNo-TrainingSplit.cids"/>
+            <arg value="-t"/>
+            <arg value="${tutorial-data-dir}/tasks/GSE8402-FusionYesNo-TrainingSplit.tasks"/>
+        </java>
+    </target>
+
+    <target name="prostate-example" depends="jar-bdval">
+        <ant dir="${basedir}" antfile="${basedir}/data/prostate-example.xml">
+            <property name="use-bdval-jar" value="true"/>
+            <property name="tag-description" value="BDVAL Nightly Build ${DSTAMP}-${TSTAMP}"/>
+        </ant>
+    </target>
+
+    <target name="nightly" depends="clean, tutorial, prostate-example"/>
+</project>

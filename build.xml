@@ -2,7 +2,7 @@
 <project name="bdval-build" default="jar" basedir=".">
     <import file="buildsupport/build.xml"/>
 
-    <property name="jarfile" value="bdval.jar"/>
+    <property name="bdval-jarfile" value="bdval.jar"/>
     <property name="api-jarfile" value="bdval-api.jar"/>
     <property name="bmf-calibration-models-jarfile" value="bmf-calibration.jar"/>
     <property name="compound-file-tool-jarfile" value="compound-file-tool.jar"/>
@@ -58,7 +58,7 @@
               overwrite="true" failonerror="false"/>
         <copy file="${config}/RConnectionPool.xml.sample" tofile="${classes}/RConnectionPool.xml"
               overwrite="true" failonerror="false"/>
-        <jar jarfile="${jarfile}" basedir="${classes}">
+        <jar jarfile="${bdval-jarfile}" basedir="${classes}">
             <manifest>
                 <attribute name="Main-Class" value="org.bdval.DiscoverAndValidate"/>
                 <attribute name="Specification-Title" value="BDVal"/>
@@ -174,7 +174,7 @@
 
     <target name="clean" depends="buildsupport.clean, testsupport.clean" description="Cleans up the directory">
         <delete dir="${javadocs}"/>
-        <delete file="${jarfile}"/>
+        <delete file="${bdval-jarfile}"/>
         <delete file="${api-jarfile}"/>
         <delete file="${bmf-calibration-models-jarfile}"/>
         <delete file="${compound-file-tool-jarfile}"/>
