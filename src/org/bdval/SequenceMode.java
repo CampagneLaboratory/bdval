@@ -418,7 +418,7 @@ public class SequenceMode extends DAVMode {
         // Split it so we can pass it to DiscoverAndValidate.main(newArgs)
         // TODO - we can't always split - this breaks paths with spaces in the name :-(
         final String[] newArgs = StringUtils.split(lineToExecute, ' ');
-        LOG.info("Running Sequence Item:" + lineToExecute);
+        LOG.info("Running Sequence (" + sequenceFilename + ") Item:" + lineToExecute);
         try {
             DiscoverAndValidate.main(newArgs);
             System.gc();
@@ -527,7 +527,7 @@ public class SequenceMode extends DAVMode {
      * When reading the sequence file, a line may look like
      * def variable=value
      * this will try to read such a line and place the definition
-     * of the variable inside the variables variable
+     * of the variable inside the variables variable.
      *
      * @throws JSAPException error adding JSAP options
      */
@@ -563,7 +563,7 @@ public class SequenceMode extends DAVMode {
      * When reading the sequence file, a line may look like
      * def variable=value
      * this will try to read such a line and place the definition
-     * of the variable inside the variables variable
+     * of the variable inside the variables variable.
      *
      * @param jsap             the jsap command line processor being used
      * @param sequenceLine     the line to try to parse a variable from
@@ -616,7 +616,7 @@ public class SequenceMode extends DAVMode {
      * When reading the sequence file, a line may look like
      * def variable=value
      * this will try to read such a line and place the definition
-     * of the variable inside the variables variable
+     * of the variable inside the variables variable.
      *
      * @param sequenceLine the line to try to parse a variable from
      */
