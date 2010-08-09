@@ -346,13 +346,6 @@ public class ExecuteSplitsMode extends DAVMode {
                 if (statsFilename != null && label != null) {
                     // and the sequence defined the variables "predictions-filename" and "label"
                     try {
-                        final String floorParam;
-                        if (options.adjustSignalToFloorValue) {
-                            floorParam = "--floor " + options.signalFloorValue;
-                        } else {
-                            floorParam = "";
-                        }
-
                         // extract survival options if any
                         // TODO: clean this up - we should not be checking for "%survival%"
                         final String survivalFileName = sequenceMode.getValue("survival");
@@ -363,20 +356,12 @@ public class ExecuteSplitsMode extends DAVMode {
                             survivalOption = "";
                         }
 
-                        final String featureSelectionCode = getFeatureSelectionCode(label);
+                        final String modelConditionsFilename = "model-conditions.txt";
                         final String sequenceArgs = String.format(
-                                "--mode stats --predictions %s" +
-                                        " %s " +
-                                        " --submission-file %s-maqcii-submission.txt "
-                                        + "--label %s "
-                                        + "--model-id %s "
-                                        + "--dataset-name %s %s --other-measures prec,rec,F-1,MCC,binary-auc",
-                                statsFilename,
-                                survivalOption,
-                                labelPrefix(label),
-                                label,
-                                modelId,
-                                options.datasetName, floorParam);
+                                "--mode stats %s --submission-file %s-maqcii-submission.txt "
+                                        + "--label %s --model-conditions %s"
+                                        + " --other-measures prec,rec,F-1,MCC,binary-auc",
+                                survivalOption, labelPrefix(label), label, modelConditionsFilename);
 
                         LOGGER.debug("Estimating statistics: " + sequenceArgs);
                         DiscoverAndValidate.main(buildArguments(sequenceArgs));
