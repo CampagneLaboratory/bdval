@@ -37,6 +37,7 @@ import it.unimi.dsi.fastutil.objects.ObjectSet;
 import it.unimi.dsi.lang.MutableString;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.LineIterator;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.bdval.WithProcessMethod;
 import org.bdval.modelconditions.ProcessModelConditionsMode;
@@ -486,10 +487,9 @@ public class CandidateModelSelectionAllTeams implements WithProcessMethod {
 
             final String svmParameters = modelCondition.get("classifier-parameters");
             final String svmDefaultCParameter;
-            if (svmParameters.contains("C=")) {
+            if (StringUtils.contains(svmParameters, "C=")) {
                 svmDefaultCParameter = "false";
-            }
-            else {
+            } else {
                 svmDefaultCParameter = "true";
             }
             modelCondition.put("svm-default-C-parameter", svmDefaultCParameter);
