@@ -38,12 +38,15 @@
     <target name="clean" depends="bdval-build.clean">
         <delete dir="logs"/>
         <delete dir="${tutorial-data-dir}"/>
-        <delete dir="${basedir}">
-            <include name="*dataset-name*.txt"/>
-            <include name="*dataset-name*.zip"/>
-            <include name="baseline-maqcii-submission.txt"/>
-            <include name="model-conditions.txt"/>
-            <include name="reformatted-output.csv"/>
+        <delete includeEmptyDirs="true">
+            <fileset dir="${basedir}">
+                <include name="*dataset-name*.txt"/>
+                <include name="*dataset-name*.zip"/>
+                <include name="baseline-maqcii-submission.txt"/>
+                <include name="model-conditions.txt"/>
+                <include name="reformatted-output.csv"/>
+                <include name="data/*-results/**"/>
+            </fileset>
         </delete>
     </target>
 
