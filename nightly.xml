@@ -139,6 +139,11 @@
 
     <target name="prostate-example" depends="jar-bdval, tutorial-data" description="Run the prostate example">
         <ant dir="${basedir}" antfile="${basedir}/data/prostate-example.xml">
+            <property name="eval-dataset-root" location="${tutorial-data-dir}"/>
+            <property name="computer.type" value="server"/>
+            <property name="server.thread-number" value="1"/>
+            <property name="server.memory" value="-Xmx${max.memory}"/>
+
             <property name="use-bdval-jar" value="true"/>
             <property name="tag-description" value="BDVAL Nightly Build ${DSTAMP}-${TSTAMP}"/>
         </ant>
