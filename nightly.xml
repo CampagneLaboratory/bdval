@@ -30,7 +30,7 @@
     <property name="timeout" value="1800000"/>          <!-- 30 minutes -->
 
     <!-- memory used per step -->
-    <property name="max.memory" value="3g"/>
+    <property name="max.memory" value="1200m"/>
 
     <!-- Directory that contains the data for the nightly tests -->
     <property name="tutorial-data-dir" location="${basedir}/data/bdval/GSE8402"/>
@@ -50,14 +50,22 @@
         </delete>
     </target>
 
-    <target name="tutorial-data">
+    <target name="check-tutorial-data">
+        <condition property="has-tutorial-data">
+            <available file="${tutorial-data-dir}"/>
+         </condition>
+    </target>
+
+    <target name="tutorial-data" depends="check-tutorial-data" unless="has-tutorial-data"
+            description="Get the data needed to run the tutorials">
         <mkdir dir="${tutorial-data-dir}/.."/>
         <svn>
             <export srcUrl="https://${svnhost}/public/svn/icb/data/bdval/GSE8402" destPath="${tutorial-data-dir}"/>
         </svn>
     </target>
 
-    <target name="tutorial" depends="jar-bdval, tutorial-data">
+    <target name="tutorial" depends="jar-bdval, tutorial-data"
+            description="Run the steps from the examples in the BDVAL User Guide">
         <!-- 5.3 Loading the dataset -->
         <java jar="${bdval-jarfile}" fork="true" failonerror="true"
               maxmemory="${max.memory}" timeout="${timeout}">
@@ -129,7 +137,7 @@
         </java>
     </target>
 
-    <target name="prostate-example" depends="jar-bdval">
+    <target name="prostate-example" depends="jar-bdval, tutorial-data" description="Run the prostate example">
         <ant dir="${basedir}" antfile="${basedir}/data/prostate-example.xml">
             <property name="use-bdval-jar" value="true"/>
             <property name="tag-description" value="BDVAL Nightly Build ${DSTAMP}-${TSTAMP}"/>
