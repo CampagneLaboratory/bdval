@@ -46,6 +46,7 @@
                 <include name="model-conditions.txt"/>
                 <include name="reformatted-output.csv"/>
                 <include name="data/*-results/**"/>
+                <include name="cache/**"/>
             </fileset>
         </delete>
     </target>
