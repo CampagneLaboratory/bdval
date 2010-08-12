@@ -1,3 +1,14 @@
+1.2
+
+- Fix for bug in code used in the tutorial from the BDVAL
+  documentation.  The ExecuteSplitsMode would fail if called
+  directly from the command line.  Using the supplied ant scripts
+  would not execute this section of code and worked properly.
+  See mantis issue #1356 for more details.
+
+- Added an option to not calculate p-value estimates in candidate
+  model selection.
+
 1.1
 
 - Support for running BDVal on Sun/Oracle Grid Engine

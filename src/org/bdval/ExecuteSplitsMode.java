@@ -340,32 +340,42 @@ public class ExecuteSplitsMode extends DAVMode {
             final SequenceMode sequenceMode = (SequenceMode) executed;
             if (evaluateStatistics) {
                 final String label = sequenceMode.getValue("label");
-
                 final String statsFilename = sequenceMode.getValue("predictions-filename");
 
                 if (statsFilename != null && label != null) {
                     // and the sequence defined the variables "predictions-filename" and "label"
                     try {
+                        final List<String> statsModeArgs = new ObjectArrayList<String>(new String[] {
+                                "--mode", "stats",
+                                "--predictions", statsFilename,
+                                "--submission-file", labelPrefix(label) + "-maqcii-submission.txt",
+                                "--label", label,
+                                "--model-id", modelId,
+                                "--dataset-name", options.datasetName,
+                                "--other-measures", "prec,rec,F-1,MCC,binary-auc"
+                        });
+
+                        if (options.adjustSignalToFloorValue) {
+                            statsModeArgs.add("--floor");
+                            statsModeArgs.add(Double.toString(options.signalFloorValue));
+                        }
+
                         // extract survival options if any
                         // TODO: clean this up - we should not be checking for "%survival%"
                         final String survivalFileName = sequenceMode.getValue("survival");
-                        final String survivalOption;
                         if (StringUtils.isNotBlank(survivalFileName) && !"%survival%".equals(survivalFileName)) {
-                            survivalOption = " --survival " + survivalFileName + " ";
-                        } else {
-                            survivalOption = "";
+                            statsModeArgs.add("--survival");
+                            statsModeArgs.add(survivalFileName);
                         }
 
-                        final String modelConditionsFilename = "model-conditions.txt";
-                        final String sequenceArgs = String.format(
-                                "--mode stats %s --submission-file %s-maqcii-submission.txt "
-                                        + "--label %s --model-conditions %s"
-                                        + " --other-measures prec,rec,F-1,MCC,binary-auc",
-                                survivalOption, labelPrefix(label), label, modelConditionsFilename);
+                       LOGGER.debug("Estimating statistics: " + statsModeArgs);
 
-                        LOGGER.debug("Estimating statistics: " + sequenceArgs);
-                        DiscoverAndValidate.main(buildArguments(sequenceArgs));
-
+                        // we create a new DAVMode here since we want to use the old StatsMode code
+                        // which is no longer exposed by DiscoverAndValidate (BDVal main method)
+                        final DAVMode statsMode = new DAVMode();
+                        statsMode.registerMode("stats", StatsMode.class);
+                        final DAVOptions statsModeOptions = new DAVOptions();
+                        statsMode.process(statsModeArgs.toArray(new String[statsModeArgs.size()]), statsModeOptions);
                     } catch (Exception e) {
                         LOGGER.error("Error executing --mode stats for all splits", e);
                     }
@@ -435,10 +445,6 @@ public class ExecuteSplitsMode extends DAVMode {
 
         }
         return executed;
-    }
-
-    private String[] buildArguments(final String s) {
-        return s.split("[\\s]+");
     }
 
     @Override

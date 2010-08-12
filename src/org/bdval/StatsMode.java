@@ -137,10 +137,6 @@ public class StatsMode extends Predict {
      */
     @Override
     public void defineOptions(final JSAP jsap) throws JSAPException {
-
-        System.err.println("The stats mode in bdval.jar is now obsolete. Please use the ant script restat target, or see org.bdval.modelconditions.ProcessModelConditions");
-
-        System.exit(1);
         final Parameter survivalFilenameOption = new FlaggedOption("survival")
                 .setStringParser(JSAP.STRING_PARSER)
                 .setDefault(JSAP.NO_DEFAULT)
