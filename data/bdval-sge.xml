@@ -44,7 +44,7 @@
         <attribute name="sge-max-memory" default="20g" description="The memory to allocate per job"/>
         <!-- TODO: <attribute name="email-address"/>-->
         <attribute name="rserve-start-port" default="6311" description="First port to start Rserve on"/>
-
+        <attribute name="cache-dir-location" default="." description="Base directory for the shared cache"/>
         <sequential>
             <fail message="Cannot setup a sge job since bdval.jar cannot be found">
                 <condition>
@@ -130,6 +130,7 @@
                     <filter token="TAG-DESCRIPTION" value="@{tag-description}"/>
                     <filter token="JOB-DIR" value="${job-dir}"/>
                     <filter token="JOB-NAME" value="@{job-name}"/>
+                    <filter token="CACHE-DIR-LOCATION" value="@{cache-dir-location}"/>
                 </filterset>
             </copy>
 

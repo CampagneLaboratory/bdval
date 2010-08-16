@@ -10,6 +10,7 @@ ant -propertyfile $SGE_ANT_PROPERTY_FILE \
     -Dsave-data-tag="@TAG@" \
     -Dtag-description="@TAG-DESCRIPTION@" \
     -Dresults-directory="@TAG@" \
+    -Dcache-dir-location="@CACHE-DIR-LOCATION@" \
     -Dmodel-conditions="model-conditions.txt" \
     -f @PROJECT@.xml @TARGET@
 

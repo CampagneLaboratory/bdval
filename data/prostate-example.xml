@@ -301,7 +301,7 @@
 
         <setup-sge-job target="sge-job" job-name="${sge-job-name}"
                        tag="${sge-job-tag}" tag-description="${sge-job-description}"
-                       number-of-threads="2" jvm-max-memory="1600m" sge-max-memory="2g"/>
+                       number-of-threads="2" jvm-max-memory="1600m" sge-max-memory="2g" cache-dir-location="/foo/bar"/>
     </target>
 
     <!-- notice that this does exactly what "evaluate" followed by "generate-final-models" does -->
