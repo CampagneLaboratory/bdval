@@ -34,17 +34,19 @@
 
     <macrodef name="setup-sge-job" description="Setup BDVAL for a SGE submission">
         <attribute name="job-name" default="${ant.project.name}" description="Name to associate with this job"/>
-        <attribute name="tasks-per-node" default="1" description="Number of tasks to run per node"/>
         <attribute name="target" description="The ant target to run on the cluster"/>
         <attribute name="tag" description="Tag for the configuration"/>
         <attribute name="tag-description" description="Description of the configuration"/>
         <attribute name="output-directory" default="." description="Location for the job submission files"/>
+        <attribute name="cache-dir-location" default="." description="Base directory for the shared cache"/>
+
         <attribute name="number-of-threads" default="8" description="Number of threads per job"/>
         <attribute name="jvm-max-memory" default="16g" description="The memory to allocate to the JVM per job"/>
         <attribute name="sge-max-memory" default="20g" description="The memory to allocate per job"/>
-        <!-- TODO: <attribute name="email-address"/>-->
+
+        <attribute name="number-of-rserve-instances" default="@{number-of-threads}" description="The number of Rserve instances to start"/>
         <attribute name="rserve-start-port" default="6311" description="First port to start Rserve on"/>
-        <attribute name="cache-dir-location" default="." description="Base directory for the shared cache"/>
+
         <sequential>
             <fail message="Cannot setup a sge job since bdval.jar cannot be found">
                 <condition>
@@ -149,7 +151,7 @@
             <shellscript shell="bash" dir="${job-dir}/config">
                 echo "&lt;RConnectionPool&gt;" > RConnectionPool.xml
                 echo "  &lt;RConfiguration&gt;" >> RConnectionPool.xml
-                for i in {1..@{number-of-threads}}; do
+                for ((i=1; i &lt;= @{number-of-rserve-instances}; i++)); do
                     let PORT=@{rserve-start-port}+$i-1
                     echo -e "    &lt;RServer host=\"localhost\" port=\"$PORT\"/&gt;" >> RConnectionPool.xml
                 done
@@ -264,6 +266,17 @@
             </for>
             <echo level="info" message="Wrote a total of ${sge-file-counter} files"/>
 
+            <!-- Determine whether or not to set sge exclusive access -->
+            <if>
+                <equals arg1="@{number-of-rserve-instances}" arg2="0"/>
+                <then>
+                    <var name="sge-processor-directive" value="-pe smp @{number-of-threads}"/>
+                </then>
+                <else>
+                    <var name="sge-processor-directive" value="-l excl=true"/>
+                </else>
+            </if>
+
             <!-- Create the SGE job submission script -->
             <copy file="${bdval.basedir}/../scripts/sge/bdval.qsub" tofile="${job-dir}/../@{job-name}.qsub" filtering="true" overwrite="true">
                 <filterset>
@@ -272,7 +285,9 @@
                     <filter token="JOB-DIR" value="${job-dir}"/>
                     <filter token="SGE_MEMORY" value="@{sge-max-memory}"/>
                     <filter token="SGE_NUMBER_OF_THREADS" value="@{number-of-threads}"/>
+                    <filter token="NUMBER_OF_RSERVE_INSTANCES" value="@{number-of-rserve-instances}"/>
                     <filter token="RSERVE_START_PORT" value="@{rserve-start-port}"/>
+                    <filter token="SGE_PROCESSOR_DIRECTIVE" value="${sge-processor-directive}"/>
                 </filterset>
             </copy>
         </sequential>

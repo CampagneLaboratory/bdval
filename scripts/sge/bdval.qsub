@@ -1,5 +1,4 @@
-#!/bin/sh
-
+#!/bin/bash
 
 # Submit to the rascals queue
 #$ -q *@@rascals.h
@@ -16,14 +15,11 @@
 # TODO Save SGE output to the result directory
 #SGE -o @JOB-DIR@/../@JOB-NAME@.^array_index^.log
 
-# Resource requirements - One node with exclusive access
-#$ -l excl=true
+# Resource requirements - One node with exclusive access or number of threads/cpus
+#$ @SGE_PROCESSOR_DIRECTIVE@
 
 # Memory resource requirements
 #$ -l h_vmem=@SGE_MEMORY@
-
-# Number of threads/cpus
-##$ -pe smp @SGE_NUMBER_OF_THREADS@
 
 # Mail job begin status
 #$ -m b
@@ -55,6 +51,9 @@ echo SGE: scratch directory is ${TMPDIR}
 echo SGE: PATH = ${SGE_O_PATH}
 echo ------------------------------------------------------
 
+# Number of Rserve instances to start up
+NUMBER_OF_RSERVE_INSTANCES=@NUMBER_OF_RSERVE_INSTANCES@
+
 # First port to use for Rserve
 RSERVE_START_PORT=@RSERVE_START_PORT@
 
@@ -62,12 +61,10 @@ RSERVE_START_PORT=@RSERVE_START_PORT@
 # Start instances of Rserve on each node in the cluster
 #
 start_rserve() {
-    echo "=============================================="
-    echo "Starting Rserve instances"
-    echo "=============================================="
-    for i in {1..@SGE_NUMBER_OF_THREADS@}; do
-        let PORT=$RSERVE_START_PORT+$i-1
-        . $TMPDIR/@JOB-NAME@/start-rserve.sh $PORT
+    for {{i=1; i <= ${NUMBER_OF_RSERVE_INSTANCES}; i++}}; do
+        let PORT=${RSERVE_START_PORT}+${i}-1
+        echo "Starting Rserve instance on port ${PORT}"
+        . $TMPDIR/@JOB-NAME@/start-rserve.sh ${PORT}
     done
 }
 
@@ -75,11 +72,9 @@ start_rserve() {
 # Stop instances of Rserve on each node in the cluster
 #
 stop_rserve() {
-    echo "=============================================="
-    echo "Stopping Rserve instances"
-    echo "=============================================="
-    for i in {1..@SGE_NUMBER_OF_THREADS@}; do
-        let PORT=$RSERVE_START_PORT+$i-1
+    for {{i=1; i <= ${NUMBER_OF_RSERVE_INSTANCES}; i++}}; do
+        let PORT=${RSERVE_START_PORT}+${i}-1
+        echo "Stoping Rserve instance on port ${PORT}"
         . $TMPDIR/@JOB-NAME@/stop-rserve.sh $PORT
     done
 }
