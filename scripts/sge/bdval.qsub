@@ -61,7 +61,7 @@ RSERVE_START_PORT=@RSERVE_START_PORT@
 # Start instances of Rserve on each node in the cluster
 #
 start_rserve() {
-    for {{i=1; i <= ${NUMBER_OF_RSERVE_INSTANCES}; i++}}; do
+    for ((i=1; i <= ${NUMBER_OF_RSERVE_INSTANCES}; i++)); do
         let PORT=${RSERVE_START_PORT}+${i}-1
         echo "Starting Rserve instance on port ${PORT}"
         . $TMPDIR/@JOB-NAME@/start-rserve.sh ${PORT}
@@ -72,10 +72,10 @@ start_rserve() {
 # Stop instances of Rserve on each node in the cluster
 #
 stop_rserve() {
-    for {{i=1; i <= ${NUMBER_OF_RSERVE_INSTANCES}; i++}}; do
+    for ((i=1; i <= ${NUMBER_OF_RSERVE_INSTANCES}; i++)); do
         let PORT=${RSERVE_START_PORT}+${i}-1
         echo "Stoping Rserve instance on port ${PORT}"
-        . $TMPDIR/@JOB-NAME@/stop-rserve.sh $PORT
+        . $TMPDIR/@JOB-NAME@/stop-rserve.sh ${PORT}
     done
 }
 
