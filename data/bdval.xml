@@ -2230,17 +2230,19 @@
     <!-- do not generate direct final models. -->
       <macrodef name="collect-statistics-no-direct">
         <attribute name="save-data-dir"/>
+ 	<attribute name="model-conditions-file" default="model-conditions.txt"/>
+
         <sequential>
             <restat results-directory="@{save-data-dir}"
                     output="@{save-data-dir}/CV.txt"/>
-            <generate-final-models
-                    model-conditions="model-conditions.txt"
-                    results-directory="@{save-data-dir}"/>
+            <!--generate-final-models
+                    model-conditions="@{model-conditions-file}"
+                    results-directory="@{save-data-dir}"/-->
 
 
 
             <cross-validation-consensus-features
-                    model-conditions="model-conditions.txt"
+                    model-conditions="@{model-conditions-file}"
                     results-directory="@{save-data-dir}"
                     output="@{save-data-dir}/CVCF.txt"/>
 
@@ -2254,7 +2256,7 @@
 
 
             <antcall target="process-model-conditions"/>
-            <rewrite-model-conditions input="model-conditions.txt"
+            <rewrite-model-conditions input="@{model-conditions-file}"
                                       output="@{save-data-dir}/model-conditions-column.txt"/>
 
             <combine-statistics
