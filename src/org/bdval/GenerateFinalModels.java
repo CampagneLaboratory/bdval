@@ -227,14 +227,14 @@ public class GenerateFinalModels {
                 @Override
                 public void run(final int startIndex, final int endIndex) {
                     for (int lineIndex = startIndex; lineIndex <= endIndex; ++lineIndex) {
-                     try {
-                        processOneLine(featuresDirectoryPath, featuresOutputDirectoryPath, modelsOutputDirectoryPath,
-                                pg,
-                                lines[lineIndex]);
-                     } catch (Exception e)  {
-                         LOG.error(e);
-                         LOG.info("Ignoring the previous error. Processing continues with the next model. ");
-                     }
+                        try {
+                            processOneLine(featuresDirectoryPath, featuresOutputDirectoryPath, modelsOutputDirectoryPath,
+                                    pg,
+                                    lines[lineIndex]);
+                        } catch (Exception e) {
+                            LOG.error(e);
+                            LOG.info("Ignoring the previous error. Processing continues with the next model. ");
+                        }
 
                     }
                 }
@@ -288,11 +288,12 @@ public class GenerateFinalModels {
 
                             final File consensusFeatureFilename = new File(featureConsensusOutputFilename);
                             final boolean consensusFeatureExist = consensusFeatureFilename.exists();
+                            boolean hasConsensusFeatures = false;
                             if (!consensusFeatureExist) {
                                 final ObjectSet<String> consensusFeatures = calculateConsensus(featuresDirectoryPath +
                                         "/" + datasetName + "/", featureFilenames, numFeatures, map);
                                 assert consensusFeatures != null : "consensus must exist when label is not null.";
-
+                                hasConsensusFeatures = consensusFeatures.size() > 0;
                                 final String datasetSpecificConsensusFeatureDir = String.format("%s/%s",
                                         featuresOutputDirectoryPath, datasetName);
                                 PrintWriter output = null;
@@ -306,14 +307,15 @@ public class GenerateFinalModels {
                                     IOUtils.closeQuietly(output);
                                 }
                             }
+                            if (hasConsensusFeatures) {
+                                // create final model dataset specific subdirectory
+                                final String datasetSpecificFinalModelDir = String.format("%s/%s",
+                                        modelsOutputDirectoryPath, datasetName);
+                                forceCreateDir(datasetSpecificFinalModelDir);
 
-                            // create final model dataset specific subdirectory
-                            final String datasetSpecificFinalModelDir = String.format("%s/%s",
-                                    modelsOutputDirectoryPath, datasetName);
-                            forceCreateDir(datasetSpecificFinalModelDir);
-
-                            trainFinalModel(modelsOutputDirectoryPath, map, featureConsensusOutputFilename, label,consensusMethodThisLine);
-                            pg.update();
+                                trainFinalModel(modelsOutputDirectoryPath, map, featureConsensusOutputFilename, label, consensusMethodThisLine);
+                                pg.update();
+                            }
                         } else if (consensusMethodThisLine == ConsensusMethod.MODEL_CONSENSUS) {
                             final ObjectSet<String> modelComponentPrefixes = collectFeatureFilenames(modelsDirectoryPath, map);
                             PrintWriter writer = null;
@@ -337,7 +339,7 @@ public class GenerateFinalModels {
                                         modelsOutputDirectoryPath, datasetName);
                                 forceCreateDir(datasetSpecificFinalModelDir);
 
-                                trainFinalModel(modelsOutputDirectoryPath, map, modelListTmpFile.getCanonicalPath(), label,consensusMethod);
+                                trainFinalModel(modelsOutputDirectoryPath, map, modelListTmpFile.getCanonicalPath(), label, consensusMethod);
                             } catch (IOException e) {
                                 System.out.println("Fatal error: cannot create temporary file to store list of model components..");
                                 System.exit(1);
