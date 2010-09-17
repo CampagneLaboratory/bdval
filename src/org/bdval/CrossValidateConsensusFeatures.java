@@ -25,6 +25,7 @@ import edu.mssm.crover.cli.CLI;
 import edu.rit.pj.IntegerForLoop;
 import edu.rit.pj.ParallelRegion;
 import edu.rit.pj.ParallelTeam;
+import edu.cornell.med.icb.io.TSVReader;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -42,7 +43,9 @@ import org.apache.log4j.Logger;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.Iterator;
+import java.util.Collections;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -80,6 +83,7 @@ public class CrossValidateConsensusFeatures {
         String cvRepeats;
         public String propertiesFilename;
         public OptionalModelId[] optionalModelIds;
+        public ObjectSet<String> ignoreModelIdList;
     }
 
     private void process(final String[] args) {
@@ -98,9 +102,18 @@ public class CrossValidateConsensusFeatures {
 
         toolsArgs.optionalModelIds = GenerateFinalModels.loadProperties(toolsArgs.propertiesFilename);
 
+        toolsArgs.ignoreModelIdList = parseIgnoreList(toolsArgs.submissionFilename);
         final ProgressLogger pg = new ProgressLogger(LOG);
         pg.itemsName = "model conditions";
-        final String[] lines = readLines(toolsArgs.modelConditionsFilename);
+        String[] lines = readLines(toolsArgs.modelConditionsFilename);
+        // shuffle the list of models to evaluate CVCF for.
+        // This is done so that restart do not always process the models in the same order. This is useful when
+        // some models do not finish and use up threads. Restarting several times will eventually process all the
+        // models that can be processed.
+        final ObjectArrayList<String> shuffledLines = new ObjectArrayList<String>(lines);
+        Collections.shuffle(shuffledLines);
+        lines=shuffledLines.toArray(lines);
+        
         if (lines == null) {
             System.out.println("model conditions file cannot be read. " + toolsArgs.modelConditionsFilename);
             System.exit(1);
@@ -119,6 +132,53 @@ public class CrossValidateConsensusFeatures {
         }
 
         pg.stop("Model condition processing complete");
+    }
+
+    /**
+     * Obtain the set of model ids already present in a pre-existing output CVCF file. Id is obtained from column #24
+     * of the file.
+     *
+     * @param submissionFilename
+     * @return
+     */
+    private ObjectSet<String> parseIgnoreList(String submissionFilename) {
+        ObjectSet<String> idsToIgnore = new ObjectArraySet<String>();
+        File resultsFile = new File(submissionFilename);
+        System.out.println("Looking for pre-calculated models ids in " + submissionFilename);
+        System.out.flush();
+        if (resultsFile.exists()) {
+            System.out.println("File was found. Using.");
+            try {
+                TSVReader reader = new TSVReader(new FileReader(resultsFile), '\t');
+                reader.setCommentPrefix("OrganizationCode");
+                while (reader.hasNext()) {
+                    if (reader.isCommentLine() || reader.isEmptyLine()) {
+                        reader.skip();
+                    } else {
+
+                        reader.next();
+                        for (int i = 1; i <= 23; i++) {
+                            String ignore = reader.getString();
+                        }
+                        String modelId = reader.getString();
+                        idsToIgnore.add(modelId);
+                    }
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace(System.err);
+                System.exit(1);
+            } catch (IOException e) {
+                e.printStackTrace(System.err);
+                System.exit(1);
+            }
+        } else {
+            System.out.println("File was not found. Ignore list is empty.");
+            System.out.flush();
+        }
+        System.out.printf("Ignore list has %d elements%n", idsToIgnore.size());
+                         System.out.flush();
+
+        return idsToIgnore;
     }
 
     ParallelTeam team;
@@ -183,16 +243,23 @@ public class CrossValidateConsensusFeatures {
             final ObjectSet<String> featureFilenames = collectFeatureFilenames(featuresDirectoryPath, map);
             final String modelId = map.get("model-id");
             final String datasetName = map.get("dataset-name");
+
+            if (toolArgs.ignoreModelIdList.contains(modelId)) {
+             //   System.out.printf("Skipping %s (already in the pre-existing CVCF file.%n", modelId);
+                // do not process models that are in the ignore list.
+                return;
+            }
+
             if (featureFilenames != null) {
                 final String label = extractLabel(datasetName, featureFilenames);
                 this.toolArgs = toolArgs;
                 final String consensusFeatureFilename = featureFilenames.iterator().next();
-             try {
-                crossValidate(featuresDirectoryPath, map, label, consensusFeatureFilename);
-             } catch (Exception e) {
-                 LOG.error(e);
-                 // continue nethertheless. We need to process the other models in the intput.
-             }
+                try {
+                    crossValidate(featuresDirectoryPath, map, label, consensusFeatureFilename);
+                } catch (Exception e) {
+                    LOG.error(e);
+                    // continue nethertheless. We need to process the other models in the intput.
+                }
             }
         }
     }
@@ -426,7 +493,7 @@ public class CrossValidateConsensusFeatures {
 
                 featureFilenames.add(filename);
 
-                System.out.println("Processing model-id: " + modelId + " feature file:" + file.getName());
+               // System.out.println("Processing model-id: " + modelId + " feature file:" + file.getName());
             }
         }
         return featureFilenames.size() == 0 ? null : featureFilenames;
