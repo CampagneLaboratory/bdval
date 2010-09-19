@@ -26,14 +26,7 @@ import edu.cornell.med.icb.stat.ZScoreCalculator;
 import edu.cornell.med.icb.tissueinfo.similarity.ScoredTranscriptBoundedSizeQueue;
 import edu.cornell.med.icb.tissueinfo.similarity.TranscriptScore;
 import edu.mssm.crover.cli.CLI;
-import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
-import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import it.unimi.dsi.fastutil.objects.ObjectList;
-import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import it.unimi.dsi.fastutil.objects.ObjectSet;
+import it.unimi.dsi.fastutil.objects.*;
 import it.unimi.dsi.lang.MutableString;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.LineIterator;
@@ -42,12 +35,7 @@ import org.bdval.WithProcessMethod;
 import org.bdval.modelconditions.ProcessModelConditionsMode;
 import org.bdval.tools.convert.OptionsSupport;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -1200,6 +1188,10 @@ public class CandidateModelSelection implements WithProcessMethod {
                     final ModelSelectionArguments toolsArgs,
                     final ModelPerformance cvPerf,
                     final ModelPerformance cvcfPerf) {
+        if (cvPerf ==null) {
+            // Need CV performance to return model ranking performance.
+            return Double.NaN;
+        }
         final String modelId = cvPerf.modelId;
         final double norm_AUC_CV = cvPerf.auc;
 // if model has no associated model condition, not much we can do:
