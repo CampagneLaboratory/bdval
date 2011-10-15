@@ -519,7 +519,7 @@
                 selection-strategy="MODEL"
                 custom-ranking-set=""
                 validation-filename="${results-directory}/validation.txt"/>
-         <candidate-model-selections
+        <candidate-model-selections
                 cv-results-filename="${results-directory}/CV.txt"
                 cvcf-results-filename="${results-directory}/CVCF.txt"
                 model-ids=""
@@ -532,8 +532,8 @@
                 selection-strategy="CV"
                 custom-ranking-set=""
                 validation-filename="${results-directory}/validation.txt"/>
-           <delete file="${results-directory}/ranks-ALL-2009.txt"/>
-         <candidate-model-selections
+        <delete file="${results-directory}/ranks-ALL-2009.txt"/>
+        <candidate-model-selections
                 cv-results-filename="${results-directory}/CV.txt"
                 cvcf-results-filename="${results-directory}/CVCF.txt"
                 model-ids=""
@@ -546,7 +546,7 @@
                 selection-strategy="MODEL"
                 custom-ranking-set=""
                 validation-filename="${results-directory}/validation.txt"/>
-         <candidate-model-selections
+        <candidate-model-selections
                 cv-results-filename="${results-directory}/CV.txt"
                 cvcf-results-filename="${results-directory}/CVCF.txt"
                 model-ids=""
@@ -560,7 +560,82 @@
                 custom-ranking-set=""
                 validation-filename="${results-directory}/validation.txt"/>
     </target>
+    <target name="combine-stats-Wang-Upsala"
+            description="Combine statistics for best practices run" depends="compile">
+        <input addproperty="evaluation-data-directory"
+               message="Enter the directory where CV/CVCF/test results are stored."
+               defaultvalue="/Users/fac2003/IdeaProjects/bdval/data"/>
 
+        <delete file="${results-directory}/CV-CVCF-validation.txt"/>
+
+
+        <var name="results-directory" value="${evaluation-data-directory}/wang-uppsala-models"/>
+        <candidate-model-selections
+                cv-results-filename="${results-directory}/CV.txt"
+                cvcf-results-filename="${results-directory}/CVCF.txt"
+                model-ids=""
+                output-filename="-"
+                dump="--dump ${results-directory}/Wang-Upsala-CV-CVCF-validation.txt --model-conditions ${results-directory}/model-conditions-column.txt"
+                reward-performance="AUC"
+                rank-candidates-by="AUC"
+                selection-strategy="CV"
+                custom-ranking-set=""
+                validation-filename="${results-directory}/validation.txt"/>
+        <delete file="${results-directory}/ranks-Wang-Upsala-ALL-April20-2010.txt"/>
+        <candidate-model-selections
+                cv-results-filename="${results-directory}/CV.txt"
+                cvcf-results-filename="${results-directory}/CVCF.txt"
+                model-ids=""
+                output-filename="-"
+                rank-output-filename="${results-directory}/ranks-Wang-Upsala-ALL-April20-2010.txt"
+                dump=" --model-conditions ${results-directory}/model-conditions-column.txt --model-name TrainedMAQCIIBlindOnApril24_2010"
+                k="10000"
+                reward-performance="AUC"
+                rank-candidates-by="AUC"
+                selection-strategy="MODEL"
+                custom-ranking-set=""
+                validation-filename="${results-directory}/validation.txt"/>
+        <candidate-model-selections
+                cv-results-filename="${results-directory}/CV.txt"
+                cvcf-results-filename="${results-directory}/CVCF.txt"
+                model-ids=""
+                output-filename="-"
+                 rank-output-filename="${results-directory}/ranks-Wang-Upsala-ALL-April20-2010.txt"
+                dump=" --model-conditions ${results-directory}/model-conditions-column.txt"
+                k="10000"
+                reward-performance="AUC"
+                rank-candidates-by="AUC"
+                selection-strategy="CV"
+                custom-ranking-set=""
+                validation-filename="${results-directory}/validation.txt"/>
+        <delete file="${results-directory}/ranks-Wang-Upsala-ALL-2009.txt"/>
+        <candidate-model-selections
+                cv-results-filename="${results-directory}/CV.txt"
+                cvcf-results-filename="${results-directory}/CVCF.txt"
+                model-ids=""
+                output-filename="-"
+                rank-output-filename="${results-directory}/ranks-Wang-Upsala-ALL-2009.txt"
+                dump=" --model-conditions ${results-directory}/model-conditions-column.txt "
+                k="10000"
+                reward-performance="AUC"
+                rank-candidates-by="AUC"
+                selection-strategy="MODEL"
+                custom-ranking-set=""
+                validation-filename="${results-directory}/validation.txt"/>
+        <candidate-model-selections
+                cv-results-filename="${results-directory}/CV.txt"
+                cvcf-results-filename="${results-directory}/CVCF.txt"
+                model-ids=""
+                output-filename="-"
+                rank-output-filename="${results-directory}/ranks-Wang-Upsala-ALL-2009.txt"
+                dump=" --model-conditions ${results-directory}/model-conditions-column.txt"
+                k="10000"
+                reward-performance="AUC"
+                rank-candidates-by="AUC"
+                selection-strategy="CV"
+                custom-ranking-set=""
+                validation-filename="${results-directory}/validation.txt"/>
+    </target>
     <target name="combine-stats-best-practices"
             description="Combine statistics for best practices run" depends="compile">
         <input addproperty="evaluation-data-directory"
