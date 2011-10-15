@@ -117,8 +117,10 @@
     <!-- end of the endpoint definitions -->
 
     <import file="bdval.xml"/>
+    <import file="bdval-sge.xml"/>
 
-    <target name="evaluate" description="Run a complete evaluation." depends="prepare-bdval, rserve-status, tag-output-directory">
+    <target name="evaluate" description="Run a complete evaluation."
+            depends="prepare-bdval, rserve-status, tag-output-directory">
         <delete file="${statistics-output}"/>
 
         <echo message="Executing with ${num-threads} threads"/>
@@ -264,6 +266,58 @@
         </sequential>
         <antcall target="process-model-conditions"/>
         <antcall target="zip-results"/>
+    </target>
+    <target name="setup-sge-job" description="setup a sge job to run on a sge cluster">
+        <property name="sge-job-name" value="maqcii-Blind"/>
+        <property name="sge-job-tag" value="maqcii-Blind"/>
+        <property name="sge-job-description" value="BDVAL on a SGE cluster"/>
+
+        <!-- endpoints -->
+        <property name="do.HamnerWithControl" value="true"/>
+        <property name="do.Iconix" value="true"/>
+        <property name="do.NIEHS" value="true"/>
+        <property name="do.MDACC_PCR" value="true"/>
+        <property name="do.MDACC_ERPOS" value="true"/>
+        <property name="do.Cologne_OS_MO" value="true"/>
+        <property name="do.Cologne_EFS_MO" value="true"/>
+        <property name="do.UAMS_EFS_MO" value="true"/>
+        <property name="do.UAMS_OS_MO" value="true"/>
+        <property name="do.UAMS_CPR1" value="true"/>
+        <property name="do.UAMS_CPS1" value="true"/>
+        <property name="do.Cologne_NEP_R" value="true"/>
+        <property name="do.Cologne_NEP_S" value="true"/>
+        <property name="do.GSE8402_FusionYesNo" value="true"/>
+
+        <!-- change values to "true" below in order to run the condition listed -->
+        <property name="use-feature-selection-fold=true" value="true"/>
+        <property name="use-feature-selection-fold=false" value="true"/>
+
+        <property name="do.baseline" value="true"/>
+        <property name="do.naive-bayes" value="true"/>
+        <property name="do.logit-boost" value="true"/>
+        <property name="do.logistic" value="true"/>
+        <property name="do.random-forest" value="true"/>
+        <property name="do.k-star" value="true"/>
+        <property name="do.foldchange-genetic-algorithm" value="true"/>
+        <property name="do.foldchange-svmglobal" value="true"/>
+        <property name="do.foldchange-svmiterative" value="true"/>
+        <property name="do.full-genetic-algorithm" value="true"/>
+        <property name="do.genelist-genetic-algorithm" value="true"/>
+        <property name="do.genelist-svmglobal" value="true"/>
+        <property name="do.minmax-svmglobal" value="true"/>
+        <property name="do.pathways-ttest-svmglobal" value="true"/>
+        <property name="do.pathways.baseline" value="true"/>
+        <property name="do.svmiterative" value="true"/>
+        <property name="do.ttest-genetic-algorithm" value="true"/>
+        <property name="do.ttest-svmglobal" value="true"/>
+        <property name="do.ttest-svmiterative" value="true"/>
+
+        <!-- for purposes of setup we don't care where the save-data-dir is -->
+        <tempfile property="save-data-dir" destdir="${java.io.tmpdir}"/>
+
+        <setup-sge-job target="sge-job" job-name="${sge-job-name}"
+                       tag="${sge-job-tag}" tag-description="${sge-job-description}"
+                       number-of-threads="8" jvm-max-memory="16g" sge-max-memory="20g"/>
     </target>
 
     <target name="generate-list-final-models"
