@@ -326,4 +326,23 @@
         <generate-final-models-from-list
                 results-list="20080420-1649-results 20080423-0837-results 20080423-2226-results 20080423-2228-results 20080424-1910-results 20080425-0812-results 20080425-1413-results 20080426-0913-results 20080426-1358-results 20080427-1228-results 20080428-1151-results 20080429-1052-results 20080430-0911-results 20080430-1350-results"/>
     </target>
+
+    <!-- notice that this does exactly what "evaluate" followed by "generate-final-models" does -->
+    <target name="sge-job" depends="prepare-bdval, rserve-status, tag-output-directory"
+            description="Tasks to run on SGE cluster.  Properties are defined in the setup">
+        <delete file="${statistics-output}"/>
+        <echo message="Executing with ${num-threads} threads"/>
+        <execute-all-endpoints/>
+        <antcall target="process-model-conditions"/>
+        <if>
+            <available file="model-conditions.txt"/>
+            <then>
+                <antcall target="generate-final-models"/>
+            </then>
+            <else>
+                <echo level="warning" message="No final models created since no model-conditions were produced"/>
+            </else>
+        </if>
+        <antcall target="zip-results"/>
+    </target>
 </project>
