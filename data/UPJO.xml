@@ -272,8 +272,8 @@
         <antcall target="zip-results"/>
     </target>
     <target name="setup-sge-job" description="setup a sge job to run on a sge cluster">
-        <property name="sge-job-name" value="UPJO-job"/>
-        <property name="sge-job-tag" value="RUN1"/>
+        <property name="sge-job-name" value="UPJO-job3"/>
+        <property name="sge-job-tag" value="RUN3"/>
         <property name="sge-job-description" value="Running UPJO dataset"/>
 
         <!-- endpoints -->
