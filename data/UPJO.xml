@@ -105,7 +105,7 @@
     <!-- Normal targets (non-pathways) -->
 
     <!-- name following "do." must match the names in the corresponding properties file -->
-    <property name="do.UPJO_surgery" value="false"/>
+    <property name="do.UPJO_surgery" value="true"/>
     <property name="do.UPJO_no_surgery" value="false"/>
     <property name="do.UPJO_s_nos" value="true"/>
 
@@ -277,9 +277,9 @@
         <property name="sge-job-description" value="Running UPJO dataset"/>
 
         <!-- endpoints -->
-        <property name="do.UPJO_surgery" value="false"/>
+        <property name="do.UPJO_surgery" value="true"/>
         <property name="do.UPJO_no_surgery" value="false"/>
-        <property name="do.UPJO_s_nos" value="true"/>
+        <property name="do.UPJO_s_nos" value="false"/>
 
         <!-- change values to "true" below in order to run the condition listed -->
         <property name="use-feature-selection-fold=true" value="false"/>
@@ -290,9 +290,9 @@
         <property name="do.logit-boost" value="true"/>
         <property name="do.logistic" value="false"/>
         <property name="do.random-forest" value="true"/>
-        <property name="do.k-star" value="true"/>
+        <property name="do.k-star" value="false"/>
         <property name="do.foldchange-genetic-algorithm" value="false"/>
-        <property name="do.foldchange-svmglobal" value="false"/>
+        <property name="do.foldchange-svmglobal" value="true"/>
         <property name="do.foldchange-svmiterative" value="false"/>
         <property name="do.full-genetic-algorithm" value="false"/>
         <property name="do.genelist-genetic-algorithm" value="false"/>

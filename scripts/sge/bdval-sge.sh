@@ -3,6 +3,7 @@
 . /etc/profile
 
 # Run bdval job
+TMDIR=/scratchLocal/campagne
 cd $TMPDIR/@JOB-NAME@/data
 
 SGE_ANT_PROPERTY_FILE=../@JOB-NAME@-${SGE_TASK_ID}.properties

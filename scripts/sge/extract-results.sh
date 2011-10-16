@@ -45,6 +45,15 @@ OUTPUT_RESULTS_DIR=${OUTPUT_DATA_DIR}/results
 
 # extract all the features, models and predictions along with the model conditions
 /bin/mkdir -p ${OUTPUT_RESULTS_DIR}/features ${OUTPUT_RESULTS_DIR}/models ${OUTPUT_RESULTS_DIR}/predictions
+
+function createCombinedFile {
+NAME=$1
+if [ -z "$COMBINED_MAQC_STATS_OUTPUT" ]; then
+  COMBINED_MAQC_STATS_OUTPUT=${OUTPUT_BASE_DIR}/${NAME}-all-maqc-stats.tsv
+  echo >${COMBINED_MAQC_STATS_OUTPUT} "OrganizationCode	DatasetCode	EndpointCode	ExcelColumnHeader	MCC	Accuracy	Sensitivity	Specificity	AUC	RMSE	MCC_StdDev	Accuracy_StdDev	Sensitivity_StdDev	Specificity_StdDev	AUC_StdDev	RMSE_StdDev	SummaryNormalization	FeatureSelectionMethod	NumberOfFeatureUsed	ClassificationAlgorithm	BatchEffectRemovalMethod	InternalValidation	ValidationIterations	ModelId	Model-Series-Id	Label	combinedPerformance	prec	prec_StdDev	rec	rec_StdDev	F-1	F-1_StdDev	MCC	MCC_StdDev	binary-auc	binary-auc_StdDev"
+fi
+}
+
 for ZIPFILE in ${RESULTS_DIR}/*.zip; do
     echo Processing ${ZIPFILE}
 
@@ -53,6 +62,8 @@ for ZIPFILE in ${RESULTS_DIR}/*.zip; do
 
     # get the basedir of the zip contents (everything before the last "-")
     NAME=${FILE%-*}
+
+    createCombinedFile $NAME
 
     # get the run number (everything after the last "-")
     RUN=${FILE##*-}
@@ -84,6 +95,10 @@ for ZIPFILE in ${RESULTS_DIR}/*.zip; do
             /bin/rmdir ${OUTPUT_RESULTS_DIR}/${NAME}/${RESULT}
         done
         /bin/rmdir ${OUTPUT_RESULTS_DIR}/${NAME}
+
+        # Extract the maqc stats file
+        /usr/bin/unzip -p ${ZIPFILE} ${NAME}/${NAME}-all-maqcii-submission.txt > ${OUTPUT_RESULTS_DIR}/${NAME}-${RUN}-maqcii-submission.txt
+        grep -v OrganizationCode ${OUTPUT_RESULTS_DIR}/${NAME}-${RUN}-maqcii-submission.txt >> ${COMBINED_MAQC_STATS_OUTPUT}
 
         # extract the model conditions (replacing the temporary paths used for SGE)
         /usr/bin/unzip -p ${ZIPFILE} ${NAME}/${NAME}-README.txt > ${OUTPUT_RESULTS_DIR}/${NAME}-${RUN}-README.txt
