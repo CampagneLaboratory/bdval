@@ -281,9 +281,12 @@ All endpoints to be run should be listed here by their symbol, separated by a sp
         <property name="sge-job-description" value="Running UPJO dataset"/>
 
         <!-- endpoints -->
-        <property name="do.UPJO_surgery" value="true"/>
+        <property name="do.UPJO_surgery" value="false"/>
         <property name="do.UPJO_no_surgery" value="false"/>
         <property name="do.UPJO_s_nos" value="false"/>
+
+        <property name="do.UPJO-independent_surgery" value="true"/>
+        <property name="do.UPJO-independent_no_surgery" value="true"/>
 
         <!-- change values to "true" below in order to run the condition listed -->
         <property name="use-feature-selection-fold=true" value="false"/>
