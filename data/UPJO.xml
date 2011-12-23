@@ -105,15 +105,19 @@
     <!-- Normal targets (non-pathways) -->
 
     <!-- name following "do." must match the names in the corresponding properties file -->
-    <property name="do.UPJO_surgery" value="true"/>
+    <property name="do.UPJO_surgery" value="false"/>
     <property name="do.UPJO_no_surgery" value="false"/>
-    <property name="do.UPJO_s_nos" value="true"/>
+    <property name="do.UPJO_s_nos" value="false"/>
+
+    <property name="do.UPJO-independent_surgery" value="true"/>
+    <property name="do.UPJO-independent_no_surgery" value="true"/>
+
 
     <!-- CONFIGURE THIS
-         All endpoints to be run should be listed here by their symbol, separated by a space -->
+All endpoints to be run should be listed here by their symbol, separated by a space -->
     <!-- note that the "do." is NOT listed here, only the endpoint symbol.
          The symbol used must match an endpoint symbol defined in the project properties file. -->
-    <property name="all-endpoints" value="UPJO_surgery UPJO_no_surgery UPJO_s_nos"/>
+    <property name="all-endpoints" value="UPJO_surgery UPJO_no_surgery UPJO_s_nos UPJO-independent_surgery UPJO-independent_no_surgery"/>
 
 
     <!--<property name="all-endpoints" value="<endpoint-symbol1> <endpoint-symbol2> <endpoint-symbol3>"/>-->
@@ -310,7 +314,7 @@
 
         <setup-sge-job target="sge-job" job-name="${sge-job-name}"
                        tag="${sge-job-tag}" tag-description="${sge-job-description}"
-                       number-of-threads="8" jvm-max-memory="16g" sge-max-memory="20g"/>
+                       number-of-threads="14" jvm-max-memory="26g" sge-max-memory="30g"/>
     </target>
     <target name="generate-list-final-models"
             description="Calculate feature consensus across multiple feature selection strategies and generate models with consensus features on the whole training set.">
