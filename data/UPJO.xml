@@ -27,9 +27,9 @@
     <property name="internal-CV-repeats" value="--cv-repeats 5"/>
     <property name="internal-CV-folds" value="3"/>
 
-    <property name="external-CV-repeats-number" value="50"/>
+    <property name="external-CV-repeats-number" value="20"/>
     <property name="external-CV-repeats" value="--cv-repeats ${external-CV-repeats-number} "/>
-    <property name="external-CV-folds" value="10"/>
+    <property name="external-CV-folds" value="5"/>
 
     <!-- CONFIGURE THIS-->
 
@@ -38,6 +38,7 @@
          or integers separated by commas. When it is a list, models are generated with each
          number of feature indicated.
     -->
+
     <property name="num-features" value="5,10,15,20,25,30"/>
 
     <!--
@@ -117,7 +118,7 @@
 All endpoints to be run should be listed here by their symbol, separated by a space -->
     <!-- note that the "do." is NOT listed here, only the endpoint symbol.
          The symbol used must match an endpoint symbol defined in the project properties file. -->
-    <property name="all-endpoints" value="UPJO_surgery UPJO_no_surgery UPJO_s_nos UPJO-independent_surgery UPJO-independent_no_surgery"/>
+    <property name="all-endpoints" value="UPJO-independent_surgery UPJO-independent_no_surgery"/>
 
 
     <!--<property name="all-endpoints" value="<endpoint-symbol1> <endpoint-symbol2> <endpoint-symbol3>"/>-->
@@ -130,6 +131,9 @@ All endpoints to be run should be listed here by their symbol, separated by a sp
     <target name="evaluate" description="Run a complete evaluation."
             depends="prepare-bdval, rserve-status, tag-output-directory">
         <delete file="${statistics-output}"/>
+
+        <property name="do.UPJO-independent_surgery" value="true"/>
+        <property name="do.UPJO-independent_no_surgery" value="true"/>
 
         <echo message="Executing with ${num-threads} threads"/>
         <sequential>
@@ -146,7 +150,7 @@ All endpoints to be run should be listed here by their symbol, separated by a sp
             <property name="do.whole-chip" value="false"/>
             <property name="do.baseline-tune-C" value="false"/>
             <property name="do.foldchange-genetic-algorithm" value="false"/>
-            <property name="do.foldchange-svmglobal" value="true"/>
+            <property name="do.foldchange-svmglobal" value="false"/>
             <property name="do.foldchange-svmiterative" value="false"/>
             <property name="do.full-genetic-algorithm" value="false"/>
             <property name="do.genelist-genetic-algorithm" value="false"/>
