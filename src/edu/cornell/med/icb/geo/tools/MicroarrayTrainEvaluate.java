@@ -23,19 +23,7 @@ import cern.jet.random.engine.RandomEngine;
 import edu.cornell.med.icb.learning.tools.svmlight.EvaluationMeasure;
 import edu.cornell.med.icb.learning.tools.svmlight.SVMLightDriver;
 import edu.cornell.med.icb.tissueinfo.similarity.clustering.Cluster;
-import edu.mssm.crover.tables.ArrayTable;
-import edu.mssm.crover.tables.ColumnTypeException;
-import edu.mssm.crover.tables.DefineColumnFromRow;
-import edu.mssm.crover.tables.IdentifierSetRowFilter;
-import edu.mssm.crover.tables.InvalidColumnException;
-import edu.mssm.crover.tables.RowFilter;
-import edu.mssm.crover.tables.RowFloorAdjustmentCalculator;
-import edu.mssm.crover.tables.RowOffsetCalculator;
-import edu.mssm.crover.tables.RowSumCalculator;
-import edu.mssm.crover.tables.ScalingRowProcessor;
-import edu.mssm.crover.tables.SumOfSquaresCalculatorRowProcessor;
-import edu.mssm.crover.tables.Table;
-import edu.mssm.crover.tables.TypeMismatchException;
+import edu.mssm.crover.tables.*;
 import edu.mssm.crover.tables.readers.ColumbiaTmmReader;
 import edu.mssm.crover.tables.readers.GeoDataSetReader;
 import edu.mssm.crover.tables.readers.SyntaxErrorException;
@@ -46,28 +34,13 @@ import edu.mssm.crover.tables.writers.SVMLightWriter;
 import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
 import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectList;
-import org.apache.commons.cli.BasicParser;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import org.apache.commons.cli.*;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.Vector;
+import java.util.*;
 
 
 /**
@@ -309,7 +282,6 @@ public class MicroarrayTrainEvaluate {
             }
 
 
-
             System.out.println("Will do " + countShuffleLabelTests + " shuffling runs");
             final File outputFile = new File(line.getOptionValue("o"));
             final boolean outputFilePreexist = outputFile.exists();
@@ -374,17 +346,18 @@ public class MicroarrayTrainEvaluate {
 
     public static ClassificationTask[] readTasksAndConditions(final String taskListFilename,
                                                               final String conditionIdsFilename) throws IOException {
-       return ClassificationTask.parseTaskAndConditions(taskListFilename, conditionIdsFilename);
+        return ClassificationTask.parseTaskAndConditions(taskListFilename, conditionIdsFilename);
     }
 
     /**
      * Read a cids/ conditions file.
+     *
      * @param conditionIdsFilename
      * @return
      * @throws IOException
      */
     public static ConditionIdentifiers readConditions(final String conditionIdsFilename) throws IOException {
-      return ClassificationTask.readConditions(conditionIdsFilename);
+        return ClassificationTask.readConditions(conditionIdsFilename);
     }
 
 
@@ -494,10 +467,18 @@ public class MicroarrayTrainEvaluate {
                                  final boolean shuffling)
             throws ColumnTypeException, TypeMismatchException, InvalidColumnException, IOException {
 
-        final Table result = filterColumnsForTask(source, labelValueGroups, IDENTIFIER_COLUMN_NAME);
+        final Table result = filterColumnsForTask(source, labelValueGroups, IDENTIFIER_COLUMN_NAME, getAllSamples(labelValueGroups));
 
         return processTaskSpecificTable(result, labelValueGroups, geneList, shuffling);
 
+    }
+
+    private Set<String> getAllSamples(List<Set<String>> labelValueGroups) {
+        ObjectOpenHashSet<String> samples = new ObjectOpenHashSet<String>();
+        for (Set<String> list : labelValueGroups) {
+            samples.addAll(list);
+        }
+        return samples;
     }
 
     private OneRunResult processTaskSpecificTable(final Table result, final List<Set<String>> labelValueGroups,
@@ -709,7 +690,7 @@ public class MicroarrayTrainEvaluate {
     }
 
     public static Table filterColumnsForTask(final Table source, final List<Set<String>> labelValueGroups,
-                                             final String identifierColumnName)
+                                             final String identifierColumnName, Set<String> reduction)
             throws TypeMismatchException, InvalidColumnException {
         final Table result = source.copy();
 
@@ -721,6 +702,10 @@ public class MicroarrayTrainEvaluate {
         }
 
         keepSet.add(identifierColumnName);
+        // keep only those samples also in reduction:
+        reduction.add(identifierColumnName);
+        keepSet.retainAll(reduction);
+
         filterColumns(result, keepSet);
         return result;
     }

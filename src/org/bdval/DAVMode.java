@@ -19,68 +19,22 @@
 package org.bdval;
 
 import cern.jet.random.engine.MersenneTwister;
-import com.martiansoftware.jsap.FlaggedOption;
-import com.martiansoftware.jsap.JSAP;
-import com.martiansoftware.jsap.JSAPException;
-import com.martiansoftware.jsap.JSAPResult;
-import com.martiansoftware.jsap.Parameter;
-import com.martiansoftware.jsap.Switch;
+import com.martiansoftware.jsap.*;
 import edu.cornell.med.icb.R.RConnectionPool;
 import edu.cornell.med.icb.R.RUtils;
 import edu.cornell.med.icb.cli.UseModality;
-import edu.cornell.med.icb.geo.AffymetrixSampleData;
-import edu.cornell.med.icb.geo.DefaultSignalAdapter;
-import edu.cornell.med.icb.geo.GEOPlatformIndexed;
-import edu.cornell.med.icb.geo.GeoSoftFamilyParser;
-import edu.cornell.med.icb.geo.SampleDataCallback;
-import edu.cornell.med.icb.geo.tools.ClassificationTask;
-import edu.cornell.med.icb.geo.tools.ConditionIdentifiers;
-import edu.cornell.med.icb.geo.tools.DummyPlatform;
-import edu.cornell.med.icb.geo.tools.FileGeneList;
-import edu.cornell.med.icb.geo.tools.FullGeneList;
-import edu.cornell.med.icb.geo.tools.GEOPlatform;
-import edu.cornell.med.icb.geo.tools.GeneList;
-import edu.cornell.med.icb.geo.tools.MicroarrayTrainEvaluate;
+import edu.cornell.med.icb.geo.*;
+import edu.cornell.med.icb.geo.tools.*;
 import edu.cornell.med.icb.identifier.DoubleIndexedIdentifier;
 import edu.cornell.med.icb.identifier.IndexedIdentifier;
-import edu.cornell.med.icb.learning.ClassificationHelper;
-import edu.cornell.med.icb.learning.ClassificationProblem;
-import edu.cornell.med.icb.learning.Classifier;
-import edu.cornell.med.icb.learning.FeatureScaler;
-import edu.cornell.med.icb.learning.FeatureTableScaler;
-import edu.cornell.med.icb.learning.LoadClassificationProblem;
-import edu.cornell.med.icb.learning.MinMaxScalingRowProcessor;
-import edu.cornell.med.icb.learning.PercentileScalingRowProcessor;
+import edu.cornell.med.icb.learning.*;
 import edu.cornell.med.icb.learning.libsvm.LibSvmClassifier;
-import edu.mssm.crover.tables.AcceptAllRowFilter;
-import edu.mssm.crover.tables.ArrayTable;
-import edu.mssm.crover.tables.ColumnTypeException;
-import edu.mssm.crover.tables.DefineColumnFromRow;
-import edu.mssm.crover.tables.IdentifierSetRowFilter;
-import edu.mssm.crover.tables.InvalidColumnException;
-import edu.mssm.crover.tables.KeepSubSetColumnFilter;
-import edu.mssm.crover.tables.RowFilter;
-import edu.mssm.crover.tables.RowFloorAdjustmentCalculator;
-import edu.mssm.crover.tables.SumOfSquaresCalculatorRowProcessor;
-import edu.mssm.crover.tables.Table;
-import edu.mssm.crover.tables.TypeMismatchException;
-import edu.mssm.crover.tables.readers.CologneReader;
-import edu.mssm.crover.tables.readers.ColumbiaTmmReader;
-import edu.mssm.crover.tables.readers.GeoDataSetReader;
-import edu.mssm.crover.tables.readers.IconixReader;
-import edu.mssm.crover.tables.readers.SyntaxErrorException;
-import edu.mssm.crover.tables.readers.TableReader;
-import edu.mssm.crover.tables.readers.UnsupportedFormatException;
-import edu.mssm.crover.tables.readers.WhiteheadResReader;
+import edu.mssm.crover.tables.*;
+import edu.mssm.crover.tables.readers.*;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.ints.IntSet;
-import it.unimi.dsi.fastutil.objects.Object2DoubleLinkedOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import it.unimi.dsi.fastutil.objects.ObjectArraySet;
-import it.unimi.dsi.fastutil.objects.ObjectList;
-import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import it.unimi.dsi.fastutil.objects.ObjectSet;
+import it.unimi.dsi.fastutil.objects.*;
 import it.unimi.dsi.io.FastBufferedReader;
 import it.unimi.dsi.io.LineIterator;
 import it.unimi.dsi.lang.MutableString;
@@ -99,22 +53,8 @@ import org.bdval.pathways.PCAFeatureAggregator;
 import org.bdval.pathways.PathwayFeatureAggregator;
 import org.bdval.pathways.PathwayInfo;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.io.Reader;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
-import java.util.Vector;
+import java.io.*;
+import java.util.*;
 import java.util.zip.GZIPInputStream;
 
 /**
@@ -843,7 +783,7 @@ public class DAVMode extends UseModality<DAVOptions> {
         }
     }
 
-    protected synchronized void  setupInput(final JSAPResult result, final DAVOptions options) {
+    protected synchronized void setupInput(final JSAPResult result, final DAVOptions options) {
         options.input = result.getString("input");
         if (isTableCacheEnabled) {
             assert tableCache != null : "TableCache must be initialized.";
@@ -1002,9 +942,12 @@ public class DAVMode extends UseModality<DAVOptions> {
                                                  final SplitPlan splitPlan,
                                                  final int splitId,
                                                  final String splitType) {
+        ConditionIdentifiers conditionsIdentifiers = task.getConditionsIdentifiers();
         final Set<String> samplesForClass0 =
-                task.getConditionsIdentifiers().getLabelGroup(task.getFirstConditionName());
-        samplesForClass0.retainAll(splitPlan.getSampleIds(splitId, splitType));
+                conditionsIdentifiers.getLabelGroup(task.getFirstConditionName());
+
+        ObjectSet<String> splitPlanSamples = splitPlan.getSampleIds(splitId, splitType);
+        samplesForClass0.retainAll(splitPlanSamples);
         if (samplesForClass0.size() == 0) {
             throw new IllegalArgumentException("Condition 0 (" + task.getFirstConditionName()
                     + ") must have some samples.");
@@ -1014,9 +957,8 @@ public class DAVMode extends UseModality<DAVOptions> {
             cids.addIdentifier(task.getFirstConditionName().intern(), negativeSample);
         }
 
-        final Set<String> samplesForClass1 =
-                task.getConditionsIdentifiers().getLabelGroup(task.getSecondConditionName());
-        samplesForClass1.retainAll(splitPlan.getSampleIds(splitId, splitType));
+        final Set<String> samplesForClass1 = conditionsIdentifiers.getLabelGroup(task.getSecondConditionName());
+        samplesForClass1.retainAll(splitPlanSamples);
         if (samplesForClass1.size() == 0) {
             throw new IllegalArgumentException("Condition 1 (" + task.getSecondConditionName()
                     + ") must have some samples.");
@@ -1025,7 +967,7 @@ public class DAVMode extends UseModality<DAVOptions> {
         for (final String positiveSample : samplesForClass1) {
             cids.addIdentifier(task.getSecondConditionName().intern(), positiveSample);
         }
-        task.setConditionsIdentifiers(cids);
+       task.setConditionsIdentifiers(cids);
         task.setNumberSamplesFirstCondition(samplesForClass0.size());
         task.setNumberSamplesSecondCondition(samplesForClass1.size());
         return task;
@@ -1297,8 +1239,9 @@ public class DAVMode extends UseModality<DAVOptions> {
      */
     public Table filterInputTable(final Table inputTable, final List<Set<String>> labelValueGroups) {
         try {
+            Set<String> reduction=splitPlan.getSampleIds(splitId, splitType);
             return MicroarrayTrainEvaluate.filterColumnsForTask(inputTable,
-                    labelValueGroups, MicroarrayTrainEvaluate.IDENTIFIER_COLUMN_NAME);
+                    labelValueGroups, MicroarrayTrainEvaluate.IDENTIFIER_COLUMN_NAME,reduction);
         } catch (TypeMismatchException e) {
             LOG.error(e);
             return null;
@@ -1384,6 +1327,7 @@ public class DAVMode extends UseModality<DAVOptions> {
             rebuildTrainingPlatform(options, table);
         } else {
             int idColumnIndex = 0;
+
             final Table taskSpecificTable = predictOnly ? inputTable : filterInputTable(inputTable, labelValueGroups);
 
             try {

@@ -18,6 +18,9 @@
 
 package edu.cornell.med.icb.geo.tools;
 
+import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -28,11 +31,16 @@ import java.util.Set;
  */
 public class ConditionIdentifiers {
 
-    private final Map<String, Set<String>> conditionToIdentifiers;
+    private final Object2ObjectMap<String, Set<String>> conditionToIdentifiers;
 
     public ConditionIdentifiers() {
         super();
-        conditionToIdentifiers = new HashMap<String, Set<String>>();
+        conditionToIdentifiers = new Object2ObjectArrayMap<String, Set<String>> ();
+    }
+
+    @Override
+    public String toString() {
+        return "cids= "+conditionToIdentifiers.toString();
     }
 
     public void addIdentifier(final String condition, final String identifier) {
@@ -41,7 +49,7 @@ public class ConditionIdentifiers {
         if (idGroup == null) {
             idGroup = new HashSet<String>();
         }
-        idGroup.add(identifier);
+        idGroup.add(identifier.intern());
         conditionToIdentifiers.put(internedCondition, idGroup);
     }
 
@@ -66,5 +74,17 @@ public class ConditionIdentifiers {
             }
         }
         return null;
+    }
+
+    /**
+     * Return the number of samples represented in this cids object.
+     * @return
+     */
+    public int size() {
+        int size=0;
+        for (Set<String> val: conditionToIdentifiers.values()) {
+            size+=val.size();
+        }
+        return size;
     }
 }
