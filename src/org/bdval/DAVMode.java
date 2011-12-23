@@ -967,7 +967,7 @@ public class DAVMode extends UseModality<DAVOptions> {
         for (final String positiveSample : samplesForClass1) {
             cids.addIdentifier(task.getSecondConditionName().intern(), positiveSample);
         }
-       task.setConditionsIdentifiers(cids);
+        task.setConditionsIdentifiers(cids);
         task.setNumberSamplesFirstCondition(samplesForClass0.size());
         task.setNumberSamplesSecondCondition(samplesForClass1.size());
         return task;
@@ -1239,15 +1239,23 @@ public class DAVMode extends UseModality<DAVOptions> {
      */
     public Table filterInputTable(final Table inputTable, final List<Set<String>> labelValueGroups) {
         try {
-            Set<String> reduction=splitPlan.getSampleIds(splitId, splitType);
+            Set<String> reduction = getReduction(labelValueGroups);
             return MicroarrayTrainEvaluate.filterColumnsForTask(inputTable,
-                    labelValueGroups, MicroarrayTrainEvaluate.IDENTIFIER_COLUMN_NAME,reduction);
+                    labelValueGroups, MicroarrayTrainEvaluate.IDENTIFIER_COLUMN_NAME, reduction);
         } catch (TypeMismatchException e) {
             LOG.error(e);
             return null;
         } catch (InvalidColumnException e) {
             LOG.error(e);
             return null;
+        }
+    }
+
+    private Set<String> getReduction(List<Set<String>> labelValueGroups) {
+        if (splitPlan == null) {
+            return MicroarrayTrainEvaluate.getAllSamples(labelValueGroups);
+        } else {
+            return splitPlan.getSampleIds(splitId, splitType);
         }
     }
 

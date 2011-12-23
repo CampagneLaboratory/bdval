@@ -473,7 +473,7 @@ public class MicroarrayTrainEvaluate {
 
     }
 
-    private Set<String> getAllSamples(List<Set<String>> labelValueGroups) {
+    public static Set<String> getAllSamples(List<Set<String>> labelValueGroups) {
         ObjectOpenHashSet<String> samples = new ObjectOpenHashSet<String>();
         for (Set<String> list : labelValueGroups) {
             samples.addAll(list);
