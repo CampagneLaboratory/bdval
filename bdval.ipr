@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project relativePaths="true" version="4">
+<project version="4">
   <component name="AntConfiguration">
     <defaultAnt bundledAnt="true" />
     <buildFile url="file://$PROJECT_DIR$/build.xml">
@@ -9,8 +9,6 @@
       <maximumHeapSize value="128" />
       <maximumStackSize value="32" />
       <properties />
-      <executeOn event="beforeRun" target="compile" />
-      <executeOn event="beforeRun" target="compile-tests" runConfigurationType="JUnit" runConfigurationName="TestShortHash.testShortHash" />
     </buildFile>
     <buildFile url="file://$PROJECT_DIR$/data/prostate-example.xml">
       <additionalClassPath />
@@ -49,6 +47,9 @@
       </map>
     </option>
   </component>
+  <component name="ClearCaseSharedConfig">
+    <option name="myUseUcmModel" value="true" />
+  </component>
   <component name="CodeStyleSettingsManager">
     <option name="PER_PROJECT_SETTINGS">
       <value>
@@ -60,6 +61,7 @@
           <option name="SMART_TABS" value="false" />
           <option name="LABEL_INDENT_SIZE" value="0" />
           <option name="LABEL_INDENT_ABSOLUTE" value="false" />
+          <option name="USE_RELATIVE_INDENTS" value="false" />
         </ADDITIONAL_INDENT_OPTIONS>
         <ADDITIONAL_INDENT_OPTIONS fileType="gsp">
           <option name="INDENT_SIZE" value="2" />
@@ -69,6 +71,7 @@
           <option name="SMART_TABS" value="false" />
           <option name="LABEL_INDENT_SIZE" value="0" />
           <option name="LABEL_INDENT_ABSOLUTE" value="false" />
+          <option name="USE_RELATIVE_INDENTS" value="false" />
         </ADDITIONAL_INDENT_OPTIONS>
         <ADDITIONAL_INDENT_OPTIONS fileType="java">
           <option name="INDENT_SIZE" value="4" />
@@ -78,6 +81,7 @@
           <option name="SMART_TABS" value="false" />
           <option name="LABEL_INDENT_SIZE" value="0" />
           <option name="LABEL_INDENT_ABSOLUTE" value="false" />
+          <option name="USE_RELATIVE_INDENTS" value="false" />
         </ADDITIONAL_INDENT_OPTIONS>
         <ADDITIONAL_INDENT_OPTIONS fileType="js">
           <option name="INDENT_SIZE" value="4" />
@@ -87,6 +91,7 @@
           <option name="SMART_TABS" value="false" />
           <option name="LABEL_INDENT_SIZE" value="0" />
           <option name="LABEL_INDENT_ABSOLUTE" value="false" />
+          <option name="USE_RELATIVE_INDENTS" value="false" />
         </ADDITIONAL_INDENT_OPTIONS>
         <ADDITIONAL_INDENT_OPTIONS fileType="jsp">
           <option name="INDENT_SIZE" value="4" />
@@ -96,6 +101,7 @@
           <option name="SMART_TABS" value="false" />
           <option name="LABEL_INDENT_SIZE" value="0" />
           <option name="LABEL_INDENT_ABSOLUTE" value="false" />
+          <option name="USE_RELATIVE_INDENTS" value="false" />
         </ADDITIONAL_INDENT_OPTIONS>
         <ADDITIONAL_INDENT_OPTIONS fileType="sql">
           <option name="INDENT_SIZE" value="2" />
@@ -105,6 +111,7 @@
           <option name="SMART_TABS" value="false" />
           <option name="LABEL_INDENT_SIZE" value="0" />
           <option name="LABEL_INDENT_ABSOLUTE" value="false" />
+          <option name="USE_RELATIVE_INDENTS" value="false" />
         </ADDITIONAL_INDENT_OPTIONS>
         <ADDITIONAL_INDENT_OPTIONS fileType="xml">
           <option name="INDENT_SIZE" value="4" />
@@ -114,14 +121,13 @@
           <option name="SMART_TABS" value="false" />
           <option name="LABEL_INDENT_SIZE" value="0" />
           <option name="LABEL_INDENT_ABSOLUTE" value="false" />
+          <option name="USE_RELATIVE_INDENTS" value="false" />
         </ADDITIONAL_INDENT_OPTIONS>
       </value>
     </option>
-    <option name="USE_PER_PROJECT_SETTINGS" value="false" />
   </component>
   <component name="CompilerConfiguration">
     <option name="DEFAULT_COMPILER" value="Javac" />
-    <option name="DEPLOY_AFTER_MAKE" value="0" />
     <resourceExtensions>
       <entry name=".+\.(properties|xml|html|dtd|tld)" />
       <entry name=".+\.(gif|png|jpeg|jpg)" />
@@ -138,6 +144,7 @@
       <entry name="?*.tld" />
       <entry name="?*.ftl" />
     </wildcardResourcePatterns>
+    <annotationProcessing enabled="false" useClasspath="true" />
   </component>
   <component name="CopyrightManager" default="">
     <module2copyright />
@@ -158,18 +165,6 @@
     <entry_points version="2.0" />
   </component>
   <component name="IdProvider" IDEtalkID="55623098D969EB9BDFE831B72B4F208A" />
-  <component name="InspectionProjectProfileManager">
-    <option name="PROJECT_PROFILE" value="Project Default" />
-    <option name="USE_PROJECT_LEVEL_SETTINGS" value="false" />
-    <scopes />
-    <profiles>
-      <profile version="1.0" is_locked="false">
-        <option name="myName" value="Project Default" />
-        <option name="myLocal" value="false" />
-      </profile>
-    </profiles>
-    <list size="0" />
-  </component>
   <component name="JavacSettings">
     <option name="DEBUGGING_INFO" value="true" />
     <option name="GENERATE_NO_WARNINGS" value="false" />
@@ -201,9 +196,6 @@
     <option name="GENERATE_NO_WARNINGS" value="false" />
     <option name="IS_EMACS_ERRORS_MODE" value="true" />
     <option name="ADDITIONAL_OPTIONS_STRING" value="" />
-  </component>
-  <component name="MavenRunner">
-    <option name="jreName" value="#JAVA_INTERNAL" />
   </component>
   <component name="Palette2">
     <group name="Swing">
@@ -329,9 +321,8 @@
   <component name="ProjectDetails">
     <option name="projectName" value="bdval" />
   </component>
-  <component name="ProjectFileVersion" converted="true" />
   <component name="ProjectKey">
-    <option name="state" value="https://pbtech-vc.med.cornell.edu/public/svn/icb/trunk/bdval/bdval.ipr" />
+    <option name="state" value="https://pbtech-vc.med.cornell.edu/public/svn/icb/trunk/bdval" />
   </component>
   <component name="ProjectModuleManager">
     <modules>
@@ -361,6 +352,45 @@
         <entry key="$PROJECT_DIR$">
           <value>
             <SvnBranchConfiguration>
+              <option name="branchMap">
+                <map>
+                  <entry key="https://pbtech-vc.med.cornell.edu/public/svn/icb/3rdparty">
+                    <value>
+                      <list />
+                    </value>
+                  </entry>
+                  <entry key="https://pbtech-vc.med.cornell.edu/public/svn/icb/branches">
+                    <value>
+                      <list />
+                    </value>
+                  </entry>
+                  <entry key="https://pbtech-vc.med.cornell.edu/public/svn/icb/buildsupport">
+                    <value>
+                      <list />
+                    </value>
+                  </entry>
+                  <entry key="https://pbtech-vc.med.cornell.edu/public/svn/icb/data">
+                    <value>
+                      <list />
+                    </value>
+                  </entry>
+                  <entry key="https://pbtech-vc.med.cornell.edu/public/svn/icb/scripts">
+                    <value>
+                      <list />
+                    </value>
+                  </entry>
+                  <entry key="https://pbtech-vc.med.cornell.edu/public/svn/icb/tags">
+                    <value>
+                      <list />
+                    </value>
+                  </entry>
+                  <entry key="https://pbtech-vc.med.cornell.edu/public/svn/icb/testsupport">
+                    <value>
+                      <list />
+                    </value>
+                  </entry>
+                </map>
+              </option>
               <option name="branchUrls">
                 <list>
                   <option value="https://pbtech-vc.med.cornell.edu/public/svn/icb/3rdparty" />
@@ -386,6 +416,45 @@
         <entry key="$PROJECT_DIR$/config">
           <value>
             <SvnBranchConfiguration>
+              <option name="branchMap">
+                <map>
+                  <entry key="https://pbtech-vc.med.cornell.edu/public/svn/icb/3rdparty">
+                    <value>
+                      <list />
+                    </value>
+                  </entry>
+                  <entry key="https://pbtech-vc.med.cornell.edu/public/svn/icb/branches">
+                    <value>
+                      <list />
+                    </value>
+                  </entry>
+                  <entry key="https://pbtech-vc.med.cornell.edu/public/svn/icb/buildsupport">
+                    <value>
+                      <list />
+                    </value>
+                  </entry>
+                  <entry key="https://pbtech-vc.med.cornell.edu/public/svn/icb/data">
+                    <value>
+                      <list />
+                    </value>
+                  </entry>
+                  <entry key="https://pbtech-vc.med.cornell.edu/public/svn/icb/scripts">
+                    <value>
+                      <list />
+                    </value>
+                  </entry>
+                  <entry key="https://pbtech-vc.med.cornell.edu/public/svn/icb/tags">
+                    <value>
+                      <list />
+                    </value>
+                  </entry>
+                  <entry key="https://pbtech-vc.med.cornell.edu/public/svn/icb/testsupport">
+                    <value>
+                      <list />
+                    </value>
+                  </entry>
+                </map>
+              </option>
               <option name="branchUrls">
                 <list>
                   <option value="https://pbtech-vc.med.cornell.edu/public/svn/icb/3rdparty" />
@@ -404,6 +473,45 @@
         <entry key="$PROJECT_DIR$/lib">
           <value>
             <SvnBranchConfiguration>
+              <option name="branchMap">
+                <map>
+                  <entry key="https://pbtech-vc.med.cornell.edu/public/svn/icb/3rdparty">
+                    <value>
+                      <list />
+                    </value>
+                  </entry>
+                  <entry key="https://pbtech-vc.med.cornell.edu/public/svn/icb/branches">
+                    <value>
+                      <list />
+                    </value>
+                  </entry>
+                  <entry key="https://pbtech-vc.med.cornell.edu/public/svn/icb/buildsupport">
+                    <value>
+                      <list />
+                    </value>
+                  </entry>
+                  <entry key="https://pbtech-vc.med.cornell.edu/public/svn/icb/data">
+                    <value>
+                      <list />
+                    </value>
+                  </entry>
+                  <entry key="https://pbtech-vc.med.cornell.edu/public/svn/icb/scripts">
+                    <value>
+                      <list />
+                    </value>
+                  </entry>
+                  <entry key="https://pbtech-vc.med.cornell.edu/public/svn/icb/tags">
+                    <value>
+                      <list />
+                    </value>
+                  </entry>
+                  <entry key="https://pbtech-vc.med.cornell.edu/public/svn/icb/testsupport">
+                    <value>
+                      <list />
+                    </value>
+                  </entry>
+                </map>
+              </option>
               <option name="branchUrls">
                 <list>
                   <option value="https://pbtech-vc.med.cornell.edu/public/svn/icb/3rdparty" />
@@ -422,6 +530,45 @@
         <entry key="$PROJECT_DIR$/src">
           <value>
             <SvnBranchConfiguration>
+              <option name="branchMap">
+                <map>
+                  <entry key="https://pbtech-vc.med.cornell.edu/public/svn/icb/3rdparty">
+                    <value>
+                      <list />
+                    </value>
+                  </entry>
+                  <entry key="https://pbtech-vc.med.cornell.edu/public/svn/icb/branches">
+                    <value>
+                      <list />
+                    </value>
+                  </entry>
+                  <entry key="https://pbtech-vc.med.cornell.edu/public/svn/icb/buildsupport">
+                    <value>
+                      <list />
+                    </value>
+                  </entry>
+                  <entry key="https://pbtech-vc.med.cornell.edu/public/svn/icb/data">
+                    <value>
+                      <list />
+                    </value>
+                  </entry>
+                  <entry key="https://pbtech-vc.med.cornell.edu/public/svn/icb/scripts">
+                    <value>
+                      <list />
+                    </value>
+                  </entry>
+                  <entry key="https://pbtech-vc.med.cornell.edu/public/svn/icb/tags">
+                    <value>
+                      <list />
+                    </value>
+                  </entry>
+                  <entry key="https://pbtech-vc.med.cornell.edu/public/svn/icb/testsupport">
+                    <value>
+                      <list />
+                    </value>
+                  </entry>
+                </map>
+              </option>
               <option name="branchUrls">
                 <list>
                   <option value="https://pbtech-vc.med.cornell.edu/public/svn/icb/3rdparty" />
@@ -440,6 +587,45 @@
         <entry key="$PROJECT_DIR$/test-src">
           <value>
             <SvnBranchConfiguration>
+              <option name="branchMap">
+                <map>
+                  <entry key="https://pbtech-vc.med.cornell.edu/public/svn/icb/3rdparty">
+                    <value>
+                      <list />
+                    </value>
+                  </entry>
+                  <entry key="https://pbtech-vc.med.cornell.edu/public/svn/icb/branches">
+                    <value>
+                      <list />
+                    </value>
+                  </entry>
+                  <entry key="https://pbtech-vc.med.cornell.edu/public/svn/icb/buildsupport">
+                    <value>
+                      <list />
+                    </value>
+                  </entry>
+                  <entry key="https://pbtech-vc.med.cornell.edu/public/svn/icb/data">
+                    <value>
+                      <list />
+                    </value>
+                  </entry>
+                  <entry key="https://pbtech-vc.med.cornell.edu/public/svn/icb/scripts">
+                    <value>
+                      <list />
+                    </value>
+                  </entry>
+                  <entry key="https://pbtech-vc.med.cornell.edu/public/svn/icb/tags">
+                    <value>
+                      <list />
+                    </value>
+                  </entry>
+                  <entry key="https://pbtech-vc.med.cornell.edu/public/svn/icb/testsupport">
+                    <value>
+                      <list />
+                    </value>
+                  </entry>
+                </map>
+              </option>
               <option name="branchUrls">
                 <list>
                   <option value="https://pbtech-vc.med.cornell.edu/public/svn/icb/3rdparty" />
