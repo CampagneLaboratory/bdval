@@ -159,6 +159,13 @@
         <antcall target="process-model-conditions"/>
         <antcall target="zip-results"/>
     </target>
+    <target name="evaluate-dataset-statistics" description="Evaluate performance statistics on a given dataset">
+        <property name="do.<endpoint1-symbol>" value="true"/>
+        <property name="do.<endpoint2-symbol>" value="true"/>
+
+        <property name="do.GSE8402_FusionYesNo" value="true"/>
+        <antcall target="inner-evaluate-dataset-statistics"/>
+    </target>
 
 
     <target name="pathways" description="Run pathways." depends="prepare-bdval, tag-output-directory">
