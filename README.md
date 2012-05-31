@@ -1,3 +1,6 @@
+Biomarker Development and Validation (BDVal)
+--------------------------------------------
+
 ### Online documentation
 
 See [BDVal](http://bdval.campagnelab.org)
