@@ -1,0 +1,11 @@
+--classifier-parameters -R=0.01
+--classifier-parameters -R=0.1
+--classifier-parameters -R=1
+--classifier-parameters -R=5
+--classifier-parameters -R=10
+--classifier-parameters -R=20
+--classifier-parameters -R=30
+--classifier-parameters -R=40
+--classifier-parameters -R=50
+--classifier-parameters -R=75
+--classifier-parameters -R=100

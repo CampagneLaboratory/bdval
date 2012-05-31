@@ -1,0 +1,1890 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="MAQC-II phase A" default="all" basedir="">
+    <!-- ===================== Property Definitions =========================== -->
+    <property environment="env"/>
+
+    <property name="logs" location="../logs"/>
+    <property name="config" location="../config"/>
+    <property name="classes" location="../classes"/>
+    <property name="lib" location="../lib"/>
+    <property name="bin" location="../bin"/>
+
+    <property name="statistics-output" value="statistics.txt"/>
+    <property name="tune-parameters-output" value="tune-parameters-output"/>
+
+    <!--property name="default-eval-dataset-root" value="/home/campagne/projects/dev-maqcii"/-->
+    <!--property name="default-eval-dataset-root" value="/home/maqcii/dev-maqcii"/-->
+    <property name="default-eval-dataset-root" value="c:/home/maqcii/dev-maqcii"/>
+    <property name="eval-dataset-root" value="${default-eval-dataset-root}"/>
+    <property name="ga-wrapper-population-size" value="20"/>
+    <property name="ga-wrapper-number-of-iterations" value="10"/>
+    <property name="CV-repeats" value="--cv-repeats 10 "/>
+    <property name="CV-folds" value="5"/>
+
+    <property name="use-probability" value="false"/>
+    <!--  - - roc -->
+
+    <property name="human-pathways-file" value="human-IntAct-KEGG-TEPSS-pathways.txt"/>
+    <property name="mouse-pathways-file" value="mouse-IntAct-KEGG-TEPSS-pathways.txt"/>
+    <property name="rat-pathways-file" value="rat-IntAct-KEGG-TEPSS-pathways.txt"/>
+
+    <property name="run-java" value="true"/>
+    <property name="parameter-C-values" value="0.0001,0.001,0.01,0.1,0.5,1,5,10"/>
+    <property name="svm-parameters" value="--classifier-parameters probability=${use-probability}"/>
+    <!-- - -classifier-parameters probability=${use-probability} -->
+    <property name="svm-classifier" value=""/>
+    <property name="feature-option"
+              value=" --normalize-features false --scale-features true --percentile-scaling false"/>
+
+    <property file="maqcii-b.properties"/>
+
+    <!--propertyfile file="../crover.prp"/-->
+
+    <path id="classpath">
+        <pathelement location="${config}"/>
+        <pathelement location="${classes}"/>
+        <fileset dir="${lib}">
+            <include name="*.jar"/>
+            <include name="Rserve/*.jar"/>
+            <include name="ojdbc14.jar"/>
+            <exclude name="tissueinfo.jar"/>
+        </fileset>
+    </path>
+
+    <taskdef resource="net/sf/antcontrib/antlib.xml" onerror="fail">
+        <classpath>
+            <pathelement location="${lib}/ant-contrib.jar"/>
+        </classpath>
+    </taskdef>
+
+    <osfamily property="osfamily"/>
+
+    <if>
+        <equals arg1="${osfamily}" arg2="windows"/>
+        <then>
+            <echo message="Configuration execution for Windows."/>
+            <property name="num-threads" value="1"/>
+            <property name="memory-flag" value="-Xmx1000m"/>
+            <property name="short-flag" value="-short"/>
+        </then>
+        <else>
+            <echo message="Configuration execution for UNIX."/>
+            <property name="num-threads" value="8"/>
+            <property name="memory-flag" value="-Xmx8000m"/>
+            <property name="short-flag" value=""/>
+        </else>
+    </if>
+
+    <macrodef name="predict-one-dataset" description="Predict one dataset.">
+        <attribute name="testset-name"/>
+        <attribute name="dataset-root"/>
+        <attribute name="type"/>
+        <attribute name="platform"/>
+        <attribute name="mode"/>
+        <attribute name="output" default="out.txt"/>
+        <attribute name="model"/>
+        <attribute name="true-labels"/>
+        <attribute name="test-samples"/>
+        <attribute name="rserve-port" default="-1"/>
+        <attribute name="other-options" default=""/>
+        <sequential>
+
+            <echo message="++"/>
+            <echo message="++ Running  @{testset-name} : @{mode} -> @{output}"/>
+            <echo message="++"/>
+
+            <if>
+                <equals arg1="${run-java}" arg2="true"/>
+                <then>
+                    <java classname="edu.cornell.med.icb.biomarkers.DiscoverAndValidate"
+                          classpathref="classpath" fork="true" failonerror="true">
+
+                        <jvmarg value="-ea"/>
+                        <jvmarg value="${memory-flag}"/>
+                        <sysproperty key="log4j.debug" value="true"/>
+                        <sysproperty key="log4j.configuration" value="file:///${config}/log4j.properties"/>
+                        <arg line="-m @{mode}"/>
+                        <arg line="-i @{dataset-root}/norm-data/@{testset-name}.@{type}"/>
+                        <!-- short for faster -->
+                        <arg line="-p @{platform} "/>
+                        <arg line="-o @{output} "/>
+                        <arg line="--model @{model} "/>
+                        <arg line="--true-labels @{true-labels} "/>
+                        <arg line="--test-samples @{test-samples} "/>
+                        <arg line="--rserve-port @{rserve-port} "/>
+                        <arg line="@{other-options} "/>
+                        <arg line=" ${feature-option} "/>
+                        <arg line="--dataset-name @{testset-name}"/>
+                        <arg line="--dataset-root @{dataset-root}"/>
+                        <arg line=" ${svm-classifier} ${svm-parameters} "/>
+                        <!--redirector output="@{testset-name}.stdout"></redirector-->
+                    </java>
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="process-one-dataset" description="Process one dataset.">
+        <attribute name="dataset-name"/>
+        <attribute name="dataset-root"/>
+        <attribute name="tasks"/>
+        <attribute name="gene-list" default="N/A"/>
+        <attribute name="specific-gene-list" default="N/A"/>
+        <attribute name="type"/>
+        <attribute name="platform"/>
+        <attribute name="mode"/>
+        <attribute name="label" default="unknown"/>
+        <attribute name="seed" default="123454"/>
+        <attribute name="output" default="out.txt"/>
+        <attribute name="rserve-port" default="-1"/>
+        <attribute name="other-options" default=""/>
+        <attribute name="pathways-params" default=""/>
+        <attribute name="gene-features-dir" default="./"/>
+        <sequential>
+
+            <echo message="++"/>
+            <echo message="++ Running  @{dataset-name} : @{mode} -> @{output}"/>
+            <echo message="++"/>
+
+            <if>
+                <equals arg1="@{gene-list}" arg2="N/A"/>
+                <then>
+                    <if>
+                        <equals arg1="@{specific-gene-list}" arg2="N/A"/>
+                        <then>
+                            <var name="gene-list-argument" value=" "/>
+                        </then>
+                        <else>
+                            <var name="gene-list-argument" value="--gene-list @{label}|@{specific-gene-list}"/>
+
+                        </else>
+                    </if>
+                </then>
+
+                <else>
+                    <var name="gene-list-argument" value="--gene-lists @{gene-list}"/>
+                </else>
+            </if>
+            <echo message="gene list argument: ${gene-list-argument}"/>
+            <if>
+                <equals arg1="${run-java}" arg2="true"/>
+                <then>
+                    <java classname="edu.cornell.med.icb.biomarkers.DiscoverAndValidate"
+                          classpathref="classpath" fork="true" failonerror="true">
+
+                        <jvmarg value="-ea"/>
+                        <jvmarg value="${memory-flag}"/>
+                        <sysproperty key="log4j.debug" value="true"/>
+                        <sysproperty key="log4j.configuration" value="file:///${config}/log4j.properties"/>
+                        <sysproperty key="pj.nt" value="${num-threads}"/>
+                        <arg line="-m @{mode}"/>
+                        <arg line="-i @{dataset-root}/norm-data/@{dataset-name}${short-flag}.@{type}"/>
+                        <!-- short for faster -->
+                        <arg line="-c @{dataset-root}/cids/@{dataset-name}.cids"/>
+                        <arg line="-t @{dataset-root}/tasks/@{tasks}"/>
+
+                        <arg line="${gene-list-argument}"/>
+                        <arg line="-p @{platform} "/>
+                        <arg line="-o @{output} "/>
+                        <!-- use RServe  config file -->
+                        <arg line="--seed @{seed} @{other-options} @{pathways-params} "/>
+                        <arg line="--gene-features-dir @{gene-features-dir}"/>
+                        <arg line="--dataset-name @{dataset-name}"/>
+                        <arg line="--dataset-root @{dataset-root}"/>
+                        <arg line=" ${svm-classifier} ${svm-parameters} "/>
+                        <arg line=" ${feature-option} "/>
+                        <!--redirector output="@{dataset-name}.stdout"></redirector-->
+
+                    </java>
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="process-one-sequence" description="Process one sequence.">
+        <attribute name="dataset-name"/>
+        <attribute name="dataset-root"/>
+        <attribute name="tasks"/>
+        <attribute name="type"/>
+        <attribute name="platform"/>
+        <attribute name="label" default="unknown"/>
+        <attribute name="seed" default="123454"/>
+        <attribute name="rserve-port" default="-1"/>
+        <attribute name="other-options" default=""/>
+        <attribute name="pathways-params" default=""/>
+        <attribute name="gene-features-dir" default="./"/>
+        <attribute name="sequence-file"/>
+        <sequential>
+
+            <echo message="++"/>
+            <echo message="++ Running  @{dataset-name} : sequence-file @{sequence-file}"/>
+            <echo message="++"/>
+
+            <if>
+                <equals arg1="${run-java}" arg2="true"/>
+                <then>
+                    <java classname="edu.cornell.med.icb.biomarkers.DiscoverAndValidate"
+                          classpathref="classpath" fork="true" failonerror="true">
+
+                        <jvmarg value="-ea"/>
+                        <jvmarg value="${memory-flag}"/>
+                        <sysproperty key="log4j.debug" value="true"/>
+                        <sysproperty key="log4j.configuration" value="file:///${config}/log4j.properties"/>
+                        <arg line="-m sequence"/>
+                        <!-- short for faster -->
+                        <arg line="-c @{dataset-root}/cids/@{dataset-name}.cids"/>
+                        <arg line="-t @{dataset-root}/tasks/@{tasks}"/>
+
+                        <arg line="-p @{platform} "/>
+                        <arg line="--seed @{seed} @{other-options} @{pathways-params} "/>
+                        <arg line="--gene-features-dir @{gene-features-dir}"/>
+                        <arg line="--dataset-name @{dataset-name}"/>
+                        <arg line="--dataset-root @{dataset-root}"/>
+                        <arg line=" ${svm-classifier} ${svm-parameters} "/>
+                        <arg line=" ${feature-option} "/>
+                        <arg line="--sequence-file sequences/@{sequence-file}"/>
+
+                        <arg line="-i NA"/>
+                        <arg line="-o NA"/>
+                        <arg line="--gene-list NA"/>
+                        <!--redirector output="@{dataset-name}.stdout"></redirector-->
+
+                    </java>
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="process-baseline" description="Apply baseline DAP to a specific dataset.">
+        <attribute name="dataset-name"/>
+        <attribute name="dataset-root"/>
+        <attribute name="tasks"/>
+        <attribute name="type"/>
+        <attribute name="platform"/>
+        <attribute name="rserve-port" default="-1"/>
+        <attribute name="label" default="baseline-svm-weights"/>
+
+        <sequential>
+            <echo message=">>> Selecting features"/>
+            <!-- output is appended, so delete the gene list to ensure we do not append to a pre-existing one. -->
+            <delete file="@{dataset-name}-@{label}-features.txt"/>
+            <trycatch>
+                <try>
+                    <process-one-dataset
+                            mode="svm-weights"
+                            dataset-name="@{dataset-name}"
+                            type="@{type}"
+                            tasks="@{tasks}"
+                            gene-list="@{dataset-root}/gene-lists/full-array-only.txt"
+                            platform="@{platform}"
+                            dataset-root="@{dataset-root}"
+                            output="@{dataset-name}-@{label}-features.txt"
+                            rserve-port="@{rserve-port}"
+                            other-options="-n 50 --output-gene-list"/>
+                    <write-model-and-cross-validation dataset-name="@{dataset-name}"
+                                                      dataset-root="@{dataset-root}" tasks="@{tasks}"
+                                                      type="@{type}" platform="@{platform}" label="@{label}"
+                                                      rserve-port="@{rserve-port}"
+                                                      stats-file="@{dataset-name}-baseline-stats.txt"/>
+                </try>
+                <catch>
+                    <echo message="CAUGHT FAILED BUILD process-baseline : dataset-name=@{dataset-name}"/>
+                </catch>
+                <finally>
+                    <copy-output-files dataset-name="@{dataset-name}"/>
+                </finally>
+            </trycatch>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="process-sequence-file">
+        <attribute name="dataset-name"/>
+        <attribute name="dataset-root"/>
+        <attribute name="tasks"/>
+        <attribute name="type"/>
+        <attribute name="platform"/>
+        <attribute name="rserve-port" default="-1"/>
+        <attribute name="sequence-file"/>
+        <sequential>
+            <echo message=">>> Processing sequence-file @{sequence-file}"/>
+            <trycatch>
+                <try>
+                    <process-one-sequence
+                            dataset-name="@{dataset-name}"
+                            type="@{type}"
+                            tasks="@{tasks}"
+                            platform="@{platform}"
+                            dataset-root="@{dataset-root}"
+                            rserve-port="@{rserve-port}"
+                            sequence-file="@{sequence-file}"/>
+                </try>
+                <catch>
+                    <echo message="CAUGHT FAILED BUILD process-sequence-file : dataset-name=@{dataset-name}"/>
+                </catch>
+                <finally>
+                    <copy-output-files dataset-name="@{dataset-name}"/>
+                </finally>
+            </trycatch>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="process-baseline-500"
+              description="Apply baseline DAP to a specific dataset (but with 500 features).">
+        <attribute name="dataset-name"/>
+        <attribute name="dataset-root"/>
+        <attribute name="tasks"/>
+        <attribute name="type"/>
+        <attribute name="platform"/>
+        <attribute name="rserve-port" default="-1"/>
+        <attribute name="label" default="baseline-500-svm-weights"/>
+
+        <sequential>
+            <echo message=">>> Selecting features"/>
+            <!-- output is appended, so delete the gene list to ensure we do not append to a pre-existing one. -->
+            <delete file="@{dataset-name}-@{label}-features.txt"/>
+            <trycatch>
+                <try>
+                    <process-one-dataset
+                            mode="svm-weights"
+                            dataset-name="@{dataset-name}"
+                            type="@{type}"
+                            tasks="@{tasks}"
+                            gene-list="@{dataset-root}/gene-lists/full-array-only.txt"
+                            platform="@{platform}"
+                            dataset-root="@{dataset-root}"
+                            output="@{dataset-name}-@{label}-features.txt"
+                            rserve-port="@{rserve-port}"
+                            other-options="-n 500 --output-gene-list"/>
+                    <write-model-and-cross-validation dataset-name="@{dataset-name}"
+                                                      dataset-root="@{dataset-root}" tasks="@{tasks}"
+                                                      type="@{type}" platform="@{platform}" label="@{label}"
+                                                      rserve-port="@{rserve-port}"
+                                                      stats-file="@{dataset-name}-baseline-stats.txt"/>
+                </try>
+                <catch>
+                    <echo message="CAUGHT FAILED BUILD process-baseline : dataset-name=@{dataset-name}"/>
+                </catch>
+                <finally>
+                    <copy-output-files dataset-name="@{dataset-name}"/>
+                </finally>
+            </trycatch>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="process-genelists">
+        <attribute name="dataset-name"/>
+        <attribute name="dataset-root"/>
+        <attribute name="tasks"/>
+        <attribute name="type"/>
+        <attribute name="platform"/>
+        <attribute name="rserve-port" default="-1"/>
+        <attribute name="label" default="genelists"/>
+        <sequential>
+            <for param="gene-list" delimiter=" " list="cancer-gene-lists-GDS1070 cancer-gene-lists-GDS183 cancer-gene-lists-GDS232 cancer-gene-lists-HM200
+cancer-gene-lists-NC01-2000 cancer-gene-lists-NuttAO cancer-gene-lists-NuttGBM cancer-gene-lists-POMEROY-0 cancer-gene-lists-POMEROY-1 cancer-gene-lists-POMEROY-2 cancer-gene-lists-POMEROY-3 cancer-gene-lists-POMEROY-4 cancer-gene-lists-POMEROY-400 cancer-gene-lists-Rhodes2004">
+                <sequential>
+                    <echo message=">>> Processing gene list @{gene-list}"/>
+
+                    <trycatch>
+                        <try>
+                            <!-- output is appended, so delete the gene list to ensure we do not append to a pre-existing one. -->
+                            <delete file="@{dataset-name}-@{label}-@{gene-list}-features.txt"/>
+                            <process-one-dataset
+                                    mode="ga-wrapper"
+                                    dataset-name="@{dataset-name}"
+                                    type="@{type}"
+                                    tasks="@{tasks}"
+                                    gene-list="@{dataset-root}/gene-lists/@{gene-list}"
+                                    platform="@{platform}"
+                                    dataset-root="@{dataset-root}"
+                                    output="@{dataset-name}-@{label}-@{gene-list}-features.txt"
+                                    rserve-port="@{rserve-port}"
+                                    other-options="-r 0.5 --num-features 50 -n ${ga-wrapper-number-of-iterations} ${CV-repeats} -s ${ga-wrapper-population-size} -f ${CV-folds} ${ga-wrapper-roc-str} --output-gene-list"/>
+
+                            <write-model-and-cross-validation dataset-name="@{dataset-name}"
+                                                              dataset-root="@{dataset-root}" tasks="@{tasks}"
+                                                              type="@{type}" platform="@{platform}"
+                                                              label="@{label}-@{gene-list}"
+                                                              rserve-port="@{rserve-port}"
+                                                              stats-file="@{dataset-name}-genelists-stats.txt"/>
+                        </try>
+                        <catch>
+                            <echo message="CAUGHT FAILED BUILD process-genelists : dataset-name=@{dataset-name}, gene-list=@{gene-list}"/>
+                        </catch>
+                    </trycatch>
+                </sequential>
+            </for>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="process-baseline-all" description="Baseline : All">
+        <attribute name="dataset-name"/>
+        <attribute name="dataset-root"/>
+        <attribute name="tasks"/>
+        <attribute name="type"/>
+        <attribute name="platform"/>
+        <attribute name="rserve-port" default="-1"/>
+        <attribute name="ttest-alpha" default="0.05"/>
+        <attribute name="foldchange-phi" default="1.5"/>
+        <attribute name="do-process-gene-lists" default="false"/>
+
+        <sequential>
+            <process-baseline dataset-name="@{dataset-name}"
+                              dataset-root="@{dataset-root}" tasks="@{tasks}"
+                              rserve-port="@{rserve-port}"
+                              type="@{type}" platform="@{platform}"/>
+
+        </sequential>
+    </macrodef>
+    <macrodef name="process-baseline-all" description="Tune : All">
+        <attribute name="dataset-name"/>
+        <attribute name="dataset-root"/>
+        <attribute name="tasks"/>
+        <attribute name="type"/>
+        <attribute name="platform"/>
+        <attribute name="rserve-port" default="-1"/>
+        <attribute name="ttest-alpha" default="0.05"/>
+        <attribute name="foldchange-phi" default="1.5"/>
+        <attribute name="do-process-gene-lists" default="false"/>
+
+        <sequential>
+            <process-baseline dataset-name="@{dataset-name}"
+                              dataset-root="@{dataset-root}" tasks="@{tasks}"
+                              rserve-port="@{rserve-port}"
+                              type="@{type}" platform="@{platform}"/>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="process-all" description="Tune : All">
+        <attribute name="dataset-name"/>
+        <attribute name="dataset-root"/>
+        <attribute name="tasks"/>
+        <attribute name="type"/>
+        <attribute name="platform"/>
+        <attribute name="rserve-port" default="-1"/>
+        <attribute name="ttest-alpha" default="0.05"/>
+        <attribute name="foldchange-phi" default="3"/>
+        <attribute name="do-process-gene-lists" default="false"/>
+
+        <sequential>
+
+
+            <!--process-sequence-file
+            dataset-name="@{dataset-name}"
+            dataset-root="@{dataset-root}" tasks="@{tasks}"
+            rserve-port="@{rserve-port}"
+            type="@{type}" platform="@{platform}"
+            sequence-file="minmax-svmglobal.sequence"
+            /-->
+
+
+            <!--process-baseline-500 dataset-name="@{dataset-name}"
+                                  dataset-root="@{dataset-root}" tasks="@{tasks}"
+                                  rserve-port="@{rserve-port}"
+                                  type="@{type}" platform="@{platform}"/>
+            <process-baseline dataset-name="@{dataset-name}"
+                              dataset-root="@{dataset-root}" tasks="@{tasks}"
+                              rserve-port="@{rserve-port}"
+                              type="@{type}" platform="@{platform}"/>
+            <process-tune-global-svm-weights dataset-name="@{dataset-name}"
+                                             dataset-root="@{dataset-root}" tasks="@{tasks}"
+                                             rserve-port="@{rserve-port}"
+                                             type="@{type}" platform="@{platform}"/>
+            <process-tune-iterative-svm-weights dataset-name="@{dataset-name}"
+                                                dataset-root="@{dataset-root}" tasks="@{tasks}"
+                                                rserve-port="@{rserve-port}"
+                                                type="@{type}" platform="@{platform}"/>
+            <process-tune-ttest-iterative-svm-weights dataset-name="@{dataset-name}"
+                                                      dataset-root="@{dataset-root}" tasks="@{tasks}"
+                                                      rserve-port="@{rserve-port}"
+                                                      type="@{type}" platform="@{platform}"
+                                                      ttest-alpha="@{ttest-alpha}"/>
+            <process-tune-ttest-global-svm-weights dataset-name="@{dataset-name}"
+                                                   dataset-root="@{dataset-root}" tasks="@{tasks}"
+                                                   rserve-port="@{rserve-port}"
+                                                   type="@{type}" platform="@{platform}" ttest-alpha="@{ttest-alpha}"/>
+            <process-tune-foldchange-iterative-svm-weights dataset-name="@{dataset-name}"
+                                                           dataset-root="@{dataset-root}" tasks="@{tasks}"
+                                                           rserve-port="@{rserve-port}"
+                                                           type="@{type}" platform="@{platform}"
+                                                           foldchange-phi="@{foldchange-phi}"/>
+
+            <process-tune-foldchange-global-svm-weights dataset-name="@{dataset-name}"
+                                                        dataset-root="@{dataset-root}" tasks="@{tasks}"
+                                                        rserve-port="@{rserve-port}"
+                                                        type="@{type}" platform="@{platform}"
+                                                        foldchange-phi="@{foldchange-phi}"/>
+
+            <if>
+                <equals arg1="@{do-process-gene-lists}" arg2="true"/>
+                <then>
+                    <process-genelists dataset-name="@{dataset-name}"
+                                       dataset-root="@{dataset-root}"
+                                       tasks="@{tasks}"
+                                       rserve-port="@{rserve-port}"
+                                       type="@{type}"
+                                       platform="@{platform}"/>
+                </then>
+            </if-->
+            <process-tune-ttest-genetic-algorithm dataset-name="@{dataset-name}"
+                                                  dataset-root="@{dataset-root}" tasks="@{tasks}"
+                                                  rserve-port="@{rserve-port}"
+                                                  type="@{type}" platform="@{platform}" ttest-alpha="@{ttest-alpha}"/>
+            <!--process-tune-foldchange-genetic-algorithm dataset-name="@{dataset-name}"
+                                                       dataset-root="@{dataset-root}" tasks="@{tasks}"
+                                                       rserve-port="@{rserve-port}"
+                                                       type="@{type}" platform="@{platform}"
+                                                       foldchange-phi="@{foldchange-phi}"/>
+
+            <process-tune-genetic-algorithm dataset-name="@{dataset-name}"
+                                            dataset-root="@{dataset-root}" tasks="@{tasks}"
+                                            rserve-port="@{rserve-port}"
+                                            type="@{type}" platform="@{platform}"/-->
+
+
+        </sequential>
+    </macrodef>
+
+    <macrodef name="tune-parameters">
+        <attribute name="dataset-name"/>
+        <attribute name="dataset-root"/>
+        <attribute name="tasks"/>
+        <attribute name="type"/>
+        <attribute name="platform"/>
+        <attribute name="pathways-file"/>
+        <attribute name="gene-to-probes-file"/>
+        <attribute name="rserve-port" default="-1"/>
+        <attribute name="label" default="tune-parameters"/>
+        <attribute name="stats-file" default="${tune-parameters-output}"/>
+        <attribute name="gene-features-dir" default="${features-dir}/@{dataset-name}"/>
+        <sequential>
+            <echo message=">>> Tuning parameters with genes from @{gene-features-dir}"/>
+
+            <for param="gene-list">
+                <fileset dir="@{gene-features-dir}">
+                    <include name="@{dataset-name}-*-features.txt"/>
+                    <exclude name="@{dataset-name}-*-intermediate-features.txt"/>
+                </fileset>
+                <sequential>
+                    <echo message=">>> Current features file is @{gene-list}"/>
+                    <var name="pathways-params" value=""/>
+                    <if>
+                        <contains string="@{gene-list}" substring="-pathways-"/>
+                        <then>
+                            <echo message=">>> Using pathways-params"/>
+                            <var name="pathways-params"
+                                 value="--pathways @{dataset-root}/pathways/@{pathways-file} --gene-to-probes @{dataset-root}/pathways/@{gene-to-probes-file}"/>
+                        </then>
+
+                    </if>
+
+                    <trycatch>
+                        <try>
+                            <java classname="edu.cornell.med.icb.biomarkers.tools.ScanParametersnParameters"
+                                  classpathref="classpath" fork="true" failonerror="true">
+                                <jvmarg value="-ea"/>
+                                <jvmarg value="${memory-flag}"/>
+                                <!--1600 for local -->
+                                <sysproperty key="log4j.debug" value="true"/>
+                                <sysproperty key="log4j.configuration" value="file:///${config}/log4j.properties"/>
+                                <arg line="--arguments '-m cross-validation ${pathways-params}  --submission-file @{dataset-name}-maqcii-submission.file.txt --rserve-port @{rserve-port} --gene-features-dir @{gene-features-dir} -i @{dataset-root}/norm-data/@{dataset-name}.@{type} -o @{stats-file} -t @{dataset-root}/tasks/@{tasks} -c @{dataset-root}/cids/@{dataset-name}.cids --gene-list @{label}-@{gene-list}|@{gene-list} -p @{platform} --folds 10 ${CV-repeats} --seed 64634 ${svm-parameters},C=%s' -1 ${parameter-C-values} "/>
+                            </java>
+                        </try>
+                        <catch>
+                            <echo message="Cross validation on @{dataset-name} failed with genelist @{gene-list}"/>
+                        </catch>
+                        <finally>
+                            <copy-output-files dataset-name="@{dataset-name}"/>
+                        </finally>
+                    </trycatch>
+                </sequential>
+            </for>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="rewrite-models">
+        <attribute name="dataset-name"/>
+        <attribute name="dataset-root"/>
+        <attribute name="tasks"/>
+        <attribute name="type"/>
+        <attribute name="platform"/>
+        <attribute name="pathways-file"/>
+        <attribute name="gene-to-probes-file"/>
+        <attribute name="rserve-port" default="-1"/>
+        <attribute name="label" default="rewrite-models"/>
+        <attribute name="stats-file" default="@{label}-stats.txt"/>
+        <attribute name="gene-features-dir" default="@{dataset-root}/features/@{dataset-name}"/>
+        <sequential>
+            <echo message=">>> Re-writing models with genes from @{gene-features-dir}"/>
+
+            <for param="gene-list">
+                <fileset dir="@{dataset-root}/gene-lists">
+                    <include name="@{dataset-name}-*-gene-lists.txt"/>
+                    <exclude name="@{dataset-name}-*-intermediate-gene-lists.txt"/>
+                    <!-- <exclude name="@{dataset-name}-*-pathways-gene-lists.txt"/> -->
+                </fileset>
+                <sequential>
+                    <echo message=">>> Current gene-list file is @{gene-list}"/>
+                    <var name="pathways-params" value=""/>
+                    <if>
+                        <contains string="@{gene-list}" substring="-pathways-"/>
+                        <then>
+                            <echo message=">>> Using pathways-params"/>
+                            <var name="pathways-params"
+                                 value="--pathways @{dataset-root}/pathways/@{pathways-file} --gene-to-probes @{dataset-root}/pathways/@{gene-to-probes-file}"/>
+                        </then>
+
+                    </if>
+
+                    <trycatch>
+                        <try>
+                            <process-one-dataset
+                                    mode="write-model"
+                                    dataset-name="@{dataset-name}"
+                                    type="@{type}"
+                                    tasks="@{tasks}"
+                                    gene-list="@{gene-list}"
+                                    gene-features-dir="@{gene-features-dir}"
+                                    platform="@{platform}"
+                                    output="@{dataset-name}-xx-features-libsvm-modelgeneration.txt"
+                                    dataset-root="@{dataset-root}"
+                                    rserve-port="@{rserve-port}"
+                                    pathways-params="${pathways-params}"
+                                    other-options=""/>
+                        </try>
+                        <catch>
+                            <echo message="CAUGHT BUILD FAILER Re-write model on @{dataset-name} failed with genelist @{gene-list}"/>
+                        </catch>
+                        <finally>
+                            <copy-output-files dataset-name="@{dataset-name}"/>
+                        </finally>
+                    </trycatch>
+                </sequential>
+            </for>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="process-tune-global-svm-weights" description="Tune : Global SVM Weights">
+        <attribute name="dataset-name"/>
+        <attribute name="dataset-root"/>
+        <attribute name="tasks"/>
+        <attribute name="type"/>
+        <attribute name="platform"/>
+        <attribute name="rserve-port" default="-1"/>
+        <attribute name="label" default="tune-global-svm-weights"/>
+
+        <sequential>
+            <echo message=">>> Selecting features"/>
+            <trycatch>
+                <try>
+                    <!-- output is appended, so delete the gene list to ensure we do not append to a pre-existing one. -->
+                    <delete file="@{dataset-name}-@{label}-features.txt"/>
+                    <process-one-dataset
+                            mode="svm-weights"
+                            dataset-name="@{dataset-name}"
+                            type="@{type}"
+                            tasks="@{tasks}"
+                            gene-list="@{dataset-root}/gene-lists/full-array-only.txt"
+                            platform="@{platform}"
+                            dataset-root="@{dataset-root}"
+                            output="@{dataset-name}-@{label}-features.txt"
+                            rserve-port="@{rserve-port}"
+                            other-options="-n 50 --output-gene-list"/>
+                    <write-model-and-cross-validation dataset-name="@{dataset-name}"
+                                                      dataset-root="@{dataset-root}" tasks="@{tasks}"
+                                                      type="@{type}" platform="@{platform}" label="@{label}"
+                                                      rserve-port="@{rserve-port}"
+                                                      stats-file="@{dataset-name}-tune-stats.txt"/>
+                </try>
+                <catch>
+                    <echo message="CAUGHT FAILED BUILD process-tune-global-svm-weights : dataset-name=@{dataset-name}"/>
+                </catch>
+            </trycatch>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="process-tune-iterative-svm-weights" description="Tune : Iterative SVM Weights">
+        <attribute name="dataset-name"/>
+        <attribute name="dataset-root"/>
+        <attribute name="tasks"/>
+        <attribute name="type"/>
+        <attribute name="platform"/>
+        <attribute name="rserve-port" default="-1"/>
+        <attribute name="label" default="tune-iterative-svm-weights"/>
+
+        <sequential>
+            <echo message=">>> Selecting features"/>
+            <!-- output is appended, so delete the gene list to ensure we do not append to a pre-existing one. -->
+            <trycatch>
+                <try>
+                    <delete file="@{dataset-name}-@{label}-features.txt"/>
+                    <process-one-dataset
+                            mode="svm-weights-iterative"
+                            dataset-name="@{dataset-name}"
+                            type="@{type}"
+                            tasks="@{tasks}"
+                            gene-list="@{dataset-root}/gene-lists/full-array-only.txt"
+                            platform="@{platform}"
+                            dataset-root="@{dataset-root}"
+                            output="@{dataset-name}-@{label}-features.txt"
+                            rserve-port="@{rserve-port}"
+                            other-options="-r 0.5 --num-features 50 --output-gene-list"/>
+                    <write-model-and-cross-validation dataset-name="@{dataset-name}"
+                                                      dataset-root="@{dataset-root}" tasks="@{tasks}"
+                                                      type="@{type}" platform="@{platform}" label="@{label}"
+                                                      rserve-port="@{rserve-port}"
+                                                      stats-file="@{dataset-name}-tune-stats.txt"/>
+                </try>
+                <catch>
+                    <echo message="CAUGHT FAILED BUILD process-tune-iterative-svm-weights : dataset-name=@{dataset-name}"/>
+                </catch>
+            </trycatch>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="process-tune-ttest-iterative-svm-weights" description="Tune : T-Test and Iterative SVM Weights">
+        <attribute name="dataset-name"/>
+        <attribute name="dataset-root"/>
+        <attribute name="tasks"/>
+        <attribute name="type"/>
+        <attribute name="platform"/>
+        <attribute name="ttest-alpha" default="0.05"/>
+        <attribute name="rserve-port" default="-1"/>
+        <attribute name="label" default="tune-ttest-iterative-svm-weights"/>
+
+        <sequential>
+            <echo message=">>> Selecting features (ttest-alpha = @{ttest-alpha})"/>
+            <trycatch>
+                <try>
+                    <!-- output is appended, so delete the gene list to ensure we do not append to a pre-existing one. -->
+                    <delete file="@{dataset-name}-@{label}-intermediate-features.txt"/>
+                    <delete file="@{dataset-name}-@{label}-features.txt"/>
+
+                    <process-one-dataset
+                            mode="t-test"
+                            dataset-name="@{dataset-name}"
+                            type="@{type}"
+                            tasks="@{tasks}"
+                            gene-list="@{dataset-root}/gene-lists/full-array-only.txt"
+                            platform="@{platform}"
+                            dataset-root="@{dataset-root}"
+                            output="@{dataset-name}-@{label}-intermediate-features.txt"
+                            rserve-port="@{rserve-port}"
+                            label="@{label}"
+                            other-options="-n @{ttest-alpha} --output-gene-list --report-max-probes 1000"/>
+
+                    <process-one-dataset
+                            mode="svm-weights-iterative"
+                            dataset-name="@{dataset-name}"
+                            type="@{type}"
+                            tasks="@{tasks}"
+                            specific-gene-list="@{dataset-name}-@{label}-intermediate-features.txt"
+                            platform="@{platform}"
+                            dataset-root="@{dataset-root}"
+                            output="@{dataset-name}-@{label}-features.txt"
+                            rserve-port="@{rserve-port}"
+                            label="@{label}"
+                            other-options="-r 0.5 --num-features 50 --output-gene-list"/>
+
+                    <write-model-and-cross-validation dataset-name="@{dataset-name}"
+                                                      dataset-root="@{dataset-root}" tasks="@{tasks}"
+                                                      type="@{type}" platform="@{platform}" label="@{label}"
+                                                      rserve-port="@{rserve-port}"
+                                                      stats-file="@{dataset-name}-tune-stats.txt"/>
+                </try>
+                <catch>
+                    <echo message="CAUGHT FAILED BUILD process-tune-ttest-iterative-svm-weights : dataset-name=@{dataset-name}"/>
+                </catch>
+
+                <finally>
+                    <copy-output-files dataset-name="@{dataset-name}"/>
+                </finally>
+
+            </trycatch>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="process-tune-ttest-global-svm-weights" description="Tune : T-Test and Global SVM Weights">
+        <attribute name="dataset-name"/>
+        <attribute name="dataset-root"/>
+        <attribute name="tasks"/>
+        <attribute name="type"/>
+        <attribute name="platform"/>
+        <attribute name="ttest-alpha" default="0.05"/>
+        <attribute name="rserve-port" default="-1"/>
+        <attribute name="label" default="tune-ttest-global-svm-weights"/>
+
+        <sequential>
+            <echo message=">>> Selecting features (ttest-alpha = @{ttest-alpha})"/>
+
+            <trycatch>
+                <try>
+                    <!-- output is appended, so delete the gene list to ensure we do not append to a pre-existing one. -->
+                    <delete file="@{dataset-name}-@{label}-intermediate-features.txt"/>
+                    <delete file="@{dataset-name}-@{label}-features.txt"/>
+
+                    <process-one-dataset
+                            mode="t-test"
+                            dataset-name="@{dataset-name}"
+                            type="@{type}"
+                            tasks="@{tasks}"
+                            gene-list="@{dataset-root}/gene-lists/full-array-only.txt"
+                            platform="@{platform}"
+                            dataset-root="@{dataset-root}"
+                            output="@{dataset-name}-@{label}-intermediate-features.txt"
+                            rserve-port="@{rserve-port}"
+                            other-options="-n @{ttest-alpha} --output-gene-list --report-max-probes 1000"/>
+
+                    <process-one-dataset
+                            mode="svm-weights"
+                            dataset-name="@{dataset-name}"
+                            type="@{type}"
+                            tasks="@{tasks}"
+                            gene-list="@{dataset-root}/gene-lists/@{dataset-name}-@{label}-intermediate-gene-lists.txt"
+                            platform="@{platform}"
+                            dataset-root="@{dataset-root}"
+                            output="@{dataset-name}-@{label}-features.txt"
+                            rserve-port="@{rserve-port}"
+                            other-options="-n 50 --output-gene-list"/>
+
+                    <write-model-and-cross-validation dataset-name="@{dataset-name}"
+                                                      dataset-root="@{dataset-root}" tasks="@{tasks}"
+                                                      type="@{type}" platform="@{platform}" label="@{label}"
+                                                      rserve-port="@{rserve-port}"
+                                                      stats-file="@{dataset-name}-tune-stats.txt"/>
+                </try>
+                <catch>
+                    <echo message="CAUGHT FAILED BUILD process-tune-ttest-global-svm-weights : dataset-name=@{dataset-name}"/>
+                </catch>
+            </trycatch>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="process-tune-foldchange-iterative-svm-weights"
+              description="Tune : Fold-Change and Iterative SVM Weights">
+        <attribute name="dataset-name"/>
+        <attribute name="dataset-root"/>
+        <attribute name="tasks"/>
+        <attribute name="type"/>
+        <attribute name="platform"/>
+        <attribute name="foldchange-phi" default="1.5"/>
+        <attribute name="rserve-port" default="-1"/>
+        <attribute name="label" default="tune-foldchange-iterative-svm-weights"/>
+
+        <sequential>
+            <echo message=">>> Selecting features (foldchange-phi = @{foldchange-phi})"/>
+            <trycatch>
+                <try>
+                    <!-- output is appended, so delete the gene list to ensure we do not append to a pre-existing one. -->
+                    <delete file="@{dataset-name}-@{label}-intermediate-features.txt"/>
+                    <delete file="@{dataset-name}-@{label}-features.txt"/>
+
+                    <process-one-dataset
+                            mode="fold-change"
+                            dataset-name="@{dataset-name}"
+                            type="@{type}"
+                            tasks="@{tasks}"
+                            gene-list="@{dataset-root}/gene-lists/full-array-only.txt"
+                            platform="@{platform}"
+                            dataset-root="@{dataset-root}"
+                            output="@{dataset-name}-@{label}-intermediate-features.txt"
+                            rserve-port="@{rserve-port}"
+                            other-options="--ratio @{foldchange-phi} --output-gene-list --report-max-probes 1000"/>
+
+                    <process-one-dataset
+                            mode="svm-weights-iterative"
+                            dataset-name="@{dataset-name}"
+                            type="@{type}"
+                            tasks="@{tasks}"
+                            specific-gene-list="@{dataset-name}-@{label}-intermediate-features.txt"
+                            platform="@{platform}"
+                            dataset-root="@{dataset-root}"
+                            output="@{dataset-name}-@{label}-features.txt"
+                            rserve-port="@{rserve-port}"
+                            other-options="-r 0.5 --num-features 50 --output-gene-list"/>
+
+                    <write-model-and-cross-validation dataset-name="@{dataset-name}"
+                                                      dataset-root="@{dataset-root}"
+                                                      tasks="@{tasks}"
+                                                      type="@{type}"
+                                                      platform="@{platform}"
+                                                      label="@{label}"
+                                                      rserve-port="@{rserve-port}"
+                                                      stats-file="@{dataset-name}-tune-stats.txt"/>
+                </try>
+                <catch>
+                    <echo message="CAUGHT FAILED BUILD process-tune-foldchange-iterative-svm-weights : dataset-name=@{dataset-name}"/>
+                </catch>
+                <finally>
+                    <copy-output-files dataset-name="@{dataset-name}"/>
+                </finally>
+            </trycatch>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="process-tune-foldchange-global-svm-weights" description="Tune : Fold-Change and Global SVM Weights">
+        <attribute name="dataset-name"/>
+        <attribute name="dataset-root"/>
+        <attribute name="tasks"/>
+        <attribute name="type"/>
+        <attribute name="platform"/>
+        <attribute name="foldchange-phi" default="1.5"/>
+        <attribute name="rserve-port" default="-1"/>
+        <attribute name="label" default="tune-foldchange-global-svm-weights"/>
+
+        <sequential>
+            <echo message=">>> Selecting features (foldchange-phi = @{foldchange-phi})"/>
+            <trycatch>
+                <try>
+                    <!-- output is appended, so delete the gene list to ensure we do not append to a pre-existing one. -->
+                    <delete file="@{dataset-name}-@{label}-intermediate-features.txt"/>
+                    <delete file="@{dataset-name}-@{label}-features.txt"/>
+
+                    <process-one-dataset
+                            mode="fold-change"
+                            dataset-name="@{dataset-name}"
+                            type="@{type}"
+                            tasks="@{tasks}"
+                            gene-list="@{dataset-root}/gene-lists/full-array-only.txt"
+                            platform="@{platform}"
+                            dataset-root="@{dataset-root}"
+                            output="@{dataset-name}-@{label}-intermediate-features.txt"
+                            rserve-port="@{rserve-port}"
+                            other-options="--ratio @{foldchange-phi} --output-gene-list --report-max-probes 1000"/>
+
+                    <process-one-dataset
+                            mode="svm-weights"
+                            dataset-name="@{dataset-name}"
+                            type="@{type}"
+                            tasks="@{tasks}"
+                            gene-list="@{dataset-root}/gene-lists/@{dataset-name}-@{label}-intermediate-gene-lists.txt"
+                            platform="@{platform}"
+                            dataset-root="@{dataset-root}"
+                            output="@{dataset-name}-@{label}-features.txt"
+                            rserve-port="@{rserve-port}"
+                            other-options="-n 50 --output-gene-list"/>
+
+                    <write-model-and-cross-validation dataset-name="@{dataset-name}"
+                                                      dataset-root="@{dataset-root}" tasks="@{tasks}"
+                                                      type="@{type}" platform="@{platform}" label="@{label}"
+                                                      rserve-port="@{rserve-port}"
+                                                      stats-file="@{dataset-name}-tune-stats.txt"/>
+                </try>
+                <catch>
+                    <echo message="CAUGHT FAILED BUILD process-tune-foldchange-global-svm-weights : dataset-name=@{dataset-name}"/>
+                </catch>
+                <finally>
+                    <copy-output-files dataset-name="@{dataset-name}"/>
+                </finally>
+            </trycatch>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="process-tune-ttest-genetic-algorithm" description="Tune : T-Test and Genetic Algorithm">
+        <attribute name="dataset-name"/>
+        <attribute name="dataset-root"/>
+        <attribute name="tasks"/>
+        <attribute name="type"/>
+        <attribute name="platform"/>
+        <attribute name="ttest-alpha" default="0.05"/>
+        <attribute name="rserve-port" default="-1"/>
+        <attribute name="label" default="tune-ttest-genetic-algorithm"/>
+
+        <sequential>
+            <echo message=">>> Selecting features (ttest-alpha = @{ttest-alpha})"/>
+            <trycatch>
+                <try>
+                    <!-- output is appended, so delete the gene list to ensure we do not append to a pre-existing one. -->
+                    <delete file="@{dataset-name}-@{label}-intermediate-features.txt"/>
+                    <delete file="@{dataset-name}-@{label}-features.txt"/>
+
+                    <process-one-dataset
+                            mode="t-test"
+                            dataset-name="@{dataset-name}"
+                            type="@{type}"
+                            tasks="@{tasks}"
+                            gene-list="@{dataset-root}/gene-lists/full-array-only.txt"
+                            platform="@{platform}"
+                            dataset-root="@{dataset-root}"
+                            output="@{dataset-name}-@{label}-intermediate-features.txt"
+                            rserve-port="@{rserve-port}"
+                            other-options="-n @{ttest-alpha} --output-gene-list --report-max-probes 1000"/>
+
+                    <process-one-dataset
+                            mode="ga-wrapper"
+                            dataset-name="@{dataset-name}"
+                            type="@{type}"
+                            tasks="@{tasks}"
+                            gene-list="@{dataset-root}/gene-lists/@{dataset-name}-@{label}-intermediate-gene-lists.txt"
+                            platform="@{platform}"
+                            dataset-root="@{dataset-root}"
+                            output="@{dataset-name}-@{label}-features.txt"
+                            rserve-port="@{rserve-port}"
+                            other-options="-r 0.5 --num-features 50 -n ${ga-wrapper-number-of-iterations} -s ${ga-wrapper-population-size} -f ${CV-folds} ${ga-wrapper-roc-str} ${CV-repeats} --output-gene-list "/>
+
+                    <write-model-and-cross-validation dataset-name="@{dataset-name}"
+                                                      dataset-root="@{dataset-root}" tasks="@{tasks}"
+                                                      type="@{type}" platform="@{platform}" label="@{label}"
+                                                      rserve-port="@{rserve-port}"
+                                                      stats-file="@{dataset-name}-tune-stats.txt"/>
+                </try>
+                <catch>
+                    <echo message="CAUGHT FAILED BUILD process-tune-ttest-genetic-algorithm : dataset-name=@{dataset-name}"/>
+                </catch>
+                <finally>
+                    <copy-output-files dataset-name="@{dataset-name}"/>
+                </finally>
+            </trycatch>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="process-tune-foldchange-genetic-algorithm" description="Tune : Fold-Change and Genetic Algorithm">
+        <attribute name="dataset-name"/>
+        <attribute name="dataset-root"/>
+        <attribute name="tasks"/>
+        <attribute name="type"/>
+        <attribute name="platform"/>
+        <attribute name="foldchange-phi" default="1.5"/>
+        <attribute name="rserve-port" default="-1"/>
+        <attribute name="label" default="tune-foldchange-genetic-algorithm"/>
+
+        <sequential>
+            <echo message=">>> Selecting features (foldchange-phi = @{foldchange-phi})"/>
+            <trycatch>
+                <try>
+                    <!-- output is appended, so delete the gene list to ensure we do not append to a pre-existing one. -->
+                    <delete file="@{dataset-name}-@{label}-intermediate-features.txt"/>
+                    <delete file="@{dataset-name}-@{label}-features.txt"/>
+
+                    <process-one-dataset
+                            mode="fold-change"
+                            dataset-name="@{dataset-name}"
+                            type="@{type}"
+                            tasks="@{tasks}"
+                            gene-list="@{dataset-root}/gene-lists/full-array-only.txt"
+                            platform="@{platform}"
+                            dataset-root="@{dataset-root}"
+                            output="@{dataset-name}-@{label}-intermediate-features.txt"
+                            rserve-port="@{rserve-port}"
+                            other-options="--ratio @{foldchange-phi} --output-gene-list --report-max-probes 1000"/>
+
+                    <process-one-dataset
+                            mode="ga-wrapper"
+                            dataset-name="@{dataset-name}"
+                            type="@{type}"
+                            tasks="@{tasks}"
+                            gene-list="@{dataset-root}/gene-lists/@{dataset-name}-@{label}-intermediate-gene-lists.txt"
+                            platform="@{platform}"
+                            dataset-root="@{dataset-root}"
+                            output="@{dataset-name}-@{label}-features.txt"
+                            rserve-port="@{rserve-port}"
+                            other-options="-r 0.5 --num-features 50 -n ${ga-wrapper-number-of-iterations} -s ${ga-wrapper-population-size} -f ${CV-folds} ${ga-wrapper-roc-str}  ${CV-repeats} --output-gene-list "/>
+
+                    <write-model-and-cross-validation dataset-name="@{dataset-name}"
+                                                      dataset-root="@{dataset-root}" tasks="@{tasks}"
+                                                      type="@{type}" platform="@{platform}" label="@{label}"
+                                                      rserve-port="@{rserve-port}"
+                                                      stats-file="@{dataset-name}-tune-stats.txt"/>
+                </try>
+                <catch>
+                    <echo message="CAUGHT FAILED BUILD process-tune-foldchange-genetic-algorithm : dataset-name=@{dataset-name}"/>
+                </catch>
+                <finally>
+                    <copy-output-files dataset-name="@{dataset-name}"/>
+                </finally>
+            </trycatch>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="process-tune-genetic-algorithm" description="Tune : Genetic Algorithm">
+        <attribute name="dataset-name"/>
+        <attribute name="dataset-root"/>
+        <attribute name="tasks"/>
+        <attribute name="type"/>
+        <attribute name="platform"/>
+        <attribute name="rserve-port" default="-1"/>
+        <attribute name="label" default="tune-genetic-algorithm"/>
+
+        <sequential>
+            <echo message=">>> Selecting features"/>
+            <trycatch>
+                <try>
+                    <!-- output is appended, so delete the gene list to ensure we do not append to a pre-existing one. -->
+                    <delete file="@{dataset-name}-@{label}-features.txt"/>
+                    <process-one-dataset
+                            mode="ga-wrapper"
+                            dataset-name="@{dataset-name}"
+                            type="@{type}"
+                            tasks="@{tasks}"
+                            gene-list="@{dataset-root}/gene-lists/full-array-only.txt"
+                            platform="@{platform}"
+                            dataset-root="@{dataset-root}"
+                            output="@{dataset-name}-@{label}-features.txt"
+                            rserve-port="@{rserve-port}"
+                            other-options="-r 0.5 --num-features 50 -n ${ga-wrapper-number-of-iterations} -s ${ga-wrapper-population-size} -f ${CV-folds} ${ga-wrapper-roc-str}"/>
+                    <write-model-and-cross-validation dataset-name="@{dataset-name}"
+                                                      dataset-root="@{dataset-root}" tasks="@{tasks}"
+                                                      type="@{type}" platform="@{platform}" label="@{label}"
+                                                      rserve-port="@{rserve-port}"
+                                                      stats-file="@{dataset-name}-tune-stats.txt"/>
+                </try>
+                <catch>
+                    <echo message="CAUGHT FAILED BUILD process-tune-genetic-algorithm : dataset-name=@{dataset-name}"/>
+                </catch>
+                <finally>
+                    <copy-output-files dataset-name="@{dataset-name}"/>
+                </finally>
+            </trycatch>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="process-predict" description="Run one prediction">
+        <attribute name="testset-name"/>
+        <attribute name="trainingset-name"/>
+        <attribute name="type"/>
+        <attribute name="dataset-root"/>
+        <attribute name="rserve-port"/>
+        <attribute name="platform"/>
+        <attribute name="pathways-file"/>
+        <attribute name="gene-to-probes-file"/>
+        <attribute name="model-directory"/>
+        <attribute name="test-samples"/>
+        <attribute name="label" default="predict-test"/>
+
+        <sequential>
+            <for param="predict-model-file">
+                <fileset dir="@{model-directory}">
+                    <include name="*.model"/>
+                </fileset>
+                <sequential>
+                    <var name="pathways-params" value=""/>
+                    <if>
+                        <contains string="@{predict-model-file}" substring="-pathways-"/>
+                        <then>
+                            <var name="pathways-params"
+                                 value="--pathways @{dataset-root}/pathways/@{pathways-file} --gene-to-probes @{dataset-root}/pathways/@{gene-to-probes-file}"/>
+                        </then>
+
+                    </if>
+                    <echo message=">>> Processing prediction for @{predict-model-file} / ${pathways-params}"/>
+                    <trycatch>
+                        <try>
+                            <predict-one-dataset
+                                    mode="predict"
+                                    testset-name="@{testset-name}"
+                                    type="@{type}"
+                                    platform="@{platform}"
+                                    dataset-root="@{dataset-root}"
+                                    output="@{trainingset-name}-@{label}-stats.txt"
+                                    rserve-port="@{rserve-port}"
+                                    model="@{predict-model-file}"
+                                    true-labels="@{dataset-root}/cids/@{testset-name}AndTesting.cids"
+                                    test-samples="@{dataset-root}/test-samples/@{test-samples}"
+                                    other-options="--print-stats ${pathways-params} "/>
+                            <!-- - - print-stats -->
+                        </try>
+                        <catch>
+                            <echo message="CAUGHT FAILED BUILD process-predict : testset-name=@{testset-name}, predict-model-file=@{predict-model-file}, test-samples=@{test-samples}"/>
+                        </catch>
+                        <finally>
+                            <copy-output-files dataset-name="@{dataset-name}"/>
+                        </finally>
+                    </trycatch>
+                </sequential>
+            </for>
+        </sequential>
+    </macrodef>
+
+    <target name="predict-synthetic-7-test" depends="init,compile" description="Predict synthetic-7 test set">
+        <process-predict
+                testset-name="synthetic-data-7"
+                trainingset-name="synthetic-data-7Training"
+                type="tmm"
+                dataset-root="${eval-dataset-root}"
+                platform="${eval-dataset-root}/platforms/GPL1261_platform.soft.gz"
+                pathways-file="${human-pathways-file}"
+                gene-to-probes-file="not-applicable"
+                model-directory="${eval-dataset-root}/models/synthetic-data-7Training"
+                test-samples="synthetic-data-7Testing.testsamples"/>
+    </target>
+
+    <target name="predict-synthetic-3-train" depends="init,compile" description="Predict UAMS train set">
+        <process-predict
+                testset-name="synthetic-3"
+                trainingset-name="synthetic-3"
+                type="tmm"
+                dataset-root="${eval-dataset-root}"
+                platform="${eval-dataset-root}/platforms/GPL570_family.soft.gz"
+                pathways-file="${human-pathways-file}"
+                gene-to-probes-file="not-applicable"
+                model-directory="${eval-dataset-root}/models/synthetic-3"
+                test-samples="synthetic-3Training-60.test-samples"/>
+    </target>
+
+    <macrodef name="process-pathways" description="Process Pathways">
+        <attribute name="dataset-name"/>
+        <attribute name="dataset-root"/>
+        <attribute name="tasks"/>
+        <attribute name="type"/>
+        <attribute name="platform"/>
+        <attribute name="pathways-file"/>
+        <attribute name="gene-to-probes-file"/>
+        <attribute name="rserve-port" default="-1"/>
+        <attribute name="ttest-alpha" default="0.05"/>
+        <attribute name="label" default="pathways-ttest-pathways"/>
+
+        <sequential>
+            <echo message=">>> Selecting features (ttest-alpha = @{ttest-alpha)"/>
+            <!-- output is appended, so delete the gene list to ensure we do not append to a pre-existing one. -->
+            <delete file="@{dataset-name}-@{label}-intermediate-features.txt"/>
+            <delete file="@{dataset-name}-@{label}-features.txt"/>
+
+            <process-one-dataset
+                    mode="t-test"
+                    dataset-name="@{dataset-name}"
+                    type="@{type}"
+                    tasks="@{tasks}"
+                    gene-list="@{dataset-root}/gene-lists/full-array-only.txt"
+                    platform="@{platform}"
+                    dataset-root="@{dataset-root}"
+                    output="@{dataset-name}-@{label}-intermediate-features.txt"
+                    rserve-port="@{rserve-port}"
+                    pathways-params="--pathways @{dataset-root}/pathways/@{pathways-file} --gene-to-probes @{dataset-root}/pathways/@{gene-to-probes-file}"
+                    other-options="-n @{ttest-alpha} --output-gene-list --report-max-probes 1000"/>
+            <process-one-dataset
+                    mode="ga-wrapper"
+                    dataset-name="@{dataset-name}"
+                    type="@{type}"
+                    tasks="@{tasks}"
+                    gene-list="@{dataset-root}/gene-lists/@{dataset-name}-@{label}-intermediate-gene-lists.txt"
+                    platform="@{platform}"
+                    dataset-root="@{dataset-root}"
+                    output="@{dataset-name}-@{label}-features.txt"
+                    rserve-port="@{rserve-port}"
+                    pathways-params="--pathways @{dataset-root}/pathways/@{pathways-file} --gene-to-probes @{dataset-root}/pathways/@{gene-to-probes-file}"
+                    other-options="-r 0.5 --num-features 50 -n ${ga-wrapper-number-of-iterations} -s ${ga-wrapper-population-size} -f ${CV-folds} ${ga-wrapper-roc-str} ${CV-repeats} --output-gene-list"/>
+            <write-model-and-cross-validation
+                    dataset-name="@{dataset-name}"
+                    dataset-root="@{dataset-root}" tasks="@{tasks}"
+                    type="@{type}" platform="@{platform}" label="@{label}"
+                    rserve-port="@{rserve-port}"
+                    stats-file="@{dataset-name}-pathways-stats.txt"
+                    pathways-params="--pathways @{dataset-root}/pathways/@{pathways-file} --gene-to-probes @{dataset-root}/pathways/@{gene-to-probes-file}"/>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="write-model-and-cross-validation" description="Write model, perform CrossValidation">
+        <attribute name="dataset-name"/>
+        <attribute name="dataset-root"/>
+        <attribute name="tasks"/>
+        <attribute name="type"/>
+        <attribute name="platform"/>
+        <attribute name="label"/>
+        <attribute name="rserve-port" default="-1"/>
+        <attribute name="stats-file"/>
+        <attribute name="pathways-params" default=""/>
+
+        <sequential>
+            <echo message=">>> Writting model"/>
+            <process-one-dataset
+                    mode="write-model"
+                    dataset-name="@{dataset-name}"
+                    type="@{type}"
+                    tasks="@{tasks}"
+                    specific-gene-list="@{dataset-name}-@{label}-features.txt"
+                    platform="@{platform}"
+                    output="@{dataset-name}-@{label}-features-libsvm-modelgeneration.txt"
+                    dataset-root="@{dataset-root}"
+                    rserve-port="@{rserve-port}"
+                    pathways-params="@{pathways-params}"
+                    label="@{label}"
+                    other-options=""/>
+            <!-- Now do cross-validation (CV10) with the features selected by the baseline approach, report the results in baseline-stats.txt   -->
+            <echo message=">>> CV10 with features"/>
+            <process-one-dataset
+                    mode="cross-validation"
+                    dataset-name="@{dataset-name}"
+                    type="@{type}"
+                    tasks="@{tasks}"
+                    specific-gene-list="@{dataset-name}-@{label}-features.txt"
+                    platform="@{platform}"
+                    output="@{stats-file}"
+                    dataset-root="@{dataset-root}"
+                    rserve-port="@{rserve-port}"
+                    pathways-params="@{pathways-params}"
+                    other-options="--folds 10 ${CV-repeats}  --submission-file @{dataset-name}-maqcii-submission.file.txt "/>
+            <!--tune-parameters  dataset-name="@{dataset-name}"
+               type="@{type}"
+               tasks="@{tasks}"
+               gene-list="@{dataset-root}/gene-lists/@{dataset-name}-@{label}-gene-lists.txt"
+               label="@{label}-parameters"
+               platform="@{platform}"   dataset-root="@{dataset-root}"
+            /-->
+
+        </sequential>
+    </macrodef>
+
+    <macrodef name="copy-output-files" description="Copy the output files to the results dir">
+        <attribute name="dataset-name"/>
+        <sequential>
+            <echo message="Moving output files for @{dataset-name} to ${save-data-dir}"/>
+            <move todir="${save-data-dir}">
+                <fileset dir="." casesensitive="false">
+                    <include name="libSVM_*@{dataset-name}*"/>
+                    <include name="@{dataset-name}-baseline-*"/>
+                    <include name="@{dataset-name}-tune-*"/>
+                    <include name="@{dataset-name}-genelists-*"/>
+                    <include name="@{dataset-name}-parameters-*"/>
+                    <include name="@{dataset-name}-pathways-*"/>
+
+                    <exclude name="@{dataset-name}-maqcii-subbmission.file.txt"/>
+                    <exclude name="@{dataset-name}-*-stats.txt"/>
+                </fileset>
+            </move>
+            <copy todir="${save-data-dir}">
+                <fileset dir="." casesensitive="false">
+                    <include name="@{dataset-name}-maqcii-submission.file.txt"/>
+                    <include name="@{dataset-name}-*-stats.txt"/>
+                </fileset>
+            </copy>
+
+            <mkdir dir="${save-data-dir}/features/@{dataset-name}"/>
+            <copy todir="${save-data-dir}/features/@{dataset-name}">
+                <fileset dir="${save-data-dir}" casesensitive="false">
+                    <include name="@{dataset-name}-*-features.txt"/>
+                    <exclude name="*-intermediate-features.txt"/>
+                </fileset>
+            </copy>
+
+            <mkdir dir="${save-data-dir}/models/@{dataset-name}"/>
+            <copy todir="${save-data-dir}/models/@{dataset-name}">
+                <fileset dir="${save-data-dir}" casesensitive="false">
+                    <include name="libSVM_*@{dataset-name}*"/>
+                </fileset>
+            </copy>
+
+        </sequential>
+    </macrodef>
+
+    <target name="zip-results" description="Zip result files">
+        <sequential>
+            <concat destfile="${save-data-dir}/${save-data-tag}-all-maqcii-submission.txt">
+                <fileset dir="${save-data-dir}" file="*maqcii-submission*.txt"/>
+            </concat>
+            <concat destfile="${save-data-dir}/${save-data-tag}-all-stats.txt">
+                <fileset dir="${save-data-dir}" file="*stats*.txt"/>
+            </concat>
+            <delete>
+                <fileset dir="${save-data-dir}" file="*maqcii-submission*.txt"/>
+                <fileset dir="${save-data-dir}" file="*stats*.txt"/>
+            </delete>
+            <echo message="Zipping results ${save-data-tag}.zip"/>
+            <zip zipfile="${save-data-tag}.zip">
+                <fileset dir="${save-data-dir}">
+                    <include name="**"/>
+                </fileset>
+            </zip>
+        </sequential>
+    </target>
+
+    <target name="delete-results" description="Zip result files">
+        <delete verbose="true" includeemptydirs="">
+            <fileset dir=".">
+                <include name="200*-results/**/*"/>
+                <include name="200*-results"/>
+                <include name="200*-results.zip"/>
+            </fileset>
+        </delete>
+    </target>
+
+    <macrodef name="copy-tune-parameters-files" description="Copy the output files to the results dir">
+        <sequential>
+            <echo message="Moving output files to ${save-data-dir}"/>
+            <move todir="${save-data-dir}">
+                <fileset dir="." casesensitive="false">
+                    <include name="maqcii-submission.file.txt"/>
+                    <include name="${tune-parameters-output}"/>
+                </fileset>
+            </move>
+        </sequential>
+    </macrodef>
+
+    <!-- ==================== Compile Target =========================== -->
+    <target name="compile">
+        <ant antfile="../build.xml" target="compile" inheritall="false"/>
+    </target>
+
+    <target name="init">
+
+    </target>
+    <target name="tag-output-directory">
+        <tstamp/>
+        <property name="save-data-dir" value="./${DSTAMP}-${TSTAMP}-results/"/>
+        <property name="save-data-tag" value="${DSTAMP}-${TSTAMP}-results"/>
+        <mkdir dir="${save-data-dir}"/>
+        <copy file="maqcii-a.xml" todir="${save-data-dir}"/>
+        <copy file="${config}/RConnectionPool.xml" todir="${classes}"/>
+        <delete verbose="true" includeemptydirs="">
+            <fileset dir=".">
+                <include name="*-maqcii-submission*.txt"/>
+                <include name="*-stats.txt"/>
+            </fileset>
+        </delete>
+        <input addproperty="tag-description"
+               message="Please provide a short description for this run (i.e., condition tested, summary of parameters)."/>
+        <echo file="${save-data-dir}/${save-data-tag}-README.txt">${tag-description}
+
+            -----
+            Parameters used in this run were:
+            default-eval-dataset-root: ${default-eval-dataset-root}
+            CV-repeats: ${CV-repeats}
+            CV-folds: ${CV-folds}
+            feature-option: ${feature-option}
+
+            svm-classifier: ${svm-classifier}
+            svm-parameters: ${svm-parameters}
+            use-probability: ${use-probability}
+
+            ga-wrapper-population-size: ${ga-wrapper-population-size}
+            ga-wrapper-number-of-iterations: ${ga-wrapper-number-of-iterations}
+            ga-wrapper-roc-str: ${ga-wrapper-roc-str}
+
+            human-pathways-file: ${human-pathways-file}
+            mouse-pathways-file: ${mouse-pathways-file}
+            rat-pathways-file: ${rat-pathways-file}
+        </echo>
+
+
+    </target>
+
+    <!-- Pathway Targets -->
+    <target name="do-pathways-all" description="Run all pathways" depends="compile, tag-output-directory">
+        <sequential>
+            <do-one-process-pathways dataset-name="HamnerWithControl"/>
+                        <!--
+            <do-one-process-pathways dataset-name="HamnerNoControl"/>
+            -->
+            <!--
+            <do-one-process-pathways dataset-name="Iconix"/>
+            <do-one-process-pathways dataset-name="NIEHS"/>
+            <do-one-process-pathways dataset-name="MDACC_PCR"/>
+            <do-one-process-pathways dataset-name="MDACC_ERPOS"/>
+            <do-one-process-pathways dataset-name="UAMS_OS_MO"/>
+            <do-one-process-pathways dataset-name="UAMS_EFS_MO"/>
+            <do-one-process-pathways dataset-name="UAMS_CPS1"/>
+            <do-one-process-pathways dataset-name="UAMS_CPR1"/>
+            <do-one-process-pathways dataset-name="Cologne_OS_MO"/>
+            <do-one-process-pathways dataset-name="Cologne_NEP_S"/>
+            <do-one-process-pathways dataset-name="Cologne_NEP_R"/>
+            <do-one-process-pathways dataset-name="Cologne_EFS_MO"/>
+             <do-one-process-pathways dataset-name="NIEHSTraining"/>
+            <do-one-process-pathways dataset-name="UAMS_CPR1Training"/>
+            <do-one-process-pathways dataset-name="CologneTraining"/>
+            -->
+
+
+            <antcall target="zip-results"/>
+
+        </sequential>
+    </target>
+
+    <!-- Normal targets (non-pathways) -->
+
+    <target name="all" description="Run a complete evaluation." depends="compile, tag-output-directory">
+        <delete file="${statistics-output}"/>
+
+        <echo message="Executing with ${num-threads} threads"/>
+        <sequential>
+            <!--
+            <do-one-process-all dataset-name="HamnerNoControl"/>
+            -->
+            <do-one-process-all dataset-name="CologneTraining"/>
+            <do-one-process-all dataset-name="NIEHSTraining"/>
+            <do-one-process-all dataset-name="UAMS_CPR1Training"/>
+            <!--
+            <do-one-process-all dataset-name="HamnerWithControl"/>
+            <do-one-process-all dataset-name="Iconix"/>
+            <do-one-process-all dataset-name="NIEHS"/>
+            <do-one-process-all dataset-name="MDACC_PCR"/>
+            <do-one-process-all dataset-name="MDACC_ERPOS"/>
+            <do-one-process-all dataset-name="UAMS_OS_MO"/>
+            <do-one-process-all dataset-name="UAMS_EFS_MO"/>
+            <do-one-process-all dataset-name="UAMS_CPS1"/>
+            <do-one-process-all dataset-name="UAMS_CPR1"/>
+            <do-one-process-all dataset-name="Cologne_OS_MO"/>
+            <do-one-process-all dataset-name="Cologne_NEP_S"/>
+            <do-one-process-all dataset-name="Cologne_NEP_R"/>
+            <do-one-process-all dataset-name="Cologne_EFS_MO"/>
+            -->
+
+        </sequential>
+        <antcall target="zip-results"/>
+    </target>
+
+
+    <target name="predict-all-tests" description="Run predict on test sets."
+            depends="compile, tag-output-directory">
+        <delete file="${statistics-output}"/>
+        <echo message="Executing with ${num-threads} threads"/>
+        <input addproperty="model-directory" defaultvalue="${eval-dataset-root}/models"
+               message="Provide a directory where the models to be tested are stored (e.g., /home/dev-maqcii/models)"/>
+        <sequential>
+            <do-one-process-predict dataset-name="CologneTraining" mode="test"/>
+            <!--
+            <do-one-process-predict dataset-name="NIEHSTraining" mode="test"/>
+            <do-one-process-predict dataset-name="UAMS_CPR1Training" mode="test"/>
+            -->
+        </sequential>
+        <antcall target="zip-results"/>
+    </target>
+
+    <target name="predict-all-trainings" description="Run predict models on test sets."
+            depends="compile, tag-output-directory">
+        <delete file="${statistics-output}"/>
+        <echo message="Executing with ${num-threads} threads"/>
+        <input addproperty="model-directory" defaultvalue="${eval-dataset-root}/models"
+               message="Provide a directory where the models to be tested are stored (e.g., /home/dev-maqcii/models)"/>
+        <sequential>
+            <do-one-process-predict dataset-name="CologneTraining" mode="train"/>
+            <!--
+            <do-one-process-predict dataset-name="NIEHSTraining" mode="train"/>
+            <do-one-process-predict dataset-name="UAMS_CPR1Training" mode="train"/>
+            -->
+        </sequential>
+        <antcall target="zip-results"/>
+    </target>
+
+    <target name="do-synthetic" description="process synthetic dataset" depends="tag-output-directory,compile">
+
+        <process-tune-ttest-iterative-svm-weights dataset-name="synthetic-data-7Training"
+                                                  dataset-root="${eval-dataset-root}"
+                                                  tasks="synthetic-data-7Training.tasks"
+                                                  type="tmm"
+                                                  platform="${eval-dataset-root}/platforms/GPL1261_platform.soft.gz"
+                                                  ttest-alpha="0.05"/>
+
+        <process-tune-foldchange-iterative-svm-weights dataset-name="synthetic-data-7"
+                                                       dataset-root="${eval-dataset-root}"
+                                                       tasks="synthetic-data-7.tasks"
+                                                       type="tmm"
+                                                       platform="${eval-dataset-root}/platforms/GPL1261_platform.soft.gz"/>
+
+        <!--process-tune-ttest-iterative-svm-weights dataset-name="synthetic-data-7"
+                                                  dataset-root="${eval-dataset-root}" tasks="synthetic-data-7.tasks"
+                                                  type="tmm"
+                                                  platform="${eval-dataset-root}/platforms/GPL1261_platform.soft.gz"
+                                                  ttest-alpha="0.05"/-->
+
+        <!--process-baseline dataset-name="synthetic-data-3"
+       dataset-root="${eval-dataset-root}" tasks="synthetic-data-3.tasks"
+       type="tmm" platform="${eval-dataset-root}/platforms/GPL1261_platform.soft.gz"/-->
+        <antcall target="zip-results"/>
+
+    </target>
+
+    <macrodef name="do-one-process-predict" description="Running process-pathways for one dataset.">
+        <attribute name="dataset-name"/>
+        <attribute name="mode"/>
+        <sequential>
+
+            <echo message="Running process-pathways with the following parameters..."/>
+            <echo message="-------------------------------------------------------"/>
+            <echo message="mode=@{mode}"/>
+            <echo message="dataset-name=@{dataset-name}"/>
+            <echo message="platform=${@{dataset-name}.platform}"/>
+            <echo message="pathways-file=${@{dataset-name}.pathways-file}"/>
+            <echo message="gene-to-probes-file=${@{dataset-name}.gene-to-probes-file}"/>
+            <echo message="trainingset-name=${@{dataset-name}.trainingset-name}"/>
+            <echo message="model-directory=${@{dataset-name}.model-directory}"/>
+            <echo message="test-samples=${@{dataset-name}.@{mode}.test-samples}"/>
+
+            <process-predict
+                testset-name="@{dataset-name}"
+                dataset-root="${eval-dataset-root}"
+                trainingset-name="${@{dataset-name}.trainingset-name}"
+                type="tmm"
+                pathways-file="${@{dataset-name}.pathways-file}"
+                gene-to-probes-file="${@{dataset-name}.gene-to-probes-file}"
+                model-directory="${@{dataset-name}.@{mode}.model-directory}"
+                test-samples="${@{dataset-name}.@{mode}.test-samples}"
+                platform="${@{dataset-name}.platform}"/>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="do-one-process-pathways" description="Running process-pathways for one dataset.">
+        <attribute name="dataset-name"/>
+        <sequential>
+
+            <echo message="Running process-pathways with the following parameters..."/>
+            <echo message="-------------------------------------------------------"/>
+            <echo message="dataset-name=@{dataset-name}"/>
+            <echo message="platform=${@{dataset-name}.platform}"/>
+            <echo message="pathways-file=${@{dataset-name}.pathways-file}"/>
+            <echo message="gene-to-probes-file=${@{dataset-name}.gene-to-probes-file}"/>
+
+            <trycatch>
+                <try>
+                    <process-pathways
+                            dataset-name="@{dataset-name}"
+                            dataset-root="${eval-dataset-root}"
+                            type="tmm"
+                            tasks="@{dataset-name}-full.tasks"
+                            pathways-file="${@{dataset-name}.pathways-file}"
+                            gene-to-probes-file="${@{dataset-name}.gene-to-probes-file}"
+                            platform="${@{dataset-name}.platform}"/>
+                </try>
+                <catch>
+                    <echo message="CAUGHT FAILED BUILD"/>
+                </catch>
+                <finally>
+                    <copy-output-files dataset-name="@{dataset-name}"/>
+                </finally>
+            </trycatch>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="do-one-tune-parameters" description="Running tune-parameters for one dataset.">
+        <attribute name="dataset-name"/>
+        <sequential>
+
+            <echo message="Running tune-parameters with the following parameters..."/>
+            <echo message="-------------------------------------------------------"/>
+            <echo message="dataset-name=@{dataset-name}"/>
+            <echo message="platform=${@{dataset-name}.platform}"/>
+            <echo message="pathways-file=${@{dataset-name}.pathways-file}"/>
+            <echo message="gene-to-probes-file=${@{dataset-name}.gene-to-probes-file}"/>
+
+            <tune-parameters
+                    dataset-name="@{dataset-name}"
+                    dataset-root="${eval-dataset-root}"
+                    type="tmm"
+                    tasks="@{dataset-name}-full.tasks"
+                    pathways-file="${@{dataset-name}.pathways-file}"
+                    gene-to-probes-file="${@{dataset-name}.gene-to-probes-file}"
+                    platform="${@{dataset-name}.platform}"/>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="do-one-rewrite-model" description="Running rewrite-models for one dataset.">
+        <attribute name="dataset-name"/>
+        <sequential>
+
+            <echo message="Running rewrite-models with the following parameters..."/>
+            <echo message="-------------------------------------------------------"/>
+            <echo message="dataset-name=@{dataset-name}"/>
+            <echo message="platform=${@{dataset-name}.platform}"/>
+            <echo message="pathways-file=${@{dataset-name}.pathways-file}"/>
+            <echo message="gene-to-probes-file=${@{dataset-name}.gene-to-probes-file}"/>
+
+            <rewrite-models
+                    dataset-name="@{dataset-name}"
+                    dataset-root="${eval-dataset-root}"
+                    type="tmm"
+                    tasks="@{dataset-name}-full.tasks"
+                    pathways-file="${@{dataset-name}.pathways-file}"
+                    gene-to-probes-file="${@{dataset-name}.gene-to-probes-file}"
+                    platform="${@{dataset-name}.platform}"/>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="do-one-re-cross-validate" description="Running re-cross-validate for one dataset.">
+        <attribute name="dataset-name"/>
+        <sequential>
+
+            <echo message="Running re-cross-validate with the following parameters..."/>
+            <echo message="-------------------------------------------------------"/>
+            <echo message="dataset-name=@{dataset-name}"/>
+            <echo message="platform=${@{dataset-name}.platform}"/>
+            <echo message="pathways-file=${@{dataset-name}.pathways-file}"/>
+            <echo message="gene-to-probes-file=${@{dataset-name}.gene-to-probes-file}"/>
+
+            <re-cross-validate
+                    dataset-name="@{dataset-name}"
+                    dataset-root="${eval-dataset-root}"
+                    type="tmm"
+                    tasks="@{dataset-name}-full.tasks"
+                    pathways-file="${@{dataset-name}.pathways-file}"
+                    gene-to-probes-file="${@{dataset-name}.gene-to-probes-file}"
+                    platform="${@{dataset-name}.platform}"/>
+            <copy-output-files dataset-name="@{dataset-name}"/>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="do-one-process-all" description="Running process-all for one dataset.">
+        <attribute name="dataset-name"/>
+        <sequential>
+            <trycatch>
+                <try>
+
+                    <echo message="Running process-all with the following parameters..."/>
+                    <echo message="-------------------------------------------------------"/>
+                    <echo message="dataset-name=@{dataset-name}"/>
+                    <echo message="platform=${@{dataset-name}.platform}"/>
+                    <echo message="do-process-gene-lists=${@{dataset-name}.do-process-gene-lists}"/>
+
+                    <process-all
+                            dataset-name="@{dataset-name}"
+                            dataset-root="${eval-dataset-root}"
+                            type="tmm"
+                            tasks="@{dataset-name}-full.tasks"
+                            platform="${@{dataset-name}.platform}"
+                            do-process-gene-lists="${@{dataset-name}.do-process-gene-lists}"/>
+                </try>
+                <catch>
+                    <echo message="CAUGHT FAILED BUILD"/>
+                </catch>
+                <finally>
+                    <copy-output-files dataset-name="@{dataset-name}"/>
+                </finally>
+            </trycatch>
+        </sequential>
+    </macrodef>
+
+    <target name="tune-parameters-all" description="Run a complete evaluation."
+            depends="init,compile,tag-output-directory">
+        <delete file="${statistics-output}"/>
+        <delete file="${tune-parameters-output}"/>
+        <input addproperty="features-dir"
+               message="Enter the features directory (i.e., /home/maqcii/dev-maqcii/features/)"
+               defaultvalue="@{dataset-root}/features"/>
+        <echo message="Executing with ${num-threads} threads"/>
+        <sequential>
+            <!--
+            <do-one-tune-parameters dataset-name="HamnerNoControl"/>
+            -->
+            <do-one-tune-parameters dataset-name="HamnerWithControl"/>
+            <do-one-tune-parameters dataset-name="Iconix"/>
+            <do-one-tune-parameters dataset-name="NIEHS"/>
+            <do-one-tune-parameters dataset-name="NIEHSTraining"/>
+            <do-one-tune-parameters dataset-name="MDACC_PCR"/>
+            <do-one-tune-parameters dataset-name="MDACC_ERPOS"/>
+            <do-one-tune-parameters dataset-name="UAMS_OS_MO"/>
+            <do-one-tune-parameters dataset-name="UAMS_EFS_MO"/>
+            <do-one-tune-parameters dataset-name="UAMS_CPS1"/>
+            <do-one-tune-parameters dataset-name="UAMS_CPR1"/>
+            <do-one-tune-parameters dataset-name="UAMS_CPR1Training"/>
+            <do-one-tune-parameters dataset-name="Cologne_OS_MO"/>
+            <do-one-tune-parameters dataset-name="Cologne_NEP_S"/>
+            <do-one-tune-parameters dataset-name="Cologne_NEP_R"/>
+            <do-one-tune-parameters dataset-name="Cologne_EFS_MO"/>
+            <do-one-tune-parameters dataset-name="CologneTraining"/>
+        </sequential>
+        <copy-tune-parameters-files/>
+        <antcall target="zip-results"/>
+    </target>
+
+    <target name="rewrite-models-all" description="Run a complete evaluation." depends="init,compile">
+        <delete file="${statistics-output}"/>
+        <echo message="Executing with ${num-threads} threads"/>
+        <sequential>
+            <!--
+            <do-one-rewrite-model dataset-name="HamnerNoControl"/>
+            -->
+            <do-one-rewrite-model dataset-name="HamnerWithControl"/>
+            <do-one-rewrite-model dataset-name="Iconix"/>
+            <do-one-rewrite-model dataset-name="NIEHS"/>
+            <do-one-rewrite-model dataset-name="NIEHSTraining"/>
+            <do-one-rewrite-model dataset-name="MDACC_PCR"/>
+            <do-one-rewrite-model dataset-name="MDACC_ERPOS"/>
+            <do-one-rewrite-model dataset-name="UAMS_OS_MO"/>
+            <do-one-rewrite-model dataset-name="UAMS_EFS_MO"/>
+            <do-one-rewrite-model dataset-name="UAMS_CPS1"/>
+            <do-one-rewrite-model dataset-name="UAMS_CPR1"/>
+            <do-one-rewrite-model dataset-name="UAMS_CPR1Training"/>
+            <do-one-rewrite-model dataset-name="Cologne_OS_MO"/>
+            <do-one-rewrite-model dataset-name="Cologne_NEP_S"/>
+            <do-one-rewrite-model dataset-name="Cologne_NEP_R"/>
+            <do-one-rewrite-model dataset-name="Cologne_EFS_MO"/>
+            <do-one-rewrite-model dataset-name="CologneTraining"/>
+        </sequential>
+        <copy-output-files dataset-name="*"/>
+    </target>
+
+    <macrodef name="re-cross-validate">
+        <attribute name="dataset-name"/>
+        <attribute name="dataset-root"/>
+        <attribute name="tasks"/>
+        <attribute name="type"/>
+        <attribute name="platform"/>
+        <attribute name="pathways-file"/>
+        <attribute name="gene-to-probes-file"/>
+        <attribute name="rserve-port" default="-1"/>
+        <attribute name="label" default="re-cross-validate"/>
+        <attribute name="gene-features-dir" default="@{dataset-root}/features/@{dataset-name}"/>
+
+        <sequential>
+            <echo message=">>> Re-Cross Validating with genes from @{gene-features-dir}"/>
+
+            <for param="gene-list">
+                <fileset dir="@{dataset-root}/gene-lists">
+                    <include name="@{dataset-name}-*-gene-lists.txt"/>
+                    <exclude name="@{dataset-name}-*-intermediate-gene-lists.txt"/>
+                    <!-- <exclude name="@{dataset-name}-*-pathways-gene-lists.txt"/> -->
+                </fileset>
+                <sequential>
+                    <var name="pathways-params" value=""/>
+                    <if>
+                        <contains string="@{gene-list}" substring="-pathways-"/>
+                        <then>
+                            <echo message=">>> Using pathways-params"/>
+                            <var name="pathways-params"
+                                 value="--pathways @{dataset-root}/pathways/@{pathways-file} --gene-to-probes @{dataset-root}/pathways/@{gene-to-probes-file}"/>
+                        </then>
+                    </if>
+                    <echo message=">>> Current gene-list file is @{gene-list}"/>
+                    <echo message=">>> pathways-params are ${pathways-params}"/>
+
+                    <trycatch>
+                        <try>
+                            <process-one-dataset
+                                    mode="cross-validation"
+                                    dataset-name="@{dataset-name}"
+                                    type="@{type}"
+                                    tasks="@{tasks}"
+                                    gene-list="@{gene-list}"
+                                    gene-features-dir="@{gene-features-dir}"
+                                    platform="@{platform}"
+                                    dataset-root="@{dataset-root}"
+                                    rserve-port="@{rserve-port}"
+                                    pathways-params="${pathways-params}"
+                                    other-options="--output-stats-from-gene-list --folds 10  ${CV-repeats}  --submission-file @{dataset-name}-maqcii-submission.file.txt "/>
+                        </try>
+                        <catch>
+                            <echo message="CAUGHT BUILD FAILER Re-Cross Validate on @{dataset-name} failed with genelist @{gene-list}"/>
+                        </catch>
+                        <finally>
+                            <copy-output-files dataset-name="@{dataset-name}"/>
+                        </finally>
+                    </trycatch>
+                </sequential>
+            </for>
+        </sequential>
+    </macrodef>
+
+    <target name="re-cross-validate-all" description="Run a complete evaluation." depends="init,compile">
+        <delete file="${statistics-output}"/>
+        <echo message="Executing with ${num-threads} threads"/>
+        <sequential>
+            <!--
+            <do-one-re-cross-validate dataset-name="HamnerNoControl"/>
+            -->
+            <do-one-re-cross-validate dataset-name="HamnerWithControl"/>
+            <do-one-re-cross-validate dataset-name="Iconix"/>
+            <do-one-re-cross-validate dataset-name="NIEHS"/>
+            <do-one-re-cross-validate dataset-name="NIEHSTraining"/>
+            <do-one-re-cross-validate dataset-name="MDACC_PCR"/>
+            <do-one-re-cross-validate dataset-name="MDACC_ERPOS"/>
+            <do-one-re-cross-validate dataset-name="UAMS_OS_MO"/>
+            <do-one-re-cross-validate dataset-name="UAMS_EFS_MO"/>
+            <do-one-re-cross-validate dataset-name="UAMS_CPS1"/>
+            <do-one-re-cross-validate dataset-name="UAMS_CPR1"/>
+            <do-one-re-cross-validate dataset-name="UAMS_CPR1Training"/>
+            <do-one-re-cross-validate dataset-name="Cologne_OS_MO"/>
+            <do-one-re-cross-validate dataset-name="Cologne_NEP_S"/>
+            <do-one-re-cross-validate dataset-name="Cologne_NEP_R"/>
+            <do-one-re-cross-validate dataset-name="Cologne_EFS_MO"/>
+            <do-one-re-cross-validate dataset-name="CologneTraining"/>
+        </sequential>
+        <copy-output-files dataset-name="*"/>
+    </target>
+</project>

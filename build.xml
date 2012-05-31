@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="bdval-build" default="jar" basedir=".">
+    <import file="buildsupport/build.xml"/>
+
+    <property name="bdval-jarfile" value="bdval.jar"/>
+    <property name="api-jarfile" value="bdval-api.jar"/>
+    <property name="bmf-calibration-models-jarfile" value="bmf-calibration.jar"/>
+    <property name="compound-file-tool-jarfile" value="compound-file-tool.jar"/>
+
+    <!-- compiler and javadoc settings -->
+    <property name="debug" value="on"/>
+    <property name="optimize" value="on"/>
+    <property name="deprecation" value="false"/>
+    <property name="ant.build.javac.source" value="1.6"/>
+    <property name="ant.build.javac.target" value="1.6"/>
+
+    <!-- the label gets overridden by CruiseControl and/or during a release -->
+    <property name="label" value="development"/>
+
+    <!-- this property controls the output of the internal log4j configuration initialization -->
+    <property name="log4j.debug" value="true"/>
+
+    <!-- this property sets the memory size for unit tests -->
+    <property name="test.max.memory" value="999m"/>
+
+    <path id="compile.classpath">
+        <fileset dir="${lib}">
+            <include name="*.jar"/>
+            <include name="Rserve/*.jar"/>
+            <include name="jlapack/*.jar"/>
+            <include name="tct/*.jar"/>
+        </fileset>
+    </path>
+
+    <path id="classpath">
+        <pathelement location="${classes}"/>
+        <pathelement location="${config}"/>
+        <pathelement location="${src}"/>
+        <!-- required for rscripts -->
+        <path refid="compile.classpath"/>
+    </path>
+
+    <import file="testsupport/build.xml"/>
+
+    <target name="init" depends="buildsupport.init, testsupport.init"/>
+
+    <target name="compile" depends="init" description="Compile Source code">
+        <javac srcdir="${src}" destdir="${classes}" debug="${debug}" deprecation="${deprecation}">
+            <!--<compilerarg value="-Xlint"/>-->
+            <classpath refid="compile.classpath"/>
+        </javac>
+    </target>
+
+    <target name="jar" depends="jar-bdval, jar-bdval-api, jar-bmf-calibration, jar-compound-file-tool" description="Create project jar files"/>
+
+    <target name="jar-bdval" depends="compile" description="Create bdval.jar">
+        <copy file="${config}/log4j.properties.sample" tofile="${classes}/log4j.properties"
+              overwrite="true" failonerror="false"/>
+        <copy file="${config}/RConnectionPool.xml.sample" tofile="${classes}/RConnectionPool.xml"
+              overwrite="true" failonerror="false"/>
+        <jar jarfile="${bdval-jarfile}" basedir="${classes}">
+            <manifest>
+                <attribute name="Main-Class" value="org.bdval.DiscoverAndValidate"/>
+                <attribute name="Specification-Title" value="BDVal"/>
+                <attribute name="Specification-Vendor"
+                           value="Institute for Computational Biomedicine (ICB), Weill Medical College of Cornell University"/>
+                <attribute name="Implementation-Version" value="${label} ${buildstamp}"/>
+                <attribute name="Implementation-Vendor"
+                           value="Institute for Computational Biomedicine (ICB), Weill Medical College of Cornell University"/>
+                <attribute name="Built-By" value="${user.name}"/>
+            </manifest>
+            <fileset dir="${src}">
+                <include name="rscripts/**"/>
+            </fileset>
+            <exclude name="org/bdval/modelselection/bmf/**"/>
+            <zipgroupfileset dir="${lib}">
+                <include name="colt.jar"/>
+                <include name="commons-cli-1.2.jar"/>
+                <include name="commons-collections-3.2.1.jar"/>
+                <include name="commons-configuration-1.6.jar"/>
+                <include name="commons-io-1.4.jar"/>
+                <include name="commons-lang-2.4.jar"/>
+                <include name="commons-logging-1.1.1.jar"/>
+                <include name="commons-math-2.0.jar"/>
+                <include name="dsiutils-1.0.10.jar"/>
+                <include name="edu.mssm.crover.cli.jar"/>
+                <include name="edu.mssm.crover.tables.jar"/>
+                <include name="fastutil-5.1.5.jar"/>
+                <include name="icb-utils.jar"/>
+                <include name="jakarta-oro-2.0.8.jar"/>
+                <include name="javastat_1.3.jar"/>
+                <include name="jgap.jar"/>
+                <include name="JSAP-2.1.jar"/>
+                <include name="law-1.2.jar"/>
+                <include name="libsvm.jar"/>
+                <include name="log4j-1.2.15.jar"/>
+                <include name="mtj.jar"/>
+                <include name="pj20071021.jar"/>
+                <include name="tisim-api.jar"/>
+                <include name="weka-3.5.6.jar"/>
+                <include name="ant/*.jar"/>        <!-- needed for "formal" releases -->
+                <include name="Rserve/*.jar"/>
+            </zipgroupfileset>
+        </jar>
+        <delete file="${classes}/log4j.properties" failonerror="false"/>
+        <delete file="${classes}/RConnectionPool.xml" failonerror="false"/>
+    </target>
+
+    <target name="jar-bdval-api" depends="compile" description="Create bdval-api.jar">
+        <jar jarfile="${api-jarfile}" basedir="${classes}">
+            <manifest>
+                <attribute name="Specification-Title" value="BDVal"/>
+                <attribute name="Specification-Vendor"
+                           value="Institute for Computational Biomedicine (ICB), Weill Medical College of Cornell University"/>
+                <attribute name="Implementation-Version" value="${label} ${buildstamp}"/>
+                <attribute name="Implementation-Vendor"
+                           value="Institute for Computational Biomedicine (ICB), Weill Medical College of Cornell University"/>
+                <attribute name="Built-By" value="${user.name}"/>
+            </manifest>
+            <fileset dir="${src}">
+                <include name="rscripts/**"/>
+            </fileset>
+            <exclude name="org/bdval/modelselection/bmf/**"/>
+        </jar>
+    </target>
+
+    <target name="jar-bmf-calibration" depends="compile"
+            description="Jar BMF calibration models (not open source, all rights reserved).">
+        <jar jarfile="${bmf-calibration-models-jarfile}" basedir="${classes}">
+            <manifest>
+                <attribute name="Implementation-Title" value="BMF calibration model plugin"/>
+                <attribute name="Specification-Vendor"
+                           value="Institute for Computational Biomedicine (ICB), Weill Medical College of Cornell University"/>
+                <attribute name="Implementation-Version" value="${label} ${buildstamp}"/>
+                <attribute name="Implementation-Vendor"
+                           value="Institute for Computational Biomedicine (ICB), Weill Medical College of Cornell University"/>
+                <attribute name="Built-By" value="${user.name}"/>
+            </manifest>
+            <include name="org/bdval/modelselection/bmf/**"/>
+        </jar>
+    </target>
+
+    <target name="javadoc" description="Run Javadoc on all source code files">
+        <!--  Create the Java doc directory -->
+        <mkdir dir="${javadocs}"/>
+        <javadoc destdir="${javadocs}" author="true" version="true"
+                 windowtitle="BDVal API ${buildstamp}"
+                 header="BDVal API ${buildstamp}">
+            <packageset dir="${src}">
+                <exclude name="org/bdval/modelselection/bmf/**"/>
+            </packageset>
+            <link href="http://java.sun.com/javase/6/docs/api/"/>
+            <link href="http://fastutil.dsi.unimi.it/docs/"/>
+            <link href="http://dsiutils.dsi.unimi.it/docs/"/>
+            <link href="http://jakarta.apache.org/commons/cli/api-release/"/>
+            <link href="http://jakarta.apache.org/commons/collections/api-release/"/>
+            <link href="http://jakarta.apache.org/commons/configuration/apidocs/"/>
+            <link href="http://jakarta.apache.org/commons/io/apidocs/"/>
+            <link href="http://commons.apache.org/lang/apidocs/"/>
+            <link href="http://jakarta.apache.org/commons/logging/apidocs/"/>
+            <link href="http://commons.apache.org/math/api-2.0/"/>
+            <link href="http://dsd.lbl.gov/~hoschek/colt/api/"/>
+            <link href="http://junit.sourceforge.net/javadoc_40/"/>
+            <link href="http://www.cs.rit.edu/~ark/pj/doc/"/>
+            <link href="http://icbtools.med.cornell.edu/javadocs/qtclustering/"/>
+            <link href="http://icbtools.med.cornell.edu/javadocs/icb-utils/"/>
+            <link href="http://martiansoftware.com/jsap/doc/javadoc/"/>
+            <link href="http://weka.sourceforge.net/doc/"/>
+            <classpath refid="classpath"/>
+            <bottom>
+                <![CDATA[<i>Copyright &#169; 2007-${year} Institute for Computational Biomedicine, All Rights Reserved.</i>]]></bottom>
+        </javadoc>
+    </target>
+
+    <target name="clean" depends="buildsupport.clean, testsupport.clean" description="Cleans up the directory">
+        <delete dir="${javadocs}"/>
+        <delete file="${bdval-jarfile}"/>
+        <delete file="${api-jarfile}"/>
+        <delete file="${bmf-calibration-models-jarfile}"/>
+        <delete file="${compound-file-tool-jarfile}"/>
+    </target>
+
+    <target name="test" depends="compile-tests, cobertura-instrument" description="Run JUnit Tests">
+        <if>
+            <equals arg1="${osfamily}" arg2="windows"/>
+            <then>
+                <var name="jni_arpack.path" value="${lib}/tct/native/win32"/>
+            </then>
+            <else>
+                <!-- TODO: this is really hacky - but test configuration is good for most unix machines -->
+                <var name="jni_arpack.path" value="${lib}/tct/native/${os.arch}"/>
+            </else>
+        </if>
+
+        <echo message="JNI path: ${jni_arpack.path}"/>
+
+        <junit dir="${basedir}" fork="true" printsummary="yes" haltonfailure="yes" haltonerror="yes"
+               showoutput="yes" maxmemory="${test.max.memory}" timeout="${test.timeout}">
+            <sysproperty key="net.sourceforge.cobertura.datafile"
+                         file="${basedir}/cobertura.ser"/>
+            <sysproperty key="log4j.debug" value="${log4j.debug}"/>
+            <sysproperty key="log4j.configuration" value="${log4j.config.url}"/>
+            <syspropertyset id="properties-starting-with-test">
+                <propertyref prefix="test."/>
+                <mapper type="glob" from="test.*" to="*"/>
+            </syspropertyset>
+            <env key="PATH" path="${java.library.path}:${jni_arpack.path}"/>
+            <env key="LD_LIBRARY_PATH" path="${env.LD_LIBRARY_PATH}:${jni_arpack.path}"/>
+            <assertions>
+                <enable/>
+            </assertions>
+            <classpath refid="test.classpath"/>
+
+            <batchtest haltonfailure="no" haltonerror="no" todir="${test-results}"
+                       failureproperty="test-failure" errorproperty="test-error">
+                <formatter type="plain" usefile="false"/>
+                <formatter type="xml"/>
+                <fileset dir="${test-src}">
+                    <include name="**/Test*.java"/>
+                    <include name="**/*Test.java"/>
+                </fileset>
+            </batchtest>
+        </junit>
+        <junitreport todir="${logs}">
+            <fileset dir="${test-results}">
+                <include name="TEST-*.xml"/>
+            </fileset>
+            <report format="frames" todir="${test-results}/html/junit"/>
+        </junitreport>
+        <condition property="tests-failed">
+            <or>
+                <isset property="test-error"/>
+                <isset property="test-failure"/>
+            </or>
+        </condition>
+        <fail message="One or more of the tests failed" if="tests-failed"/>
+    </target>
+
+    <target name="cruisecontrol"
+            depends="clean, jar, jar-compound-file-tool, test, javadoc, pmd, findbugs"
+            description="Run CruiseControl Build and Tests"/>
+
+    <target name="jar-compound-file-tool" description="creates compound-file-tool.jar" depends="compile">
+        <copy file="${config}/log4j.properties.sample" tofile="${classes}/log4j.properties"
+              overwrite="true" failonerror="false"/>
+        <jar jarfile="${compound-file-tool-jarfile}">
+            <fileset dir="${classes}">
+                <include name="org/bdval/io/compound/**.class"/>
+            </fileset>
+            <zipgroupfileset dir="${lib}">
+                <include name="log4j-1.2.15.jar"/>
+                <include name="commons-logging-1.1.1.jar"/>
+                <include name="JSAP-2.1.jar"/>
+            </zipgroupfileset>
+            <manifest>
+                <attribute name="Specification-Title" value="BDVal CompoundFileTool"/>
+                <attribute name="Specification-Vendor"
+                           value="Institute for Computational Biomedicine (ICB), Weill Medical College of Cornell University"/>
+                <attribute name="Implementation-Version" value="${label} (${buildstamp})"/>
+                <attribute name="Implementation-Vendor"
+                           value="Institute for Computational Biomedicine (ICB), Weill Medical College of Cornell University"/>
+                <attribute name="Main-Class" value="org.bdval.io.compound.CompoundFileTool"/>
+                <attribute name="Built-By" value="${user.name}"/>
+            </manifest>
+        </jar>
+        <delete file="${classes}/log4j.properties" failonerror="false"/>
+    </target>
+</project>
+

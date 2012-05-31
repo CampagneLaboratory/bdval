@@ -1,0 +1,21 @@
+def label=tune-ttest-genetic-algorithm-%model-id%
+def predictions-filename=%dataset-name%-%label%-prediction-table.txt
+def survival=%survival%
+#
+addoption required:other-options:Other DAVMode options can be provided here
+addoption required:split-id:id of split being processed
+addoption required:alpha:confidence level for T-test
+addoption required:max-intermediate-features:Maximum number of intermediate features to consider
+addoption required:population-size:GA population size
+addoption required:number-of-steps:GA max number of iterations
+addoption required:maximize:the performance measure to maximize
+addoption required:num-features:Number of features in the generated model
+addoption required:folds:Number of cross validation folds
+addoption required:cv-repeats:Number of cross validation repeats.
+addoption required:ratio:The ratio of new number of feature to original number of features (GA)
+#
+#
+-m t-test --overwrite-output true -o %dataset-name%-%split-id%-%label%-intermediate-features.txt --gene-list full --gene-features-dir %gene-features-dir% --alpha %alpha% --output-gene-list --report-max-probes %max-intermediate-features% %other-options% --split-type feature-selection 
+-m ga-wrapper --overwrite-output true -o %dataset-name%-%split-id%-%label%-features.txt --optimal-parameters-out %dataset-name%-%split-id%-%label%-optimal-parameters.txt --gene-list %label%|%dataset-name%-%split-id%-%label%-intermediate-features.txt --gene-features-dir %gene-features-dir% --num-features %num-features% --population-size %population-size% --number-of-steps %number-of-steps% %other-options% --split-type training --maximize %maximize% --output-gene-list --folds %folds% --cv-repeats %cv-repeats% --ratio %ratio%
+-m write-model --overwrite-output true --gene-list %label%|%dataset-name%-%split-id%-%label%-features.txt --use-parameters %dataset-name%-%split-id%-%label%-optimal-parameters.txt %other-options%  --model-prefix libSVM_%dataset-name%-%split-id%-%label%  --split-type training
+-m predict --overwrite-output false --model libSVM_%dataset-name%-%split-id%-%label%.model -o %predictions-filename%  %other-options% --true-labels %conditions%   --split-type test

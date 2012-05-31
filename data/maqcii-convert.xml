@@ -1,0 +1,1236 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="maqcii-convert" default="compile" basedir=".">
+
+    <property name="config" location="../config"/>
+    <property name="classes" location="../classes"/>
+    <property name="lib" location="../lib"/>
+    <property name="bin" location="../bin"/>
+    <import file="../buildsupport/build.xml"/>
+    <target name="compile">
+        <ant antfile="../build.xml" target="compile" inheritall="false"/>
+    </target>
+
+    <taskdef resource="net/sf/antcontrib/antlib.xml" onerror="fail">
+        <classpath>
+            <pathelement location="../buildsupport/lib/ant-contrib.jar"/>
+        </classpath>
+    </taskdef>
+
+    <osfamily property="osfamily"/>
+    <if>
+        <equals arg1="${osfamily}" arg2="windows"/>
+        <then>
+            <echo message="Configuration execution for Windows."/>
+            <property name="memory-flag" value="-Xmx1300m"/>
+        </then>
+        <else>
+            <echo message="Configuration execution for UNIX."/>
+            <property name="memory-flag" value="-Xmx80000m"/>
+        </else>
+    </if>
+
+    <target name="clean">
+        <ant antfile="../build.xml" target="clean" inheritall="false"/>
+    </target>
+
+    <path id="classpath">
+        <pathelement location="${config}"/>
+        <pathelement location="${classes}"/>
+        <fileset dir="${lib}">
+            <include name="*.jar"/>
+            <include name="Rserve/*.jar"/>
+            <include name="ojdbc14.jar"/>
+            <exclude name="tissueinfo.jar"/>
+        </fileset>
+    </path>
+
+    <!-- Do one complete conversion + verification. -->
+    <macrodef name="convert-predictions"
+              description="Convert a predictions dataset to cornell and leming format">
+        <attribute name="date-prefix"/>
+        <attribute name="predictions-dir"/>
+        <attribute name="output-dir"/>
+        <attribute name="sample-ids-map-file"/>
+        <attribute name="model-ids-map-file"/>
+        <attribute name="cologne-sample-multimap-file"/>
+        <sequential>
+            <mkdir dir="@{output-dir}/@{date-prefix}-Cornell-Models"/>
+
+            <java classname="edu.cornell.med.icb.biomarkers.tools.convertols.convert.maqcii.PredictionsToCornell"
+                  fork="true"
+                  failonerror="true">
+                <jvmarg value="${memory-flag}"/>
+                <arg line="--input-directory @{predictions-dir}"/>
+                <arg line="--output-file @{output-dir}/@{date-prefix}-Cornell-Models/@{date-prefix}-validation-predictions-cornell-format-all-endpoints.txt"/>
+                <arg line="--sample-ids-map-file @{sample-ids-map-file}"/>
+                <arg line="--model-ids-map-file @{model-ids-map-file}"/>
+                <arg line="--omit-unknown"/>
+                <classpath refid="classpath"/>
+            </java>
+
+            <java classname="edu.cornell.med.icb.biomarkers.tools.convertols.convert.maqcii.CornellToLeming" fork="true"
+                  failonerror="true">
+                <jvmarg value="${memory-flag}"/>
+                <arg line="--input-file @{output-dir}/@{date-prefix}-Cornell-Models/@{date-prefix}-validation-predictions-cornell-format-all-endpoints.txt"/>
+                <arg line="--output-directory @{output-dir}/@{date-prefix}-Cornell-Models/"/>
+                <arg line="--cologne-sample-multimap-file @{cologne-sample-multimap-file}"/>
+                <arg line="--date-prefix @{date-prefix}"/>
+                <classpath refid="classpath"/>
+            </java>
+
+            <java classname="edu.cornell.med.icb.biomarkers.tools.convertols.convert.maqcii.VerifyConversion"
+                  fork="true" failonerror="true">
+                <jvmarg value="${memory-flag}"/>
+                <arg line="--predictions-directory @{predictions-dir}"/>
+                <arg line="--validations-directory @{output-dir}/@{date-prefix}-Cornell-Models/"/>
+                <classpath refid="classpath"/>
+            </java>
+
+        </sequential>
+    </macrodef>
+    <!-- Do one complete conversion + verification. -->
+    <macrodef name="candidate-model-selections">
+
+        <attribute name="model-ids"
+                   default="--model-ids-map-file C:\home\maqcii\dev-maqcii\results\Sept-17-2008\official-submission-May-5-2008\ModelId-Mapping-Info.txt"/>
+        <attribute name="cv-results-filename"/>
+        <attribute name="cvcf-results-filename"/>
+        <attribute name="output-filename"/>
+        <attribute name="pvalue-output-filename" default="-"/>
+        <attribute name="rank-output-filename" default="default-rank-output.txt"/>
+        <attribute name="reward-performance" default="AUC"/>
+        <attribute name="rank-candidates-by" default="AUC"/>
+        <attribute name="selection-strategy" default="CV"/>
+        <attribute name="validation-filename" default=""/>
+        <attribute name="custom-ranking-set" default=""/>
+        <attribute name="dump" default=""/>
+        <attribute name="k" default="100"/>
+
+        <sequential>
+
+            <java classname="org.bdval.modelselection.CandidateModelSelection" fork="true"
+                  failonerror="true">
+                <jvmarg value="-ea"/>
+                <jvmarg value="${memory-flag}"/>
+                <arg value="--cv"/>
+                <arg value="@{cv-results-filename}"/>
+                <arg value="--cvcf"/>
+                <arg value="@{cvcf-results-filename}"/>
+                <arg value="--rank-by"/>
+                <arg value="@{selection-strategy}"/>
+                <arg value="--test"/>
+                <arg value="@{validation-filename}"/>
+                <arg value="--rank-candidates-by"/>
+                <arg value="@{rank-candidates-by}"/>
+                <arg value="--reward-performance"/>
+                <arg value="@{reward-performance}"/>
+                <arg line="@{model-ids}"/>
+                <arg line="@{custom-ranking-set}"/>
+                <arg line="@{dump}"/>
+                <arg line="-k @{k}"/>
+                <arg value="-o"/>
+                <arg value="@{output-filename}"/>
+                <arg value="-op"/>
+                <arg value="@{pvalue-output-filename}"/>
+                <arg value="--no-p-values"/>
+                <arg value="-or"/>
+                <arg value="@{rank-output-filename}"/>
+                <classpath refid="classpath"/>
+            </java>
+
+
+        </sequential>
+    </macrodef>
+    <macrodef name="all-teams-candidate-model-selections">
+
+        <attribute name="rank-output-filename"/>
+        <attribute name="pvalue-output-filename" default="-"/>
+        <attribute name="reward-performance" default="AUC"/>
+        <attribute name="rank-candidates-by" default="AUC"/>
+        <attribute name="selection-strategy" default="CV"/>
+        <attribute name="maqcii-combined-filename" default=""/>
+        <attribute name="label" default=""/>
+
+        <sequential>
+
+            <java classname="edu.cornell.med.icb.biomarkers.CandidateModelSelectionAllTeams" fork="true"
+                  failonerror="true">
+                <jvmarg value="-ea"/>
+                <jvmarg value="${memory-flag}"/>
+                <arg value="--rank-by"/>
+                <arg value="@{selection-strategy}"/>
+                <arg value="--maqcii-combined"/>
+                <arg value="@{maqcii-combined-filename}"/>
+                <arg value="--rank-candidates-by"/>
+                <arg value="@{rank-candidates-by}"/>
+                <arg value="--reward-performance"/>
+                <arg value="@{reward-performance}"/>
+                <arg line="-k 10000"/>
+                <arg value="-or"/>
+                <arg value="@{rank-output-filename}"/>
+                <arg value="-op"/>
+                <arg value="@{pvalue-output-filename}"/>
+                <arg value="--label"/>
+                <arg value="@{label}"/>
+                <classpath refid="classpath"/>
+            </java>
+
+
+        </sequential>
+    </macrodef>
+    <!-- Convert the new predictions with no prompting. -->
+    <target name="new-predictions-no-prompt" depends="compile" description="convert and verify new models">
+        <convert-predictions
+                date-prefix="Aug-01-2008"
+                predictions-dir="/scratchLocal/maqcii/production3/tissueinfo/data/20081015-1833-results/predictions"
+                output-dir="/scratchLocal/maqcii/production3/tissueinfo/data/20081015-1833-results/"
+                sample-ids-map-file="predictions-mappings/Validation-SampleId-Mapping-u.txt"
+                model-ids-map-file="predictions-mappings/models-ids-mapping-new.txt"
+                cologne-sample-multimap-file="predictions-mappings/cologne-sample-multimap.txt"/>
+    </target>
+    <target name="endpoint-E-predictions-no-prompt" depends="compile" description="convert and verify new models">
+        <convert-predictions
+                date-prefix="Oct-16-2008"
+                predictions-dir="D:/maqcii/predictions-files-Aug-01-2008/"
+                output-dir="D:/maqcii/"
+                sample-ids-map-file="predictions-mappings/Validation-SampleId-Mapping-u.txt"
+                model-ids-map-file="predictions-mappings/models-ids-mapping-new.txt"
+                cologne-sample-multimap-file="predictions-mappings/cologne-sample-multimap.txt"/>
+    </target>
+
+    <!-- Convert the new endpoint E predictions with no prompting. -->
+    <target name="new-predictions-endpoint-e-no-prompt" depends="compile" description="convert and verify new models">
+        <convert-predictions
+                date-prefix="Oct-14-2008"
+                predictions-dir="/scratchLocal/maqcii/results/endpoint-E-20081014-0920-results/predictions/"
+                output-dir="/home/maqcii/maqcii-output-results/"
+                sample-ids-map-file="predictions-mappings/Validation-SampleId-Mapping-u.txt"
+                model-ids-map-file="predictions-mappings/models-ids-mapping-new.txt"
+                cologne-sample-multimap-file="predictions-mappings/cologne-sample-multimap.txt"/>
+    </target>
+
+    <!-- Convert the old predictions with no prompting. -->
+    <target name="old-predictions-no-prompt" depends="compile" description="convert and verify new models">
+        <convert-predictions
+                date-prefix="May-02-2008"
+                predictions-dir="D:/maqcii/predictions-files-May-02-2008/"
+                output-dir="D:/maqcii/"
+                sample-ids-map-file="predictions-mappings/Validation-SampleId-Mapping-u.txt"
+                model-ids-map-file="predictions-mappings/ModelId-Mapping-Info.txt"
+                cologne-sample-multimap-file="predictions-mappings/cologne-sample-multimap.txt"/>
+    </target>
+
+    <target name="swap-predictions-no-prompt" depends="compile" description="convert and verify new models">
+        <convert-predictions
+                date-prefix="Nov-13-2008-Swap"
+                predictions-dir="/scratchLocal/maqcii/swap/tissueinfo/data/20081113-1101-results/predictions"
+                output-dir="/scratchLocal/maqcii/swap/tissueinfo/data/20081113-1101-results/converted-predictions"
+                sample-ids-map-file="predictions-mappings/swap/Swap-SampleId-Map.txt"
+                model-ids-map-file="predictions-mappings/swap/Swap-ModelIds-Map.txt"
+                cologne-sample-multimap-file="predictions-mappings/swap/Swap-Cologne-SampleId-Multimap.txt"/>
+    </target>
+
+    <target name="all" depends="new-predictions-no-prompt,old-predictions-no-prompt"
+            description="run new + old conversions and verifications, no prompting"/>
+
+    <!-- This will run a conversion + verification but ask the user for the information needed -->
+    <!-- to run the conversion + verification. The default values are for the "old" predictions. -->
+    <target name="convert-predictions" depends="compile" description="convert and verify new models with prompts">
+        <input addproperty="date-prefix" message="date-prefix"
+               defaultvalue="May-02-2008"/>
+        <input addproperty="predictions-dir" message="predictions-dir"
+               defaultvalue="D:/maqcii/predictions-files-May-02-2008/"/>
+        <input addproperty="output-dir" message="output-dir"
+               defaultvalue="D:/maqcii/"/>
+        <input addproperty="sample-ids-map-file" message="sample-ids-map-file"
+               defaultvalue="predictions-mappings/Validation-SampleId-Mapping-u.txt"/>
+        <input addproperty="model-ids-map-file" message="model-ids-map-file"
+               defaultvalue="predictions-mappings/ModelId-Mapping-Info.txt"/>
+        <input addproperty="cologne-sample-multimap-file" message="cologne-sample-multimap-file"
+               defaultvalue="predictions-mappings/cologne-sample-multimap.txt"/>
+
+        <convert-predictions
+                date-prefix="${date-prefix}"
+                predictions-dir="${predictions-dir}"
+                output-dir="${output-dir}"
+                sample-ids-map-file="${sample-ids-map-file}"
+                model-ids-map-file="${model-ids-map-file}"
+                cologne-sample-multimap-file="${cologne-sample-multimap-file}"/>
+    </target>
+
+
+    <!-- Will run CandidateModelSelection in evaluation mode. This estimates P-values that the
+    choices made by different ranking strategies can be explained by chance alone.
+    -->
+    <macrodef name="candidate-model-selections-ignore">
+        <attribute name="cv-results-filename"/>
+        <attribute name="cvcf-results-filename"/>
+        <attribute name="model-ids"/>
+        <attribute name="output-filename"/>
+        <attribute name="pvalue-output-filename"/>
+        <attribute name="rank-candidates-by"/>
+        <attribute name="reward-performance"/>
+        <attribute name="selection-strategy"/>
+        <attribute name="validation-filename"/>
+        <attribute name="custom-ranking-set"/>
+        <attribute name="dump" default=""/>
+        <sequential>
+
+        </sequential>
+    </macrodef>
+    <target name="rerank-all-teams"
+            description="Run CandidateModelSelection in evaluation mode" depends="compile">
+        <input addproperty="evaluation-data-directory"
+               message="Enter the directory where CV/CVCF/test results are stored."
+               defaultvalue="C:/home/maqcii/dev-maqcii/results/Sept-30-2008"/>
+
+        <delete file="all-teams-p-values.txt"/>
+        <delete file="swap-all-teams-p-values.txt"/>
+        <delete file="combined-all-teams-ranks.txt"/>
+
+        <for param="rank-by" delimiter="," trim="yes"
+             list="AUC,MCC">                    <!-- ,SENSITIVITY,SPECIFICITY,ACCURACY,RMSE-->
+            <sequential>
+
+                <all-teams-candidate-model-selections
+                        maqcii-combined-filename="C:\home\maqcii\dev-maqcii\results\UniqueModels19779_PerformanceMetrics_22OCT2008.txt"
+                        reward-performance="@{rank-by}"
+                        rank-candidates-by="@{rank-by}"
+                        selection-strategy="SUBMISSION_RANK"
+                        pvalue-output-filename="all-teams-p-values.txt"
+                        rank-output-filename="combined-all-teams-ranks.txt"
+                        label="Training->Validation"/>
+                <all-teams-candidate-model-selections
+                        maqcii-combined-filename="C:\home\maqcii\dev-maqcii\results\UniqueModels19779_PerformanceMetrics_22OCT2008.txt"
+                        reward-performance="@{rank-by}"
+                        rank-candidates-by="@{rank-by}"
+                        selection-strategy="CV"
+                        pvalue-output-filename="all-teams-p-values.txt"
+                        rank-output-filename="combined-all-teams-ranks.txt"
+                        label="Training->Validation"/>
+
+                <all-teams-candidate-model-selections
+                        maqcii-combined-filename="C:\home\maqcii\dev-maqcii\results\Swap_UniqueModels13287_PerformanceMetrics_21DEC2008-l695-patched.txt"
+                        reward-performance="@{rank-by}"
+                        rank-candidates-by="@{rank-by}"
+                        selection-strategy="CV"
+                        label="Validation->Training"
+                        pvalue-output-filename="swap-all-teams-p-values.txt"
+                        rank-output-filename="combined-all-teams-ranks.txt"/>
+
+                <all-teams-candidate-model-selections
+                        maqcii-combined-filename="C:\home\maqcii\dev-maqcii\results\Swap_UniqueModels13287_PerformanceMetrics_21DEC2008-l695-patched.txt"
+                        reward-performance="@{rank-by}"
+                        rank-candidates-by="@{rank-by}"
+                        selection-strategy="SUBMISSION_RANK"
+                        label="Validation->Training"
+                        pvalue-output-filename="swap-all-teams-p-values.txt"
+                        rank-output-filename="combined-all-teams-ranks.txt"/>
+
+            </sequential>
+        </for>
+    </target>
+
+  <target name="combine-stats-Wang-Upsala-50"
+            description="Combine statistics for best practices run" depends="compile">
+        <input addproperty="evaluation-data-directory"
+               message="Enter the directory where CV/CVCF/test results are stored."
+               defaultvalue="/Users/fac2003/IdeaProjects/bdval/data"/>
+
+        <delete file="${results-directory}/CV-CVCF-validation.txt"/>
+
+
+        <var name="results-directory" value="${evaluation-data-directory}/wang50-uppsala-validation"/>
+        <candidate-model-selections
+                cv-results-filename="${results-directory}/CV.txt"
+                cvcf-results-filename="${results-directory}/CVCF.txt"
+                model-ids=""
+                output-filename="-"
+                dump="--dump ${results-directory}/Wang-Upsala-CV-CVCF-validation.txt --model-conditions ${results-directory}/model-conditions-column.txt"
+                reward-performance="AUC"
+                rank-candidates-by="AUC"
+                selection-strategy="CV"
+                custom-ranking-set=""
+                validation-filename="${results-directory}/validation.txt"/>
+        <delete file="${results-directory}/ranks-Wang-Upsala-ALL-April20-2010.txt"/>
+        <candidate-model-selections
+                cv-results-filename="${results-directory}/CV.txt"
+                cvcf-results-filename="${results-directory}/CVCF.txt"
+                model-ids=""
+                output-filename="-"
+                rank-output-filename="${results-directory}/ranks-Wang-Upsala-ALL-April20-2010.txt"
+                dump=" --model-conditions ${results-directory}/model-conditions-column.txt --model-name TrainedMAQCIIBlindOnApril24_2010"
+                k="10000"
+                reward-performance="AUC"
+                rank-candidates-by="AUC"
+                selection-strategy="MODEL"
+                custom-ranking-set=""
+                validation-filename="${results-directory}/validation.txt"/>
+        <candidate-model-selections
+                cv-results-filename="${results-directory}/CV.txt"
+                cvcf-results-filename="${results-directory}/CVCF.txt"
+                model-ids=""
+                output-filename="-"
+                 rank-output-filename="${results-directory}/ranks-Wang-Upsala-ALL-April20-2010.txt"
+                dump=" --model-conditions ${results-directory}/model-conditions-column.txt"
+                k="10000"
+                reward-performance="AUC"
+                rank-candidates-by="AUC"
+                selection-strategy="CV"
+                custom-ranking-set=""
+                validation-filename="${results-directory}/validation.txt"/>
+        <delete file="${results-directory}/ranks-Wang-Upsala-ALL-2009.txt"/>
+        <candidate-model-selections
+                cv-results-filename="${results-directory}/CV.txt"
+                cvcf-results-filename="${results-directory}/CVCF.txt"
+                model-ids=""
+                output-filename="-"
+                rank-output-filename="${results-directory}/ranks-Wang-Upsala-ALL-2009.txt"
+                dump=" --model-conditions ${results-directory}/model-conditions-column.txt "
+                k="10000"
+                reward-performance="AUC"
+                rank-candidates-by="AUC"
+                selection-strategy="MODEL"
+                custom-ranking-set=""
+                validation-filename="${results-directory}/validation.txt"/>
+        <candidate-model-selections
+                cv-results-filename="${results-directory}/CV.txt"
+                cvcf-results-filename="${results-directory}/CVCF.txt"
+                model-ids=""
+                output-filename="-"
+                rank-output-filename="${results-directory}/ranks-Wang-Upsala-ALL-2009.txt"
+                dump=" --model-conditions ${results-directory}/model-conditions-column.txt"
+                k="10000"
+                reward-performance="AUC"
+                rank-candidates-by="AUC"
+                selection-strategy="CV"
+                custom-ranking-set=""
+                validation-filename="${results-directory}/validation.txt"/>
+    </target>
+
+     <target name="combine-stats-Wang-Upsala-parameter-series"
+            description="Combine statistics for best practices run" depends="compile">
+        <input addproperty="evaluation-data-directory"
+               message="Enter the directory where CV/CVCF/test results are stored."
+               defaultvalue="/Users/fac2003/IdeaProjects/bdval/data"/>
+
+        <delete file="${results-directory}/CV-CVCF-validation.txt"/>
+
+
+        <var name="results-directory" value="${evaluation-data-directory}/wang-uppsala-parameter-scan"/>
+        <candidate-model-selections
+                cv-results-filename="${results-directory}/CV.txt"
+                cvcf-results-filename="${results-directory}/CVCF.txt"
+                model-ids=""
+                output-filename="-"
+                dump="--dump ${results-directory}/Wang-Upsala-CV-CVCF-validation.txt --model-conditions ${results-directory}/model-conditions-column.txt"
+                reward-performance="AUC"
+                rank-candidates-by="AUC"
+                selection-strategy="CV"
+                custom-ranking-set=""
+                validation-filename="${results-directory}/validation.txt"/>
+        <delete file="${results-directory}/ranks-Wang-Upsala-ALL-April20-2010.txt"/>
+        <candidate-model-selections
+                cv-results-filename="${results-directory}/CV.txt"
+                cvcf-results-filename="${results-directory}/CVCF.txt"
+                model-ids=""
+                output-filename="-"
+                rank-output-filename="${results-directory}/ranks-Wang-Upsala-ALL-April20-2010.txt"
+                dump=" --model-conditions ${results-directory}/model-conditions-column.txt --model-name TrainedMAQCIIBlindOnApril24_2010"
+                k="10000"
+                reward-performance="AUC"
+                rank-candidates-by="AUC"
+                selection-strategy="MODEL"
+                custom-ranking-set=""
+                validation-filename="${results-directory}/validation.txt"/>
+        <candidate-model-selections
+                cv-results-filename="${results-directory}/CV.txt"
+                cvcf-results-filename="${results-directory}/CVCF.txt"
+                model-ids=""
+                output-filename="-"
+                 rank-output-filename="${results-directory}/ranks-Wang-Upsala-ALL-April20-2010.txt"
+                dump=" --model-conditions ${results-directory}/model-conditions-column.txt "
+                k="10000"
+                reward-performance="AUC"
+                rank-candidates-by="AUC"
+                selection-strategy="CV"
+                custom-ranking-set=""
+                validation-filename="${results-directory}/validation.txt"/>
+        <delete file="${results-directory}/ranks-Wang-Upsala-ALL-2009.txt"/>
+        <candidate-model-selections
+                cv-results-filename="${results-directory}/CV.txt"
+                cvcf-results-filename="${results-directory}/CVCF.txt"
+                model-ids=""
+                output-filename="-"
+                rank-output-filename="${results-directory}/ranks-Wang-Upsala-ALL-2009.txt"
+                dump=" --model-conditions ${results-directory}/model-conditions-column.txt "
+                k="10000"
+                reward-performance="AUC"
+                rank-candidates-by="AUC"
+                selection-strategy="MODEL"
+                custom-ranking-set=""
+                validation-filename="${results-directory}/validation.txt"/>
+        <candidate-model-selections
+                cv-results-filename="${results-directory}/CV.txt"
+                cvcf-results-filename="${results-directory}/CVCF.txt"
+                model-ids=""
+                output-filename="-"
+                rank-output-filename="${results-directory}/ranks-Wang-Upsala-ALL-2009.txt"
+                dump=" --model-conditions ${results-directory}/model-conditions-column.txt"
+                k="10000"
+                reward-performance="AUC"
+                rank-candidates-by="AUC"
+                selection-strategy="CV"
+                custom-ranking-set=""
+                validation-filename="${results-directory}/validation.txt"/>
+    </target>
+    <target name="combine-stats-April-20-2010"
+            description="Combine statistics for April 20 Blind run" depends="compile">
+        <input addproperty="evaluation-data-directory"
+               message="Enter the directory where CV/CVCF/test results are stored."
+               defaultvalue="/Users/fac2003/IdeaProjects/bdval/data"/>
+
+        <delete file="${results-directory}/April-20-2010-consensus-CV-CVCF-validation.txt"/>
+
+
+        <var name="results-directory" value="${evaluation-data-directory}/for-transfer"/>
+        <candidate-model-selections
+                cv-results-filename="${results-directory}/CV.txt"
+                cvcf-results-filename="${results-directory}/CVCF.txt"
+                model-ids=""
+                output-filename="-"
+                dump="--dump ${results-directory}/April-20-2010-consensus-CV-CVCF-validation.txt --model-conditions ${results-directory}/model-conditions-column.txt"
+                reward-performance="AUC"
+                rank-candidates-by="AUC"
+                selection-strategy="CV"
+                custom-ranking-set=""
+                validation-filename="${results-directory}/validation.txt"/>
+        <delete file="${results-directory}/ranks-ALL-April20-2010.txt"/>
+        <candidate-model-selections
+                cv-results-filename="${results-directory}/CV.txt"
+                cvcf-results-filename="${results-directory}/CVCF.txt"
+                model-ids=""
+                output-filename="-"
+                rank-output-filename="${results-directory}/ranks-ALL-April20-2010.txt"
+                dump=" --model-conditions ${evaluation-data-directory}/model-conditions-column.txt --model-name TrainedMAQCIIBlindOnApril24_2010"
+                k="10000"
+                reward-performance="AUC"
+                rank-candidates-by="AUC"
+                selection-strategy="MODEL"
+                custom-ranking-set=""
+                validation-filename="${results-directory}/validation.txt"/>
+        <candidate-model-selections
+                cv-results-filename="${results-directory}/CV.txt"
+                cvcf-results-filename="${results-directory}/CVCF.txt"
+                model-ids=""
+                output-filename="-"
+                rank-output-filename="${results-directory}/ranks-ALL-April20-2010.txt"
+                dump=" --model-conditions ${evaluation-data-directory}/model-conditions-column.txt"
+                k="10000"
+                reward-performance="AUC"
+                rank-candidates-by="AUC"
+                selection-strategy="CV"
+                custom-ranking-set=""
+                validation-filename="${results-directory}/validation.txt"/>
+        <delete file="${results-directory}/ranks-ALL-2009.txt"/>
+        <candidate-model-selections
+                cv-results-filename="${results-directory}/CV.txt"
+                cvcf-results-filename="${results-directory}/CVCF.txt"
+                model-ids=""
+                output-filename="-"
+                rank-output-filename="${results-directory}/ranks-ALL-2009.txt"
+                dump=" --model-conditions ${evaluation-data-directory}/model-conditions-column.txt "
+                k="10000"
+                reward-performance="AUC"
+                rank-candidates-by="AUC"
+                selection-strategy="MODEL"
+                custom-ranking-set=""
+                validation-filename="${results-directory}/validation.txt"/>
+        <candidate-model-selections
+                cv-results-filename="${results-directory}/CV.txt"
+                cvcf-results-filename="${results-directory}/CVCF.txt"
+                model-ids=""
+                output-filename="-"
+                rank-output-filename="${results-directory}/ranks-ALL-2009.txt"
+                dump=" --model-conditions ${evaluation-data-directory}/model-conditions-column.txt"
+                k="10000"
+                reward-performance="AUC"
+                rank-candidates-by="AUC"
+                selection-strategy="CV"
+                custom-ranking-set=""
+                validation-filename="${results-directory}/validation.txt"/>
+    </target>
+    <target name="combine-stats-Wang-Upsala"
+            description="Combine statistics for best practices run" depends="compile">
+        <input addproperty="evaluation-data-directory"
+               message="Enter the directory where CV/CVCF/test results are stored."
+               defaultvalue="/Users/fac2003/IdeaProjects/bdval/data"/>
+
+        <delete file="${results-directory}/CV-CVCF-validation.txt"/>
+
+
+        <var name="results-directory" value="${evaluation-data-directory}/wang-uppsala-models"/>
+        <candidate-model-selections
+                cv-results-filename="${results-directory}/CV.txt"
+                cvcf-results-filename="${results-directory}/CVCF.txt"
+                model-ids=""
+                output-filename="-"
+                dump="--dump ${results-directory}/Wang-Upsala-CV-CVCF-validation.txt --model-conditions ${results-directory}/model-conditions-column.txt"
+                reward-performance="AUC"
+                rank-candidates-by="AUC"
+                selection-strategy="CV"
+                custom-ranking-set=""
+                validation-filename="${results-directory}/validation.txt"/>
+        <delete file="${results-directory}/ranks-Wang-Upsala-ALL-April20-2010.txt"/>
+        <candidate-model-selections
+                cv-results-filename="${results-directory}/CV.txt"
+                cvcf-results-filename="${results-directory}/CVCF.txt"
+                model-ids=""
+                output-filename="-"
+                rank-output-filename="${results-directory}/ranks-Wang-Upsala-ALL-April20-2010.txt"
+                dump=" --model-conditions ${results-directory}/model-conditions-column.txt --model-name TrainedMAQCIIBlindOnApril24_2010"
+                k="10000"
+                reward-performance="AUC"
+                rank-candidates-by="AUC"
+                selection-strategy="MODEL"
+                custom-ranking-set=""
+                validation-filename="${results-directory}/validation.txt"/>
+        <candidate-model-selections
+                cv-results-filename="${results-directory}/CV.txt"
+                cvcf-results-filename="${results-directory}/CVCF.txt"
+                model-ids=""
+                output-filename="-"
+                 rank-output-filename="${results-directory}/ranks-Wang-Upsala-ALL-April20-2010.txt"
+                dump=" --model-conditions ${results-directory}/model-conditions-column.txt"
+                k="10000"
+                reward-performance="AUC"
+                rank-candidates-by="AUC"
+                selection-strategy="CV"
+                custom-ranking-set=""
+                validation-filename="${results-directory}/validation.txt"/>
+        <delete file="${results-directory}/ranks-Wang-Upsala-ALL-2009.txt"/>
+        <candidate-model-selections
+                cv-results-filename="${results-directory}/CV.txt"
+                cvcf-results-filename="${results-directory}/CVCF.txt"
+                model-ids=""
+                output-filename="-"
+                rank-output-filename="${results-directory}/ranks-Wang-Upsala-ALL-2009.txt"
+                dump=" --model-conditions ${results-directory}/model-conditions-column.txt "
+                k="10000"
+                reward-performance="AUC"
+                rank-candidates-by="AUC"
+                selection-strategy="MODEL"
+                custom-ranking-set=""
+                validation-filename="${results-directory}/validation.txt"/>
+        <candidate-model-selections
+                cv-results-filename="${results-directory}/CV.txt"
+                cvcf-results-filename="${results-directory}/CVCF.txt"
+                model-ids=""
+                output-filename="-"
+                rank-output-filename="${results-directory}/ranks-Wang-Upsala-ALL-2009.txt"
+                dump=" --model-conditions ${results-directory}/model-conditions-column.txt"
+                k="10000"
+                reward-performance="AUC"
+                rank-candidates-by="AUC"
+                selection-strategy="CV"
+                custom-ranking-set=""
+                validation-filename="${results-directory}/validation.txt"/>
+    </target>
+    <target name="combine-stats-best-practices"
+            description="Combine statistics for best practices run" depends="compile">
+        <input addproperty="evaluation-data-directory"
+               message="Enter the directory where CV/CVCF/test results are stored."
+               defaultvalue="/home/maqcii/results"/>
+
+        <delete file="official-rankings-output.txt"/>
+        <delete file="other-rankings-output.txt"/>
+        <delete file="official-models-p-values.txt"/>
+        <delete file="other-models-p-values.txt"/>
+        <delete file="endpoint-E-p-values.txt"/>
+        <delete file="prostate-p-values.txt"/>
+
+        <var name="results-directory" value="${evaluation-data-directory}/best-practices-nov31"/>
+        <candidate-model-selections
+                cv-results-filename="${results-directory}/CV.txt"
+                cvcf-results-filename="${results-directory}/combined-CVCF-maqcii-submission.txt"
+                model-ids=""
+                output-filename="-"
+                dump="--dump ${results-directory}/best-practices-direct-CV-CVCF-validation.txt --model-conditions ${results-directory}/model-conditions-columns.txt"
+                reward-performance="AUC"
+                rank-candidates-by="AUC"
+                selection-strategy="CV"
+                custom-ranking-set=""
+                validation-filename="${results-directory}/direct-validation.txt"/>
+
+        <var name="results-directory" value="${evaluation-data-directory}/best-practices-nov31"/>
+        <candidate-model-selections
+                cv-results-filename="${results-directory}/CV.txt"
+                cvcf-results-filename="${results-directory}/combined-CVCF-maqcii-submission.txt"
+                model-ids=""
+                output-filename="-"
+                dump="--dump ${results-directory}/best-practices-consensus-CV-CVCF-validation.txt --model-conditions ${results-directory}/model-conditions-columns.txt"
+                reward-performance="AUC"
+                rank-candidates-by="AUC"
+                selection-strategy="CV"
+                custom-ranking-set=""
+                validation-filename="${results-directory}/consensus-validation.txt"/>
+    </target>
+    <target name="combine-stats-pathways"
+            description="Combine statistics for best practices run" depends="compile">
+        <input addproperty="evaluation-data-directory"
+               message="Enter the directory where CV/CVCF/test results are stored."
+               defaultvalue="/home/maqcii/results"/>
+
+        <var name="results-directory" value="${evaluation-data-directory}/pathways-dec-3"/>
+        <delete file="${results-directory}/pathways-average-direct-CV-CVCF=CV-validation.txt"/>
+
+        <candidate-model-selections
+                cv-results-filename="${results-directory}/combined-20081202-1603-results-evaluation-stats.txt"
+                cvcf-results-filename="${results-directory}/combined-20081202-1603-results-evaluation-stats.txt"
+                model-ids=""
+                output-filename="-"
+                dump="--dump ${results-directory}/pathways-average-direct-CV-CVCF=CV-validation.txt --model-conditions ${results-directory}/model-conditions-columns.txt"
+                reward-performance="AUC"
+                rank-candidates-by="AUC"
+                selection-strategy="CV"
+                custom-ranking-set=""
+                validation-filename="${results-directory}/predict-validation-maqcii-stats.txt"/>
+
+
+    </target>
+
+    <target name="combine-stats-bias"
+            description="Combine statistics for bias comparison runs" depends="compile">
+        <input addproperty="evaluation-data-directory"
+               message="Enter the directory where CV/CVCF/test results are stored."
+               defaultvalue="/Users/fac2003/Dropbox/BDVal Project/Iconix-results"/>
+
+        <var name="results-directory" value="${evaluation-data-directory}"/>
+        <delete file="${results-directory}/bias-CV-CVCF=CV-validation.txt"/>
+
+        <candidate-model-selections
+                cv-results-filename="${results-directory}/CV.dat"
+                cvcf-results-filename="${results-directory}/CVCF.dat"
+                model-ids=""
+                output-filename="-"
+                dump="--dump ${results-directory}/bias-CV-CVCF=CV-validation.txt --model-conditions ${results-directory}/model-conditions-columns.txt"
+                reward-performance="ACCURACY"
+                rank-candidates-by="ACCURACY"
+                selection-strategy="CV"
+                custom-ranking-set=""
+                validation-filename="${results-directory}/validation.dat"/>
+
+
+    </target>
+    <target name="evaluate-model-selection-strategies-swap"
+            description="Run CandidateModelSelection in evaluation mode" depends="compile">
+        <input addproperty="evaluation-data-directory"
+               message="Enter the directory where CV/CVCF/test results are stored."
+               defaultvalue="/scratchLocal/maqcii/swap/tissueinfo/data/"/>
+
+        <delete file="integrated-results-maqcii-swap-testset.txt"/>
+        <delete file="ranks-swap-other-models.txt"/>
+
+        <candidate-model-selections
+                cv-results-filename="${evaluation-data-directory}/all-cv-submission-nonofficial-labelfix.txt"
+                cvcf-results-filename="${evaluation-data-directory}/all-cvcf-submission-nonofficial-labelfix.txt"
+                model-ids=""
+                output-filename="-"
+                dump="--dump ${evaluation-data-directory}/integrated-results-maqcii-swap-testset.txt --model-conditions ${evaluation-data-directory}/model-conditions-columns.txt"
+                reward-performance="AUC"
+                rank-candidates-by="AUC"
+                selection-strategy="CV"
+                custom-ranking-set=""
+                validation-filename="${evaluation-data-directory}/swap-validation-maqcii-stats.txt"/>
+
+        <candidate-model-selections
+                cv-results-filename="${evaluation-data-directory}/all-cv-submission-nonofficial-labelfix.txt"
+                cvcf-results-filename="${evaluation-data-directory}/all-cvcf-submission-nonofficial-labelfix.txt"
+                model-ids=""
+                rank-output-filename="ranks-swap-other-models.txt"
+                dump=" --model-conditions ${evaluation-data-directory}/model-conditions-columns.txt"
+                reward-performance="AUC"
+                rank-candidates-by="AUC"
+                selection-strategy="MODEL"
+                k="10000"
+                output-filename="-"
+                custom-ranking-set=""
+                validation-filename="${evaluation-data-directory}/swap-validation-maqcii-stats.txt"/>
+
+        <candidate-model-selections
+                cv-results-filename="${evaluation-data-directory}/all-cv-submission-nonofficial-labelfix.txt"
+                cvcf-results-filename="${evaluation-data-directory}/all-cvcf-submission-nonofficial-labelfix.txt"
+                model-ids=""
+                rank-output-filename="ranks-swap-other-models.txt"
+                dump=" --model-conditions ${evaluation-data-directory}/model-conditions-columns.txt"
+                reward-performance="AUC"
+                rank-candidates-by="AUC"
+                selection-strategy="CV"
+                output-filename="-"
+                custom-ranking-set=""
+                k="10000"
+                validation-filename="${evaluation-data-directory}/swap-validation-maqcii-stats.txt"/>
+
+    </target>
+    <target name="evaluate-model-selection-strategies"
+            description="Run CandidateModelSelection in evaluation mode" depends="compile">
+        <input addproperty="evaluation-data-directory"
+               message="Enter the directory where CV/CVCF/test results are stored."
+               defaultvalue="C:/home/maqcii/dev-maqcii/results/Sept-30-2008"/>
+
+        <delete file="official-rankings-output.txt"/>
+        <delete file="other-rankings-output.txt"/>
+        <delete file="official-models-p-values.txt"/>
+        <delete file="other-models-p-values.txt"/>
+        <delete file="endpoint-E-p-values.txt"/>
+        <delete file="prostate-p-values.txt"/>
+
+        <candidate-model-selections
+                cv-results-filename="${evaluation-data-directory}/prostate-fusion/CV.txt"
+                cvcf-results-filename="${evaluation-data-directory}/prostate-fusion/CV-CF.txt"
+                model-ids=""
+                output-filename="-"
+                dump="--dump ${evaluation-data-directory}/prostate-fusion/integrated-results-prostate-fusion-testset.txt --model-conditions ${evaluation-data-directory}/prostate-fusion/model-conditions-columns.txt"
+                reward-performance="AUC"
+                rank-candidates-by="AUC"
+                selection-strategy="CV"
+                custom-ranking-set=""
+                validation-filename="${evaluation-data-directory}/prostate-fusion/test.txt"/>
+
+        <candidate-model-selections
+                cv-results-filename="${evaluation-data-directory}/prostate-fusion/CV.txt"
+                cvcf-results-filename="${evaluation-data-directory}/prostate-fusion/CV-CF.txt"
+                model-ids=""
+                output-filename="-"
+                dump="--dump ${evaluation-data-directory}/prostate-fusion/integrated-results-prostate-fusion-validationset.txt --model-conditions ${evaluation-data-directory}/prostate-fusion/model-conditions-columns.txt"
+                reward-performance="AUC"
+                rank-candidates-by="AUC"
+                selection-strategy="CV"
+                custom-ranking-set=""
+                validation-filename="${evaluation-data-directory}/prostate-fusion/validation.txt"/>
+
+        <candidate-model-selections
+                cv-results-filename="${evaluation-data-directory}/official-submission-May-5-2008/CV-20080630-1801-results-restat-maqcii-submission.txt"
+                cvcf-results-filename="${evaluation-data-directory}/official-submission-May-5-2008/CVCF-maqcii-submission.txt"
+                model-ids="--model-ids-map-file ${evaluation-data-directory}/official-submission-May-5-2008/ModelId-Mapping-Info.txt"
+                output-filename="-"
+                dump="--dump ${evaluation-data-directory}/official-submission-May-5-2008/integrated-results-official-models-maqcii-version.txt --model-conditions ${evaluation-data-directory}/official-submission-May-5-2008/model-conditions.txt-8"
+                reward-performance="AUC"
+                rank-candidates-by="AUC"
+                selection-strategy="CV"
+                custom-ranking-set=""
+                validation-filename="${evaluation-data-directory}/official-submission-May-5-2008/MAQC-II_UniqueModels19696_PerformanceMetrics_18SEP2008.txt"/>
+
+        <candidate-model-selections
+                cv-results-filename="${evaluation-data-directory}/official-submission-May-5-2008/CV-20080630-1801-results-restat-maqcii-submission.txt"
+                cvcf-results-filename="${evaluation-data-directory}/official-submission-May-5-2008/CVCF-maqcii-submission.txt"
+                model-ids=""
+                output-filename="-"
+                dump="--dump ${evaluation-data-directory}/official-submission-May-5-2008/integrated-results-official-models-our-version.txt"
+                reward-performance="AUC"
+                rank-candidates-by="AUC"
+                selection-strategy="CV"
+                custom-ranking-set=""
+                validation-filename="${evaluation-data-directory}/official-submission-May-5-2008/May-02-2008-validation-predictions-cornell-format-all-endpoints-submission.txt"/>
+        <candidate-model-selections
+                cv-results-filename="${evaluation-data-directory}/other-models-Aug-1-2008/CV-20080701-all-maqcii-submission.txt"
+                cvcf-results-filename="${evaluation-data-directory}/other-models-Aug-1-2008/CVCF-20080701.txt"
+                model-ids=""
+                custom-ranking-set=""
+                validation-filename="${evaluation-data-directory}/other-models-Aug-1-2008/Aug-01-2008-validation-predictions-cornell-format-all-endpoints-submission.txt"
+                output-filename="-"
+                dump="--dump ${evaluation-data-directory}/other-models-Aug-1-2008/integrated-results-other-models-our-version.txt --model-conditions ${evaluation-data-directory}/other-models-Aug-1-2008/other-models-model-conditions-columns.txt"
+                reward-performance="AUC"
+                rank-candidates-by="AUC"
+                selection-strategy="CV"
+                />
+
+        <candidate-model-selections
+                cv-results-filename="${evaluation-data-directory}/endpoint-E-Oct-16-2008/ERPOS-CV-20081014-0920-results-all-maqcii-submission.txt"
+                cvcf-results-filename="${evaluation-data-directory}/endpoint-E-Oct-16-2008/ERPOS-20081014-0920-results-CVCF-maqcii-submission.txt"
+                model-ids=""
+                custom-ranking-set=""
+                validation-filename="${evaluation-data-directory}/endpoint-E-Oct-16-2008/endpoint-E-validation-submission.txt"
+                output-filename="-"
+                dump="--dump ${evaluation-data-directory}/endpoint-E-Oct-16-2008/integrated-results-endpoint-E.txt --model-conditions ${evaluation-data-directory}/endpoint-E-Oct-16-2008/model-conditions.txt"
+                reward-performance="AUC"
+                rank-candidates-by="AUC"
+                selection-strategy="CV"
+                />
+
+        <candidate-model-selections
+                cv-results-filename="${evaluation-data-directory}/endpoint-E-Oct-16-2008/ERPOS-CV-20081014-0920-results-all-maqcii-submission.txt"
+                cvcf-results-filename="${evaluation-data-directory}/endpoint-E-Oct-16-2008/ERPOS-20081014-0920-results-CVCF-maqcii-submission.txt"
+                model-ids=""
+                custom-ranking-set=""
+                validation-filename="${evaluation-data-directory}/endpoint-E-Oct-16-2008/endpoint-E-validation-submission.txt"
+                output-filename="-"
+                pvalue-output-filename="endpoint-E-p-values.txt"
+                dump="--model-conditions ${evaluation-data-directory}/endpoint-E-Oct-16-2008/model-conditions.txt"
+                reward-performance="AUC"
+                rank-candidates-by="AUC"
+                selection-strategy="MODEL"
+                />
+
+        <for param="selection-strategy" delimiter="," trim="yes"
+             list="MODEL,CV,CVCF">
+
+            <sequential>
+
+                <for param="rank-by" delimiter="," trim="yes"
+                     list="AUC">  <!-- SENSITIVITY,SPECIFICITY,ACCURACY,AUC_MCC_STD,AUC_MCC, -->
+                    <sequential>
+                        <candidate-model-selections
+                                cv-results-filename="${evaluation-data-directory}/prostate-fusion/CV.txt"
+                                cvcf-results-filename="${evaluation-data-directory}/prostate-fusion/CV-CF.txt"
+                                model-ids=""
+                                output-filename="-"
+                                dump=" --model-conditions ${evaluation-data-directory}/prostate-fusion/model-conditions-columns.txt"
+                                reward-performance="@{rank-by}"
+                                rank-candidates-by="@{rank-by}"
+                                selection-strategy="@{selection-strategy}"
+                                pvalue-output-filename="prostate-p-values.txt"
+                                custom-ranking-set=""
+                                validation-filename="${evaluation-data-directory}/prostate-fusion/validation.txt"/>
+                        <candidate-model-selections
+                                cv-results-filename="${evaluation-data-directory}/endpoint-E-Oct-16-2008/ERPOS-CV-20081014-0920-results-all-maqcii-submission.txt"
+                                cvcf-results-filename="${evaluation-data-directory}/endpoint-E-Oct-16-2008/ERPOS-20081014-0920-results-CVCF-maqcii-submission.txt"
+                                model-ids=""
+                                custom-ranking-set=""
+                                validation-filename="${evaluation-data-directory}/endpoint-E-Oct-16-2008/endpoint-E-validation-submission.txt"
+                                output-filename="-"
+                                pvalue-output-filename="endpoint-E-p-values.txt"
+                                dump="--model-conditions ${evaluation-data-directory}/endpoint-E-Oct-16-2008/model-conditions.txt"
+                                reward-performance="@{rank-by}"
+                                rank-candidates-by="@{rank-by}"
+                                selection-strategy="@{selection-strategy}"
+                                />
+                        <candidate-model-selections-ignore
+                                cv-results-filename="${evaluation-data-directory}/official-submission-May-5-2008/CV-20080630-1801-results-restat-maqcii-submission.txt"
+                                cvcf-results-filename="${evaluation-data-directory}/official-submission-May-5-2008/CVCF-maqcii-submission.txt"
+                                model-ids="--model-ids-map-file ${evaluation-data-directory}/official-submission-May-5-2008/ModelId-Mapping-Info.txt"
+                                output-filename="official-rankings-output.txt"
+                                pvalue-output-filename="official-models-p-values.txt"
+                                reward-performance="@{rank-by}"
+                                rank-candidates-by="@{rank-by}"
+                                selection-strategy="@{selection-strategy}"
+                                dump="--model-conditions ${evaluation-data-directory}/official-submission-May-5-2008/model-conditions.txt-8"
+                                custom-ranking-set=""
+                                validation-filename="${evaluation-data-directory}/official-submission-May-5-2008/May-02-2008-validation-predictions-cornell-format-all-endpoints-submission.txt"/>
+                        <candidate-model-selections
+                                cv-results-filename="${evaluation-data-directory}/other-models-Aug-1-2008/CV-20080701-all-maqcii-submission.txt"
+                                cvcf-results-filename="${evaluation-data-directory}/other-models-Aug-1-2008/CVCF-20080701.txt"
+                                model-ids=""
+                                output-filename="other-rankings-output.txt"
+                                pvalue-output-filename="other-models-p-values.txt"
+                                reward-performance="@{rank-by}"
+                                rank-candidates-by="@{rank-by}"
+                                dump="--model-conditions ${evaluation-data-directory}/other-models-Aug-1-2008/other-models-model-conditions-columns.txt"
+                                custom-ranking-set=""
+                                selection-strategy="@{selection-strategy}"
+                                validation-filename="${evaluation-data-directory}/other-models-Aug-1-2008/Aug-01-2008-validation-predictions-cornell-format-all-endpoints-submission.txt"/>
+
+                    </sequential>
+                </for>
+            </sequential>
+        </for>
+        <for param="selection-strategy" delimiter="," trim="yes"
+             list="CUSTOM">
+            <sequential>
+
+                <for param="rank-by" delimiter="," trim="yes"
+                     list="AUC,MCC">
+                    <sequential>
+                        <candidate-model-selections-ignore
+                                cv-results-filename="${evaluation-data-directory}/official-submission-May-5-2008/CV-20080630-1801-results-restat-maqcii-submission.txt"
+                                cvcf-results-filename="${evaluation-data-directory}/official-submission-May-5-2008/CVCF-maqcii-submission.txt"
+                                model-ids=""
+                                output-filename="official-rankings-output.txt"
+                                pvalue-output-filename="official-models-p-values.txt"
+                                reward-performance="@{rank-by}"
+                                rank-candidates-by="@{rank-by}"
+                                selection-strategy="@{selection-strategy}"
+                                custom-ranking-set="--custom-ranking-file ${evaluation-data-directory}/official-submission-May-5-2008/color-rankings.txt"
+                                validation-filename="${evaluation-data-directory}/official-submission-May-5-2008//May-02-2008-validation-predictions-cornell-format-all-endpoints-submission.txt"/>
+
+                        <candidate-model-selections
+                                cv-results-filename="${evaluation-data-directory}/other-models-Aug-1-2008/CV-20080701-all-maqcii-submission.txt"
+                                cvcf-results-filename="${evaluation-data-directory}/other-models-Aug-1-2008/CVCF-20080701.txt"
+                                model-ids=""
+                                output-filename="other-rankings-output.txt"
+                                pvalue-output-filename="other-models-p-values.txt"
+                                reward-performance="@{rank-by}"
+                                rank-candidates-by="@{rank-by}"
+                                selection-strategy="@{selection-strategy}"
+                                validation-filename="${evaluation-data-directory}/other-models-Aug-1-2008/Aug-01-2008-validation-predictions-cornell-format-all-endpoints-submission.txt"
+                                custom-ranking-set="--custom-ranking-file ${evaluation-data-directory}/other-models-Aug-1-2008/color-rankings.txt"/>
+
+                    </sequential>
+                </for>
+            </sequential>
+        </for>
+    </target>
+
+    <macrodef name="stats-maqcii" description="Run StatsMACQIIMode">
+        <attribute name="cornell-input-file"/>
+        <attribute name="true-labels-file"/>
+        <attribute name="output-file"/>
+        <attribute name="binary-mode" default="true"/>
+        <attribute name="sample-with-replacement" default="false"/>
+        <attribute name="number-of-bootstrap-samples" default="1000"/>
+        <sequential>
+            <java classname="edu.cornell.med.icb.biomarkers.DiscoverAndValidate" fork="true" failonerror="true">
+                <classpath refid="classpath"/>
+                <jvmarg value="-ea"/>
+                <jvmarg value="${memory-flag}"/>
+                <sysproperty key="log4j.debug" value="true"/>
+                <sysproperty key="log4j.configuration" value="file:///${config}/log4j.properties"/>
+                <arg line="-m stats-maqcii"/>
+                <arg line="--predictions-long @{cornell-input-file}"/>
+                <arg line="--true-labels-file @{true-labels-file}"/>
+                <arg line="--submission-file @{output-file}"/>
+                <arg line="--label N/A"/>
+                <arg line="--folds 0"/>
+                <arg line="--binary @{binary-mode}"/>
+                <arg line="--rserve-port -1"/>
+                <arg line="--sample-with-replacement @{sample-with-replacement}"/>
+                <arg line="--number-of-bootstrap-samples @{number-of-bootstrap-samples}"/>
+            </java>
+        </sequential>
+    </macrodef>
+
+    <target name="stats-maqcii-e-endpoint" depends="compile" description="convert and verify new models with prompts">
+        <stats-maqcii
+                cornell-input-file="/home/maqcii/maqcii-output-results/Oct-14-2008-Cornell-Models/Oct-14-2008-validation-predictions-cornell-format-all-endpoints.txt"
+                true-labels-file="/home/maqcii/validation/true-labels-file.txt"
+                output-file="/home/maqcii/maqcii-output-results/0-Oct-14-2008-validation-predictions-cornell-format-all-endpoints-submission.txt"
+                sample-with-replacement="false"/>
+    </target>
+
+    <target name="stats-maqcii" depends="compile" description="convert and verify new models with prompts">
+        <stats-maqcii
+                cornell-input-file="/home/maqcii/tissueinfo/data/May-02-2008-validation-predictions-cornell-format-all-endpoints.txt"
+                true-labels-file="/home/maqcii/validation/true-labels-file.txt"
+                output-file="/home/maqcii/tissueinfo/data/0-May-02-2008-validation-predictions-cornell-format-all-endpoints-submission.txt"
+                sample-with-replacement="false"/>
+        <stats-maqcii
+                cornell-input-file="/home/maqcii/tissueinfo/data/Aug-01-2008-validation-predictions-cornell-format-all-endpoints.txt"
+                true-labels-file="/home/maqcii/validation/true-labels-file.txt"
+                output-file="/home/maqcii/tissueinfo/data/0-Aug-01-2008-validation-predictions-cornell-format-all-endpoints-submission.txt"
+                sample-with-replacement="false"/>
+        <stats-maqcii
+                cornell-input-file="/home/maqcii/tissueinfo/data/May-02-2008-validation-predictions-cornell-format-all-endpoints.txt"
+                true-labels-file="/home/maqcii/validation/true-labels-file.txt"
+                output-file="/home/maqcii/tissueinfo/data/1000-May-02-2008-validation-predictions-cornell-format-all-endpoints-submission.txt"
+                sample-with-replacement="true"
+                number-of-bootstrap-samples="1000"/>
+        <stats-maqcii
+                cornell-input-file="/home/maqcii/tissueinfo/data/Aug-01-2008-validation-predictions-cornell-format-all-endpoints.txt"
+                true-labels-file="/home/maqcii/validation/true-labels-file.txt"
+                output-file="/home/maqcii/tissueinfo/data/1000-Aug-01-2008-validation-predictions-cornell-format-all-endpoints-submission.txt"
+                sample-with-replacement="true"
+                number-of-bootstrap-samples="1000"/>
+    </target>
+
+    <target name="stats-swap">
+        <stats-maqcii
+                cornell-input-file="/scratchLocal/maqcii/swap/tissueinfo/data/20081113-1101-results/converted-predictions/Nov-13-2008-Cornell-Models/Nov-13-2008-validation-predictions-cornell-format-all-endpoints.txt"
+                true-labels-file="/home/maqcii/validation/swap-true-labels-file.txt"
+                output-file="/scratchLocal/maqcii/swap/tissueinfo/data/20081113-1101-results/converted-predictions/Nov-13-2008-Cornell-Models/Nov-13-2008-swap-validation-predictions-cornell-format-all-endpoints-submission.txt"
+                sample-with-replacement="false"/>
+    </target>
+
+    <macrodef name="distribution-difference-by-feature"
+              description="Evaluate differences in feature distribution for features">
+        <attribute name="signal-quality-calc-class"
+                   default="edu.cornell.med.icb.biomarkers.signalquality.SimpleSignalQualityCalculator"/>
+        <attribute name="maqcii-properties-file"/>
+        <attribute name="model-conditions-file"/>
+        <attribute name="models-dir"/>
+        <attribute name="model-list" default="all"/>
+        <attribute name="model-exclude-list" default="none"/>
+        <attribute name="eval-dataset-root" default="-"/>
+        <attribute name="properties-training-label" default="training"/>
+        <attribute name="properties-validation-label" default="validation"/>
+        <attribute name="scale-features" default="false"/>
+        <attribute name="extended-output" default="false"/>
+        <attribute name="merge-classes" default="false"/>
+        <attribute name="max-num-classes" default="2"/>
+        <attribute name="output" default="screen"/>
+        <attribute name="other-args" default=""/>
+        <sequential>
+            <java classname="edu.cornell.med.icb.biomarkers.DiscoverAndValidate" fork="true" failonerror="true">
+                <classpath refid="classpath"/>
+                <jvmarg value="-ea"/>
+                <jvmarg value="${memory-flag}"/>
+                <sysproperty key="log4j.debug" value="true"/>
+                <sysproperty key="log4j.configuration" value="file:///${config}/log4j.properties"/>
+                <arg line="-m distribution-difference-by-feature"/>
+                <arg line="--maqcii-properties-file @{maqcii-properties-file}"/>
+                <arg line="--model-conditions-file @{model-conditions-file}"/>
+                <arg line="--models-dir @{models-dir}"/>
+                <arg line="--model-list @{model-list}"/>
+                <arg line="--signal-quality-calc-class @{signal-quality-calc-class}"/>
+                <arg line="--eval-dataset-root @{eval-dataset-root}"/>
+                <arg line="--properties-training-label @{properties-training-label}"/>
+                <arg line="--properties-validation-label @{properties-validation-label}"/>
+                <arg line="--model-exclude-list @{model-exclude-list}"/>
+                <arg line="--output @{output}"/>
+                <arg line="--scale-features @{scale-features}"/>
+                <arg line="--extended-output @{extended-output}"/>
+                <arg line="--merge-classes @{merge-classes}"/>
+                <arg line="--max-num-classes @{max-num-classes}"/>
+                <arg line="@{other-args}"/>
+            </java>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="distribution-difference-by-model"
+              description="Evaluate differences in feature distribution for models">
+        <attribute name="pvalues-file"/>
+        <attribute name="signal-quality-calc-class"
+                   default="edu.cornell.med.icb.biomarkers.signalquality.SimpleSignalQualityCalculator"/>
+        <attribute name="output" default="screen"/>
+        <attribute name="extended-output" default="false"/>
+        <attribute name="other-args" default=""/>
+        <sequential>
+            <java classname="edu.cornell.med.icb.biomarkers.DiscoverAndValidate" fork="true" failonerror="true">
+                <classpath refid="classpath"/>
+                <jvmarg value="-ea"/>
+                <jvmarg value="${memory-flag}"/>
+                <sysproperty key="log4j.debug" value="true"/>
+                <sysproperty key="log4j.configuration" value="file:///${config}/log4j.properties"/>
+                <arg line="-m distribution-difference"/>
+
+                <arg line="--signal-quality-calc-class @{signal-quality-calc-class}"/>
+                <arg line="--output '@{output}'"/>
+                <arg line="--extended-output @{extended-output}"/>
+
+                <arg line="--pvalues-file '@{pvalues-file}'"/>
+                <arg line="@{other-args}"/>
+
+            </java>
+        </sequential>
+    </macrodef>
+
+    <target name="signal-quality-prostate" depends="compile" description="signal quality on prostate models">
+        <!--
+        <signal-quality-pvalues
+                maqcii-properties-file="/scratchLocal/maqcii/results/prostate-fusion-20080611-0903-results/prostate-example.properties"
+                model-conditions-file="/scratchLocal/maqcii/results/prostate-fusion-20080611-0903-results/model-conditions.txt"
+                models-dir="/scratchLocal/maqcii/results/prostate-fusion-20080611-0903-results/final-models"
+                model-list="XJSYZ"
+                properties-training-label="training"
+                properties-validation-label="test"
+                output="signal-quality-prostate-training-test-XJSYZ-pvalues.txt"
+                extended-output="true"/>
+        <signal-quality-pvalues
+                maqcii-properties-file="/scratchLocal/maqcii/results/prostate-fusion-20080611-0903-results/prostate-example.properties"
+                model-conditions-file="/scratchLocal/maqcii/results/prostate-fusion-20080611-0903-results/model-conditions.txt"
+                models-dir="/scratchLocal/maqcii/results/prostate-fusion-20080611-0903-results/final-models"
+                model-list="GEAUU,FZQYG"
+                properties-training-label="training"
+                properties-validation-label="validation"
+                output="signal-quality-prostate-training-validation-XJSYZ-pvalues.txt"
+                extended-output="true"/>
+        -->
+
+        <distribution-difference-by-feature
+                maqcii-properties-file="/scratchLocal/maqcii/results/prostate-fusion-20080611-0903-results/prostate-example.properties"
+                model-conditions-file="/scratchLocal/maqcii/results/prostate-fusion-20080611-0903-results/model-conditions.txt"
+                models-dir="/scratchLocal/maqcii/results/prostate-fusion-20080611-0903-results/final-models"
+                properties-training-label="training"
+                properties-validation-label="test"
+                output="signal-quality-prostate-training-test-pvalues.txt"/>
+        <distribution-difference-by-model
+                pvalues-file="signal-quality-prostate-training-test-pvalues.txt"
+                output="signal-quality-prostate-training-test-quality.txt"/>
+
+        <distribution-difference-by-feature
+                maqcii-properties-file="/scratchLocal/maqcii/results/prostate-fusion-20080611-0903-results/prostate-example.properties"
+                model-conditions-file="/scratchLocal/maqcii/results/prostate-fusion-20080611-0903-results/model-conditions.txt"
+                models-dir="/scratchLocal/maqcii/results/prostate-fusion-20080611-0903-results/final-models"
+                properties-training-label="training"
+                properties-validation-label="validation"
+                output="signal-quality-prostate-training-validation-pvalues.txt"/>
+        <distribution-difference-by-model
+                pvalues-file="signal-quality-prostate-training-validation-pvalues.txt"
+                output="signal-quality-prostate-training-validation-quality.txt"/>
+    </target>
+
+    <target name="signal-quality-may-2-2008" depends="compile" description="signal quality on may-2-2008 models">
+        <distribution-difference-by-feature
+                maqcii-properties-file="maqcii-c.properties"
+                model-conditions-file="predictions-mappings/model-conditions-columns.txt"
+                models-dir="/home/maqcii/dev-maqcii/results/May-2-2008/new-final-models"
+                merge-classes="false"
+                output="signal-quality-maqcii-may-2-2008-pvalues.txt"
+                extended-output="false"/>
+        <distribution-difference-by-model
+                pvalues-file="signal-quality-maqcii-may-2-2008-pvalues.txt"
+                output="signal-quality-maqcii-may-2-2008-quality.txt"/>
+    </target>
+
+    <target name="signal-quality-aug-1-2008" depends="compile" description="signal quality on aug-1-2008 models">
+        <distribution-difference-by-feature
+                maqcii-properties-file="maqcii-c.properties"
+                model-conditions-file="/scratchLocal/maqcii/results/maqcii-aug-1-models/model-conditions-columns.txt"
+                models-dir="/scratchLocal/maqcii/results/maqcii-aug-1-models/20080713-1629-results/final-models/"
+                output="signal-quality-maqcii-aug-1a-2008-pvalues.txt"
+                extended-output="false"/>
+        <distribution-difference-by-model
+                pvalues-file="signal-quality-maqcii-aug-1a-2008-pvalues.txt"
+                output="signal-quality-maqcii-aug-1a-2008-quality.txt"/>
+        <distribution-difference-by-feature
+                maqcii-properties-file="maqcii-c.properties"
+                model-conditions-file="/scratchLocal/maqcii/results/maqcii-aug-1-models/model-conditions-columns.txt"
+                models-dir="/scratchLocal/maqcii/results/maqcii-aug-1-models/20080701-1613-results/final-models/"
+                output="signal-quality-maqcii-aug-1b-2008-pvalues.txt"
+                extended-output="false"/>
+        <distribution-difference-by-model
+                pvalues-file="signal-quality-maqcii-aug-1b-2008-pvalues.txt"
+                output="signal-quality-maqcii-aug-1b-2008-quality.txt"/>
+
+
+        <distribution-difference-by-feature
+                maqcii-properties-file="maqcii-c.properties"
+                model-conditions-file="/scratchLocal/maqcii/results/maqcii-aug-1-models/model-conditions-columns.txt"
+                models-dir="/scratchLocal/maqcii/results/maqcii-aug-1-models/20080713-1629-results/final-models/"
+                output="signal-quality-maqcii-aug-1a-2008-merged-pvalues.txt"
+                merge-classes="true"
+                extended-output="false"/>
+        <distribution-difference-by-model
+                pvalues-file="signal-quality-maqcii-aug-1a-2008-merged-pvalues.txt"
+                output="signal-quality-maqcii-aug-1a-2008-merged-quality.txt"/>
+        <distribution-difference-by-feature
+                maqcii-properties-file="maqcii-c.properties"
+                model-conditions-file="/scratchLocal/maqcii/results/maqcii-aug-1-models/model-conditions-columns.txt"
+                models-dir="/scratchLocal/maqcii/results/maqcii-aug-1-models/20080701-1613-results/final-models/"
+                output="signal-quality-maqcii-aug-1b-2008-merged-pvalues.txt"
+                merge-classes="true"
+                extended-output="false"/>
+        <distribution-difference-by-model
+                pvalues-file="signal-quality-maqcii-aug-1b-2008-merged-pvalues.txt"
+                output="signal-quality-maqcii-aug-1b-2008-merged-quality.txt"/>
+    </target>
+
+    <target name="signal-quality-endpoint-e" depends="compile" description="signal quality on endpoint-e models">
+        <distribution-difference-by-feature
+                maqcii-properties-file="maqcii-c.properties"
+                model-conditions-file="/scratchLocal/maqcii/results/endpoint-E-20081014-0920-results/20081014-0920-results/model-conditions.txt"
+                models-dir="/scratchLocal/maqcii/results/endpoint-E-20081014-0920-results/20081014-0920-results/final-models"
+                output="signal-quality-maqcii-endpoint-e-pvalues.txt"/>
+        <distribution-difference-by-model
+                pvalues-file="signal-quality-maqcii-endpoint-e-pvalues.txt"
+                output="signal-quality-maqcii-endpoint-e-quality.txt"/>
+    </target>
+
+    <target name="distribution-differences-other-models" depends="compile"
+            description="signal quality on endpoint-e models">
+        <antcall target="signal-quality-prostate"/>
+        <antcall target="signal-quality-aug-1-2008"/>
+        <antcall target="signal-quality-endpoint-e"/>
+    </target>
+
+</project>
+

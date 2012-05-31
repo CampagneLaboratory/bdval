@@ -1,0 +1,96 @@
+#!/bin/bash
+
+# Submit to the rascals queue
+#$ -q *@@rascals.h
+
+# Name of the job
+#$ -N @JOB-NAME@
+
+# Execute the script from the current directory
+#$ -cwd
+
+# Combine SGE error and output files.
+#$ -j y
+
+# TODO Save SGE output to the result directory
+#SGE -o @JOB-DIR@/../@JOB-NAME@.^array_index^.log
+
+# Resource requirements - One node with exclusive access or number of threads/cpus
+#$ @SGE_PROCESSOR_DIRECTIVE@
+
+# Memory resource requirements
+#$ -l h_vmem=@SGE_MEMORY@
+
+# Mail job begin status
+#$ -m b
+
+# Mail job completion status
+#$ -m e
+
+# TODO - Mail to user specified
+##$ -M nobody@med.cornell.edu
+
+# Submit as a job array
+#$ -t 1-@SGE-TASKS@
+
+#
+# Output some useful SGE job information
+#
+echo ------------------------------------------------------
+echo SGE: qsub is running on ${SGE_O_HOST}
+echo SGE: originating queue is ${QUEUE}
+echo SGE: executing cell is ${SGE_CELL}
+echo SGE: working directory is ${SGE_O_WORKDIR}
+echo SGE: execution mode is ${ENVIRONMENT}
+echo SGE: execution host is ${HOSTNAME}
+echo SGE: job identifier is ${JOB_ID}
+echo SGE: job name is ${JOB_NAME}
+echo SGE: task number is ${SGE_TASK_ID}
+echo SGE: current home directory is ${SGE_O_HOME}
+echo SGE: scratch directory is ${TMPDIR}
+echo SGE: PATH = ${SGE_O_PATH}
+echo ------------------------------------------------------
+
+# Number of Rserve instances to start up
+NUMBER_OF_RSERVE_INSTANCES=@NUMBER_OF_RSERVE_INSTANCES@
+
+# First port to use for Rserve
+RSERVE_START_PORT=@RSERVE_START_PORT@
+
+#
+# Start instances of Rserve on each node in the cluster
+#
+start_rserve() {
+    for ((i=1; i <= ${NUMBER_OF_RSERVE_INSTANCES}; i++)); do
+        let PORT=${RSERVE_START_PORT}+${i}-1
+        echo "Starting Rserve instance on port ${PORT}"
+        . $TMPDIR/@JOB-NAME@/start-rserve.sh ${PORT}
+    done
+}
+
+#
+# Stop instances of Rserve on each node in the cluster
+#
+stop_rserve() {
+    for ((i=1; i <= ${NUMBER_OF_RSERVE_INSTANCES}; i++)); do
+        let PORT=${RSERVE_START_PORT}+${i}-1
+        echo "Stoping Rserve instance on port ${PORT}"
+        . $TMPDIR/@JOB-NAME@/stop-rserve.sh ${PORT}
+    done
+}
+
+trap 'stop_rserve' 2 9 15
+
+# Copy needed files from master node to the worker node
+echo "=============================================="
+echo "Copying files to $HOSTNAME"
+echo "=============================================="
+/bin/cp -pr @JOB-DIR@ $TMPDIR/@JOB-NAME@
+
+start_rserve
+
+# Run bdval job
+cd $TMPDIR/@JOB-NAME@
+./bdval-sge.sh
+
+stop_rserve

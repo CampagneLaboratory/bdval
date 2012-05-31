@@ -1,0 +1,11 @@
+--classifier-parameters default-options
+--classifier-parameters C=0.1
+--classifier-parameters C=0.01
+--classifier-parameters C=0.001
+--classifier-parameters C=0.0001
+--classifier-parameters C=0.00001
+--classifier-parameters C=1
+--classifier-parameters C=10
+--classifier-parameters C=100
+--classifier-parameters C=1000
+

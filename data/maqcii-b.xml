@@ -1,0 +1,1361 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="MAQC-II phase B" default="evaluate" basedir="">
+    <!-- ===================== Property Definitions =========================== -->
+    <property environment="env"/>
+
+    <property name="logs" location="../logs"/>
+    <property name="config" location="../config"/>
+    <property name="classes" location="../classes"/>
+    <property name="lib" location="../lib"/>
+    <property name="bin" location="../bin"/>
+
+    <property name="do-specific-gene-lists-only" value="true"/>
+    <property name="enable-flooring" value="true"/>
+
+    <property file="${config}/maqcii-local.properties"/>
+
+    <property name="ga-wrapper-population-size" value="200"/>
+    <property name="ga-wrapper-number-of-iterations" value="20"/>
+    <property name="performance-measure-maximized-by-GA" value="MCC"/>
+    <property name="internal-CV-repeats" value="--cv-repeats 10 "/>
+    <property name="internal-CV-folds" value="3"/>
+
+    <property name="external-CV-repeats" value="--cv-repeats 10 "/>
+    <property name="external-CV-folds" value="5"/>
+
+    <property name="num-features" value="50"/>
+    <property name="max-intermediate-features" value="400"/>
+
+    <property name="use-probability" value="false"/>
+    <property name="fold-change-phi" value="1.5"/>
+    <property name="ttest-alpha" value="0.05"/>
+    <property name="pathway-aggregation-method" value="PCA"/>
+
+    <!--  - - roc -->
+
+    <property name="human-pathways-file" value="human-IntAct-KEGG-TEPSS-pathways.txt"/>
+    <property name="mouse-pathways-file" value="mouse-IntAct-KEGG-TEPSS-pathways.txt"/>
+    <property name="rat-pathways-file" value="rat-IntAct-KEGG-TEPSS-pathways.txt"/>
+
+    <property name="run-java" value="true"/>
+    <property name="svm-parameters" value="--classifier-parameters probability=${use-probability}"/>
+    <!-- - -classifier-parameters probability=${use-probability} -->
+    <property name="svm-classifier" value=""/>
+    <property name="feature-option"
+              value=" --normalize-features false --scale-features true --percentile-scaling false"/>
+
+    <property file="maqcii-b.properties"/>
+
+    <!--propertyfile file="../crover.prp"/-->
+
+    <path id="classpath">
+        <pathelement location="${config}"/>
+        <pathelement location="${classes}"/>
+        <fileset dir="${lib}">
+            <include name="*.jar"/>
+            <include name="Rserve/*.jar"/>
+            <include name="ojdbc14.jar"/>
+            <exclude name="tissueinfo.jar"/>
+        </fileset>
+    </path>
+
+    <taskdef resource="net/sf/antcontrib/antlib.xml" onerror="fail">
+        <classpath>
+            <pathelement location="../buildsupport/lib/ant-contrib.jar"/>
+        </classpath>
+    </taskdef>
+
+    <osfamily property="osfamily"/>
+
+    <if>
+        <equals arg1="${osfamily}" arg2="windows"/>
+        <then>
+            <echo message="Configuration execution for Windows."/>
+            <property name="num-threads" value="1"/>
+            <property name="memory-flag" value="-Xmx1300m"/>
+            <property name="short-flag" value=""/>
+        </then>
+        <else>
+            <echo message="Configuration execution for UNIX."/>
+            <property name="num-threads" value="8"/>
+            <property name="memory-flag" value="-Xmx20000m"/>
+            <property name="short-flag" value=""/>
+        </else>
+    </if>
+
+    <macrodef name="predict-one-dataset" description="Predict one dataset.">
+        <attribute name="testset-name"/>
+        <attribute name="dataset-root"/>
+        <attribute name="type"/>
+        <attribute name="platform"/>
+        <attribute name="mode"/>
+        <attribute name="floor-param"/>
+        <attribute name="output" default="out.txt"/>
+        <attribute name="model"/>
+        <attribute name="true-labels"/>
+        <attribute name="test-samples"/>
+        <attribute name="rserve-port" default="-1"/>
+        <attribute name="other-options" default=""/>
+        <sequential>
+
+            <echo message="++"/>
+            <echo message="++ Running  @{testset-name} : @{mode} -> @{output}"/>
+            <echo message="++"/>
+
+            <if>
+                <equals arg1="${run-java}" arg2="true"/>
+                <then>
+                    <java classname="edu.cornell.med.icb.biomarkers.DiscoverAndValidate"
+                          classpathref="classpath" fork="true" failonerror="true">
+
+                        <jvmarg value="-ea"/>
+                        <jvmarg value="${memory-flag}"/>
+                        <sysproperty key="log4j.debug" value="true"/>
+                        <sysproperty key="log4j.configuration" value="file:///${config}/log4j.properties"/>
+                        <arg line="-m @{mode}"/>
+                        <arg line="-i @{dataset-root}/norm-data/@{testset-name}.@{type}"/>
+                        <!-- short for faster -->
+                        <arg line="-p @{platform} "/>
+                        <arg line="-o @{output} "/>
+                        <arg line="--model @{model} "/>
+                        <arg line="--true-labels @{true-labels} "/>
+                        <arg line="--test-samples @{test-samples} "/>
+                        <arg line="--rserve-port @{rserve-port} "/>
+                        <arg line="@{other-options} "/>
+                        <arg line=" ${feature-option} "/>
+                        <arg line="--dataset-name @{testset-name}"/>
+                        <arg line="--dataset-root @{dataset-root}"/>
+                        <arg line=" ${svm-classifier} ${svm-parameters} @{floor-param} "/>
+                        <!--redirector output="@{testset-name}.stdout"></redirector-->
+                    </java>
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="process-one-dataset" description="Process one dataset.">
+        <attribute name="dataset-name"/>
+        <attribute name="dataset-root"/>
+        <attribute name="tasks"/>
+        <attribute name="gene-list" default="N/A"/>
+        <attribute name="specific-gene-list" default="N/A"/>
+        <attribute name="type"/>
+        <attribute name="platform"/>
+        <attribute name="mode"/>
+        <attribute name="floor-param"/>
+        <attribute name="label" default="unknown"/>
+        <attribute name="seed" default="123454"/>
+        <attribute name="output" default="out.txt"/>
+        <attribute name="rserve-port" default="-1"/>
+        <attribute name="other-options" default=""/>
+        <attribute name="pathways-params" default=""/>
+        <attribute name="gene-features-dir" default="./"/>
+        <attribute name="extra-classifier-parameters" default=""/>
+        <sequential>
+
+            <echo message="++"/>
+            <echo message="++ Running  @{dataset-name} : @{mode} -> @{output}"/>
+            <echo message="++"/>
+
+            <if>
+                <equals arg1="@{gene-list}" arg2="N/A"/>
+                <then>
+                    <if>
+                        <equals arg1="@{specific-gene-list}" arg2="N/A"/>
+                        <then>
+                            <var name="gene-list-argument" value=" "/>
+                        </then>
+                        <else>
+                            <var name="gene-list-argument" value="--gene-list @{label}|@{specific-gene-list}"/>
+
+                        </else>
+                    </if>
+                </then>
+
+                <else>
+                    <var name="gene-list-argument" value="--gene-lists @{gene-list}"/>
+                </else>
+            </if>
+            <echo message="gene list argument: ${gene-list-argument}"/>
+            <if>
+                <equals arg1="${run-java}" arg2="true"/>
+                <then>
+                    <java classname="edu.cornell.med.icb.biomarkers.DiscoverAndValidate"
+                          classpathref="classpath" fork="true" failonerror="true">
+
+                        <jvmarg value="-ea"/>
+                        <jvmarg value="${memory-flag}"/>
+                        <sysproperty key="log4j.debug" value="true"/>
+                        <sysproperty key="log4j.configuration" value="file:///${config}/log4j.properties"/>
+                        <sysproperty key="pj.nt" value="${num-threads}"/>
+                        <arg line="-m @{mode}"/>
+                        <arg line="-i @{dataset-root}/norm-data/@{dataset-name}${short-flag}.@{type}"/>
+                        <!-- short for faster -->
+                        <arg line="-c @{dataset-root}/cids/@{dataset-name}.cids"/>
+                        <arg line="-t @{dataset-root}/tasks/@{tasks}"/>
+
+                        <arg line="${gene-list-argument}"/>
+                        <arg line="-p @{platform} "/>
+                        <arg line="-o @{output} "/>
+                        <!-- use RServe  config file -->
+                        <arg line="--seed @{seed} @{other-options} @{pathways-params} "/>
+                        <arg line="--gene-features-dir @{gene-features-dir}"/>
+                        <arg line="--dataset-name @{dataset-name}"/>
+                        <arg line="--dataset-root @{dataset-root}"/>
+                        <arg line=" ${svm-classifier} ${svm-parameters}@{extra-classifier-parameters} "/>
+                        <arg line=" ${feature-option} @{floor-param} "/>
+                        <!--redirector output="@{dataset-name}.stdout"></redirector-->
+
+                    </java>
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="process-one-sequence" description="Process one sequence.">
+        <attribute name="dataset-name"/>
+        <attribute name="dataset-root"/>
+        <attribute name="tasks"/>
+        <attribute name="type"/>
+        <attribute name="platform"/>
+        <attribute name="floor-param"/>
+        <attribute name="label" default="unknown"/>
+        <attribute name="seed" default="123454"/>
+        <attribute name="rserve-port" default="-1"/>
+        <attribute name="other-options" default=""/>
+        <attribute name="pathways-params" default=""/>
+        <attribute name="gene-features-dir" default="./"/>
+        <attribute name="sequence-file"/>
+        <sequential>
+
+            <echo message="++"/>
+            <echo message="++ Running  @{dataset-name} : sequence-file @{sequence-file}"/>
+            <echo message="++"/>
+
+            <if>
+                <equals arg1="${run-java}" arg2="true"/>
+                <then>
+                    <java classname="edu.cornell.med.icb.biomarkers.DiscoverAndValidate"
+                          classpathref="classpath" fork="true" failonerror="true">
+
+                        <jvmarg value="-ea"/>
+                        <jvmarg value="${memory-flag}"/>
+                        <sysproperty key="log4j.debug" value="true"/>
+                        <sysproperty key="log4j.configuration" value="file:///${config}/log4j.properties"/>
+                        <arg line="-m sequence"/>
+                        <!-- short for faster -->
+                        <arg line="-c @{dataset-root}/cids/@{dataset-name}.cids"/>
+                        <arg line="-t @{dataset-root}/tasks/@{tasks}"/>
+
+                        <arg line="-p @{platform} "/>
+                        <arg line="--seed @{seed} @{other-options} @{pathways-params} "/>
+                        <arg line="--gene-features-dir @{gene-features-dir}"/>
+                        <arg line="--dataset-name @{dataset-name}"/>
+                        <arg line="--dataset-root @{dataset-root}"/>
+                        <arg line=" ${svm-classifier} ${svm-parameters} "/>
+                        <arg line=" ${feature-option} "/>
+                        <arg line="--sequence-file sequences/@{sequence-file}"/>
+
+                        <arg line="-i NA"/>
+                        <arg line="-o NA"/>
+                        <arg line="--gene-list NA @{floor-param} "/>
+                        <!--redirector output="@{dataset-name}.stdout"></redirector-->
+
+                    </java>
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+
+
+    <macrodef name="process-sequence-file">
+        <attribute name="dataset-name"/>
+        <attribute name="dataset-root"/>
+        <attribute name="tasks"/>
+        <attribute name="type"/>
+        <attribute name="platform"/>
+        <attribute name="rserve-port" default="-1"/>
+        <attribute name="sequence-file"/>
+        <sequential>
+            <echo message=">>> Processing sequence-file @{sequence-file}"/>
+            <trycatch>
+                <try>
+                    <process-one-sequence
+                            dataset-name="@{dataset-name}"
+                            type="@{type}"
+                            tasks="@{tasks}"
+                            platform="@{platform}"
+                            dataset-root="@{dataset-root}"
+                            rserve-port="@{rserve-port}"
+                            sequence-file="@{sequence-file}"/>
+                </try>
+                <catch>
+                    <echo message="CAUGHT FAILED BUILD process-sequence-file=@{sequence-file} dataset-name=@{dataset-name}"/>
+                </catch>
+                <finally>
+                    <copy-output-files dataset-name="@{dataset-name}"/>
+                </finally>
+            </trycatch>
+        </sequential>
+    </macrodef>
+
+
+    <macrodef name="define-splits">
+        <attribute name="dataset-name"/>
+        <attribute name="dataset-root"/>
+        <attribute name="tasks"/>
+        <attribute name="rserve-port"/>
+        <attribute name="type"/>
+        <attribute name="platform"/>
+        <attribute name="floor-param"/>
+
+        <attribute name="feature-selection-fold" description="When true, generate a feature selection fold"
+                   default="false"/>
+        <sequential>
+
+            <trycatch>
+                <try>
+                    <var name="split-plan-file"
+                         value="@{dataset-root}/splits/@{dataset-name}-split-plan-fs=@{feature-selection-fold}.txt"/>
+                    <if>
+
+                        <not>
+                            <available file="${split-plan-file}"/>
+                        </not>
+                        <then>
+                            <echo message=">>> Writing split plan ${split-plan-file}"/>
+                            <process-one-dataset mode="define-splits"
+                                                 dataset-name="@{dataset-name}"
+                                                 type="@{type}"
+                                                 tasks="@{tasks}"
+                                                 platform="@{platform}"
+                                                 dataset-root="@{dataset-root}"
+                                                 rserve-port="@{rserve-port}"
+                                                 output="${split-plan-file}"
+                                                 floor-param="@{floor-param}"
+                                                 other-options="-f ${external-CV-folds} ${external-CV-repeats} --gene-list full --overwrite-output true --feature-selection-fold @{feature-selection-fold}"/>
+                        </then>
+                    </if>
+
+                </try>
+                <catch>
+                    <echo message="CAUGHT FAILED BUILD process define-splits dataset-name=@{dataset-name}"/>
+                </catch>
+                <finally>
+                    <copy-output-files dataset-name="@{dataset-name}"/>
+                </finally>
+            </trycatch>
+        </sequential>
+
+    </macrodef>
+
+    <macrodef name="execute-splits-skip">
+        <attribute name="feature-selection-fold"/>
+        <attribute name="sequence-file"/>
+        <attribute name="dataset-name"/>
+        <attribute name="dataset-root"/>
+        <attribute name="tasks"/>
+        <attribute name="type"/>
+        <attribute name="platform"/>
+        <attribute name="floor-param"/>
+        <attribute name="other-options" default=""/>
+        <sequential>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="execute-splits">
+        <attribute name="feature-selection-fold"/>
+        <attribute name="sequence-file"/>
+        <attribute name="dataset-name"/>
+        <attribute name="dataset-root"/>
+        <attribute name="tasks"/>
+        <attribute name="type"/>
+        <attribute name="platform"/>
+        <attribute name="extra-classifier-parameters" default=""/>
+        <attribute name="floor-param"/>
+        <attribute name="other-options" default=""/>
+        <sequential>
+            <echo message="Executing splits for sequence @{sequence-file}"/>
+
+            <var name="split-plan-file"
+                 value="@{dataset-root}/splits/@{dataset-name}-split-plan-fs=@{feature-selection-fold}.txt"/>
+            <var name="cache-dir"
+                 value="@{dataset-root}/cache/fs=@{feature-selection-fold}"/>
+             <var name="pathway-components-dir"
+                 value="pathway-components/fs=@{feature-selection-fold}/"/>
+            <trycatch>
+                <try>
+
+                    <if>
+                        <not>
+                            <available file="${split-plan-file}"/>
+                        </not>
+                        <then>
+                            <echo message=">>> ERROR: Cannot find split plan ${split-plan-file}"/>
+                        </then>
+                        <else>
+
+                            <echo message=">>> Executing split plan ${split-plan-file}"/>
+
+                            <process-one-dataset mode="execute-splits"
+                                                 dataset-name="@{dataset-name}"
+                                                 type="@{type}"
+                                                 tasks="@{tasks}"
+                                                 platform="@{platform}"
+                                                 dataset-root="@{dataset-root}"
+                                                 output="-"
+                                                 extra-classifier-parameters="@{extra-classifier-parameters}"
+                                                 floor-param="@{floor-param}"
+                                                 other-options=" --num-features ${num-features} --cache-dir ${cache-dir} --splits ${split-plan-file} --gene-list full  --sequence-file sequences/@{sequence-file} @{other-options} --pathway-components-dir ${pathway-components-dir} "/>
+                        </else>
+                    </if>
+                </try>
+                <catch>
+                    <echo message="CAUGHT FAILED BUILD process sequence-file=@{sequence-file} dataset-name=@{dataset-name}"/>
+                </catch>
+                <finally>
+                    <copy-output-files dataset-name="@{dataset-name}"/>
+                </finally>
+            </trycatch>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="process-splits-all" description="Tune : execute all split plans">
+        <attribute name="dataset-name"/>
+        <attribute name="dataset-root"/>
+        <attribute name="tasks"/>
+        <attribute name="type"/>
+        <attribute name="platform"/>
+        <attribute name="rserve-port" default="-1"/>
+        <attribute name="do-process-gene-lists" default="false"/>
+        <attribute name="floor-param"/>
+        <attribute name="pathway-options"/>
+        <attribute name="endpoint-specific-genelist-names"
+                   default="Merged HM200 NC01-2000 GDS1070 GDS183 GDS232 NuttAO NuttGBM POMEROY-0 POMEROY-1 POMEROY-2 POMEROY-3 POMEROY-4 POMEROY-400 Rhodes2004 "/>
+
+        <sequential>
+
+            <define-splits dataset-name="@{dataset-name}"
+                           dataset-root="@{dataset-root}" tasks="@{tasks}"
+                           rserve-port="@{rserve-port}"
+                           type="@{type}" platform="@{platform}"
+                           floor-param="@{floor-param}"/>
+            <define-splits feature-selection-fold="true"
+                           dataset-name="@{dataset-name}"
+                           dataset-root="@{dataset-root}" tasks="@{tasks}"
+                           rserve-port="@{rserve-port}"
+                           type="@{type}" platform="@{platform}"
+                           floor-param="@{floor-param}"/>
+
+            <if>
+                <istrue value="${do.baseline}"/>
+                <then>
+                    <execute-splits feature-selection-fold="false"
+                                    sequence-file="baseline.sequence"
+                                    dataset-name="@{dataset-name}"
+                                    dataset-root="@{dataset-root}" tasks="@{tasks}"
+                                    type="@{type}" platform="@{platform}"
+                                    floor-param="@{floor-param}"/>
+                </then>
+            </if>
+
+            <if>
+                           <istrue value="${do.whole-chip}"/>
+                           <then>
+                               <execute-splits feature-selection-fold="false"
+                                               sequence-file="whole-chip.sequence"
+                                               dataset-name="@{dataset-name}"
+                                               dataset-root="@{dataset-root}" tasks="@{tasks}"
+                                               type="@{type}" platform="@{platform}"
+                                               floor-param="@{floor-param}"/>
+                           </then>
+                       </if>
+
+            <if>
+                <istrue value="${do.baseline-tune-C}"/>
+                <then>
+                    <execute-splits feature-selection-fold="false"
+                                    sequence-file="tuneC-baseline.sequence"
+                                    dataset-name="@{dataset-name}"
+                                    dataset-root="@{dataset-root}" tasks="@{tasks}"
+                                    type="@{type}" platform="@{platform}"
+                                    floor-param="@{floor-param}"
+                                    extra-classifier-parameters=",C=1"/>
+                    <execute-splits feature-selection-fold="false"
+                                    sequence-file="tuneC-baseline.sequence"
+                                    dataset-name="@{dataset-name}"
+                                    dataset-root="@{dataset-root}" tasks="@{tasks}"
+                                    type="@{type}" platform="@{platform}"
+                                    floor-param="@{floor-param}"
+                                    extra-classifier-parameters=",C=10"/>
+                    <execute-splits feature-selection-fold="false"
+                                    sequence-file="tuneC-baseline.sequence"
+                                    dataset-name="@{dataset-name}"
+                                    dataset-root="@{dataset-root}" tasks="@{tasks}"
+                                    type="@{type}" platform="@{platform}"
+                                    floor-param="@{floor-param}"
+                                    extra-classifier-parameters=",C=.5"/>
+                </then>
+            </if>
+
+            <if>
+                <istrue value="${do.minmax-svmglobal}"/>
+                <then>
+                    <execute-splits feature-selection-fold="true"
+                                    sequence-file="minmax-svmglobal.sequence"
+                                    dataset-name="@{dataset-name}"
+                                    dataset-root="@{dataset-root}" tasks="@{tasks}"
+                                    type="@{type}" platform="@{platform}"
+                                    floor-param="@{floor-param}"
+                                    other-options="--max-intermediate-features ${max-intermediate-features}"/>
+                </then>
+            </if>
+
+            <if>
+                <istrue value="${do.svmiterative}"/>
+                <then>
+                    <execute-splits feature-selection-fold="false"
+                                    sequence-file="svmiterative.sequence"
+                                    dataset-name="@{dataset-name}"
+                                    dataset-root="@{dataset-root}" tasks="@{tasks}"
+                                    type="@{type}" platform="@{platform}"
+                                    floor-param="@{floor-param}"/>
+                </then>
+            </if>
+
+            <if>
+                <istrue value="${do.ttest-svmiterative}"/>
+                <then>
+                    <execute-splits feature-selection-fold="true"
+                                    sequence-file="ttest-svmiterative.sequence"
+                                    dataset-name="@{dataset-name}"
+                                    dataset-root="@{dataset-root}" tasks="@{tasks}"
+                                    type="@{type}" platform="@{platform}"
+                                    other-options="--alpha ${ttest-alpha} --max-intermediate-features ${max-intermediate-features}"
+                                    floor-param="@{floor-param}"/>
+                </then>
+            </if>
+
+            <if>
+                <istrue value="${do.ttest-svmglobal}"/>
+                <then>
+                    <execute-splits feature-selection-fold="true"
+                                    sequence-file="ttest-svmglobal.sequence"
+                                    dataset-name="@{dataset-name}"
+                                    dataset-root="@{dataset-root}" tasks="@{tasks}"
+                                    type="@{type}" platform="@{platform}"
+                                    other-options="--alpha ${ttest-alpha} --max-intermediate-features ${max-intermediate-features}"
+                                    floor-param="@{floor-param}"/>
+                </then>
+            </if>
+
+            <if>
+                <equals arg1="@{do-process-gene-lists}" arg2="true"/>
+                <then>
+                    <var name="endpoint-specific-genelist-names" value=""/>
+                    <for param="which-gene-list" delimiter=" "
+                         list="@{endpoint-specific-genelist-names}">
+                        <sequential>
+                            <echo message=">>> Processing gene list @{which-gene-list}"/>
+
+                            <if>
+                                <istrue value="${do.genelist-svmglobal}"/>
+                                <then>
+                                    <execute-splits feature-selection-fold="false"
+                                                    sequence-file="genelist-svmglobal.sequence"
+                                                    dataset-name="@{dataset-name}"
+                                                    dataset-root="@{dataset-root}" tasks="@{tasks}"
+                                                    type="@{type}" platform="@{platform}"
+                                                    other-options="--which-gene-list @{which-gene-list}"
+                                                    floor-param="@{floor-param}"/>
+                                </then>
+                            </if>
+
+                            <if>
+                                <istrue value="${do.genelist-svmglobal-tune-C}"/>
+                                <then>
+                                    <execute-splits feature-selection-fold="false"
+                                                    sequence-file="genelist-svmglobal.sequence"
+                                                    dataset-name="@{dataset-name}"
+                                                    dataset-root="@{dataset-root}" tasks="@{tasks}"
+                                                    type="@{type}" platform="@{platform}"
+                                                    other-options="--which-gene-list @{which-gene-list}"
+                                                    extra-classifier-parameters=",C=1"
+                                                    floor-param="@{floor-param}"/>
+                                    <execute-splits feature-selection-fold="false"
+                                                    sequence-file="genelist-svmglobal.sequence"
+                                                    dataset-name="@{dataset-name}"
+                                                    dataset-root="@{dataset-root}" tasks="@{tasks}"
+                                                    type="@{type}" platform="@{platform}"
+                                                    other-options="--which-gene-list @{which-gene-list}"
+                                                    extra-classifier-parameters=",C=10"
+                                                    floor-param="@{floor-param}"/>
+                                    <execute-splits feature-selection-fold="false"
+                                                    sequence-file="genelist-svmglobal.sequence"
+                                                    dataset-name="@{dataset-name}"
+                                                    dataset-root="@{dataset-root}" tasks="@{tasks}"
+                                                    type="@{type}" platform="@{platform}"
+                                                    other-options="--which-gene-list @{which-gene-list}"
+                                                    extra-classifier-parameters=",C=.5"
+                                                    floor-param="@{floor-param}"/>
+                                </then>
+                            </if>
+
+                            <if>
+                                <istrue value="${do.genelist-genetic-algorithm}"/>
+                                <then>
+                                    <execute-splits feature-selection-fold="false"
+                                                    sequence-file="genelist-genetic-algorithm.sequence"
+                                                    dataset-name="@{dataset-name}"
+                                                    dataset-root="@{dataset-root}" tasks="@{tasks}"
+                                                    type="@{type}" platform="@{platform}"
+                                                    other-options="--which-gene-list @{which-gene-list} --ratio 0.5 --number-of-steps ${ga-wrapper-number-of-iterations} ${internal-CV-repeats} --population-size ${ga-wrapper-population-size} --folds ${internal-CV-folds} ${ga-wrapper-roc-str} --maximize ${performance-measure-maximized-by-GA}"
+                                                    floor-param="@{floor-param}"/>
+                                </then>
+                            </if>
+
+                        </sequential>
+                    </for>
+                </then>
+                <else>
+                    <echo message="NOT Processing Gene Lists for @{dataset-name}"/>
+                </else>
+            </if>
+
+            <if>
+                <istrue value="${do.foldchange-svmiterative}"/>
+                <then>
+                    <execute-splits feature-selection-fold="true"
+                                    sequence-file="foldchange-svmiterative.sequence"
+                                    dataset-name="@{dataset-name}"
+                                    dataset-root="@{dataset-root}" tasks="@{tasks}"
+                                    type="@{type}" platform="@{platform}"
+                                    other-options="--phi ${fold-change-phi} --max-intermediate-features ${max-intermediate-features}"
+                                    floor-param="@{floor-param}"/>
+                </then>
+            </if>
+
+            <if>
+                <istrue value="${do.foldchange-svmglobal}"/>
+                <then>
+                    <execute-splits feature-selection-fold="true"
+                                    sequence-file="foldchange-svmglobal.sequence"
+                                    dataset-name="@{dataset-name}"
+                                    dataset-root="@{dataset-root}" tasks="@{tasks}"
+                                    type="@{type}" platform="@{platform}"
+                                    other-options="--phi ${fold-change-phi}  --max-intermediate-features ${max-intermediate-features}"
+                                    floor-param="@{floor-param}"/>
+                </then>
+            </if>
+
+            <if>
+                <istrue value="${do.ttest-genetic-algorithm}"/>
+                <then>
+                    <execute-splits feature-selection-fold="true"
+                                    sequence-file="ttest-genetic-algorithm.sequence"
+                                    dataset-name="@{dataset-name}"
+                                    dataset-root="@{dataset-root}" tasks="@{tasks}"
+                                    type="@{type}" platform="@{platform}"
+                                    other-options=" --alpha ${ttest-alpha} --max-intermediate-features ${max-intermediate-features} --ratio 0.5 --number-of-steps ${ga-wrapper-number-of-iterations} ${internal-CV-repeats} --population-size ${ga-wrapper-population-size} --folds ${internal-CV-folds} ${ga-wrapper-roc-str} --maximize ${performance-measure-maximized-by-GA}"
+                                    floor-param="@{floor-param}"/>
+                </then>
+            </if>
+
+            <if>
+                <istrue value="${do.foldchange-genetic-algorithm}"/>
+                <then>
+                    <execute-splits feature-selection-fold="true"
+                                    sequence-file="foldchange-genetic-algorithm.sequence"
+                                    dataset-name="@{dataset-name}"
+                                    dataset-root="@{dataset-root}" tasks="@{tasks}"
+                                    type="@{type}" platform="@{platform}"
+                                    other-options="--phi ${fold-change-phi} --max-intermediate-features ${max-intermediate-features} --ratio 0.5 --number-of-steps ${ga-wrapper-number-of-iterations} ${internal-CV-repeats} --population-size ${ga-wrapper-population-size} --folds ${internal-CV-folds} ${ga-wrapper-roc-str} --maximize ${performance-measure-maximized-by-GA}"
+                                    floor-param="@{floor-param}"/>
+                </then>
+            </if>
+
+            <if>
+                <istrue value="${do.full-genetic-algorithm}"/>
+                <then>
+                    <execute-splits feature-selection-fold="true"
+                                    sequence-file="genetic-algorithm.sequence"
+                                    dataset-name="@{dataset-name}"
+                                    dataset-root="@{dataset-root}" tasks="@{tasks}"
+                                    type="@{type}" platform="@{platform}"
+                                    other-options="--ratio 0.00001 --number-of-steps ${ga-wrapper-number-of-iterations} ${internal-CV-repeats} --population-size ${ga-wrapper-population-size} --folds ${internal-CV-folds} ${ga-wrapper-roc-str} --maximize ${performance-measure-maximized-by-GA}"
+                                    floor-param="@{floor-param}"/>
+
+                </then>
+            </if>
+
+
+            <if>
+                <istrue value="${do.pathways-build-pathway-components}"/>
+                <then>
+                    <execute-splits feature-selection-fold="true"
+                                    sequence-file="pathways-build-pathway-components-fs=true.sequence"
+                                    dataset-name="@{dataset-name}"
+                                    dataset-root="@{dataset-root}" tasks="@{tasks}"
+                                    type="@{type}" platform="@{platform}"
+                                    floor-param="@{floor-param}"
+                                    other-options="@{pathway-options} "/>
+
+                    <execute-splits feature-selection-fold="false"
+                                    sequence-file="pathways-build-pathway-components-fs=false.sequence"
+                                    dataset-name="@{dataset-name}"
+                                    dataset-root="@{dataset-root}" tasks="@{tasks}"
+                                    type="@{type}" platform="@{platform}"
+                                    floor-param="@{floor-param}"
+                                    other-options="@{pathway-options} "/>
+                </then>
+            </if>
+            <if>
+                <istrue value="${do.pathways.baseline}"/>
+                <then>
+                    <execute-splits feature-selection-fold="false"
+                                    sequence-file="pathways-global-svm-weights.sequence"
+                                    dataset-name="@{dataset-name}"
+                                    dataset-root="@{dataset-root}" tasks="@{tasks}"
+                                    type="@{type}" platform="@{platform}"
+                                    floor-param="@{floor-param}"
+                                    other-options="@{pathway-options} "/>
+
+                </then>
+            </if>
+
+            <if>
+                <istrue value="${do.pathways-ttest-svmglobal}"/>
+                <then>
+                    <execute-splits feature-selection-fold="true"
+                                    sequence-file="pathways-ttest-svmglobal.sequence"
+                                    dataset-name="@{dataset-name}"
+                                    dataset-root="@{dataset-root}" tasks="@{tasks}"
+                                    type="@{type}" platform="@{platform}"
+                                    floor-param="@{floor-param}"
+                                    other-options="@{pathway-options} --alpha  ${ttest-alpha}   --max-intermediate-features ${max-intermediate-features}"/>
+                </then>
+            </if>
+
+            <if>
+                <istrue value="${do.pathways-tune-C}"/>
+                <then>
+                    <execute-splits feature-selection-fold="true"
+                                    sequence-file="pathways-global-svm-weights.sequence"
+                                    dataset-name="@{dataset-name}"
+                                    dataset-root="@{dataset-root}" tasks="@{tasks}"
+                                    type="@{type}" platform="@{platform}"
+                                    floor-param="@{floor-param}"
+                                    other-options="@{pathway-options}   "
+                                    extra-classifier-parameters=",C=1"/>
+                    <execute-splits feature-selection-fold="true"
+                                    sequence-file="pathways-global-svm-weights.sequence"
+                                    dataset-name="@{dataset-name}"
+                                    dataset-root="@{dataset-root}" tasks="@{tasks}"
+                                    type="@{type}" platform="@{platform}"
+                                    floor-param="@{floor-param}"
+                                    other-options="@{pathway-options}   "
+                                    extra-classifier-parameters=",C=10"/>
+                    <execute-splits feature-selection-fold="true"
+                                    sequence-file="pathways-global-svm-weights.sequence"
+                                    dataset-name="@{dataset-name}"
+                                    dataset-root="@{dataset-root}" tasks="@{tasks}"
+                                    type="@{type}" platform="@{platform}"
+                                    floor-param="@{floor-param}"
+                                    other-options="@{pathway-options}   "
+                                    extra-classifier-parameters=",C=.5"/>
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+    <target name="unused">
+    </target>
+
+
+    <macrodef name="copy-output-files" description="Copy the output files to the results dir">
+        <attribute name="dataset-name"/>
+        <sequential>
+            <echo message="Moving output files for @{dataset-name} to ${save-data-dir}"/>
+            <move todir="${save-data-dir}" verbose="false">
+                <fileset dir="." casesensitive="false">
+                    <include name="libSVM_*@{dataset-name}*"/>
+                    <include name="@{dataset-name}-baseline-*"/>
+                    <include name="@{dataset-name}-tune-*"/>
+                    <include name="@{dataset-name}-tuneC-*"/>
+                    <include name="@{dataset-name}-genelists-*"/>
+                    <include name="@{dataset-name}-parameters-*"/>
+                    <include name="@{dataset-name}*optimal-parameters.txt"/>
+
+                    <include name="@{dataset-name}-pathways-*"/>
+
+                    <include name="@{dataset-name}*-features.txt"/>
+
+                    <!-- These two come from split. -->
+                    <include name="@{dataset-name}-*-tune-*"/>
+                    <include name="exec-@{dataset-name}-*"/>
+                    <!--
+                    <include name="pathway-components/**/*"/>
+                     -->
+                    <exclude name="@{dataset-name}-maqcii-subbmission.file.txt"/>
+                    <exclude name="@{dataset-name}-*-stats.txt"/>
+                </fileset>
+
+            </move>
+
+            <copy todir="${save-data-dir}">
+                <fileset dir="." casesensitive="false">
+                    <include name="@{dataset-name}-maqcii-submission.file.txt"/>
+                    <include name="@{dataset-name}-*-stats.txt"/>
+                </fileset>
+            </copy>
+
+            <mkdir dir="${save-data-dir}/features/@{dataset-name}"/>
+            <move todir="${save-data-dir}/features/@{dataset-name}">
+                <fileset dir="${save-data-dir}" casesensitive="false">
+                    <include name="@{dataset-name}-*-features.txt"/>
+                </fileset>
+            </move>
+
+            <mkdir dir="${save-data-dir}/models/@{dataset-name}"/>
+            <move todir="${save-data-dir}/models/@{dataset-name}">
+                <fileset dir="${save-data-dir}" casesensitive="false">
+                    <include name="libSVM_*@{dataset-name}*"/>
+                </fileset>
+            </move>
+
+        </sequential>
+    </macrodef>
+
+    <target name="zip-results" description="Zip result files">
+        <sequential>
+            <concat destfile="${save-data-dir}/${save-data-tag}-all-maqcii-submission.txt">
+                <fileset dir="${save-data-dir}" file="*maqcii-submission*.txt"/>
+            </concat>
+            <concat destfile="${save-data-dir}/${save-data-tag}-all-stats.txt">
+                <fileset dir="${save-data-dir}" file="*stats*.txt"/>
+            </concat>
+            <delete>
+                <fileset dir="${save-data-dir}">
+                    <include name="*maqcii-submission*.txt"/>
+                    <include name="*stats*.txt"/>
+                    <exclude name="${save-data-tag}-all-maqcii-submission.txt"/>
+                    <exclude name="${save-data-tag}-all-stats.txt"/>
+                </fileset>
+            </delete>
+            <echo message="Zipping results ${save-data-tag}.zip"/>
+            <zip zipfile="${save-data-tag}.zip">
+                <fileset dir="${save-data-dir}">
+                    <include name="**"/>
+                </fileset>
+            </zip>
+        </sequential>
+    </target>
+
+    <target name="delete-results" description="Delete previous result files">
+        <delete verbose="true" includeemptydirs="">
+            <fileset dir=".">
+                <include name="200*-results/**/*"/>
+                <include name="200*-results"/>
+                <include name="200*-results.zip"/>
+            </fileset>
+        </delete>
+    </target>
+
+    <macrodef name="copy-tune-parameters-files" description="Copy the output files to the results dir">
+        <sequential>
+            <echo message="Moving output files to ${save-data-dir}"/>
+            <move todir="${save-data-dir}">
+                <fileset dir="." casesensitive="false">
+                    <include name="maqcii-submission.file.txt"/>
+                </fileset>
+            </move>
+        </sequential>
+    </macrodef>
+
+    <!-- ==================== Compile Target =========================== -->
+    <target name="compile">
+        <ant antfile="../build.xml" target="compile" inheritall="false"/>
+    </target>
+
+    <target name="init">
+
+    </target>
+
+    <!-- Normal targets (non-pathways) -->
+
+
+    <macrodef name="define-endpoints">
+        <sequential>
+            <property name="do.HamnerWithControl" value="true"/>
+            <property name="do.Iconix" value="true"/>
+            <property name="do.NIEHS" value="true"/>
+
+            <property name="do.MDACC_PCR" value="true"/>
+            <property name="do.MDACC_ERPOS" value="true"/>
+
+            <property name="do.Cologne_OS_MO" value="true"/>
+            <property name="do.Cologne_EFS_MO" value="true"/>
+
+
+            <property name="do.UAMS_EFS_MO" value="true"/>
+            <property name="do.UAMS_OS_MO" value="true"/>
+
+            <!-- less used endpoints -->
+            <property name="do.CologneTraining" value="false"/>
+            <property name="do.UAMS_CPS1" value="true"/>
+            <property name="do.UAMS_CPR1" value="true"/>
+            <property name="do.Cologne_NEP_S" value="true"/>
+            <property name="do.Cologne_NEP_R" value="true"/>
+            <property name="do.NIEHSTraining" value="false"/>
+            <property name="do.UAMS_CPR1Training" value="false"/>
+
+            <echo message="Executing all endpoints..."/>
+
+            <property name="all-endpoints" value="
+                HamnerWithControl Iconix NIEHS MDACC_PCR MDACC_ERPOS Cologne_OS_MO
+                Cologne_EFS_MO UAMS_EFS_MO UAMS_OS_MO CologneTraining UAMS_CPS1 UAMS_CPR1
+                Cologne_NEP_S Cologne_NEP_R NIEHSTraining UAMS_CPR1Training"/>
+        </sequential>
+    </macrodef>
+    <macrodef name="execute-all-endpoints" description="Run do-one-splits-all for each target">
+        <sequential>
+
+            <define-endpoints/>
+
+            <for param="current-endpoint" delimiter=" " list="${all-endpoints}">
+                <sequential>
+                    <if>
+                        <istrue value="${do.@{current-endpoint}}"/>
+                        <then>
+                            <do-one-splits-all dataset-name="@{current-endpoint}"/>
+                        </then>
+                    </if>
+                </sequential>
+            </for>
+        </sequential>
+    </macrodef>
+
+
+    <target name="evaluate" description="Run a complete evaluation." depends="compile, tag-output-directory">
+        <delete file="${statistics-output}"/>
+
+        <echo message="Executing with ${num-threads} threads"/>
+        <sequential>
+            <property name="do.baseline" value="false"/>
+            <property name="do.whole-chip" value="false"/>
+            <property name="do.baseline-tune-C" value="false"/>
+            <property name="do.foldchange-genetic-algorithm" value="false"/>
+            <property name="do.foldchange-svmglobal" value="false"/>
+            <property name="do.foldchange-svmiterative" value="false"/>
+            <property name="do.full-genetic-algorithm" value="false"/>
+            <property name="do.genelist-genetic-algorithm" value="false"/>
+            <property name="do.genelist-svmglobal" value="false"/>
+            <property name="do.genelist-svmglobal-tune-C" value="false"/>
+            <property name="do.minmax-svmglobal" value="false"/>
+            <property name="do.pathways-ttest-svmglobal" value="false"/>
+            <property name="do.pathways-tune-C" value="false"/>
+            <property name="do.pathways.baseline" value="false"/>
+            <property name="do.svmiterative" value="false"/>
+            <property name="do.ttest-genetic-algorithm" value="false"/>
+            <property name="do.ttest-svmglobal" value="false"/>
+            <property name="do.ttest-svmiterative" value="false"/>
+
+            <execute-all-endpoints/>
+
+        </sequential>
+        <antcall target="process-model-conditions"/>
+        <antcall target="zip-results"/>
+    </target>
+
+
+    <target name="pathways" description="Run pathways." depends="compile, tag-output-directory">
+        <delete file="${statistics-output}"/>
+
+        <echo message="Executing with ${num-threads} threads"/>
+        <sequential>
+            <property name="do.baseline" value="false"/>
+            <property name="do.baseline-tune-C" value="false"/>
+            <property name="do.foldchange-genetic-algorithm" value="false"/>
+            <property name="do.foldchange-svmglobal" value="false"/>
+            <property name="do.foldchange-svmiterative" value="false"/>
+            <property name="do.full-genetic-algorithm" value="false"/>
+            <property name="do.genelist-genetic-algorithm" value="false"/>
+            <property name="do.genelist-svmglobal" value="false"/>
+            <property name="do.genelist-svmglobal-tune-C" value="false"/>
+            <property name="do.minmax-svmglobal" value="false"/>
+            <property name="do.pathways-build-pathway-components" value="true"/>
+            <property name="do.pathways-ttest-svmglobal" value="false"/>
+            <property name="do.pathways-tune-C" value="false"/>
+            <property name="do.pathways.baseline" value="false"/>
+            <property name="do.svmiterative" value="false"/>
+            <property name="do.ttest-genetic-algorithm" value="false"/>
+            <property name="do.ttest-svmglobal" value="false"/>
+            <property name="do.ttest-svmiterative" value="false"/>
+
+            <execute-all-endpoints/>
+
+        </sequential>
+        <antcall target="process-model-conditions"/>
+        <antcall target="zip-results"/>
+    </target>
+
+    <target name="genetic-algorithm" description="Run Genetic Algorithm." depends="compile, tag-output-directory">
+        <delete file="${statistics-output}"/>
+
+        <echo message="Executing with ${num-threads} threads"/>
+        <sequential>
+            <property name="do.baseline" value="false"/>
+            <property name="do.whole-chip" value="false"/>
+            <property name="do.baseline-tune-C" value="false"/>
+            <property name="do.foldchange-svmglobal" value="false"/>
+            <property name="do.foldchange-svmiterative" value="false"/>
+
+            <property name="do.genelist-svmglobal" value="false"/>
+            <property name="do.genelist-svmglobal-tune-C" value="false"/>
+            <property name="do.minmax-svmglobal" value="false"/>
+            <property name="do.pathways-ttest-svmglobal" value="false"/>
+            <property name="do.pathways-tune-C" value="false"/>
+            <property name="do.pathways.baseline" value="false"/>
+            <property name="do.svmiterative" value="false"/>
+            <property name="do.ttest-svmglobal" value="false"/>
+            <property name="do.ttest-svmiterative" value="false"/>
+
+            <property name="do.full-genetic-algorithm" value="true"/>
+            <property name="do.ttest-genetic-algorithm" value="true"/>
+            <property name="do.foldchange-genetic-algorithm" value="true"/>
+            <property name="do.genelist-genetic-algorithm" value="true"/>
+
+            <execute-all-endpoints/>
+
+        </sequential>
+        <antcall target="process-model-conditions"/>
+        <antcall target="zip-results"/>
+    </target>
+
+    <target name="tune-C" description="Try a few values of cost parameter C with baseline and gene lists"
+            depends="compile, tag-output-directory">
+        <delete file="${statistics-output}"/>
+
+        <echo message="Executing with ${num-threads} threads"/>
+        <sequential>
+            <property name="do.baseline" value="false"/>
+            <property name="do.whole-chip" value="false"/>
+            <property name="do.foldchange-genetic-algorithm" value="false"/>
+            <property name="do.foldchange-svmglobal" value="false"/>
+            <property name="do.foldchange-svmiterative" value="false"/>
+            <property name="do.full-genetic-algorithm" value="false"/>
+            <property name="do.genelist-genetic-algorithm" value="false"/>
+            <property name="do.genelist-svmglobal" value="false"/>
+            <property name="do.minmax-svmglobal" value="false"/>
+            <property name="do.pathways-ttest-svmglobal" value="false"/>
+            <property name="do.pathways.baseline" value="false"/>
+            <property name="do.svmiterative" value="false"/>
+            <property name="do.ttest-genetic-algorithm" value="false"/>
+            <property name="do.ttest-svmglobal" value="false"/>
+            <property name="do.ttest-svmiterative" value="false"/>
+
+            <property name="do.pathways-tune-C" value="false"/>
+            <property name="do.baseline-tune-C" value="true"/>
+            <property name="do.genelist-svmglobal-tune-C" value="false"/>
+            <execute-all-endpoints/>
+
+        </sequential>
+        <antcall target="process-model-conditions"/>
+        <antcall target="zip-results"/>
+    </target>
+
+
+    <target name="restat" description="Recalculate statistics for prediction table files in a given directory"
+            depends="compile, tag-output-directory">
+        <delete file="${statistics-output}"/>
+        <input addproperty="directory" message="Enter the directory where prediction table are stored."/>
+        <for param="prediction-table-filename" trim="yes">
+            <fileset dir="${directory}">
+                <include name="*prediction-table.txt"/>
+            </fileset>
+            <sequential>
+
+                <java classname="edu.cornell.med.icb.biomarkers.DiscoverAndValidate"
+                      classpathref="classpath" fork="true" failonerror="true">
+
+                    <jvmarg value="-ea"/>
+                    <jvmarg value="${memory-flag}"/>
+                    <sysproperty key="log4j.debug" value="true"/>
+                    <sysproperty key="log4j.configuration" value="file:///${config}/log4j.properties"/>
+                    <sysproperty key="pj.nt" value="${num-threads}"/>
+                    <arg line="-m stats"/>
+                    <arg line="--predictions @{prediction-table-filename}"/>
+                    <arg line="--label auto"/>
+                    <arg line="--binary true"/>
+                    <arg line="--dataset-name auto"/>
+                    <arg line="--folds ${external-CV-folds}"/>
+                    <arg line="--submission-file restat-maqcii-submission.txt"/>
+
+                </java>
+            </sequential>
+        </for>
+    </target>
+    <target name="generate-all-final-models"
+            description="Calculate feature consensus across multiple feature selection strategies and generate models with consensus features on the whole training set."
+            depends="compile">
+
+        <input addproperty="model-conditions" message="Enter the model condition filename."
+               defaultvalue="model-conditions.txt"/>
+
+        <input addproperty="inspect-directory"
+               message="Enter the directory where results directory will be found (each results directory must include features and models subdirectories)."/>
+
+        <for param="results-directory">
+            <dirset dir="${inspect-directory}">
+                <depth max="0"/>
+                <filename name="20*-*-results"/>
+
+            </dirset>
+            <sequential>
+                <echo message="Processing directory @{results-directory}"/>
+                <property name="results-directory" value="@{results-directory}"/>
+
+                <antcall target="generate-final-models" inheritall="true"/>
+
+            </sequential>
+        </for>
+    </target>
+
+    <target name="generate-list-final-models"
+            description="Calculate feature consensus across multiple feature selection strategies and generate models with consensus features on the whole training set."
+            depends="compile">
+
+        <input addproperty="model-conditions" message="Enter the model condition filename."
+               defaultvalue="model-conditions.txt"/>
+
+        <input addproperty="inspect-directory"
+               message="Enter the directory where results directory will be found (each results directory must include features and models subdirectories)."/>
+
+        <for param="results-directory" delimiter=" " trim="yes"
+             list="20080420-1649-results 20080423-0837-results 20080423-2226-results 20080423-2228-results 20080424-1910-results 20080425-0812-results 20080425-1413-results 20080426-0913-results 20080426-1358-results 20080427-1228-results 20080428-1151-results 20080429-1052-results 20080430-0911-results 20080430-1350-results">
+
+            <!--dirset dir="${inspect-directory}">
+                <depth max="0"/>
+                <filename name="20*-*-results"/>
+
+            </dirset-->
+
+            <sequential>
+                <echo message="Processing directory @{results-directory}"/>
+                <var name="results-directory" value="${inspect-directory}/@{results-directory}"/>
+
+                <antcall target="generate-final-models" inheritall="true"/>
+
+            </sequential>
+        </for>
+    </target>
+
+    <target name="generate-final-models"
+            description="Calculate feature consensus across multiple feature selection strategies and generate models with consensus features on the whole training set.">
+        <define-endpoints/>
+        <delete file="${statistics-output}"/>
+        <input addproperty="model-conditions" message="Enter the model condition filename."
+               defaultvalue="model-conditions.txt"/>
+        <input addproperty="results-directory"
+               message="Enter the directory where results are stored (features subdirectory must exist in the results directory)."/>
+
+        <java classname="edu.cornell.med.icb.biomarkers.GenerateFinalModels"
+              classpathref="classpath" fork="true" failonerror="true">
+
+            <jvmarg value="-ea"/>
+            <jvmarg value="${memory-flag}"/>
+            <sysproperty key="log4j.debug" value="true"/>
+            <sysproperty key="log4j.configuration" value="file:///${config}/log4j.properties"/>
+            <sysproperty key="pj.nt" value="${num-threads}"/>
+            <arg value="--model-conditions"/>
+            <arg value="${model-conditions}"/>
+            <arg value="--results-directory"/>
+            <arg value="${results-directory}"/>
+        </java>
+    </target>
+
+    <macrodef name="do-one-splits-all" description="Running process-splits-all for one dataset.">
+        <attribute name="dataset-name"/>
+        <sequential>
+            <trycatch>
+                <try>
+                    <if>
+                        <equals arg1="${do-specific-gene-lists-only}" arg2="true"/>
+
+                        <then>
+                            <!-- Will process the endpoint specific gene lists (see maqcii-b.properties) -->
+                            <var name="endpoint-specific-genelist-names" value="${@{dataset-name}.genelists}"/>
+                        </then>
+                        <else>
+                            <!-- Will process all the gene lists. -->
+                            <var name="endpoint-specific-genelist-names"
+                                 value="Merged HM200 NC01-2000 GDS1070 GDS183 GDS232 NuttAO NuttGBM POMEROY-0 POMEROY-1 POMEROY-2 POMEROY-3 POMEROY-4 POMEROY-400 Rhodes2004"/>
+                        </else>
+                    </if>
+                    <var name="floor-param" value=""/>
+                    <var name="floor-val" value="${@{dataset-name}.floor}"/>
+                    <if>
+                        <not>
+                            <equals arg1="${floor-val}" arg2=""/>
+                        </not>
+                        <then>
+                            <!-- we HAVE a floor value -->
+                            <if>
+                                <equals arg1="${enable-flooring}" arg2="true"/>
+                                <then>
+                                    <!-- and enable-flooring is true -->
+                                    <var name="floor-param" value="--floor ${floor-val}"/>
+                                </then>
+                            </if>
+                        </then>
+                    </if>
+                    <echo message="Running process-splits-all with the following parameters..."/>
+                    <echo message="-------------------------------------------------------"/>
+                    <echo message="dataset-name=@{dataset-name}"/>
+                    <echo message="platform=${@{dataset-name}.platform}"/>
+                    <echo message="do-process-gene-lists=${@{dataset-name}.do-process-gene-lists}"/>
+                    <echo message="endpoint-specific-genelist-names: ${endpoint-specific-genelist-names}"/>
+                    <echo message="floor-param=${floor-param}"/>
+
+                    <process-splits-all
+                            dataset-name="@{dataset-name}"
+                            dataset-root="${eval-dataset-root}"
+                            type="tmm"
+                            tasks="@{dataset-name}-full.tasks"
+                            platform="${@{dataset-name}.platform}"
+                            pathway-options=" --pathways ${@{dataset-name}.pathways-file} --gene-to-probes ${@{dataset-name}.gene-to-probes-file} --pathway-aggregation-method ${pathway-aggregation-method} "
+                            do-process-gene-lists="${@{dataset-name}.do-process-gene-lists}"
+                            endpoint-specific-genelist-names="${endpoint-specific-genelist-names}"
+                            floor-param="${floor-param}"/>
+                </try>
+                <catch>
+                    <echo message="CAUGHT FAILED BUILD"/>
+                </catch>
+                <finally>
+                    <copy-output-files dataset-name="@{dataset-name}"/>
+                </finally>
+            </trycatch>
+        </sequential>
+    </macrodef>
+
+    <target name="process-model-conditions" description="Handle the model-conditions.txt file">
+        <copy todir="${save-data-dir}">
+            <fileset dir=".">
+                <include name="model-conditions.txt"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="rewrite-model-conditions-no-prompt" depends="compile"
+            description="Read a model-conditions.txt file, write a model-conditions-columns.txt file">
+        <java classname="edu.cornell.med.icb.biomarkers.util.RewriteModelConditionslConditions"
+              classpathref="classpath" fork="true" failonerror="true">
+            <jvmarg value="-ea"/>
+            <jvmarg value="${memory-flag}"/>
+            <sysproperty key="log4j.debug" value="true"/>
+            <sysproperty key="log4j.configuration" value="file:///${config}/log4j.properties"/>
+            <arg line="-i model-conditions.txt"/>
+            <arg line="-o model-conditions-columns.txt"/>
+        </java>
+    </target>
+
+    <target name="rewrite-model-conditions" depends="compile"
+            description="Read a model-conditions.txt file, write a model-conditions-columns.txt file">
+
+        <input addproperty="model-conditions-input-file"
+               message="Name of INPUT model conditions file?"
+               defaultvalue="model-conditions.txt"/>
+        <input addproperty="model-conditions-output-file"
+               message="Name of OUTPUT model conditions file (in columns)?"
+               defaultvalue="model-conditions-columns.txt"/>
+
+        <java classname="edu.cornell.med.icb.biomarkers.util.RewriteModelConditionslConditions"
+              classpathref="classpath" fork="true" failonerror="true">
+            <jvmarg value="-ea"/>
+            <jvmarg value="${memory-flag}"/>
+            <sysproperty key="log4j.debug" value="true"/>
+            <sysproperty key="log4j.configuration" value="file:///${config}/log4j.properties"/>
+            <arg line="-i ${model-conditions-input-file}"/>
+            <arg line="-o ${model-conditions-output-file}"/>
+        </java>
+    </target>
+    <target name="tag-output-directory">
+        <tstamp/>
+        <property name="save-data-dir" value="./${DSTAMP}-${TSTAMP}-results/"/>
+        <property name="save-data-tag" value="${DSTAMP}-${TSTAMP}-results"/>
+        <mkdir dir="${save-data-dir}"/>
+        <copy file="maqcii-b.xml" todir="${save-data-dir}"/>
+        <copy file="maqcii-b.properties" todir="${save-data-dir}"/>
+        <copy file="${config}/RConnectionPool.xml" todir="${classes}"/>
+        <delete verbose="true" includeemptydirs="">
+            <fileset dir=".">
+                <include name="*-maqcii-submission*.txt"/>
+                <include name="*-stats.txt"/>
+            </fileset>
+        </delete>
+        <define-endpoints/>
+        <input addproperty="tag-description"
+               message="Please provide a short description for this run (i.e., condition tested, summary of parameters)."/>
+        <echo file="${save-data-dir}/${save-data-tag}-README.txt">${tag-description}
+
+            -----
+            Parameters used in this run were:
+            default-eval-dataset-root: ${default-eval-dataset-root}
+            do-specific-gene-lists-only: ${do-specific-gene-lists-only}
+            enable-flooring: ${enable-flooring}
+
+            num-features: ${num-features}
+            max-intermediate-features: ${max-intermediate-features}
+            feature-option: ${feature-option}
+
+            external-CV-repeats: ${external-CV-repeats}
+            external-CV-folds: ${external-CV-folds}
+            internal-CV-repeats: ${internal-CV-repeats}
+            internal-CV-folds: ${internal-CV-folds}
+
+            fold-change-phi: ${fold-change-phi}
+            ttest-alpha: ${ttest-alpha}
+
+            svm-classifier: ${svm-classifier}
+            svm-parameters: ${svm-parameters}
+            use-probability: ${use-probability}
+
+            performance-measure-maximized-by-GA: ${performance-measure-maximized-by-GA}
+            ga-wrapper-population-size: ${ga-wrapper-population-size}
+            ga-wrapper-number-of-iterations: ${ga-wrapper-number-of-iterations}
+            ga-wrapper-roc-str: ${ga-wrapper-roc-str}
+
+            pathway-aggregation-method: ${pathway-aggregation-method}
+            human-pathways-file: ${human-pathways-file}
+            mouse-pathways-file: ${mouse-pathways-file}
+            rat-pathways-file: ${rat-pathways-file}
+
+            A value of true in the following properties indicates that the dataset/endpoint was processed in this run:
+            do.HamnerWithControl: ${do.HamnerWithControl}
+            do.Iconix: ${do.Iconix}
+            do.NIEHS: ${do.NIEHS}
+
+            do.MDACC_PCR: ${do.MDACC_PCR}
+            do.MDACC_ERPOS: ${do.MDACC_ERPOS}
+
+            do.Cologne_OS_MO: ${do.Cologne_OS_MO}
+            do.Cologne_EFS_MO: ${do.Cologne_EFS_MO}
+
+            do.UAMS_EFS_MO: ${do.UAMS_EFS_MO}
+            do.UAMS_OS_MO: ${do.UAMS_OS_MO}
+
+            do.CologneTraining: ${do.CologneTraining}
+            do.UAMS_CPS1: ${do.UAMS_CPS1}
+            do.UAMS_CPR1: ${do.UAMS_CPR1}
+            do.Cologne_NEP_S: ${do.Cologne_NEP_S}
+            do.Cologne_NEP_R: ${do.Cologne_NEP_R}
+            do.NIEHSTraining: ${do.NIEHSTraining}
+            do.UAMS_CPR1Training: ${do.UAMS_CPR1Training}
+
+
+        </echo>
+
+
+    </target>
+
+
+</project>

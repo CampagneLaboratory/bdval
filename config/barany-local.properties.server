@@ -1,0 +1,12 @@
+# Defines the location of the prostate example data files:
+eval-dataset-root=/home/campagne/xud2002/baraney
+# The type of computer BDVal is running on:
+computer.type=server
+# The number of parallel threads to use in a server environment:
+server.thread-number=1
+# The amount of memory to use on a server machine (8Gb)
+server.memory=-Xmx8000m
+# The number of parallel threads to use on a desktop machine
+desktop.thread-number=1
+# The amount of memory to use on a desktop machine (1200 Mb)
+desktop.memory=-Xmx1200m

@@ -1,0 +1,11 @@
+trained.from.dataset = Cologne_EFS_MO_data.cologne
+training.class0.label = 0
+training.class0.encoding = -1
+training.class1.label = 1
+training.class1.encoding = 1
+training.classifier.classname = edu.cornell.med.icb.learning.libsvm.LibSvmClassifier
+training.classifier.parameters = probability=false,
+scaling.use.percentiles = false
+scaling.enabled = true
+feature-normalization.enabled = false
+scaling.implementation.classname = edu.cornell.med.icb.learning.MinMaxScalingRowProcessor

@@ -1,0 +1,12 @@
+#Writes a final model, applying the minmax-svmglobal strategy to the full training set.
+def label=tune-minmax-global-svm-weights-3-50-%model-id%
+#
+addoption required:max-intermediate-features:Maximum number of intermediate features to consider
+addoption required:num-features:Number of features in the generated model
+addoption required:model-final-features-filename:Path and filename where to write the final model
+addoption required:model-prefix:Path and filename where to write the final model
+#
+-m min-max --overwrite-output true -o %dataset-name%-%label%-intermediate-features.txt --gene-list full --gene-features-dir %gene-features-dir% --min-max-observations 3 --output-gene-list --report-max-probes %max-intermediate-features%
+-m svm-weights --overwrite-output true -o %model-final-features-filename%  --gene-list %label%|%dataset-name%-%label%-intermediate-features.txt --output-gene-list --gene-features-dir %gene-features-dir% --num-features %num-features%
+-m write-model --overwrite-output true --gene-list %label%|%model-final-features-filename%  --model-prefix %model-prefix%
+

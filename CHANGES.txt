@@ -1,0 +1,64 @@
+1.2
+
+- Fix for bug in code used in the tutorial from the BDVAL
+  documentation.  The ExecuteSplitsMode would fail if called
+  directly from the command line.  Using the supplied ant scripts
+  would not execute this section of code and worked properly.
+  See mantis issue #1356 for more details.
+
+- Added an option to not calculate p-value estimates in candidate
+  model selection.
+
+1.1
+
+- Support for running BDVal on Sun/Oracle Grid Engine
+  (http://www.sun.com/software/sge/).
+
+- Upgraded commons-math to version 2.0. Commons-math provides the
+  T-Test implementation used by the t-test mode.
+
+- Make T-Test calculation dependent on --logged-array parameter.
+  Please note that calibration models must be rebuilt for approaches
+  which use fold-change and process logged array datasets.
+
+- Change template to use "--logged-array" rather than the older
+  "--log-10-array"
+
+1.0.4
+
+- Update template scripts and configuration files to include
+  missing parameters that were referenced in the project
+  documentation and prostate example ("use-feature-selection-fold"
+  for example).
+
+1.0.3
+
+- "Survival" mode option was not being set properly and caused
+  the ExecuteSplits mode to fail when generating statistics.
+
+- The correct name for the prostate example test split is
+  now set to GSE8402-FusionYesNo-TestSplit.cids.
+
+- The "predict-validation" target now sets the required attribute
+  "model-directory" properly.
+
+1.0.2
+
+- Set the properties for "use-feature-selection-fold" to true in
+  the  prostate-example.xml file. When these are not defined, the
+  prostate example doesn't produce any results.
+
+- Improve error handling in the "compound file" code used to store
+  results.
+
+1.0.1
+
+- Fixed a crash due to missing class "ProgressLogger".
+  See http://icbtools.med.cornell.edu/mantis/view.php?id=1314
+
+- Updated icb-utils.jar to version icb-utils-144.  Previously
+  included version included duplicate but older CompoundFile code.
+
+1.0
+
+- First release.
