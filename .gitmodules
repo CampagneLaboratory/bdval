@@ -4,3 +4,12 @@
 [submodule "testsupport"]
 	path = testsupport
 	url = git@github.com:CampagneLaboratory/testsupport.git
+[submodule "externals/icb-stats"]
+	path = externals/icb-stats
+	url = git@github.com:CampagneLaboratory/icb-stats.git
+[submodule "externals/optimization"]
+	path = externals/optimization
+	url = git@github.com:CampagneLaboratory/optimization.git
+[submodule "externals/learning"]
+	path = externals/learning
+	url = git@github.com:CampagneLaboratory/learning.git
