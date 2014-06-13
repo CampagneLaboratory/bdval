@@ -15,3 +15,15 @@ PMID: 20702395
 2. Introduction to the development and validation of predictive biomarker models from high-throughput data sets.
 Deng X, Campagne F.
 Methods Mol Biol. 2010;620:435-70.
+
+### Compilation Instructions
+
+After you clone BDVal from GitHub, you must initialize submodules as follows:
+
+1. git submodule init
+2. git submodule update
+
+You can then build the project:
+
+3. ant 
+ 
