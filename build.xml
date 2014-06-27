@@ -92,7 +92,7 @@
                 <include name="jgap.jar"/>
                 <include name="JSAP-2.1.jar"/>
                 <include name="law-1.2.jar"/>
-                <include name="libsvm.jar"/>
+                <include name="libsvm-3.18.jar"/>
                 <include name="log4j-1.2.15.jar"/>
                 <include name="mtj.jar"/>
                 <include name="pj20071021.jar"/>

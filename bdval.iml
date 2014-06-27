@@ -175,15 +175,6 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/libsvm.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/fastutil-5.1.5.jar!/" />
         </CLASSES>
         <JAVADOC />
@@ -233,6 +224,15 @@
       <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/mtj.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/libsvm-3.18.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
