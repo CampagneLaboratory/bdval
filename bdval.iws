@@ -1,0 +1,595 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="86f1b0a3-8439-4f28-96e3-8f9acd7038fd" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/pathways/AverageAcrossPathwayFeatureAggregator.java" afterPath="$PROJECT_DIR$/src/org/bdval/pathways/AverageAcrossPathwayFeatureAggregator.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/BDVModel.java" afterPath="$PROJECT_DIR$/src/org/bdval/BDVModel.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/modelselection/BMFCalibrationModel.java" afterPath="$PROJECT_DIR$/src/org/bdval/modelselection/BMFCalibrationModel.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/signalquality/BaseSignalQualityCalculator.java" afterPath="$PROJECT_DIR$/src/org/bdval/signalquality/BaseSignalQualityCalculator.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/modelselection/CandidateModelSelection.java" afterPath="$PROJECT_DIR$/src/org/bdval/modelselection/CandidateModelSelection.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/modelselection/CandidateModelSelectionAllTeams.java" afterPath="$PROJECT_DIR$/src/org/bdval/modelselection/CandidateModelSelectionAllTeams.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/CombineDataMode.java" afterPath="$PROJECT_DIR$/src/org/bdval/CombineDataMode.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/rscripts/Combined_p_fz.R" afterPath="$PROJECT_DIR$/src/rscripts/Combined_p_fz.R" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/io/compound/CompoundDataInput.java" afterPath="$PROJECT_DIR$/src/org/bdval/io/compound/CompoundDataInput.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/io/compound/CompoundDataOutput.java" afterPath="$PROJECT_DIR$/src/org/bdval/io/compound/CompoundDataOutput.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/io/compound/CompoundDirectoryEntry.java" afterPath="$PROJECT_DIR$/src/org/bdval/io/compound/CompoundDirectoryEntry.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/io/compound/CompoundFileReader.java" afterPath="$PROJECT_DIR$/src/org/bdval/io/compound/CompoundFileReader.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/io/compound/CompoundFileTool.java" afterPath="$PROJECT_DIR$/src/org/bdval/io/compound/CompoundFileTool.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/io/compound/CompoundFileWriter.java" afterPath="$PROJECT_DIR$/src/org/bdval/io/compound/CompoundFileWriter.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/signalquality/ComputeRatioRank.java" afterPath="$PROJECT_DIR$/src/org/bdval/signalquality/ComputeRatioRank.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/ConsensusBDVModel.java" afterPath="$PROJECT_DIR$/src/org/bdval/ConsensusBDVModel.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/tools/convert/maqcii/CornellDataFormatter.java" afterPath="$PROJECT_DIR$/src/org/bdval/tools/convert/maqcii/CornellDataFormatter.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/tools/convert/maqcii/CornellToLeming.java" afterPath="$PROJECT_DIR$/src/org/bdval/tools/convert/maqcii/CornellToLeming.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/tools/convert/maqcii/CornellToLemingOptions.java" afterPath="$PROJECT_DIR$/src/org/bdval/tools/convert/maqcii/CornellToLemingOptions.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/CrossValidateConsensusFeatures.java" afterPath="$PROJECT_DIR$/src/org/bdval/CrossValidateConsensusFeatures.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/CrossValidationMode.java" afterPath="$PROJECT_DIR$/src/org/bdval/CrossValidationMode.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/modelselection/CustomRanking.java" afterPath="$PROJECT_DIR$/src/org/bdval/modelselection/CustomRanking.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/DAVMode.java" afterPath="$PROJECT_DIR$/src/org/bdval/DAVMode.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/DAVOptions.java" afterPath="$PROJECT_DIR$/src/org/bdval/DAVOptions.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/DefineSplitsMode.java" afterPath="$PROJECT_DIR$/src/org/bdval/DefineSplitsMode.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/DiscoverAndValidate.java" afterPath="$PROJECT_DIR$/src/org/bdval/DiscoverAndValidate.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/DiscoverWithCoxRegression.java" afterPath="$PROJECT_DIR$/src/org/bdval/DiscoverWithCoxRegression.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/DiscoverWithFoldChange.java" afterPath="$PROJECT_DIR$/src/org/bdval/DiscoverWithFoldChange.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/DiscoverWithGeneticAlgorithm.java" afterPath="$PROJECT_DIR$/src/org/bdval/DiscoverWithGeneticAlgorithm.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/DiscoverWithKendallTau.java" afterPath="$PROJECT_DIR$/src/org/bdval/DiscoverWithKendallTau.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/DiscoverWithMinMax.java" afterPath="$PROJECT_DIR$/src/org/bdval/DiscoverWithMinMax.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/DiscoverWithTTest.java" afterPath="$PROJECT_DIR$/src/org/bdval/DiscoverWithTTest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/DistributionDifferenceByFeatureMode.java" afterPath="$PROJECT_DIR$/src/org/bdval/DistributionDifferenceByFeatureMode.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/DistributionDifferenceByModelMode.java" afterPath="$PROJECT_DIR$/src/org/bdval/DistributionDifferenceByModelMode.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/ExecuteSplitsMode.java" afterPath="$PROJECT_DIR$/src/org/bdval/ExecuteSplitsMode.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/FeatureReporting.java" afterPath="$PROJECT_DIR$/src/org/bdval/FeatureReporting.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/Gene2Probesets.java" afterPath="$PROJECT_DIR$/src/org/bdval/Gene2Probesets.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/GenerateFinalModels.java" afterPath="$PROJECT_DIR$/src/org/bdval/GenerateFinalModels.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/tools/convert/IDataFormatter.java" afterPath="$PROJECT_DIR$/src/org/bdval/tools/convert/IDataFormatter.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/rscripts/KS_test.R" afterPath="$PROJECT_DIR$/src/rscripts/KS_test.R" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/signalquality/KolmogorovSmirnovTest.java" afterPath="$PROJECT_DIR$/src/org/bdval/signalquality/KolmogorovSmirnovTest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/signalquality/KolmogorovSmirnovTestResult.java" afterPath="$PROJECT_DIR$/src/org/bdval/signalquality/KolmogorovSmirnovTestResult.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/LabelSample.java" afterPath="$PROJECT_DIR$/src/org/bdval/LabelSample.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/tools/convert/maqcii/LemingCologneDataFormatter.java" afterPath="$PROJECT_DIR$/src/org/bdval/tools/convert/maqcii/LemingCologneDataFormatter.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/tools/convert/maqcii/LemingStandardDataFormatter.java" afterPath="$PROJECT_DIR$/src/org/bdval/tools/convert/maqcii/LemingStandardDataFormatter.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/MakeSyntheticDataset.java" afterPath="$PROJECT_DIR$/src/org/bdval/MakeSyntheticDataset.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/MaqciiHelper.java" afterPath="$PROJECT_DIR$/src/org/bdval/MaqciiHelper.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/modelselection/ModelSelectionArguments.java" afterPath="$PROJECT_DIR$/src/org/bdval/modelselection/ModelSelectionArguments.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/util/NormalizeClassifierParameters.java" afterPath="$PROJECT_DIR$/src/org/bdval/util/NormalizeClassifierParameters.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/OptionalModelId.java" afterPath="$PROJECT_DIR$/src/org/bdval/OptionalModelId.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/tools/convert/OptionsConfigurationException.java" afterPath="$PROJECT_DIR$/src/org/bdval/tools/convert/OptionsConfigurationException.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/tools/convert/OptionsSupport.java" afterPath="$PROJECT_DIR$/src/org/bdval/tools/convert/OptionsSupport.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/pathways/PCAFeatureAggregator.java" afterPath="$PROJECT_DIR$/src/org/bdval/pathways/PCAFeatureAggregator.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/pathways/PathwayFeatureAggregator.java" afterPath="$PROJECT_DIR$/src/org/bdval/pathways/PathwayFeatureAggregator.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/pathways/PathwayInfo.java" afterPath="$PROJECT_DIR$/src/org/bdval/pathways/PathwayInfo.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/PredictedItem.java" afterPath="$PROJECT_DIR$/src/org/bdval/PredictedItem.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/PredictedItems.java" afterPath="$PROJECT_DIR$/src/org/bdval/PredictedItems.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/tools/convert/maqcii/PredictionsToCornell.java" afterPath="$PROJECT_DIR$/src/org/bdval/tools/convert/maqcii/PredictionsToCornell.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/tools/convert/maqcii/PredictionsToCornellOptions.java" afterPath="$PROJECT_DIR$/src/org/bdval/tools/convert/maqcii/PredictionsToCornellOptions.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/modelconditions/ProcessModelConditions.java" afterPath="$PROJECT_DIR$/src/org/bdval/modelconditions/ProcessModelConditions.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/Reformat.java" afterPath="$PROJECT_DIR$/src/org/bdval/Reformat.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/util/RewriteModelConditions.java" afterPath="$PROJECT_DIR$/src/org/bdval/util/RewriteModelConditions.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/edu/cornell/med/icb/pca/RotationReaderWriter.java" afterPath="$PROJECT_DIR$/src/edu/cornell/med/icb/pca/RotationReaderWriter.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/RserveStatusMode.java" afterPath="$PROJECT_DIR$/src/org/bdval/RserveStatusMode.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/SequenceMode.java" afterPath="$PROJECT_DIR$/src/org/bdval/SequenceMode.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/util/ShortHash.java" afterPath="$PROJECT_DIR$/src/org/bdval/util/ShortHash.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/signalquality/SimpleSignalQualityCalculator.java" afterPath="$PROJECT_DIR$/src/org/bdval/signalquality/SimpleSignalQualityCalculator.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/SplitInfo.java" afterPath="$PROJECT_DIR$/src/org/bdval/SplitInfo.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/SplitPlan.java" afterPath="$PROJECT_DIR$/src/org/bdval/SplitPlan.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/StatsMAQCIIMode.java" afterPath="$PROJECT_DIR$/src/org/bdval/StatsMAQCIIMode.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/StatsMode.java" afterPath="$PROJECT_DIR$/src/org/bdval/StatsMode.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/SurvivalMeasureResult.java" afterPath="$PROJECT_DIR$/src/org/bdval/SurvivalMeasureResult.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/SurvivalMeasures.java" afterPath="$PROJECT_DIR$/src/org/bdval/SurvivalMeasures.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/cache/TableCache.java" afterPath="$PROJECT_DIR$/src/org/bdval/cache/TableCache.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-src/edu/cornell/med/icb/geo/binaryarray/TestArrayIO.java" afterPath="$PROJECT_DIR$/test-src/edu/cornell/med/icb/geo/binaryarray/TestArrayIO.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-src/org/bdval/TestBDVModel.java" afterPath="$PROJECT_DIR$/test-src/org/bdval/TestBDVModel.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-src/edu/cornell/med/icb/geo/tools/TestClassificationTask.java" afterPath="$PROJECT_DIR$/test-src/edu/cornell/med/icb/geo/tools/TestClassificationTask.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-src/org/bdval/io/compound/TestCompoundFile.java" afterPath="$PROJECT_DIR$/test-src/org/bdval/io/compound/TestCompoundFile.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-src/org/bdval/TestConsensusBDVModel.java" afterPath="$PROJECT_DIR$/test-src/org/bdval/TestConsensusBDVModel.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-src/edu/cornell/med/icb/geo/TestGEOPlatformIndexed.java" afterPath="$PROJECT_DIR$/test-src/edu/cornell/med/icb/geo/TestGEOPlatformIndexed.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-src/edu/cornell/med/icb/geo/TestIndexedIdentifier.java" afterPath="$PROJECT_DIR$/test-src/edu/cornell/med/icb/geo/TestIndexedIdentifier.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-src/org/bdval/signalquality/TestKolmogorovSmirnovTest.java" afterPath="$PROJECT_DIR$/test-src/org/bdval/signalquality/TestKolmogorovSmirnovTest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-src/edu/cornell/med/icb/pca/TestPCAWithR.java" afterPath="$PROJECT_DIR$/test-src/edu/cornell/med/icb/pca/TestPCAWithR.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-src/org/bdval/util/TestShortHash.java" afterPath="$PROJECT_DIR$/test-src/org/bdval/util/TestShortHash.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-src/org/bdval/signalquality/TestSimpleSignalQualityCalculator.java" afterPath="$PROJECT_DIR$/test-src/org/bdval/signalquality/TestSimpleSignalQualityCalculator.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/TimeLoggingService.java" afterPath="$PROJECT_DIR$/src/org/bdval/TimeLoggingService.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/ToRanksMode.java" afterPath="$PROJECT_DIR$/src/org/bdval/ToRanksMode.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/TrueLabelLine.java" afterPath="$PROJECT_DIR$/src/org/bdval/TrueLabelLine.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/tools/convert/maqcii/TsvToFromMapMaqciiFactory.java" afterPath="$PROJECT_DIR$/src/org/bdval/tools/convert/maqcii/TsvToFromMapMaqciiFactory.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/tools/convert/maqcii/VerifyConversion.java" afterPath="$PROJECT_DIR$/src/org/bdval/tools/convert/maqcii/VerifyConversion.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/tools/convert/maqcii/VerifyConversionOptions.java" afterPath="$PROJECT_DIR$/src/org/bdval/tools/convert/maqcii/VerifyConversionOptions.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/WithProcessMethod.java" afterPath="$PROJECT_DIR$/src/org/bdval/WithProcessMethod.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bdval.ipr" afterPath="$PROJECT_DIR$/bdval.ipr" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data/bdval.xml" afterPath="$PROJECT_DIR$/data/bdval.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/rscripts/cox_regression.R" afterPath="$PROJECT_DIR$/src/rscripts/cox_regression.R" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/rscripts/data_to_pvalue.R" afterPath="$PROJECT_DIR$/src/rscripts/data_to_pvalue.R" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/rscripts/logRank_test.R" afterPath="$PROJECT_DIR$/src/rscripts/logRank_test.R" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/io/compound/package.html" afterPath="$PROJECT_DIR$/src/org/bdval/io/compound/package.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/modelselection/package.html" afterPath="$PROJECT_DIR$/src/org/bdval/modelselection/package.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/tools/convert/package.html" afterPath="$PROJECT_DIR$/src/org/bdval/tools/convert/package.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/tools/convert/maqcii/package.html" afterPath="$PROJECT_DIR$/src/org/bdval/tools/convert/maqcii/package.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/util/package.html" afterPath="$PROJECT_DIR$/src/org/bdval/util/package.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-src/org/bdval/io/compound/package.html" afterPath="$PROJECT_DIR$/test-src/org/bdval/io/compound/package.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/rscripts/pvalue_to_quality.R" afterPath="$PROJECT_DIR$/src/rscripts/pvalue_to_quality.R" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/quality-pvalues.tsv" afterPath="$PROJECT_DIR$/test-data/quality/quality-pvalues.tsv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/rscripts/rank_features.R" afterPath="$PROJECT_DIR$/src/rscripts/rank_features.R" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/ratio.tsv" afterPath="$PROJECT_DIR$/test-data/quality/ratio.tsv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/rscripts/ratio_rank.R" afterPath="$PROJECT_DIR$/src/rscripts/ratio_rank.R" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/rscripts/test_sum_prod_local.R" afterPath="$PROJECT_DIR$/src/rscripts/test_sum_prod_local.R" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/x1.csv" afterPath="$PROJECT_DIR$/test-data/quality/x1.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/x10.csv" afterPath="$PROJECT_DIR$/test-data/quality/x10.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/x11.csv" afterPath="$PROJECT_DIR$/test-data/quality/x11.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/x12.csv" afterPath="$PROJECT_DIR$/test-data/quality/x12.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/x13.csv" afterPath="$PROJECT_DIR$/test-data/quality/x13.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/x14.csv" afterPath="$PROJECT_DIR$/test-data/quality/x14.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/x15.csv" afterPath="$PROJECT_DIR$/test-data/quality/x15.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/x16.csv" afterPath="$PROJECT_DIR$/test-data/quality/x16.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/x17.csv" afterPath="$PROJECT_DIR$/test-data/quality/x17.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/x18.csv" afterPath="$PROJECT_DIR$/test-data/quality/x18.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/x19.csv" afterPath="$PROJECT_DIR$/test-data/quality/x19.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/x2.csv" afterPath="$PROJECT_DIR$/test-data/quality/x2.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/x20.csv" afterPath="$PROJECT_DIR$/test-data/quality/x20.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/x3.csv" afterPath="$PROJECT_DIR$/test-data/quality/x3.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/x4.csv" afterPath="$PROJECT_DIR$/test-data/quality/x4.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/x5.csv" afterPath="$PROJECT_DIR$/test-data/quality/x5.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/x6.csv" afterPath="$PROJECT_DIR$/test-data/quality/x6.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/x7.csv" afterPath="$PROJECT_DIR$/test-data/quality/x7.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/x8.csv" afterPath="$PROJECT_DIR$/test-data/quality/x8.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/x9.csv" afterPath="$PROJECT_DIR$/test-data/quality/x9.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/y1.csv" afterPath="$PROJECT_DIR$/test-data/quality/y1.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/y10.csv" afterPath="$PROJECT_DIR$/test-data/quality/y10.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/y11.csv" afterPath="$PROJECT_DIR$/test-data/quality/y11.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/y12.csv" afterPath="$PROJECT_DIR$/test-data/quality/y12.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/y13.csv" afterPath="$PROJECT_DIR$/test-data/quality/y13.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/y14.csv" afterPath="$PROJECT_DIR$/test-data/quality/y14.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/y15.csv" afterPath="$PROJECT_DIR$/test-data/quality/y15.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/y16.csv" afterPath="$PROJECT_DIR$/test-data/quality/y16.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/y17.csv" afterPath="$PROJECT_DIR$/test-data/quality/y17.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/y18.csv" afterPath="$PROJECT_DIR$/test-data/quality/y18.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/y19.csv" afterPath="$PROJECT_DIR$/test-data/quality/y19.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/y2.csv" afterPath="$PROJECT_DIR$/test-data/quality/y2.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/y20.csv" afterPath="$PROJECT_DIR$/test-data/quality/y20.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/y3.csv" afterPath="$PROJECT_DIR$/test-data/quality/y3.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/y4.csv" afterPath="$PROJECT_DIR$/test-data/quality/y4.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/y5.csv" afterPath="$PROJECT_DIR$/test-data/quality/y5.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/y6.csv" afterPath="$PROJECT_DIR$/test-data/quality/y6.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/y7.csv" afterPath="$PROJECT_DIR$/test-data/quality/y7.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/y8.csv" afterPath="$PROJECT_DIR$/test-data/quality/y8.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/y9.csv" afterPath="$PROJECT_DIR$/test-data/quality/y9.csv" />
+    </list>
+    <ignored path="bdval.iws" />
+    <ignored path=".idea/workspace.xml" />
+    <option name="TRACKING_ENABLED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ChangesViewManager" flattened_view="true" show_ignored="false" />
+  <component name="CreatePatchCommitExecutor">
+    <option name="PATCH_PATH" value="" />
+  </component>
+  <component name="DaemonCodeAnalyzer">
+    <disable_hints />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
+  <component name="FavoritesManager">
+    <favorites_list name="bdval" />
+  </component>
+  <component name="FileEditorManager">
+    <leaf>
+      <file leaf-file-name="bdval.xml" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/data/bdval.xml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.31990522" vertical-offset="0" max-vertical-offset="27165">
+              <caret line="18" column="0" selection-start-line="18" selection-start-column="0" selection-end-line="18" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="FindManager">
+    <FindUsagesManager>
+      <setting name="OPEN_NEW_TAB" value="true" />
+    </FindUsagesManager>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="changedFiles">
+      <list>
+        <option value="$PROJECT_DIR$/data/bdval.xml" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectFrameBounds">
+    <option name="x" value="1" />
+    <option name="y" value="22" />
+    <option name="width" value="1918" />
+    <option name="height" value="1001" />
+  </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="false">
+    <OptionsSetting value="true" id="Add" />
+    <OptionsSetting value="true" id="Remove" />
+    <OptionsSetting value="true" id="Checkout" />
+    <OptionsSetting value="true" id="Update" />
+    <OptionsSetting value="true" id="Status" />
+    <OptionsSetting value="true" id="Edit" />
+    <ConfirmationsSetting value="0" id="Add" />
+    <ConfirmationsSetting value="0" id="Remove" />
+  </component>
+  <component name="ProjectReloadState">
+    <option name="STATE" value="0" />
+  </component>
+  <component name="ProjectView">
+    <navigator currentView="ProjectPane" proportions="" version="1">
+      <flattenPackages />
+      <showMembers />
+      <showModules />
+      <showLibraryContents />
+      <hideEmptyPackages />
+      <abbreviatePackageNames />
+      <autoscrollToSource />
+      <autoscrollFromSource />
+      <sortByType />
+    </navigator>
+    <panes>
+      <pane id="PackagesPane" />
+      <pane id="Scope" />
+      <pane id="ProjectPane">
+        <subPane>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="bdval" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="bdval" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="bdval" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
+      </pane>
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="GoToClass.includeLibraries" value="false" />
+    <property name="GoToClass.toSaveIncludeLibraries" value="false" />
+    <property name="GoToFile.includeJavaFiles" value="false" />
+    <property name="MemberChooser.sorted" value="false" />
+    <property name="MemberChooser.showClasses" value="true" />
+    <property name="MemberChooser.copyJavadoc" value="false" />
+    <property name="options.lastSelected" value="project.propVCSSupport.Mappings" />
+    <property name="options.splitter.main.proportions" value="0.3" />
+    <property name="options.splitter.details.proportions" value="0.2" />
+    <property name="options.searchVisible" value="true" />
+  </component>
+  <component name="RunManager">
+    <configuration default="true" type="#org.jetbrains.idea.devkit.run.PluginConfigurationType" factoryName="Plugin">
+      <module name="" />
+      <option name="VM_PARAMETERS" value="-Xmx512m -Xms256m -XX:MaxPermSize=250m -ea" />
+      <option name="PROGRAM_PARAMETERS" />
+      <method />
+    </configuration>
+    <configuration default="true" type="AndroidTestRunConfigurationType" factoryName="Android Tests">
+      <module name="" />
+      <option name="TESTING_TYPE" value="0" />
+      <option name="INSTRUMENTATION_RUNNER_CLASS" value="" />
+      <option name="METHOD_NAME" value="" />
+      <option name="CLASS_NAME" value="" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="TARGET_SELECTION_MODE" value="EMULATOR" />
+      <option name="USE_LAST_SELECTED_DEVICE" value="false" />
+      <option name="PREFERRED_AVD" value="" />
+      <option name="USE_COMMAND_LINE" value="true" />
+      <option name="COMMAND_LINE" value="" />
+      <option name="WIPE_USER_DATA" value="false" />
+      <option name="DISABLE_BOOT_ANIMATION" value="false" />
+      <option name="NETWORK_SPEED" value="full" />
+      <option name="NETWORK_LATENCY" value="none" />
+      <option name="CLEAR_LOGCAT" value="false" />
+      <option name="SHOW_LOGCAT_AUTOMATICALLY" value="true" />
+      <option name="FILTER_LOGCAT_AUTOMATICALLY" value="true" />
+      <method />
+    </configuration>
+    <configuration default="true" type="Remote" factoryName="Remote">
+      <option name="USE_SOCKET_TRANSPORT" value="true" />
+      <option name="SERVER_MODE" value="false" />
+      <option name="SHMEM_ADDRESS" value="javadebug" />
+      <option name="HOST" value="localhost" />
+      <option name="PORT" value="5005" />
+      <method />
+    </configuration>
+    <configuration default="true" type="TestNG" factoryName="TestNG">
+      <module name="" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="SUITE_NAME" />
+      <option name="PACKAGE_NAME" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="METHOD_NAME" />
+      <option name="GROUP_NAME" />
+      <option name="TEST_OBJECT" value="CLASS" />
+      <option name="VM_PARAMETERS" value="-ea" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="OUTPUT_DIRECTORY" />
+      <option name="ANNOTATION_TYPE" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="moduleWithDependencies" />
+      </option>
+      <option name="USE_DEFAULT_REPORTERS" value="false" />
+      <option name="PROPERTIES_FILE" />
+      <envs />
+      <properties />
+      <listeners />
+      <method />
+    </configuration>
+    <configuration default="true" type="Applet" factoryName="Applet">
+      <module name="" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="HTML_FILE_NAME" />
+      <option name="HTML_USED" value="false" />
+      <option name="WIDTH" value="400" />
+      <option name="HEIGHT" value="300" />
+      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
+      <option name="VM_PARAMETERS" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <method />
+    </configuration>
+    <configuration default="true" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" />
+      <option name="VM_PARAMETERS" />
+      <option name="PROGRAM_PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="ENABLE_SWING_INSPECTOR" value="false" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <module name="" />
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="JUnit" factoryName="JUnit">
+      <module name="" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PACKAGE_NAME" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="METHOD_NAME" />
+      <option name="TEST_OBJECT" value="class" />
+      <option name="VM_PARAMETERS" value="-ea" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="moduleWithDependencies" />
+      </option>
+      <envs />
+      <patterns />
+      <method />
+    </configuration>
+    <configuration default="true" type="AndroidRunConfigurationType" factoryName="Android Application">
+      <module name="" />
+      <option name="ACTIVITY_CLASS" value="" />
+      <option name="MODE" value="default_activity" />
+      <option name="DEPLOY" value="true" />
+      <option name="ARTIFACT_NAME" value="" />
+      <option name="TARGET_SELECTION_MODE" value="EMULATOR" />
+      <option name="USE_LAST_SELECTED_DEVICE" value="false" />
+      <option name="PREFERRED_AVD" value="" />
+      <option name="USE_COMMAND_LINE" value="true" />
+      <option name="COMMAND_LINE" value="" />
+      <option name="WIPE_USER_DATA" value="false" />
+      <option name="DISABLE_BOOT_ANIMATION" value="false" />
+      <option name="NETWORK_SPEED" value="full" />
+      <option name="NETWORK_LATENCY" value="none" />
+      <option name="CLEAR_LOGCAT" value="false" />
+      <option name="SHOW_LOGCAT_AUTOMATICALLY" value="true" />
+      <option name="FILTER_LOGCAT_AUTOMATICALLY" value="true" />
+      <method />
+    </configuration>
+    <list size="0" />
+    <configuration name="&lt;template&gt;" type="WebApp" default="true" selected="false">
+      <Host>localhost</Host>
+      <Port>5050</Port>
+    </configuration>
+  </component>
+  <component name="ShelveChangesManager" show_recycled="false" />
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="86f1b0a3-8439-4f28-96e3-8f9acd7038fd" name="Default" comment="" />
+      <created>1407872359463</created>
+      <updated>1407872359463</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="1" y="22" width="1918" height="1001" extended-state="0" />
+    <editor active="true" />
+    <layout>
+      <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.25" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+    </layout>
+  </component>
+  <component name="Vcs.Log.UiProperties">
+    <option name="RECENTLY_FILTERED_USER_GROUPS">
+      <collection />
+    </option>
+    <option name="RECENTLY_FILTERED_BRANCH_GROUPS">
+      <collection />
+    </option>
+  </component>
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="myTodoPanelSettings">
+      <TodoPanelSettings />
+    </option>
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager />
+  </component>
+  <component name="antWorkspaceConfiguration">
+    <option name="IS_AUTOSCROLL_TO_SOURCE" value="false" />
+    <option name="FILTER_TARGETS" value="false" />
+    <buildFile url="file://$PROJECT_DIR$/build.xml">
+      <targetFilters>
+        <filter targetName="init" isVisible="false" />
+        <filter targetName="compile" isVisible="true" />
+        <filter targetName="jar" isVisible="true" />
+        <filter targetName="jar-bdval" isVisible="true" />
+        <filter targetName="jar-bdval-api" isVisible="true" />
+        <filter targetName="jar-bmf-calibration" isVisible="true" />
+        <filter targetName="javadoc" isVisible="true" />
+        <filter targetName="clean" isVisible="true" />
+        <filter targetName="test" isVisible="true" />
+        <filter targetName="cruisecontrol" isVisible="true" />
+        <filter targetName="jar-compound-file-tool" isVisible="true" />
+      </targetFilters>
+      <expanded value="true" />
+    </buildFile>
+    <buildFile url="file://$PROJECT_DIR$/data/prostate-example.xml">
+      <targetFilters>
+        <filter targetName="evaluate" isVisible="true" />
+        <filter targetName="scan-series" isVisible="true" />
+        <filter targetName="pathways" isVisible="true" />
+        <filter targetName="genetic-algorithm" isVisible="true" />
+        <filter targetName="tune-C" isVisible="true" />
+        <filter targetName="generate-list-final-models" isVisible="true" />
+        <filter targetName="evaluate-dataset-statistics" isVisible="true" />
+        <filter targetName="setup-sge-job" isVisible="true" />
+        <filter targetName="sge-job" isVisible="true" />
+        <filter targetName="compile" isVisible="false" />
+        <filter targetName="prepare-bdval" isVisible="false" />
+        <filter targetName="clean-cache" isVisible="true" />
+        <filter targetName="prepare-rank-datasets" isVisible="false" />
+        <filter targetName="cross-validate-consensus-features" isVisible="true" />
+        <filter targetName="candidate-model-selection" isVisible="true" />
+        <filter targetName="generate-final-models" isVisible="true" />
+        <filter targetName="generate-final-models-direct-method" isVisible="true" />
+        <filter targetName="generate-all-final-models" isVisible="true" />
+        <filter targetName="zip-results" isVisible="true" />
+        <filter targetName="delete-results" isVisible="true" />
+        <filter targetName="restat" isVisible="true" />
+        <filter targetName="inner-evaluate-dataset-statistics" isVisible="true" />
+        <filter targetName="process-model-conditions" isVisible="true" />
+        <filter targetName="rewrite-model-conditions-no-prompt" isVisible="true" />
+        <filter targetName="make-synthetic-dataset" isVisible="true" />
+        <filter targetName="rewrite-model-conditions" isVisible="true" />
+        <filter targetName="tag-output-directory" isVisible="false" />
+        <filter targetName="inner-generate-dataset-predictions" isVisible="true" />
+        <filter targetName="rserve-status" isVisible="true" />
+        <filter targetName="best-practices-full-pipeline" isVisible="true" />
+      </targetFilters>
+      <expanded value="true" />
+    </buildFile>
+    <buildFile url="file://$PROJECT_DIR$/release.xml">
+      <targetFilters>
+        <filter targetName="init" isVisible="false" />
+        <filter targetName="gettag" isVisible="false" />
+        <filter targetName="tag" isVisible="true" />
+        <filter targetName="export" isVisible="true" />
+        <filter targetName="release" isVisible="true" />
+        <filter targetName="source" isVisible="true" />
+        <filter targetName="data" isVisible="true" />
+        <filter targetName="dependencies" isVisible="true" />
+        <filter targetName="javadoc" isVisible="false" />
+        <filter targetName="jar" isVisible="true" />
+        <filter targetName="bdval" isVisible="true" />
+      </targetFilters>
+      <expanded value="true" />
+    </buildFile>
+    <buildFile url="file://$PROJECT_DIR$/data/maqcii-c.xml">
+      <targetFilters>
+        <filter targetName="evaluate-dataset-statistics" isVisible="true" />
+        <filter targetName="generate-dataset-predictions" isVisible="true" />
+        <filter targetName="evaluate" isVisible="true" />
+        <filter targetName="fast" isVisible="true" />
+        <filter targetName="best-practices" isVisible="true" />
+        <filter targetName="pathways" isVisible="true" />
+        <filter targetName="genetic-algorithm" isVisible="true" />
+        <filter targetName="tune-C" isVisible="true" />
+        <filter targetName="generate-list-final-models" isVisible="true" />
+        <filter targetName="finish-pipeline" isVisible="true" />
+        <filter targetName="finish-pipeline-no-direct" isVisible="true" />
+        <filter targetName="setup-sge-job" isVisible="true" />
+        <filter targetName="sge-job" isVisible="true" />
+        <filter targetName="compile" isVisible="false" />
+        <filter targetName="prepare-bdval" isVisible="false" />
+        <filter targetName="clean-cache" isVisible="true" />
+        <filter targetName="prepare-rank-datasets" isVisible="false" />
+        <filter targetName="cross-validate-consensus-features" isVisible="true" />
+        <filter targetName="candidate-model-selection" isVisible="true" />
+        <filter targetName="generate-final-models" isVisible="true" />
+        <filter targetName="generate-final-models-direct-method" isVisible="true" />
+        <filter targetName="generate-all-final-models" isVisible="true" />
+        <filter targetName="zip-results" isVisible="true" />
+        <filter targetName="delete-results" isVisible="true" />
+        <filter targetName="restat" isVisible="true" />
+        <filter targetName="inner-evaluate-dataset-statistics" isVisible="true" />
+        <filter targetName="process-model-conditions" isVisible="true" />
+        <filter targetName="rewrite-model-conditions-no-prompt" isVisible="true" />
+        <filter targetName="make-synthetic-dataset" isVisible="true" />
+        <filter targetName="rewrite-model-conditions" isVisible="true" />
+        <filter targetName="tag-output-directory" isVisible="false" />
+        <filter targetName="inner-generate-dataset-predictions" isVisible="true" />
+        <filter targetName="rserve-status" isVisible="true" />
+        <filter targetName="best-practices-full-pipeline" isVisible="true" />
+      </targetFilters>
+      <expanded value="true" />
+    </buildFile>
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/data/bdval.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="27165">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/bdval.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.31990522" vertical-offset="0" max-vertical-offset="27165">
+          <caret line="18" column="0" selection-start-line="18" selection-start-column="0" selection-end-line="18" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+  </component>
+</project>
+
