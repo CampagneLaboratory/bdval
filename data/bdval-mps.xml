@@ -1,0 +1,1805 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="bdval" basedir=".">
+    <dirname property="bdval.basedir" file="${ant.file.bdval}"/>
+    <property file="${bdval.basedir}/bdval.properties"/>
+    <import file="${bdval.basedir}/../buildsupport/build.xml"/>
+    <description>
+        This build file defines macros and tasks used by the Biomarker
+        Discovery and VALidation (BDVAL) framework. This file is not
+        intended to be used directly, rather it should be included by
+        other project specific build files that utilize BDVAL.
+    </description>
+
+    <!--
+        The following properties define default values and should not be modified here.
+        Rather, these should be set in the main project file
+    -->
+    <property name="do-specific-gene-lists-only" value="true"/>
+    <property name="evaluate-statistics-after-splits" value="false"/>
+
+    <property name="feature-option"
+              value="--normalize-features false --scale-features true --percentile-scaling false"/>
+    <!-- other performance measures to evaluate and report as extra columns in the MAQCII submission file. -->
+    <property name="other-performance-measures" value=""/>
+
+    <!-- setting "cache-options" to the empty string will disable the cache -->
+    <!--property name="cache-options" value=""/-->
+    <property name="cache-options" value="--enable-cache"/>
+
+    <!-- base directory for the cache -->
+    <property name="cache-dir-location" location="${basedir}"/>
+
+    <!-- this property controls the output of the internal log4j configuration initialization -->
+    <property name="log4j.debug" value="false"/>
+    <!-- change these settings in the "bdval-local" property file to best match the local configuration -->
+    <if>
+        <equals arg1="${computer.type}" arg2="desktop"/>
+        <then>
+            <echo message="Configuration execution for desktop."/>
+            <echo message="Configuration execution for a ${computer.type} machine."/>
+            <property name="num-threads" value="${desktop.thread-number}"/>
+            <property name="memory-flag" value="${desktop.memory}"/>
+        </then>
+        <else>
+            <echo message="Configuration execution for a ${computer.type} machine."/>
+            <property name="num-threads" value="${server.thread-number}"/>
+            <property name="memory-flag" value="${server.memory}"/>
+        </else>
+    </if>
+
+    <if>
+        <istrue value="${use-bdval-jar}"/>
+        <then>
+            <path id="bdval.classpath">
+                <pathelement path="${bdval.basedir}/../bdval.jar"/>
+            </path>
+        </then>
+        <else>
+            <path id="bdval.classpath">
+                <pathelement location="${config}"/>
+                <pathelement location="${classes}"/>
+                <pathelement location="${src}"/>
+                <!-- required for rscripts -->
+                <fileset dir="${lib}">
+                    <include name="*.jar"/>
+                    <include name="Rserve/*.jar"/>
+                    <include name="ant/*.jar"/>
+                </fileset>
+            </path>
+        </else>
+    </if>
+
+    <taskdef resource="edu/cornell/med/icb/ant/antlib.xml" onerror="fail"
+             classpathref="bdval.classpath"/>
+
+    <!-- Set the property "bdval-version" to the value in the bdval.jar manifest -->
+    <makeurl property="bdval-jar-url" file="${bdval.basedir}/../bdval.jar" validate="false"/>
+    <version-info jarfileUrl="${bdval-jar-url}" property="bdval-version"/>
+
+    <target name="prepare-bdval" unless="nocompile">
+        <if>
+            <istrue value="${use-bdval-jar}"/>
+            <then>
+                <ant antfile="${bdval.basedir}/../build.xml" target="jar-bdval" inheritall="false"/>
+            </then>
+            <else>
+                <antcall target="compile"/>
+            </else>
+        </if>
+    </target>
+
+    <target name="compile">
+        <ant antfile="${bdval.basedir}/../build.xml" target="compile" inheritall="false"/>
+    </target>
+
+    <target name="rserve-status" description="Displays status of Rserve instances defined in a configuration file">
+        <echo level="info" message="Checking status of Rserve instances configured in ${config}/RConnectionPool.xml"/>
+        <java classname="edu.cornell.med.icb.R.RUtils" fork="true" failonerror="true">
+            <classpath refid="bdval.classpath"/>
+            <arg value="--validate"/>
+            <arg value="--configuration"/>
+            <arg value="${config}/RConnectionPool.xml"/>
+        </java>
+    </target>
+
+
+    <target name="tag-output-directory">
+        <tstamp/>
+        <property name="save-data-tag" value="${DSTAMP}-${TSTAMP}-results"/>
+        <property name="save-data-dir" location="${bdval-project.basedir}/${save-data-tag}/"/>
+        <mkdir dir="${save-data-dir}"/>
+        <echo message="Save tag: ${save-data-tag}"/>
+
+        <copy todir="${save-data-dir}">
+            <fileset dir="${bdval.basedir}">
+                <include name="bdval.xml"/>
+            </fileset>
+            <fileset file="${ant.file}"/>
+            <fileset dir="${bdval-project.basedir}">
+                <include name="${ant.project.name}.properties"/>
+            </fileset>
+			<!-- ^^^^Modified this (line below)!!!^^^^ -->
+            <fileset file="${bdval-project.basedir}/${ant.project.name}-local.properties"/>
+        </copy>
+
+        <input addproperty="tag-description"
+               message="Please provide a short description for this run (i.e., condition tested, summary of parameters)."
+               defaultvalue="N/A"/>
+        <echo append="false" file="${save-data-dir}/${save-data-tag}-README.txt">
+            ${tag-description}
+
+            Generated with BDVal version ${bdval-version} on ${TODAY} at ${TSTAMP}
+            -----
+            Parameters used in this run were:
+
+            eval-dataset-root: ${eval-dataset-root}
+            evaluate-statistics-after-splits: ${evaluate-statistics-after-splits}
+            do-specific-gene-lists-only: ${do-specific-gene-lists-only}
+            enable-flooring: ${enable-flooring}
+            scaler-class-name: ${scaler-class-name}
+
+            use-feature-selection-fold=true: ${use-feature-selection-fold=true}
+            use-feature-selection-fold=false: ${use-feature-selection-fold=false}
+
+            num-features: ${num-features}
+            max-intermediate-features: ${max-intermediate-features}
+            feature-option: ${feature-option}
+
+            external-CV-repeats: ${external-CV-repeats}
+            external-CV-folds: ${external-CV-folds}
+            internal-CV-repeats: ${internal-CV-repeats}
+            internal-CV-folds: ${internal-CV-folds}
+
+            fold-change-phi: ${fold-change-phi}
+            ttest-alpha: ${ttest-alpha}
+
+            svm-classifier: ${svm-classifier}
+            svm-parameters: ${svm-parameters}
+            use-probability: ${use-probability}
+
+            performance-measure-maximized-by-GA: ${performance-measure-maximized-by-GA}
+            ga-wrapper-population-size: ${ga-wrapper-population-size}
+            ga-wrapper-number-of-iterations: ${ga-wrapper-number-of-iterations}
+            ga-wrapper-roc-str: ${ga-wrapper-roc-str}
+
+            pathway-aggregation-method: ${pathway-aggregation-method}
+            human-pathways-file: ${human-pathways-file}
+            mouse-pathways-file: ${mouse-pathways-file}
+            rat-pathways-file: ${rat-pathways-file}
+
+            A value of true in the following properties indicates that the dataset/endpoint was processed in this run:
+        </echo>
+        <for param="current-endpoint" delimiter=" " list="${all-endpoints}">
+            <sequential>
+                <echo append="true" file="${save-data-dir}/${save-data-tag}-README.txt">
+                    @{current-endpoint}: ${do.@{current-endpoint}}
+                </echo>
+            </sequential>
+        </for>
+    </target>
+
+    <macrodef name="execute-all-endpoints" description="Run do-one-splits-all for each target">
+        <attribute name="define-splits-only" default="false"/>
+        <sequential>
+            <for param="current-endpoint" delimiter=" " list="${all-endpoints}">
+                <sequential>
+                    <if>
+                        <istrue value="${do.@{current-endpoint}}"/>
+                        <then>
+                            <do-one-splits-all endpoint-name="@{current-endpoint}"
+                                               define-splits-only="@{define-splits-only}"/>
+                        </then>
+                    </if>
+                </sequential>
+            </for>
+        </sequential>
+    </macrodef>
+
+
+    <macrodef name="do-one-splits-all" description="Running process-splits-all for one dataset.">
+        <attribute name="endpoint-name"/>
+        <attribute name="define-splits-only" default="false"/>
+        <sequential>
+            <trycatch>
+                <try>
+                    <if>
+                        <equals arg1="${do-specific-gene-lists-only}" arg2="true"/>
+
+                        <then>
+                            <!-- Will process the endpoint specific gene lists (see maqcii-b.properties) -->
+                            <var name="endpoint-specific-genelist-names" value="${@{endpoint-name}.genelists}"/>
+                        </then>
+                        <else>
+                            <!-- Will process all the gene lists. -->
+                            <var name="endpoint-specific-genelist-names"
+                                 value="Merged-ensembl-genbank-refseq"/>
+                        </else>
+                    </if>
+
+                    <!-- determine if this endpoint has a floor value -->
+                    <var name="floor-param" value=""/>
+                    <var name="floor-val" value="${@{endpoint-name}.floor}"/>
+                    <if>
+                        <not>
+                            <equals arg1="${floor-val}" arg2=""/>
+                        </not>
+                        <then>
+                            <!-- we HAVE a floor value -->
+                            <if>
+                                <equals arg1="${enable-flooring}" arg2="true"/>
+                                <then>
+                                    <!-- and enable-flooring is true -->
+                                    <var name="floor-param" value="--floor ${floor-val}"/>
+                                </then>
+                            </if>
+                        </then>
+                    </if>
+
+                    <!-- determine if this endpoint has specific array parameters (i.e., logged-array) -->
+                    <echo level="debug" message="array parameter: ${@{endpoint-name}.array-parameters}"/>
+                    <if>
+                        <isset property="@{endpoint-name}.array-parameters"/>
+                        <then>
+                            <var name="array-params" value="${@{endpoint-name}.array-parameters}"/>
+                            <!-- cdna-array and logged-array parameters -->
+                        </then>
+                        <else>
+                            <var name="array-params" value=""/>
+                        </else>
+                    </if>
+
+                    <echo message="Running process-splits-all with the following parameters..."/>
+                    <echo message="-------------------------------------------------------"/>
+                    <echo message="endpoint-name=@{endpoint-name}"/>
+                    <echo message="dataset-name=${@{endpoint-name}.dataset-name}"/>
+                    <echo message="dataset-root=${eval-dataset-root}"/>
+                    <echo message="platform=${@{endpoint-name}.platform-file}"/>
+                    <echo message="do-process-gene-lists=${@{endpoint-name}.do-process-gene-lists}"/>
+                    <echo message="endpoint-specific-genelist-names: ${endpoint-specific-genelist-names}"/>
+                    <echo message="floor-param=${floor-param}"/>
+                    <echo message="array-params=${array-params}"/>
+
+                    <process-splits-all
+                            endpoint-name="@{endpoint-name}"
+                            dataset-root="${eval-dataset-root}"
+                            pathway-options="--pathways ${@{endpoint-name}.pathways-file} --gene-to-probes ${@{endpoint-name}.gene-to-probes-file} --pathway-aggregation-method ${pathway-aggregation-method}"
+                            do-process-gene-lists="${@{endpoint-name}.do-process-gene-lists}"
+                            endpoint-specific-genelist-names="${endpoint-specific-genelist-names}"
+                            floor-param="${floor-param}"
+                            array-params="${array-params}"
+                            define-splits-only="@{define-splits-only}"/>
+                </try>
+                <catch>
+                    <echo message="CAUGHT FAILED BUILD"/>
+                    <fail unless="continue-after-fail"/>
+                </catch>
+                <finally>
+                    <copy-output-files endpoint-name="@{endpoint-name}"/>
+                </finally>
+            </trycatch>
+        </sequential>
+    </macrodef>
+
+
+    <macrodef name="process-splits-all" description="Tune : execute all split plans">
+        <attribute name="workingdir" default="${basedir}" description="directory where processing should take place"/>
+        <attribute name="endpoint-name"/>
+        <attribute name="dataset-root"/>
+        <attribute name="rserve-port" default="-1"/>
+        <attribute name="do-process-gene-lists" default="false"/>
+        <attribute name="floor-param"/>
+        <attribute name="array-params"/>
+        <attribute name="pathway-options"/>
+        <attribute name="endpoint-specific-genelist-names"
+                   default="Merged-ensembl-genbank-refseq"/>
+        <attribute name="define-splits-only" default="false"/>
+
+        <sequential>
+            <!-- define survival file, with default value of "-" -->
+            <var name="survival-file" value="-"/>
+            <if>
+                <isset property="@{endpoint-name}.survival-file"/>
+                <then>
+                    <var name="survival-file" value="${@{endpoint-name}.survival-file}"/>
+                </then>
+            </if>
+
+            <echo message="Using dataset: ${predict-dataset-file}"/>
+            <define-splits feature-selection-fold="false"
+						   endpoint-name="@{endpoint-name}"
+                           dataset-root="@{dataset-root}"
+                           rserve-port="@{rserve-port}"
+                           floor-param="@{floor-param}"
+                           array-params="@{array-params}"/>
+            <define-splits feature-selection-fold="true"
+                           endpoint-name="@{endpoint-name}"
+                           dataset-root="@{dataset-root}"
+                           rserve-port="@{rserve-port}"
+                           floor-param="@{floor-param}"
+                           array-params="@{array-params}"/>
+
+            <if>
+                <not>
+                    <istrue value="@{define-splits-only}"/>
+                </not>
+                <then>
+				
+                    <if>
+                        <istrue value="${do.baseline}"/>
+                        <then>
+                            <execute-splits feature-selection-fold="false"
+                                            sequence-file="baseline.sequence"
+                                            endpoint-name="@{endpoint-name}"
+                                            dataset-root="@{dataset-root}"
+                                            floor-param="@{floor-param}"
+                                            array-params="@{array-params}"/>
+                        </then>
+                    </if>
+
+				
+                    <if>
+                        <istrue value="${do.pathways-build-pathway-components}"/>
+                        <then>
+                            <execute-splits feature-selection-fold="true"
+                                            sequence-file="pathways-build-pathway-components-fs=true.sequence"
+                                            endpoint-name="@{endpoint-name}"
+                                            dataset-root="@{dataset-root}"
+                                            floor-param="@{floor-param}"
+                                            array-params="@{array-params}"
+                                            other-options="@{pathway-options} "/>
+
+                            <execute-splits feature-selection-fold="false"
+                                            sequence-file="pathways-build-pathway-components-fs=false.sequence"
+                                            endpoint-name="@{endpoint-name}"
+                                            dataset-root="@{dataset-root}"
+                                            floor-param="@{floor-param}"
+                                            array-params="@{array-params}"
+                                            other-options="@{pathway-options} "/>
+                        </then>
+                    </if>
+
+                    <if>
+                        <istrue value="${do.pathways-coxreg-svmglobal}"/>
+                        <then>
+                            <execute-splits feature-selection-fold="true"
+                                            sequence-file="pathways-coxreg-svmglobal.sequence"
+                                            endpoint-name="@{endpoint-name}"
+                                            dataset-root="@{dataset-root}"
+                                            floor-param="@{floor-param}"
+                                            array-params="@{array-params}"
+                                            other-options="@{pathway-options} --alpha ${coxreg-alpha}  --max-intermediate-features ${max-intermediate-features}"/>
+                        </then>
+                    </if>
+
+					<if>
+						<istrue value="${do.my-execute-splits}"/>
+						<then>
+							<echo message="calling call-execute-splits"/>
+							<call-execute-splits	endpoint-name="@{endpoint-name}"
+													dataset-root="@{dataset-root}"
+													floor-param="@{floor-param}"
+													array-params="@{array-params}"/>
+						</then>
+					</if>
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+
+
+    <macrodef name="define-splits">
+        <attribute name="workingdir" default="${basedir}" description="directory where processing should take place"/>
+        <attribute name="endpoint-name"/>
+        <attribute name="dataset-root"/>
+        <attribute name="rserve-port"/>
+        <attribute name="floor-param"/>
+        <attribute name="array-params"/>
+        <attribute name="feature-selection-fold" description="When true, generate a feature selection fold"/>
+		
+        <sequential>
+            <trycatch>
+                <try>
+                    <var name="split-plan-file"
+                         value="@{dataset-root}/splits/@{endpoint-name}-split-plan-fs=@{feature-selection-fold}-CV-${external-CV-folds}-R-${external-CV-repeats}.txt"/>
+                    <if>
+                        <not>
+                            <available file="${split-plan-file}"/>
+                        </not>
+                        <then>
+                            <echo message=">>> Writing split plan ${split-plan-file}"/>
+                            <process-one-dataset
+                                    workingdir="@{workingdir}"
+                                    mode="define-splits"
+                                    endpoint-name="@{endpoint-name}"
+                                    dataset-root="@{dataset-root}"
+                                    rserve-port="@{rserve-port}"
+                                    output="${split-plan-file}"
+                                    floor-param="@{floor-param}"
+                                    array-params="@{array-params}"
+                                    other-options="--folds ${external-CV-folds} --cv-repeats ${external-CV-repeats} --gene-list full --overwrite-output true --feature-selection-fold @{feature-selection-fold}"/>
+                        </then>
+                    </if>
+                </try>
+                <catch>
+                    <echo message="CAUGHT FAILED BUILD process define-splits endpoint-name=@{endpoint-name}"/>
+                    <fail unless="continue-after-fail"/>
+                </catch>
+                <finally>
+                    <copy-output-files endpoint-name="@{endpoint-name}"/>
+                </finally>
+            </trycatch>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="process-one-dataset" description="Process one dataset.">
+        <attribute name="workingdir" default="${basedir}" description="directory where processing should take place"/>
+        <attribute name="endpoint-name"/>
+        <attribute name="dataset-root"/>
+        <attribute name="gene-list" default="N/A"/>
+        <attribute name="specific-gene-list" default="N/A"/>
+        <attribute name="mode"/>
+        <attribute name="floor-param"/>
+        <attribute name="array-params"/>
+        <attribute name="label" default="unknown"/>
+        <attribute name="seed" default="123454"/>
+        <attribute name="output" default="out.txt"/>
+        <attribute name="rserve-port" default="-1"/>
+        <attribute name="other-options" default=""/>
+        <attribute name="pathways-params" default=""/>
+        <attribute name="gene-features-dir" default="./"/>
+        <attribute name="extra-classifier-parameters" default=""/>
+        <attribute name="evaluate-statistics" default=""/>
+        <attribute name="all-classifier-parameters"
+                   default=""/>
+        <sequential>
+            <echo message="++"/>
+            <echo message="++ Running  @{endpoint-name} : @{mode} -> @{output}"/>
+            <echo message="++"/>
+
+            <if>
+                <equals arg1="@{evaluate-statistics}" arg2=""/>
+                <then>
+                    <var name="flag-evaluate-stats" value=""/>
+                </then>
+                <else>
+                    <var name="flag-evaluate-stats" value="--evaluate-statistics @{evaluate-statistics}"/>
+                </else>
+            </if>
+            <if>
+                <not>
+                    <equals arg1="${@{endpoint-name}.survival-file}" arg2="${@{endpoint-name}.survival-file}"/>
+                </not>
+
+                <then>
+                    <var name="survival-arg-1" value="--survival"/>
+                    <var name="survival-arg-2" value="${@{endpoint-name}.survival-file}"/>
+
+                </then>
+                <else>
+                    <var name="survival-arg-1" value=""/>
+                    <var name="survival-arg-2" value=""/>
+                </else>
+            </if>
+
+            <if>
+                <equals arg1="@{gene-list}" arg2="N/A"/>
+                <then>
+                    <if>
+                        <equals arg1="@{specific-gene-list}" arg2="N/A"/>
+                        <then>
+                            <var name="gene-list-argument" value=" "/>
+                        </then>
+                        <else>
+                            <var name="gene-list-argument" value="--gene-list @{label}|@{specific-gene-list}"/>
+
+                        </else>
+                    </if>
+                </then>
+                <else>
+                    <var name="gene-list-argument" value="--gene-lists @{gene-list}"/>
+                </else>
+            </if>
+            <echo message="gene list argument: ${gene-list-argument}"/>
+            <if>
+                <equals arg1="${run-java}" arg2="true"/>
+                <then>
+                    <java classname="org.bdval.DiscoverAndValidate"
+                          classpathref="bdval.classpath" fork="true" failonerror="true"
+                          dir="@{workingdir}">
+                        <jvmarg value="-ea"/>
+                        <jvmarg value="${memory-flag}"/>
+                        <sysproperty key="log4j.debug" value="${log4j.debug}"/>
+                        <sysproperty key="log4j.configuration" value="file:///${config}/log4j.properties"/>
+                        <sysproperty key="RConnectionPool.configuration" value="file:///${config}/RConnectionPool.xml"/>
+                        <sysproperty key="pj.nt" value="${num-threads}"/>
+                        <arg value="-m"/>
+                        <arg value="@{mode}"/>
+                        <arg value="-i"/>
+                        <arg value="${@{endpoint-name}.dataset-file}"/>
+
+                        <!-- short for faster -->
+                        <arg value="-c"/>
+                        <arg value="${@{endpoint-name}.cids-file}"/>
+
+                        <arg value="-t"/>
+                        <arg value="${@{endpoint-name}.tasks-file}"/>
+                        <arg line="${gene-list-argument}"/>
+                        <arg value="-p"/>
+                        <arg value="${@{endpoint-name}.platform-file}"/>
+                        <arg value="-o"/>
+                        <arg value="@{output}"/>
+                        <!-- use RServe  config file -->
+                        <arg value="--seed"/>
+                        <arg value="@{seed}"/>
+                        <arg line="@{other-options} @{pathways-params} ${cache-options}"/>
+                        <arg value="--gene-features-dir"/>
+                        <arg value="@{gene-features-dir}"/>
+                        <arg value="--dataset-name"/>
+                        <!-- dataset name should really be endpoint-name in DAVMode option -->
+                        <arg value="@{endpoint-name}"/>
+                        <arg value="--dataset-root"/>
+                        <arg value="@{dataset-root}"/>
+                        <arg line="@{all-classifier-parameters}"/>
+                        <arg line="${feature-option}"/>
+                        <arg line="@{floor-param}"/>
+                        <arg line="@{array-params}"/>
+                        <arg line="${flag-evaluate-stats}"/>
+                        <arg line="${survival-arg-1}"/>
+                        <arg line="${survival-arg-2}"/>
+                        <arg value="--properties"/>
+                        <arg value="${project-property-file}"/>
+
+                        <!--redirector output="@{endpoint-name}.stdout"></redirector-->
+                    </java>
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="execute-splits">
+        <attribute name="workingdir" default="${basedir}" description="directory where processing should take place"/>
+        <attribute name="endpoint-name" description="Name of the endpoint being run"/>
+        <attribute name="dataset-root"/>
+        <attribute name="feature-selection-fold"/>
+        <attribute name="extra-classifier-parameters" default=""/>
+        <attribute name="all-classifier-parameters"
+                   default="${svm-classifier} ${svm-parameters}@{extra-classifier-parameters}"/>
+        <attribute name="floor-param"/>
+        <attribute name="array-params"/>
+        <attribute name="other-options" default=""/>
+        <attribute name="sequence-file"/>
+        <attribute name="clear-cache" default="false" description="Clear the cache directory before processing"/>
+        <sequential>
+            <echo message="Executing splits for sequence @{sequence-file}"/>
+
+            <var name="split-plan-file"
+                 value="@{dataset-root}/splits/@{endpoint-name}-split-plan-fs=@{feature-selection-fold}-CV-${external-CV-folds}-R-${external-CV-repeats}.txt"/>
+            <var name="cache-dir"
+                 value="${cache-dir-location}/cache/fs=@{feature-selection-fold}"/>
+            <var name="pathway-components-dir"
+                 value="pathway-components/fs=@{feature-selection-fold}/"/>
+
+            <if>
+                <equals arg1="${@{endpoint-name}.survival-file}" arg2=""/>
+                <then>
+                    <property name="survival-arg-1" value="--survival"/>
+                    <property name="survival-arg-2" value="${@{endpoint-name}.survival-file}"/>
+
+                </then>
+                <else>
+                    <property name="survival-arg-1" value=""/>
+                    <property name="survival-arg-2" value="${@{endpoint-name}.survival-file}"/>
+                </else>
+            </if>
+            <if>
+                <istrue value="@{clear-cache}"/>
+                <then>
+                    <echo level="info" message="clearing the cache directory"/>
+                    <delete includeemptydirs="true" failonerror="false" verbose="true">
+                        <fileset dir="${cache-dir}" includes="**/*"/>
+                    </delete>
+                </then>
+            </if>
+            <if>
+                <not>
+                    <available file="${split-plan-file}"/>
+                </not>
+                <then>
+                    <echo message=">>> ERROR: Cannot find split plan ${split-plan-file}"/>
+                </then>
+                <else>
+                    <echo message=">>> Executing split plan ${split-plan-file}"/>
+                    <for param="a-num-features" delimiter=","
+                         list="${num-features}">
+                        <sequential>
+                            <trycatch>
+                                <try>
+									<process-one-dataset
+											workingdir="@{workingdir}"
+											mode="execute-splits"
+											endpoint-name="@{endpoint-name}"
+											dataset-root="@{dataset-root}"
+											output="-"
+											all-classifier-parameters="@{all-classifier-parameters}"
+											extra-classifier-parameters="@{extra-classifier-parameters}"
+											floor-param="@{floor-param}"
+											array-params="${array-params}"
+											evaluate-statistics="${evaluate-statistics-after-splits}"
+											other-options=" --num-features @{a-num-features} --cache-dir &quot;${cache-dir}&quot;
+                                    --splits &quot;${split-plan-file}&quot; --gene-list full --sequence-file &quot;${bdval-project.basedir}/sequences/@{sequence-file}&quot;
+                                    @{other-options} --pathway-components-dir &quot;${pathway-components-dir}&quot;"/>
+                                </try>
+                                <catch>
+                                    <echo message="CAUGHT FAILED BUILD process sequence-file=@{sequence-file} endpoint-name=@{endpoint-name}"/>
+                                    <fail unless="continue-after-fail"/>
+                                </catch>
+                                <finally>
+                                    <copy-output-files endpoint-name="@{endpoint-name}"/>
+                                </finally>
+                            </trycatch>
+                        </sequential>
+                    </for>
+                </else>
+            </if>
+
+        </sequential>
+    </macrodef>
+
+    <macrodef name="copy-output-files" description="Copy the output files to the results dir">
+        <attribute name="endpoint-name"/>
+        <!-- Directory names are based on endpoint name, files are based on dataset name -->
+        <sequential>
+
+            <echo message="Moving output files for @{endpoint-name} to ${save-data-dir}"/>
+            <move todir="${save-data-dir}" verbose="false">
+                <fileset dir="." casesensitive="false">
+                    <include name="libSVM_*@{endpoint-name}*"/>
+                    <include name="*@{endpoint-name}*.zip"/>
+                    <include name="*@{endpoint-name}*.model"/>
+                    <include name="weka_*@{endpoint-name}*"/>
+                    <include name="@{endpoint-name}-baseline-*"/>
+                    <include name="@{endpoint-name}-tune-*"/>
+                    <include name="@{endpoint-name}-tuneC-*"/>
+                    <include name="@{endpoint-name}-genelists-*"/>
+                    <include name="@{endpoint-name}-parameters-*"/>
+                    <include name="@{endpoint-name}-weka-*"/>
+                    <include name="@{endpoint-name}*optimal-parameters.txt"/>
+
+                    <include name="@{endpoint-name}-pathways-*"/>
+
+                    <include name="@{endpoint-name}*-features.txt"/>
+                    <include name="@{endpoint-name}*-prediction-table.txt"/>
+                    <!-- These two come from split. -->
+                    <include name="@{endpoint-name}-*-tune-*"/>
+                    <include name="exec-@{endpoint-name}-*"/>
+                    <!--
+                   <include name="pathway-components/**/*"/>
+                    -->
+                    <exclude name="@{endpoint-name}-maqcii-subbmission.file.txt"/>
+                    <exclude name="@{endpoint-name}-*-stats.txt"/>
+                </fileset>
+            </move>
+
+            <copy todir="${save-data-dir}">
+                <fileset dir="." casesensitive="false">
+                    <include name="*-maqcii-submission.txt"/>
+                    <include name="@{endpoint-name}-*-stats.txt"/>
+                </fileset>
+            </copy>
+
+            <mkdir dir="${save-data-dir}/features/@{endpoint-name}"/>
+            <move todir="${save-data-dir}/features/@{endpoint-name}">
+                <fileset dir="${save-data-dir}" casesensitive="false">
+                    <include name="@{endpoint-name}-*-features.txt"/>
+                </fileset>
+            </move>
+
+            <mkdir dir="${save-data-dir}/models/@{endpoint-name}"/>
+            <move todir="${save-data-dir}/models/@{endpoint-name}">
+                <fileset dir="${save-data-dir}" casesensitive="false">
+                    <include name="libSVM_*@{endpoint-name}*"/>
+                    <include name="*@{endpoint-name}*.zip"/>
+                    <include name="weka_@{endpoint-name}*"/>
+                    <include name="*@{endpoint-name}*.model"/>
+                </fileset>
+            </move>
+            <mkdir dir="${save-data-dir}/predictions/@{endpoint-name}"/>
+            <move todir="${save-data-dir}/predictions/@{endpoint-name}">
+                <fileset dir="${save-data-dir}" casesensitive="false">
+                    <include name="@{endpoint-name}*-prediction-table.txt"/>
+                </fileset>
+            </move>
+        </sequential>
+    </macrodef>
+
+    <target name="process-model-conditions" description="Handle the model-conditions.txt file">
+		<echo message="Inside process-model-conditions, todir: ${save-data-dir} from dir: ${bdval.basedir}"/>
+        <copy todir="${save-data-dir}">
+            <fileset dir="${basedir}">
+                <include name="model-conditions.txt"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="zip-results" description="Zip result files">
+        <zip-results/>
+    </target>
+
+    <macrodef name="zip-results">
+        <attribute name="include-split-models" default="true"/>
+        <attribute name="include-predictions" default="true"/>
+        <attribute name="include-final-models" default="true"/>
+        <attribute name="label" default=""/>
+        <sequential>
+            <concat destfile="${save-data-dir}/${save-data-tag}-all-maqcii-submission.txt">
+                <fileset dir="${save-data-dir}" file="*maqcii-submission*.txt"/>
+            </concat>
+            <concat destfile="${save-data-dir}/${save-data-tag}-all-stats.txt">
+                <fileset dir="${save-data-dir}" file="*stats*.txt"/>
+            </concat>
+            <delete>
+                <fileset dir="${save-data-dir}">
+                    <include name="*maqcii-submission*.txt"/>
+                    <include name="*stats*.txt"/>
+                    <exclude name="${save-data-tag}-all-maqcii-submission.txt"/>
+                    <exclude name="${save-data-tag}-all-stats.txt"/>
+                </fileset>
+            </delete>
+            <echo message="Zipping results ${save-data-tag}.zip"/>
+            <condition property="include-split-models">
+                <istrue value="@{include-split-models}"/>
+            </condition>
+            <condition property="include-predictions">
+                <istrue value="@{include-predictions}"/>
+            </condition>
+            <condition property="include-final-models">
+                <istrue value="@{include-final-models}"/>
+            </condition>
+
+            <zip destfile="${basedir}/${save-data-tag}@{label}.zip"
+                 comment="${ant.project.name} results from ${save-data-tag}">
+                <fileset dir="${basedir}">
+                    <exclude name="${save-data-tag}/features/**" unless="include-split-models"/>
+                    <exclude name="${save-data-tag}/models/**" unless="include-split-models"/>
+                    <exclude name="${save-data-tag}/predictions/**" unless="include-predictions"/>
+                    <exclude name="${save-data-tag}/final-models/**" unless="include-final-models"/>
+                    <exclude name="${save-data-tag}/final-models-direct/**" unless="include-final-models"/>
+                    <include name="${save-data-tag}/**/*"/>
+                </fileset>
+            </zip>
+        </sequential>
+    </macrodef>
+
+
+
+	<!-- Note: So far haven't used any of the code below-->
+
+
+    <target name="clean-cache" description="Remove the contents of the cache directory">
+        <!-- note the cache directory itself will remain -->
+        <delete includeemptydirs="true" failonerror="false" verbose="true">
+            <fileset dir="${cache-dir-location}/cache" includes="**/*"/>
+        </delete>
+    </target>
+
+
+    <macrodef name="predict-one-dataset" description="Predict one dataset.">
+        <attribute name="test-set-name"/>
+        <attribute name="endpoint-name"/>
+        <attribute name="dataset-root"/>
+        <attribute name="output" default="out.txt"/>
+        <attribute name="model"/>
+        <attribute name="other-options" default=""/>
+        <attribute name="sample-with-replacement" default="false"/>
+        <attribute name="submission-output" default="@{endpoint-name}-@{test-set-name}-maqcii-stats.txt"/>
+        <sequential>
+            <echo message="++"/>
+            <echo message="++ Running  @{test-set-name} : predict -> @{output}"/>
+            <echo message="++"/>
+
+            <!-- define survival file, with default value of "-" -->
+            <var name="survival-file" value="-"/>
+            <if>
+                <isset property="@{endpoint-name}.survival-file"/>
+                <then>
+                    <!-- but we use the "test set specific" (i.e., validation) file if it is defined -->
+                    <var name="survival-file" value="${@{endpoint-name}.survival-file}"/>
+                </then>
+            </if>
+
+            <!-- which dataset file should we use?  default is "global" dataset file -->
+            <var name="predict-dataset-file" value="${@{endpoint-name}.dataset-file}"/>
+            <if>
+                <isset property="@{endpoint-name}.@{test-set-name}.dataset-file"/>
+                <then>
+                    <!-- but we use the "test set specific" (i.e., validation) file if it is defined -->
+                    <var name="predict-dataset-file" value="${@{endpoint-name}.@{test-set-name}.dataset-file}"/>
+                    <!-- Cache must be disabled when predicting a test set other than the global input set. -->
+                    <var name="local-cache-options" value=""/>
+
+                </then>
+                <else>
+                    <var name="local-cache-options" value="${cache-options}"/>
+                </else>
+            </if>
+
+            <echo message="Using dataset: ${predict-dataset-file}"/>
+
+            <!-- do we have true labels? -->
+            <var name="true-labels-option" value=""/>
+            <if>
+                <isset property="@{endpoint-name}.@{test-set-name}.true-labels"/>
+                <then>
+                    <var name="true-labels-option"
+                         value="--true-labels ${@{endpoint-name}.@{test-set-name}.true-labels}"/>
+                </then>
+            </if>
+
+            <if>
+                <equals arg1="${@{endpoint-name}.survival-file}" arg2=""/>
+                <then>
+                    <property name="survival-arg-1" value="--survival"/>
+                    <property name="survival-arg-2" value="${@{endpoint-name}.survival-file}"/>
+
+                </then>
+                <else>
+                    <property name="survival-arg-1" value=""/>
+                    <property name="survival-arg-2" value=""/>
+                </else>
+            </if>
+            <if>
+                <equals arg1="${run-java}" arg2="true"/>
+                <then>
+                    <java classname="org.bdval.DiscoverAndValidate"
+                          classpathref="bdval.classpath" fork="true" failonerror="true">
+                        <jvmarg value="-ea"/>
+                        <jvmarg value="${memory-flag}"/>
+                        <sysproperty key="log4j.debug" value="${log4j.debug}"/>
+                        <sysproperty key="log4j.configuration" value="file:///${config}/log4j.properties"/>
+                        <sysproperty key="RConnectionPool.configuration" value="file:///${config}/RConnectionPool.xml"/>
+                        <arg value="-m"/>
+                        <arg value="predict"/>
+                        <arg value="--dataset-name"/>
+                        <arg value="${@{endpoint-name}.dataset-name}"/>
+                        <arg value="-i"/>
+                        <arg value="${predict-dataset-file}"/>
+                        <arg value="--submission-file"/>
+                        <arg value="@{submission-output}"/>
+                        <!-- short for faster -->
+                        <arg value="--test-samples"/>
+                        <arg value="${@{endpoint-name}.@{test-set-name}.test-samples}"/>
+                        <arg line="${true-labels-option}"/>
+                        <arg line="--label auto "/>
+                        <arg value="-p"/>
+                        <arg value="${@{endpoint-name}.platform-file}"/>
+                        <arg line="-o @{output} "/>
+                        <arg line="--model @{model} "/>
+                        <arg line="--rserve-port -1 "/>
+                        <arg line="@{other-options} "/>
+                        <!-- Do not use the cache when reading a dataset for prediction -->
+                        <!--arg line="@{other-options} ${local-cache-options}"/-->
+                        <arg line="--dataset-root @{dataset-root}"/>
+                        <arg line="--other-measures ${other-performance-measures}"/>
+                        <arg line="--estimate-with-replacement @{sample-with-replacement}"/>
+                        <arg line="${survival-arg-1}"/>
+                        <arg line="${survival-arg-2}"/>
+                    </java>
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="process-one-sequence" description="Process one sequence.">
+        <attribute name="workingdir" default="${basedir}" description="directory where processing should take place"/>
+        <attribute name="endpoint-name"/>
+        <attribute name="dataset-root"/>
+        <attribute name="floor-param"/>
+        <attribute name="array-params"/>
+        <attribute name="label" default="unknown"/>
+        <attribute name="seed" default="123454"/>
+        <attribute name="rserve-port" default="-1"/>
+        <attribute name="other-options" default=""/>
+        <attribute name="pathways-params" default=""/>
+        <attribute name="gene-features-dir" default="./"/>
+        <attribute name="sequence-file"/>
+        <sequential>
+
+            <echo message="++"/>
+            <echo message="++ Running  @{endpoint-name} : sequence-file @{sequence-file}"/>
+            <echo message="++"/>
+
+            <if>
+                <equals arg1="${run-java}" arg2="true"/>
+                <then>
+                    <java classname="org.bdval.DiscoverAndValidate"
+                          classpathref="bdval.classpath" fork="true" failonerror="true"
+                          dir="@{workingdir}">
+
+                        <jvmarg value="-ea"/>
+                        <jvmarg value="${memory-flag}"/>
+                        <sysproperty key="log4j.debug" value="${log4j.debug}"/>
+                        <sysproperty key="log4j.configuration" value="file:///${config}/log4j.properties"/>
+                        <sysproperty key="RConnectionPool.configuration" value="file:///${config}/RConnectionPool.xml"/>
+                        <arg value="-m"/>
+                        <arg value="sequence"/>
+                        <!-- short for faster -->
+                        <arg value="-c"/>
+                        <arg value="${@{endpoint-name}.cids-file}"/>
+                        <arg value="-t"/>
+                        <arg value="${@{endpoint-name}.tasks-file}"/>
+                        <arg value="-p"/>
+                        <arg value="${@{endpoint-name}.platform-file}"/>
+                        <arg value="--seed"/>
+                        <arg value="@{seed}"/>
+                        <arg line="@{other-options} @{pathways-params} ${cache-options}"/>
+                        <arg value="--gene-features-dir"/>
+                        <arg value="@{gene-features-dir}"/>
+                        <arg value="--dataset-name"/>
+                        <arg value="@{endpoint-name}"/>
+                        <arg value="--dataset-root"/>
+                        <arg value="@{dataset-root}"/>
+                        <arg line="${svm-classifier} ${svm-parameters}"/>
+                        <arg line="${feature-option}"/>
+                        <arg value="--sequence-file"/>
+                        <arg value="${bdval.basedir}/../data/sequences/@{sequence-file}"/>
+
+                        <arg value="-i"/>
+                        <arg value="NA"/>
+                        <arg value="-o"/>
+                        <arg value="NA"/>
+                        <arg value="--gene-list"/>
+                        <arg value="NA"/>
+                        <arg line="@{floor-param}"/>
+                        <arg line="@{array-params}"/>
+
+                        <!--redirector output="@{endpoint-name}.stdout"></redirector-->
+                    </java>
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="execute-splits-skip">
+        <attribute name="workingdir" default="${basedir}" description="directory where processing should take place"/>
+        <attribute name="feature-selection-fold"/>
+        <attribute name="endpoint-name"/>
+        <attribute name="dataset-root"/>
+        <attribute name="floor-param"/>
+        <attribute name="array-params"/>
+        <attribute name="sequence-file"/>
+        <attribute name="other-options" default=""/>
+        <attribute name="all-classifier-parameters" default=""/>
+
+        <sequential>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="process-predict" description="Predict with pre-built models on a specific test set">
+        <attribute name="test-set-name"/>
+        <attribute name="endpoint-name"/>
+        <attribute name="dataset-root" default="${dataset-root}"/>
+        <attribute name="model-directory"/>
+        <attribute name="label" default="predict-test"/>
+        <attribute name="sample-with-replacement" default="false"/>
+        <attribute name="evaluate-statistics" default="true"/>
+        <attribute name="output-directory" default="."/>
+        <attribute name="submission-output"
+                   default="@{output-directory}/${save-data-tag}-@{endpoint-name}-@{test-set-name}-maqcii-stats.txt"/>
+        <!-- TODO: predict has issues running in parallel.  See http://icbtools.med.cornell.edu/mantis/view.php?id=1301 -->
+        <attribute name="num-threads" default="1"/>
+
+        <sequential>
+            <if>
+                <available file="@{model-directory}/@{endpoint-name}"/>
+                <then>
+                    <trycatch>
+                        <try>
+                            <for param="predict-model-file" parallel="true" threadCount="@{num-threads}">
+                                <fileset dir="@{model-directory}/@{endpoint-name}">
+                                    <include name="*model-?????.zip"/>
+                                </fileset>
+                                <sequential>
+                                    <var name="model-basename" unset="true"/>
+                                    <basename property="model-basename" file="@{predict-model-file}"/>
+                                    <var name="pathways-params" value=""/>
+                                    <if>
+                                        <contains string="@{predict-model-file}" substring="-pathways-"/>
+                                        <then>
+                                            <var name="pathways-params"
+                                                 value="--pathways ${@{endpoint-name}.pathways-file} --gene-to-probes ${@{endpoint-name}.gene-to-probes-file}"/>
+                                        </then>
+
+                                    </if>
+                                    <if>
+                                        <istrue value="@{evaluate-statistics}"/>
+                                        <then>
+                                            <var name="evaluate-statistics-option"
+                                                 value="--print-stats"/>
+                                            <var name="output-option"
+                                                 value="@{output-directory}/@{endpoint-name}-@{label}-stats.txt"/>
+
+                                        </then>
+                                        <else>
+                                            <var name="evaluate-statistics-option"
+                                                 value=" "/>
+                                            <var name="output-option"
+                                                 value="@{endpoint-name}-${model-basename}-prediction-table.txt"/>
+
+                                        </else>
+
+                                    </if>
+                                    <echo message=">>> Processing prediction for @{predict-model-file} / ${pathways-params}"/>
+
+                                    <if>
+                                        <contains string="${model-basename}"
+                                                  substring="@{endpoint-name}"/>
+                                        <then>
+
+                                            <predict-one-dataset
+                                                    endpoint-name="@{endpoint-name}"
+                                                    test-set-name="@{test-set-name}"
+                                                    dataset-root="@{dataset-root}"
+                                                    output="${output-option}"
+                                                    model="@{predict-model-file}"
+                                                    other-options="${evaluate-statistics-option} ${pathways-params} "
+                                                    sample-with-replacement="@{sample-with-replacement}"
+                                                    submission-output="@{submission-output}"/>
+                                        </then>
+                                        <else>
+                                            <echo message="Model basename (${model-basename}) does not contain endpoint (@{endpoint-name}). Skipping model for this endpoint"/>
+                                        </else>
+                                    </if>
+
+                                </sequential>
+                            </for>
+                        </try>
+
+                        <catch>
+                            <echo message="CAUGHT FAILED BUILD process-predict : testset-name=@{test-set-name}, predict-model-file=@{predict-model-file}, test-samples=@{test-set-name}"/>
+                            <fail unless="continue-after-fail"/>
+                        </catch>
+                        <finally>
+                            <copy-output-files endpoint-name="@{endpoint-name}"/>
+                        </finally>
+                    </trycatch>
+                </then>
+            </if>
+
+        </sequential>
+    </macrodef>
+
+
+    <macrodef name="prepare-rank-dataset">
+        <attribute name="endpoint-name"/>
+
+        <sequential>
+            <echo message="endpoint: @{endpoint-name} value: ${@{endpoint-name}.validation.dataset-file.ranked}"/>
+            <if>
+                <!-- Produce a ranked validation dataset only when the validation.dataset-file.ranked property
+                is defined for the endpoint -->
+                <equals arg1="${@{endpoint-name}.validation.dataset-file.ranked}"
+                        arg2="\${\@{endpoint-name}.validation.dataset-file.ranked}"/>
+                <then>
+                </then>
+                <else>
+                    <delete failonerror="false" file="${@{endpoint-name}.validation.dataset-file.ranked}"/>
+                    <java classname="org.bdval.DiscoverAndValidate"
+                          classpathref="bdval.classpath" fork="true" failonerror="true">
+                        <jvmarg value="-ea"/>
+                        <jvmarg value="${memory-flag}"/>
+                        <sysproperty key="log4j.debug" value="${log4j.debug}"/>
+                        <sysproperty key="log4j.configuration" value="file:///${config}/log4j.properties"/>
+                        <sysproperty key="RConnectionPool.configuration" value="file:///${config}/RConnectionPool.xml"/>
+                        <arg value="-m"/>
+                        <arg value="to-ranks"/>
+                        <arg value="--dataset-name"/>
+                        <arg value="${@{endpoint-name}.dataset-name}"/>
+                        <arg value="-i"/>
+                        <arg value="${@{endpoint-name}.validation.dataset-file}"/>
+
+                        <arg value="-p"/>
+                        <arg value="${@{endpoint-name}.platform-file}"/>
+                        <arg value="-t"/>
+                        <arg value="${@{endpoint-name}.tasks-file}"/>
+                        <arg value="-c"/>
+                        <arg value="${@{endpoint-name}.cids-file}"/>
+                        <arg line="-o ${@{endpoint-name}.validation.dataset-file.ranked} "/>
+                    </java>
+                </else>
+            </if>
+            <if>
+                <!-- Produce a ranked  dataset only when the dataset-file.ranked property
+                is defined for the endpoint -->
+                <equals arg1="${@{endpoint-name}.dataset-file.ranked}"
+                        arg2="\${\@{endpoint-name}.dataset-file.ranked}"/>
+                <then>
+                </then>
+                <else>
+                    <delete failonerror="false" file="${@{endpoint-name}.dataset-file.ranked}"/>
+
+                    <java classname="org.bdval.DiscoverAndValidate"
+                          classpathref="bdval.classpath" fork="true" failonerror="true">
+                        <jvmarg value="-ea"/>
+                        <jvmarg value="${memory-flag}"/>
+                        <sysproperty key="log4j.debug" value="${log4j.debug}"/>
+                        <sysproperty key="log4j.configuration" value="file:///${config}/log4j.properties"/>
+                        <sysproperty key="RConnectionPool.configuration" value="file:///${config}/RConnectionPool.xml"/>
+                        <arg value="-m"/>
+                        <arg value="to-ranks"/>
+                        <arg value="--dataset-name"/>
+                        <arg value="${@{endpoint-name}.dataset-name}"/>
+                        <arg value="-i"/>
+                        <arg value="${@{endpoint-name}.dataset-file}"/>
+
+                        <arg value="-p"/>
+                        <arg value="${@{endpoint-name}.platform-file}"/>
+                        <arg value="-t"/>
+                        <arg value="${@{endpoint-name}.tasks-file}"/>
+                        <arg value="-c"/>
+                        <arg value="${@{endpoint-name}.cids-file}"/>
+                        <arg line="-o ${@{endpoint-name}.dataset-file.ranked} "/>
+                    </java>
+                </else>
+            </if>
+        </sequential>
+    </macrodef>
+
+
+    <target name="prepare-rank-datasets">
+        <sequential>
+            <for param="current-endpoint" delimiter=" " list="${all-endpoints}">
+                <sequential>
+                    <if>
+                        <istrue value="${do.@{current-endpoint}}"/>
+                        <then>
+                            <prepare-rank-dataset endpoint-name="@{current-endpoint}"/>
+                        </then>
+                    </if>
+                </sequential>
+            </for>
+        </sequential>
+    </target>
+
+    <macrodef name="cross-validation-consensus-features">
+        <attribute name="model-conditions"/>
+        <attribute name="results-directory"/>
+        <attribute name="output" default="@{results-directory}/${save-data-tag}-CVCF-maqcii-submission.txt"/>
+        <sequential>
+            <java classname="org.bdval.CrossValidateConsensusFeatures" dir="${bdval.basedir}"
+                  classpathref="bdval.classpath" fork="true" failonerror="true">
+                <jvmarg value="-ea"/>
+                <jvmarg value="${memory-flag}"/>
+                <sysproperty key="log4j.debug" value="${log4j.debug}"/>
+                <sysproperty key="log4j.configuration" value="file:///${config}/log4j.properties"/>
+                <sysproperty key="RConnectionPool.configuration" value="file:///${config}/RConnectionPool.xml"/>
+                <sysproperty key="pj.nt" value="${num-threads}"/>
+                <arg value="--model-conditions"/>
+                <arg value="@{model-conditions}"/>
+                <arg value="--results-directory"/>
+                <arg value="@{results-directory}"/>
+                <arg value="--submission-file"/>
+                <arg value="@{output}"/>
+                <arg value="--folds"/>
+                <arg value="${external-CV-folds}"/>
+                <arg value="--cv-repeats"/>
+                <arg value="${external-CV-repeats}"/>
+                <arg value="--properties"/>
+                <arg value="${project-property-file}"/>
+            </java>
+        </sequential>
+    </macrodef>
+
+    <target name="cross-validate-consensus-features"
+            description="Performs cross-validation with the consensus features corresponding to each model."
+            depends="prepare-bdval,tag-output-directory">
+
+        <delete file="${statistics-output}"/>
+        <input addproperty="model-conditions" message="Enter the model condition filename."
+               defaultvalue="model-conditions.txt"/>
+        <input addproperty="results-directory"
+               message="Enter the directory where results are stored (features subdirectory must exist in the results directory)."/>
+        <cross-validation-consensus-features model-conditions="${model-conditions}"
+                                             results-directory="${results-directory}"/>
+    </target>
+    <macrodef name="candidate-model-selections">
+        <attribute name="model-ids"
+                   default="--model-ids-map-file C:\home\maqcii\dev-maqcii\results\Sept-17-2008\official-submission-May-5-2008\ModelId-Mapping-Info.txt"/>
+        <attribute name="cv-results-filename"/>
+        <attribute name="cvcf-results-filename"/>
+        <attribute name="validation-results-filename" default="N/A"/>
+        <attribute name="output-filename"/>
+        <attribute name="pvalue-output-filename" default="-"/>
+        <attribute name="rank-output-filename" default="-"/>
+        <attribute name="reward-performance" default="AUC"/>
+        <attribute name="rank-candidates-by" default="AUC"/>
+        <attribute name="selection-strategy" default="CV"/>
+        <attribute name="custom-ranking-set" default=""/>
+        <attribute name="dump" default=""/>
+
+        <sequential>
+            <if>
+                <not>
+                    <equals arg1="@{validation-results-filename}" arg2="N/A"/>
+                </not>
+                <then>
+                    <var name="test-arguments" value="--test @{validation-results-filename}"></var>
+                </then>
+                <else>
+                    <var name="test-arguments" value=" "></var>
+                </else>
+            </if>
+
+            <java classname="org.bdval.modelselection.CandidateModelSelection" fork="true"
+                  failonerror="true">
+                <jvmarg value="-ea"/>
+                <jvmarg value="${memory-flag}"/>
+                <arg value="--cv"/>
+                <arg value="@{cv-results-filename}"/>
+                <arg value="--cvcf"/>
+                <arg value="@{cvcf-results-filename}"/>
+                <arg value="--rank-by"/>
+                <arg value="@{selection-strategy}"/>
+                <arg value="--rank-candidates-by"/>
+                <arg value="@{rank-candidates-by}"/>
+                <arg value="--reward-performance"/>
+                <arg value="@{reward-performance}"/>
+                <arg line="${test-arguments}"/>
+                <arg line="@{model-ids}"/>
+                <arg line="@{custom-ranking-set}"/>
+                <arg line="@{dump}"/>
+                <arg line="-k 1000"/>
+                <arg value="-o"/>
+                <arg value="@{output-filename}"/>
+                <arg value="-op"/>
+                <arg value="@{pvalue-output-filename}"/>
+                <arg value="-or"/>
+                <arg value="@{rank-output-filename}"/>
+                <classpath refid="bdval.classpath"/>
+            </java>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="combine-statistics">
+
+        <attribute name="model-ids"
+                   default="--model-ids-map-file C:\home\maqcii\dev-maqcii\results\Sept-17-2008\official-submission-May-5-2008\ModelId-Mapping-Info.txt"/>
+        <attribute name="cv-statistics"/>
+        <attribute name="cvcf-statistics"/>
+        <attribute name="validation-statistics"/>
+        <attribute name="model-conditions"/>
+        <attribute name="output"/>
+        <attribute name="dump" default=""/>
+
+        <sequential>
+            <candidate-model-selections
+                    cv-results-filename="@{cv-statistics}"
+                    cvcf-results-filename="@{cvcf-statistics}"
+                    model-ids=""
+                    output-filename="-"
+                    dump="--dump @{output}  --model-conditions @{model-conditions}"
+                    reward-performance="AUC"
+                    rank-candidates-by="AUC"
+                    selection-strategy="CV"
+                    custom-ranking-set=""
+                    validation-results-filename="@{validation-statistics}"/>
+        </sequential>
+    </macrodef>
+
+    <target name="candidate-model-selection"
+            description="Rank models accroding to some model selection strategy."
+            depends="prepare-bdval">
+
+        <input addproperty="model-conditions" message="Enter the model condition filename."
+               defaultvalue="model-conditions.txt"/>
+        <input addproperty="CV-submission-file"
+               message="Enter the path to the cross-validation evaluation results (CV)."/>
+        <input addproperty="CVCF-submission-file"
+               message="Enter the path to the cross-validation evaluation results (CVCF)."/>
+        <input addproperty="selection-strategy"
+               message="Enter the name of the strategy to rank models by (CV, CVCF, MODEL)." defaultvalue="CV"/>
+        <input addproperty="rank-by" defaultvalue="AUC"
+               message="Enter the performance measure to rank model by (i.e., AUC, MCC, ACC, SENS, SPEC)."/>
+        <input addproperty="model-name"
+               message="If ranking by model, enter the name of the BMF calibration model to use (TrainedOnA, TrainedOnACZ, TrainedOnABCDEGJKZ)."
+               defaultvalue="TrainedOnABCDEGJKZ"/>
+
+        <candidate-model-selections
+                cv-results-filename="${CV-submission-file}"
+                cvcf-results-filename="${CVCF-submission-file}"
+                model-ids=""
+                output-filename="-"
+                rank-output-filename="model-selection-ranks-output.txt"
+                pvalue-output-filename="model-selection-p-values-output.txt"
+                reward-performance="${rank-by}"
+                rank-candidates-by="${rank-by}"
+                dump="--model-conditions ${model-conditions} --model-name ${model-name}"
+                custom-ranking-set=""
+
+                selection-strategy="${selection-strategy}"/>
+
+    </target>
+
+    <macrodef name="generate-final-models">
+        <attribute name="results-directory"/>
+        <attribute name="model-conditions"/>
+        <!-- By default, generate consensus model for pathway PCA models -->
+        <attribute name="consensus-type" default="pathways:models"/>
+        <sequential>
+            <java classname="org.bdval.GenerateFinalModels" dir="${bdval.basedir}"
+                  classpathref="bdval.classpath" fork="true" failonerror="true">
+                <jvmarg value="-ea"/>
+                <jvmarg value="${memory-flag}"/>
+                <sysproperty key="log4j.debug" value="${log4j.debug}"/>
+                <sysproperty key="log4j.configuration" value="file:///${config}/log4j.properties"/>
+                <sysproperty key="RConnectionPool.configuration" value="file:///${config}/RConnectionPool.xml"/>
+                <sysproperty key="pj.nt" value="${num-threads}"/>
+                <arg value="--model-conditions"/>
+                <arg value="@{model-conditions}"/>
+                <arg value="--results-directory"/>
+                <arg value="@{results-directory}"/>
+                <arg value="--consensus"/>
+                <arg value="@{consensus-type}"/>
+                <arg value="--properties"/>
+                <arg value="${project-property-file}"/>
+            </java>
+        </sequential>
+    </macrodef>
+    <target name="generate-final-models"
+            description="Calculate feature consensus across multiple feature selection strategies and generate models with consensus features on the whole training set."
+            depends="prepare-bdval">
+        <delete file="${statistics-output}"/>
+        <input addproperty="model-conditions" message="Enter the model condition filename."
+               defaultvalue="model-conditions.txt"/>
+        <input addproperty="results-directory"
+               message="Enter the directory where results are stored (features subdirectory must exist in the results directory)."/>
+
+        <generate-final-models results-directory="${results-directory}"
+                               model-conditions="${model-conditions}"/>
+
+
+    </target>
+
+    <target name="generate-final-models-direct-method"
+            description="Calculate feature consensus across multiple feature selection strategies and generate models with consensus features on the whole training set."
+            depends="prepare-bdval">
+        <delete file="${statistics-output}"/>
+        <input addproperty="model-conditions" message="Enter the model condition filename."
+               defaultvalue="model-conditions.txt"/>
+        <input addproperty="results-directory"
+               message="Enter the directory where results are stored (features subdirectory must exist in the results directory)."/>
+
+        <generate-final-models results-directory="${results-directory}"
+                               model-conditions="${model-conditions}"
+                               consensus-type="direct"/>
+
+    </target>
+
+    <target name="generate-all-final-models"
+            description="Calculate feature consensus across multiple feature selection strategies and generate models with consensus features on the whole training set."
+            depends="prepare-bdval">
+
+        <input addproperty="model-conditions" message="Enter the model condition filename."
+               defaultvalue="model-conditions.txt"/>
+
+        <input addproperty="inspect-directory"
+               message="Enter the directory where results directory will be found (each results directory must include features and models subdirectories)."/>
+
+
+        <for param="results-directory">
+            <dirset dir="${inspect-directory}">
+                <depth max="0"/>
+                <filename name="20*-*-results"/>
+
+            </dirset>
+            <sequential>
+                <echo message="Processing directory @{results-directory}"/>
+                <var name="results-directory" value="@{results-directory}"/>
+
+                <antcall target="generate-final-models" inheritall="true"/>
+
+            </sequential>
+        </for>
+    </target>
+
+    <macrodef name="generate-final-models-from-list">
+        <attribute name="results-list" description="list of results directories"/>
+        <sequential>
+            <input addproperty="model-conditions" message="Enter the model condition filename."
+                   defaultvalue="model-conditions.txt"/>
+
+            <input addproperty="inspect-directory" defaultvalue="./"
+                   message="Enter the directory where results directory will be found (each results directory must include features and models subdirectories)."/>
+
+            <for param="results-directory" delimiter=" " trim="yes"
+                 list="@{results-list}">
+
+                <sequential>
+                    <echo message="Processing directory @{results-directory}"/>
+                    <var name="results-directory" value="${inspect-directory}/@{results-directory}"/>
+
+                    <antcall target="generate-final-models" inheritall="true"/>
+                </sequential>
+            </for>
+        </sequential>
+    </macrodef>
+    <macrodef name="predict-validation-from-list">
+        <attribute name="results-list" description="list of results directories"/>
+        <sequential>
+            <input addproperty="model-conditions" message="Enter the model condition filename."
+                   defaultvalue="model-conditions.txt"/>
+            <input addproperty="final-model-directory-name" message="Enter final-models or final-models-direct."
+                   defaultvalue="final-models"/>
+            <input addproperty="inspect-directory"
+                   message="Enter the directory where results directory will be found (each results directory must include final-model subdirectories)."/>
+
+            <for param="results-directory" delimiter=" " trim="yes" list="@{results-list}">
+
+                <sequential>
+                    <echo message="Processing directory @{results-directory}"/>
+                    <var name="results-directory" value="${inspect-directory}/@{results-directory}"/>
+
+                    <antcall target="inner-evaluate-dataset-statistics" inheritall="true"/>
+                </sequential>
+            </for>
+        </sequential>
+    </macrodef>
+
+
+
+    <target name="delete-results" description="Delete previous result files">
+        <delete verbose="true" includeemptydirs="true">
+            <fileset dir="${bdval.basedir}">
+                <include name="200*-results/**/*"/>
+                <include name="200*-results"/>
+                <include name="200*-results.zip"/>
+            </fileset>
+        </delete>
+
+    </target>
+
+    <macrodef name="restat">
+        <attribute name="results-directory"/>
+        <attribute name="model-conditions" default="model-conditions.txt"/>
+        <attribute name="output" default="@{results-directory}/${DSTAMP}-${TSTAMP}-restat-maqcii-submission.txt"/>
+        <attribute name="other-measures" default="bias"/>
+        <sequential>
+
+            <java classname="org.bdval.modelconditions.ProcessModelConditions" dir="${bdval.basedir}"
+                  classpathref="bdval.classpath" fork="true" failonerror="true">
+                <jvmarg value="-ea"/>
+                <jvmarg value="${memory-flag}"/>
+                <sysproperty key="log4j.debug" value="${log4j.debug}"/>
+                <sysproperty key="log4j.configuration" value="file:///${config}/log4j.properties"/>
+                <sysproperty key="RConnectionPool.configuration" value="file:///${config}/RConnectionPool.xml"/>
+                <sysproperty key="pj.nt" value="${num-threads}"/>
+                <arg value="-m"/>
+                <arg value="stats"/>
+                <arg value="--other-measures"/>
+                <arg value="@{other-measures}"/>
+                <arg value="--submission-file"/>
+                <arg value="@{output}"/>
+                <arg value="--model-conditions"/>
+                <arg value="@{model-conditions}"/>
+                <arg line="@{results-directory}"/>
+            </java>
+        </sequential>
+    </macrodef>
+
+    <target name="restat" description="Recalculate statistics for prediction table files in a given directory"
+            depends="prepare-bdval">
+
+        <input addproperty="results-directory"
+               message="Enter the results directories to restat. The directories must contain a predictions directory."/>
+        <input addproperty="model-conditions"
+               message="Enter the name of model conditions file associated with the results."
+               defaultvalue="model-conditions.txt"/>
+        <input addproperty="other-measures"
+               message="Enter the name of additional performance measures to evaluate."
+               defaultvalue="bias"/>
+
+        <echo message="Calculating statistics for results in ${results-directory}"/>
+        <restat results-directory="${results-directory}" model-conditions="${model-conditions}"
+                other-measures="${other-measures}"/>
+
+
+    </target>
+
+    <target name="inner-evaluate-dataset-statistics" depends="prepare-bdval,tag-output-directory"
+            description="Evaluate performance statistics on a given dataset">
+        <input addproperty="results-directory" message="Enter the results directory."/>
+        <input addproperty="final-model-directory-name"
+               defaultvalue="final-models"
+               message="Enter the subdirectory that contains the final models (must exist in results directory)."/>
+
+        <var name="model-directory" value="${results-directory}/${final-model-directory-name}"/>
+        <echo message="Will look for models into ${model-directory}"/>
+        <input addproperty="test-set-name"
+               message="Name of the dataset for which performance statistics of existing models will be evaluated (dataset name must match an entry in the property file)."
+               defaultvalue="test"/>
+        <input addproperty="sample-with-replacement" message="Sample with replacement? (true/false), default false"
+               defaultvalue="false"/>
+        <input addproperty="evaluate-statistics" message="Evaluate statistics (true/false), default true"
+               defaultvalue="true"/>
+        <!-- force continue after failure so that we can get the stats for all the models that work. -->
+        <property name="continue-after-fail" value="true"/>
+
+        <sequential>
+            <echo message="Predicting all endpoints ${all-endpoints}"/>
+
+            <for param="current-endpoint" delimiter=" " list="${all-endpoints}">
+                <sequential>
+                    <if>
+                        <istrue value="${do.@{current-endpoint}}"/>
+                        <then>
+                            <echo message="Predicting for endpoint @{current-endpoint}"/>
+                            <process-predict
+                                    endpoint-name="@{current-endpoint}"
+                                    test-set-name="${test-set-name}"
+                                    model-directory="${model-directory}"
+                                    label="predict-set=${test-set-name}"
+                                    sample-with-replacement="${sample-with-replacement}"
+                                    evaluate-statistics="${evaluate-statistics}"
+                                    output-directory="${results-directory}"
+                                    num-threads="1"/>
+                        </then>
+                    </if>
+                </sequential>
+            </for>
+        </sequential>
+    </target>
+
+
+    <macrodef name="rewrite-model-conditions">
+        <attribute name="input"/>
+        <attribute name="output"/>
+        <sequential>
+            <java classname="org.bdval.util.RewriteModelConditions" dir="${bdval.basedir}"
+                  classpathref="bdval.classpath" fork="true" failonerror="true">
+                <jvmarg value="-ea"/>
+                <jvmarg value="${memory-flag}"/>
+                <sysproperty key="log4j.debug" value="${log4j.debug}"/>
+                <sysproperty key="log4j.configuration" value="file:///${config}/log4j.properties"/>
+                <sysproperty key="RConnectionPool.configuration" value="file:///${config}/RConnectionPool.xml"/>
+                <arg value="-i"/>
+                <arg value="@{input}"/>
+                <arg value="-o"/>
+                <arg value="@{output}"/>
+            </java>
+        </sequential>
+    </macrodef>
+    <target name="rewrite-model-conditions-no-prompt" depends="prepare-bdval"
+            description="Read a model-conditions.txt file, write a model-conditions-columns.txt file">
+        <rewrite-model-conditions input="model-conditions.txt" output="model-conditions-columns.txt"/>
+
+    </target>
+
+    <target name="make-synthetic-dataset" depends="prepare-bdval"
+            description="Produce a synthetic dataset">
+        <java classname="org.bdval.MakeSyntheticDataset" dir="${bdval.basedir}"
+              classpathref="bdval.classpath" fork="true" failonerror="true">
+            <jvmarg value="-ea"/>
+            <jvmarg value="${memory-flag}"/>
+            <sysproperty key="log4j.debug" value="${log4j.debug}"/>
+            <sysproperty key="log4j.configuration" value="file:///${config}/log4j.properties"/>
+            <sysproperty key="RConnectionPool.configuration" value="file:///${config}/RConnectionPool.xml"/>
+            <arg value="--dataset-name"/>
+            <arg value="synthetic-9"/>
+            <arg value="--probeset-number"/>
+            <arg value="8000"/>
+            <arg value="--positive-sample-number"/>
+            <arg value="125"/>
+            <arg value="--sample-number"/>
+            <arg value="500"/>
+            <arg value="--number-informative-probesets"/>
+            <arg value="12"/>
+        </java>
+
+    </target>
+    <target name="rewrite-model-conditions" depends="prepare-bdval"
+            description="Read a model-conditions.txt file, write a model-conditions-columns.txt file">
+
+        <input addproperty="model-conditions-input-file"
+               message="Name of INPUT model conditions file?"
+               defaultvalue="model-conditions.txt"/>
+        <input addproperty="model-conditions-output-file"
+               message="Name of OUTPUT model conditions file (in columns)?"
+               defaultvalue="model-conditions-columns.txt"/>
+
+        <java classname="org.bdval.util.RewriteModelConditions" dir="${bdval.basedir}"
+              classpathref="bdval.classpath" fork="true" failonerror="true">
+            <jvmarg value="-ea"/>
+            <jvmarg value="${memory-flag}"/>
+            <sysproperty key="log4j.debug" value="${log4j.debug}"/>
+            <sysproperty key="log4j.configuration" value="file:///${config}/log4j.properties"/>
+            <sysproperty key="RConnectionPool.configuration" value="file:///${config}/RConnectionPool.xml"/>
+            <arg value="-i"/>
+            <arg value="${model-conditions-input-file}"/>
+            <arg value="-o"/>
+            <arg value="${model-conditions-output-file}"/>
+        </java>
+    </target>
+
+    <macrodef name="predict-dataset">
+        <attribute name="test-set-name"/>
+        <attribute name="evaluate-stats"/>
+        <attribute name="model-directory"/>
+        <attribute name="num-threads" default="1"/>
+        <attribute name="output-directory" default="."/>
+        <attribute name="submission-output" default="@{test-set-name}-maqcii-stats.txt"/>
+        <sequential>
+            <sequential>
+                <echo message="Predicting all endpoints ${all-endpoints}"/>
+
+                <for param="current-endpoint" delimiter=" " list="${all-endpoints}" parallel="true"
+                     threadCount="@{num-threads}">
+                    <sequential>
+                        <if>
+                            <istrue value="${do.@{current-endpoint}}"/>
+                            <then>
+                                <echo message="Predicting for endpoint @{current-endpoint}"/>
+                                <process-predict
+                                        endpoint-name="@{current-endpoint}"
+                                        test-set-name="@{test-set-name}"
+                                        model-directory="@{model-directory}"
+                                        sample-with-replacement="false"
+                                        evaluate-statistics="@{evaluate-stats}"
+                                        label="predict-set=@{test-set-name}"
+                                        num-threads="1"
+                                        submission-output="@{submission-output}"
+                                        output-directory="@{output-directory}"
+                                        />
+                                <copy-output-files endpoint-name="@{current-endpoint}"/>
+                            </then>
+                        </if>
+                    </sequential>
+                </for>
+            </sequential>
+        </sequential>
+    </macrodef>
+
+    <target name="inner-generate-dataset-predictions" depends="prepare-bdval,tag-output-directory"
+            description="Generate prediction files for a test/validation dataset">
+        <input addproperty="results-directory" message="Enter the results directory."/>
+        <input addproperty="final-model-directory-name"
+               defaultvalue="final-models"
+               message="Enter the subdirectory that contains the final models (must exist in results directory)."/>
+
+        <var name="model-directory" value="${results-directory}/${final-model-directory-name}"/>
+        <echo message="Will look for models into ${model-directory}"/>
+        <input addproperty="test-set-name" message="Name of the test set (must match an entry in the property file)."
+               defaultvalue="validation"/>
+        <input addproperty="evaluate-stats" message="Evaluate performance statistics"
+               defaultvalue="false"/>
+        <predict-dataset
+                test-set-name="${test-set-name}"
+                evaluate-stats="${evaluate-stats}"
+                model-directory="${model-directory}"/>
+    </target>
+
+    <!-- do not generate direct final models. -->
+      <macrodef name="collect-statistics-no-direct">
+        <attribute name="save-data-dir"/>
+        <sequential>
+            <restat results-directory="@{save-data-dir}"
+                    output="@{save-data-dir}/CV.txt"/>
+            <generate-final-models
+                    model-conditions="model-conditions.txt"
+                    results-directory="@{save-data-dir}"/>
+
+
+
+            <cross-validation-consensus-features
+                    model-conditions="model-conditions.txt"
+                    results-directory="@{save-data-dir}"
+                    output="@{save-data-dir}/CVCF.txt"/>
+
+            <predict-dataset
+                    num-threads="1"
+                    test-set-name="validation"
+                    evaluate-stats="true"
+                    submission-output="@{save-data-dir}/validation.txt"
+                    model-directory="@{save-data-dir}/final-models"
+                    output-directory="@{save-data-dir}"/>
+
+
+            <antcall target="process-model-conditions"/>
+            <rewrite-model-conditions input="model-conditions.txt"
+                                      output="@{save-data-dir}/model-conditions-column.txt"/>
+
+            <combine-statistics
+                    cv-statistics="@{save-data-dir}/CV.txt"
+                    cvcf-statistics="@{save-data-dir}/CVCF.txt"
+                    validation-statistics="@{save-data-dir}/validation.txt"
+                    output="@{save-data-dir}/CV_CVCF_validation.txt"
+                    model-conditions="@{save-data-dir}/model-conditions-column.txt"/>
+
+
+            <zip-results
+                    include-predictions="false"
+                    include-split-models="false"
+                    include-final-models="true"
+                    label="-final-models-and-stats"/>
+        </sequential>
+    </macrodef>
+	
+    <macrodef name="collect-statistics">
+        <attribute name="save-data-dir"/>
+        <sequential>
+            <restat results-directory="@{save-data-dir}"
+                    output="@{save-data-dir}/CV.txt"/>
+            <generate-final-models
+                    model-conditions="model-conditions.txt"
+                    results-directory="@{save-data-dir}"/>
+
+            <generate-final-models results-directory="@{save-data-dir}"
+                                   model-conditions="model-conditions.txt"
+                                   consensus-type="direct"/>
+
+            <cross-validation-consensus-features
+                    model-conditions="model-conditions.txt"
+                    results-directory="@{save-data-dir}"
+                    output="@{save-data-dir}/CVCF.txt"/>
+
+            <predict-dataset
+                    num-threads="1"
+                    test-set-name="validation"
+                    evaluate-stats="true"
+                    submission-output="@{save-data-dir}/validation.txt"
+                    model-directory="@{save-data-dir}/final-models"
+                    output-directory="@{save-data-dir}"/>
+            <predict-dataset
+                    num-threads="1"
+                    test-set-name="validation"
+                    evaluate-stats="true"
+                    submission-output="@{save-data-dir}/validation-direct-method-models.txt"
+                    model-directory="@{save-data-dir}/final-models-direct"
+                    output-directory="@{save-data-dir}"/>
+
+            <antcall target="process-model-conditions"/>
+            <rewrite-model-conditions input="model-conditions.txt"
+                                      output="@{save-data-dir}/model-conditions-column.txt"/>
+
+            <combine-statistics
+                    cv-statistics="@{save-data-dir}/CV.txt"
+                    cvcf-statistics="@{save-data-dir}/CVCF.txt"
+                    validation-statistics="@{save-data-dir}/validation.txt"
+                    output="@{save-data-dir}/CV_CVCF_validation.txt"
+                    model-conditions="@{save-data-dir}/model-conditions-column.txt"/>
+            <combine-statistics
+                    cv-statistics="@{save-data-dir}/CV.txt"
+                    cvcf-statistics="@{save-data-dir}/CVCF.txt"
+                    validation-statistics="@{save-data-dir}/validation-direct-method-models.txt"
+                    output="@{save-data-dir}/CV_CVCF_validation-direct-method-models.txt"
+                    model-conditions="@{save-data-dir}/model-conditions-column.txt"/>
+
+            <zip-results
+                    include-predictions="false"
+                    include-split-models="false"
+                    include-final-models="true"
+                    label="-final-models-and-stats"/>
+        </sequential>
+    </macrodef>
+
+    <target name="best-practices-full-pipeline" description="Run a complete pipeline"
+            depends="prepare-bdval,tag-output-directory">
+        <delete file="${statistics-output}"/>
+
+        <echo message="Executing with ${num-threads} threads"/>
+        <sequential>
+            <property name="use-feature-selection-fold=true" value="true"/>
+            <property name="use-feature-selection-fold=false" value="false"/>
+
+            <property name="do.FC+P.logitboost" value="true"/>
+            <property name="do.random-forest" value="true"/>
+            <!--property name="do.baseline-tune-C" value="true"/-->
+            <property name="do.foldchange-svmglobal" value="true"/>
+            <property name="do.minmax-svmglobal" value="false"/>
+            <property name="do.ttest-svmglobal" value="true"/>
+            <execute-all-endpoints/>
+
+            <collect-statistics
+                    save-data-dir="${save-data-dir}"/>
+        </sequential>
+    </target>
+	
+</project>
