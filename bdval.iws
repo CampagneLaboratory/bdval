@@ -2,155 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="86f1b0a3-8439-4f28-96e3-8f9acd7038fd" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/pathways/AverageAcrossPathwayFeatureAggregator.java" afterPath="$PROJECT_DIR$/src/org/bdval/pathways/AverageAcrossPathwayFeatureAggregator.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/BDVModel.java" afterPath="$PROJECT_DIR$/src/org/bdval/BDVModel.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/modelselection/BMFCalibrationModel.java" afterPath="$PROJECT_DIR$/src/org/bdval/modelselection/BMFCalibrationModel.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/signalquality/BaseSignalQualityCalculator.java" afterPath="$PROJECT_DIR$/src/org/bdval/signalquality/BaseSignalQualityCalculator.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/modelselection/CandidateModelSelection.java" afterPath="$PROJECT_DIR$/src/org/bdval/modelselection/CandidateModelSelection.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/modelselection/CandidateModelSelectionAllTeams.java" afterPath="$PROJECT_DIR$/src/org/bdval/modelselection/CandidateModelSelectionAllTeams.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/CombineDataMode.java" afterPath="$PROJECT_DIR$/src/org/bdval/CombineDataMode.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/rscripts/Combined_p_fz.R" afterPath="$PROJECT_DIR$/src/rscripts/Combined_p_fz.R" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/io/compound/CompoundDataInput.java" afterPath="$PROJECT_DIR$/src/org/bdval/io/compound/CompoundDataInput.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/io/compound/CompoundDataOutput.java" afterPath="$PROJECT_DIR$/src/org/bdval/io/compound/CompoundDataOutput.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/io/compound/CompoundDirectoryEntry.java" afterPath="$PROJECT_DIR$/src/org/bdval/io/compound/CompoundDirectoryEntry.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/io/compound/CompoundFileReader.java" afterPath="$PROJECT_DIR$/src/org/bdval/io/compound/CompoundFileReader.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/io/compound/CompoundFileTool.java" afterPath="$PROJECT_DIR$/src/org/bdval/io/compound/CompoundFileTool.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/io/compound/CompoundFileWriter.java" afterPath="$PROJECT_DIR$/src/org/bdval/io/compound/CompoundFileWriter.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/signalquality/ComputeRatioRank.java" afterPath="$PROJECT_DIR$/src/org/bdval/signalquality/ComputeRatioRank.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/ConsensusBDVModel.java" afterPath="$PROJECT_DIR$/src/org/bdval/ConsensusBDVModel.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/tools/convert/maqcii/CornellDataFormatter.java" afterPath="$PROJECT_DIR$/src/org/bdval/tools/convert/maqcii/CornellDataFormatter.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/tools/convert/maqcii/CornellToLeming.java" afterPath="$PROJECT_DIR$/src/org/bdval/tools/convert/maqcii/CornellToLeming.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/tools/convert/maqcii/CornellToLemingOptions.java" afterPath="$PROJECT_DIR$/src/org/bdval/tools/convert/maqcii/CornellToLemingOptions.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/CrossValidateConsensusFeatures.java" afterPath="$PROJECT_DIR$/src/org/bdval/CrossValidateConsensusFeatures.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/CrossValidationMode.java" afterPath="$PROJECT_DIR$/src/org/bdval/CrossValidationMode.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/modelselection/CustomRanking.java" afterPath="$PROJECT_DIR$/src/org/bdval/modelselection/CustomRanking.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/DAVMode.java" afterPath="$PROJECT_DIR$/src/org/bdval/DAVMode.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/DAVOptions.java" afterPath="$PROJECT_DIR$/src/org/bdval/DAVOptions.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/DefineSplitsMode.java" afterPath="$PROJECT_DIR$/src/org/bdval/DefineSplitsMode.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/DiscoverAndValidate.java" afterPath="$PROJECT_DIR$/src/org/bdval/DiscoverAndValidate.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/DiscoverWithCoxRegression.java" afterPath="$PROJECT_DIR$/src/org/bdval/DiscoverWithCoxRegression.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/DiscoverWithFoldChange.java" afterPath="$PROJECT_DIR$/src/org/bdval/DiscoverWithFoldChange.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/DiscoverWithGeneticAlgorithm.java" afterPath="$PROJECT_DIR$/src/org/bdval/DiscoverWithGeneticAlgorithm.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/DiscoverWithKendallTau.java" afterPath="$PROJECT_DIR$/src/org/bdval/DiscoverWithKendallTau.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/DiscoverWithMinMax.java" afterPath="$PROJECT_DIR$/src/org/bdval/DiscoverWithMinMax.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/DiscoverWithTTest.java" afterPath="$PROJECT_DIR$/src/org/bdval/DiscoverWithTTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/DistributionDifferenceByFeatureMode.java" afterPath="$PROJECT_DIR$/src/org/bdval/DistributionDifferenceByFeatureMode.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/DistributionDifferenceByModelMode.java" afterPath="$PROJECT_DIR$/src/org/bdval/DistributionDifferenceByModelMode.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/ExecuteSplitsMode.java" afterPath="$PROJECT_DIR$/src/org/bdval/ExecuteSplitsMode.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/FeatureReporting.java" afterPath="$PROJECT_DIR$/src/org/bdval/FeatureReporting.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/Gene2Probesets.java" afterPath="$PROJECT_DIR$/src/org/bdval/Gene2Probesets.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/GenerateFinalModels.java" afterPath="$PROJECT_DIR$/src/org/bdval/GenerateFinalModels.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/tools/convert/IDataFormatter.java" afterPath="$PROJECT_DIR$/src/org/bdval/tools/convert/IDataFormatter.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/rscripts/KS_test.R" afterPath="$PROJECT_DIR$/src/rscripts/KS_test.R" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/signalquality/KolmogorovSmirnovTest.java" afterPath="$PROJECT_DIR$/src/org/bdval/signalquality/KolmogorovSmirnovTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/signalquality/KolmogorovSmirnovTestResult.java" afterPath="$PROJECT_DIR$/src/org/bdval/signalquality/KolmogorovSmirnovTestResult.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/LabelSample.java" afterPath="$PROJECT_DIR$/src/org/bdval/LabelSample.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/tools/convert/maqcii/LemingCologneDataFormatter.java" afterPath="$PROJECT_DIR$/src/org/bdval/tools/convert/maqcii/LemingCologneDataFormatter.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/tools/convert/maqcii/LemingStandardDataFormatter.java" afterPath="$PROJECT_DIR$/src/org/bdval/tools/convert/maqcii/LemingStandardDataFormatter.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/MakeSyntheticDataset.java" afterPath="$PROJECT_DIR$/src/org/bdval/MakeSyntheticDataset.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/MaqciiHelper.java" afterPath="$PROJECT_DIR$/src/org/bdval/MaqciiHelper.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/modelselection/ModelSelectionArguments.java" afterPath="$PROJECT_DIR$/src/org/bdval/modelselection/ModelSelectionArguments.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/util/NormalizeClassifierParameters.java" afterPath="$PROJECT_DIR$/src/org/bdval/util/NormalizeClassifierParameters.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/OptionalModelId.java" afterPath="$PROJECT_DIR$/src/org/bdval/OptionalModelId.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/tools/convert/OptionsConfigurationException.java" afterPath="$PROJECT_DIR$/src/org/bdval/tools/convert/OptionsConfigurationException.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/tools/convert/OptionsSupport.java" afterPath="$PROJECT_DIR$/src/org/bdval/tools/convert/OptionsSupport.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/pathways/PCAFeatureAggregator.java" afterPath="$PROJECT_DIR$/src/org/bdval/pathways/PCAFeatureAggregator.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/pathways/PathwayFeatureAggregator.java" afterPath="$PROJECT_DIR$/src/org/bdval/pathways/PathwayFeatureAggregator.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/pathways/PathwayInfo.java" afterPath="$PROJECT_DIR$/src/org/bdval/pathways/PathwayInfo.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/PredictedItem.java" afterPath="$PROJECT_DIR$/src/org/bdval/PredictedItem.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/PredictedItems.java" afterPath="$PROJECT_DIR$/src/org/bdval/PredictedItems.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/tools/convert/maqcii/PredictionsToCornell.java" afterPath="$PROJECT_DIR$/src/org/bdval/tools/convert/maqcii/PredictionsToCornell.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/tools/convert/maqcii/PredictionsToCornellOptions.java" afterPath="$PROJECT_DIR$/src/org/bdval/tools/convert/maqcii/PredictionsToCornellOptions.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/modelconditions/ProcessModelConditions.java" afterPath="$PROJECT_DIR$/src/org/bdval/modelconditions/ProcessModelConditions.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/Reformat.java" afterPath="$PROJECT_DIR$/src/org/bdval/Reformat.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/util/RewriteModelConditions.java" afterPath="$PROJECT_DIR$/src/org/bdval/util/RewriteModelConditions.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/edu/cornell/med/icb/pca/RotationReaderWriter.java" afterPath="$PROJECT_DIR$/src/edu/cornell/med/icb/pca/RotationReaderWriter.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/RserveStatusMode.java" afterPath="$PROJECT_DIR$/src/org/bdval/RserveStatusMode.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/SequenceMode.java" afterPath="$PROJECT_DIR$/src/org/bdval/SequenceMode.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/util/ShortHash.java" afterPath="$PROJECT_DIR$/src/org/bdval/util/ShortHash.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/signalquality/SimpleSignalQualityCalculator.java" afterPath="$PROJECT_DIR$/src/org/bdval/signalquality/SimpleSignalQualityCalculator.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/SplitInfo.java" afterPath="$PROJECT_DIR$/src/org/bdval/SplitInfo.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/SplitPlan.java" afterPath="$PROJECT_DIR$/src/org/bdval/SplitPlan.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/StatsMAQCIIMode.java" afterPath="$PROJECT_DIR$/src/org/bdval/StatsMAQCIIMode.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/StatsMode.java" afterPath="$PROJECT_DIR$/src/org/bdval/StatsMode.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/SurvivalMeasureResult.java" afterPath="$PROJECT_DIR$/src/org/bdval/SurvivalMeasureResult.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/SurvivalMeasures.java" afterPath="$PROJECT_DIR$/src/org/bdval/SurvivalMeasures.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/cache/TableCache.java" afterPath="$PROJECT_DIR$/src/org/bdval/cache/TableCache.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-src/edu/cornell/med/icb/geo/binaryarray/TestArrayIO.java" afterPath="$PROJECT_DIR$/test-src/edu/cornell/med/icb/geo/binaryarray/TestArrayIO.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-src/org/bdval/TestBDVModel.java" afterPath="$PROJECT_DIR$/test-src/org/bdval/TestBDVModel.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-src/edu/cornell/med/icb/geo/tools/TestClassificationTask.java" afterPath="$PROJECT_DIR$/test-src/edu/cornell/med/icb/geo/tools/TestClassificationTask.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-src/org/bdval/io/compound/TestCompoundFile.java" afterPath="$PROJECT_DIR$/test-src/org/bdval/io/compound/TestCompoundFile.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-src/org/bdval/TestConsensusBDVModel.java" afterPath="$PROJECT_DIR$/test-src/org/bdval/TestConsensusBDVModel.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-src/edu/cornell/med/icb/geo/TestGEOPlatformIndexed.java" afterPath="$PROJECT_DIR$/test-src/edu/cornell/med/icb/geo/TestGEOPlatformIndexed.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-src/edu/cornell/med/icb/geo/TestIndexedIdentifier.java" afterPath="$PROJECT_DIR$/test-src/edu/cornell/med/icb/geo/TestIndexedIdentifier.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-src/org/bdval/signalquality/TestKolmogorovSmirnovTest.java" afterPath="$PROJECT_DIR$/test-src/org/bdval/signalquality/TestKolmogorovSmirnovTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-src/edu/cornell/med/icb/pca/TestPCAWithR.java" afterPath="$PROJECT_DIR$/test-src/edu/cornell/med/icb/pca/TestPCAWithR.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-src/org/bdval/util/TestShortHash.java" afterPath="$PROJECT_DIR$/test-src/org/bdval/util/TestShortHash.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-src/org/bdval/signalquality/TestSimpleSignalQualityCalculator.java" afterPath="$PROJECT_DIR$/test-src/org/bdval/signalquality/TestSimpleSignalQualityCalculator.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/TimeLoggingService.java" afterPath="$PROJECT_DIR$/src/org/bdval/TimeLoggingService.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/ToRanksMode.java" afterPath="$PROJECT_DIR$/src/org/bdval/ToRanksMode.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/TrueLabelLine.java" afterPath="$PROJECT_DIR$/src/org/bdval/TrueLabelLine.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/tools/convert/maqcii/TsvToFromMapMaqciiFactory.java" afterPath="$PROJECT_DIR$/src/org/bdval/tools/convert/maqcii/TsvToFromMapMaqciiFactory.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/tools/convert/maqcii/VerifyConversion.java" afterPath="$PROJECT_DIR$/src/org/bdval/tools/convert/maqcii/VerifyConversion.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/tools/convert/maqcii/VerifyConversionOptions.java" afterPath="$PROJECT_DIR$/src/org/bdval/tools/convert/maqcii/VerifyConversionOptions.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/WithProcessMethod.java" afterPath="$PROJECT_DIR$/src/org/bdval/WithProcessMethod.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/edu/cornell/med/icb/geo/SectionProperties.java" afterPath="$PROJECT_DIR$/src/edu/cornell/med/icb/geo/SectionProperties.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bdval.ipr" afterPath="$PROJECT_DIR$/bdval.ipr" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data/bdval.xml" afterPath="$PROJECT_DIR$/data/bdval.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/rscripts/cox_regression.R" afterPath="$PROJECT_DIR$/src/rscripts/cox_regression.R" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/rscripts/data_to_pvalue.R" afterPath="$PROJECT_DIR$/src/rscripts/data_to_pvalue.R" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/rscripts/logRank_test.R" afterPath="$PROJECT_DIR$/src/rscripts/logRank_test.R" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/io/compound/package.html" afterPath="$PROJECT_DIR$/src/org/bdval/io/compound/package.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/modelselection/package.html" afterPath="$PROJECT_DIR$/src/org/bdval/modelselection/package.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/tools/convert/package.html" afterPath="$PROJECT_DIR$/src/org/bdval/tools/convert/package.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/tools/convert/maqcii/package.html" afterPath="$PROJECT_DIR$/src/org/bdval/tools/convert/maqcii/package.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/util/package.html" afterPath="$PROJECT_DIR$/src/org/bdval/util/package.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-src/org/bdval/io/compound/package.html" afterPath="$PROJECT_DIR$/test-src/org/bdval/io/compound/package.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/rscripts/pvalue_to_quality.R" afterPath="$PROJECT_DIR$/src/rscripts/pvalue_to_quality.R" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/quality-pvalues.tsv" afterPath="$PROJECT_DIR$/test-data/quality/quality-pvalues.tsv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/rscripts/rank_features.R" afterPath="$PROJECT_DIR$/src/rscripts/rank_features.R" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/ratio.tsv" afterPath="$PROJECT_DIR$/test-data/quality/ratio.tsv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/rscripts/ratio_rank.R" afterPath="$PROJECT_DIR$/src/rscripts/ratio_rank.R" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/rscripts/test_sum_prod_local.R" afterPath="$PROJECT_DIR$/src/rscripts/test_sum_prod_local.R" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/x1.csv" afterPath="$PROJECT_DIR$/test-data/quality/x1.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/x10.csv" afterPath="$PROJECT_DIR$/test-data/quality/x10.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/x11.csv" afterPath="$PROJECT_DIR$/test-data/quality/x11.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/x12.csv" afterPath="$PROJECT_DIR$/test-data/quality/x12.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/x13.csv" afterPath="$PROJECT_DIR$/test-data/quality/x13.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/x14.csv" afterPath="$PROJECT_DIR$/test-data/quality/x14.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/x15.csv" afterPath="$PROJECT_DIR$/test-data/quality/x15.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/x16.csv" afterPath="$PROJECT_DIR$/test-data/quality/x16.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/x17.csv" afterPath="$PROJECT_DIR$/test-data/quality/x17.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/x18.csv" afterPath="$PROJECT_DIR$/test-data/quality/x18.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/x19.csv" afterPath="$PROJECT_DIR$/test-data/quality/x19.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/x2.csv" afterPath="$PROJECT_DIR$/test-data/quality/x2.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/x20.csv" afterPath="$PROJECT_DIR$/test-data/quality/x20.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/x3.csv" afterPath="$PROJECT_DIR$/test-data/quality/x3.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/x4.csv" afterPath="$PROJECT_DIR$/test-data/quality/x4.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/x5.csv" afterPath="$PROJECT_DIR$/test-data/quality/x5.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/x6.csv" afterPath="$PROJECT_DIR$/test-data/quality/x6.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/x7.csv" afterPath="$PROJECT_DIR$/test-data/quality/x7.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/x8.csv" afterPath="$PROJECT_DIR$/test-data/quality/x8.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/x9.csv" afterPath="$PROJECT_DIR$/test-data/quality/x9.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/y1.csv" afterPath="$PROJECT_DIR$/test-data/quality/y1.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/y10.csv" afterPath="$PROJECT_DIR$/test-data/quality/y10.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/y11.csv" afterPath="$PROJECT_DIR$/test-data/quality/y11.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/y12.csv" afterPath="$PROJECT_DIR$/test-data/quality/y12.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/y13.csv" afterPath="$PROJECT_DIR$/test-data/quality/y13.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/y14.csv" afterPath="$PROJECT_DIR$/test-data/quality/y14.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/y15.csv" afterPath="$PROJECT_DIR$/test-data/quality/y15.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/y16.csv" afterPath="$PROJECT_DIR$/test-data/quality/y16.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/y17.csv" afterPath="$PROJECT_DIR$/test-data/quality/y17.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/y18.csv" afterPath="$PROJECT_DIR$/test-data/quality/y18.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/y19.csv" afterPath="$PROJECT_DIR$/test-data/quality/y19.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/y2.csv" afterPath="$PROJECT_DIR$/test-data/quality/y2.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/y20.csv" afterPath="$PROJECT_DIR$/test-data/quality/y20.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/y3.csv" afterPath="$PROJECT_DIR$/test-data/quality/y3.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/y4.csv" afterPath="$PROJECT_DIR$/test-data/quality/y4.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/y5.csv" afterPath="$PROJECT_DIR$/test-data/quality/y5.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/y6.csv" afterPath="$PROJECT_DIR$/test-data/quality/y6.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/y7.csv" afterPath="$PROJECT_DIR$/test-data/quality/y7.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/y8.csv" afterPath="$PROJECT_DIR$/test-data/quality/y8.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test-data/quality/y9.csv" afterPath="$PROJECT_DIR$/test-data/quality/y9.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build.xml" afterPath="$PROJECT_DIR$/build.xml" />
     </list>
     <ignored path="bdval.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -173,11 +27,81 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="bdval.xml" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="bdval.xml" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/data/bdval.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.31990522" vertical-offset="0" max-vertical-offset="27165">
-              <caret line="18" column="0" selection-start-line="18" selection-start-column="0" selection-end-line="18" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="2025" max-vertical-offset="35460">
+              <caret line="135" column="0" selection-start-line="135" selection-start-column="0" selection-end-line="135" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="bdval-mps.xml" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/data/bdval-mps.xml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="225" max-vertical-offset="27165">
+              <caret line="45" column="16" selection-start-line="45" selection-start-column="16" selection-end-line="45" selection-end-column="16" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Map.class" pinned="false" current="false" current-in-tab="false">
+        <entry file="jar:///System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Classes/classes.jar!/java/util/Map.class">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="90" max-vertical-offset="780">
+              <caret line="6" column="17" selection-start-line="6" selection-start-column="17" selection-end-line="6" selection-end-column="17" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="SectionProperties.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/edu/cornell/med/icb/geo/SectionProperties.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.5759717" vertical-offset="64" max-vertical-offset="630">
+              <caret line="46" column="0" selection-start-line="46" selection-start-column="0" selection-end-line="46" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="MultiValueMap.class" pinned="false" current="false" current-in-tab="false">
+        <entry file="jar://$PROJECT_DIR$/lib/commons-collections-3.2.1.jar!/org/apache/commons/collections/map/MultiValueMap.class">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="-10.8" vertical-offset="75" max-vertical-offset="1230">
+              <caret line="24" column="3" selection-start-line="22" selection-start-column="3" selection-end-line="24" selection-end-column="3" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="build.xml" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/build.xml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="4125">
+              <caret line="14" column="54" selection-start-line="14" selection-start-column="54" selection-end-line="14" selection-end-column="54" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="classpath" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/classpath">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="-0.5769231" vertical-offset="0" max-vertical-offset="105">
+              <caret line="1" column="19" selection-start-line="1" selection-start-column="19" selection-end-line="1" selection-end-column="19" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="TestShortHash.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/test-src/org/bdval/util/TestShortHash.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="435" max-vertical-offset="990">
+              <caret line="29" column="22" selection-start-line="29" selection-start-column="22" selection-end-line="29" selection-end-column="22" />
               <folding />
             </state>
           </provider>
@@ -197,12 +121,16 @@
     <option name="changedFiles">
       <list>
         <option value="$PROJECT_DIR$/data/bdval.xml" />
+        <option value="$PROJECT_DIR$/classpath" />
+        <option value="$PROJECT_DIR$/lib/commons-collections-3.2.1.jar!/org/apache/commons/collections/MultiMap.class" />
+        <option value="$PROJECT_DIR$/build.xml" />
+        <option value="$PROJECT_DIR$/src/edu/cornell/med/icb/geo/SectionProperties.java" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="1" />
-    <option name="y" value="22" />
+    <option name="x" value="2" />
+    <option name="y" value="101" />
     <option name="width" value="1918" />
     <option name="height" value="1001" />
   </component>
@@ -252,6 +180,20 @@
               <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="bdval" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="bdval" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="lib" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
         </subPane>
       </pane>
     </panes>
@@ -267,6 +209,11 @@
     <property name="options.splitter.main.proportions" value="0.3" />
     <property name="options.splitter.details.proportions" value="0.2" />
     <property name="options.searchVisible" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/lib/commons-io-2.4.jar!/" />
+    <property name="project.structure.last.edited" value="Modules" />
+    <property name="project.structure.proportion" value="0.0" />
+    <property name="project.structure.side.proportion" value="0.0" />
+    <property name="LayoutCode.rearrangeEntriesJava" value="false" />
   </component>
   <component name="RunManager">
     <configuration default="true" type="#org.jetbrains.idea.devkit.run.PluginConfigurationType" factoryName="Plugin">
@@ -304,6 +251,19 @@
       <option name="PORT" value="5005" />
       <method />
     </configuration>
+    <configuration default="true" type="Applet" factoryName="Applet">
+      <module name="" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="HTML_FILE_NAME" />
+      <option name="HTML_USED" value="false" />
+      <option name="WIDTH" value="400" />
+      <option name="HEIGHT" value="300" />
+      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
+      <option name="VM_PARAMETERS" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <method />
+    </configuration>
     <configuration default="true" type="TestNG" factoryName="TestNG">
       <module name="" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
@@ -329,19 +289,6 @@
       <envs />
       <properties />
       <listeners />
-      <method />
-    </configuration>
-    <configuration default="true" type="Applet" factoryName="Applet">
-      <module name="" />
-      <option name="MAIN_CLASS_NAME" />
-      <option name="HTML_FILE_NAME" />
-      <option name="HTML_USED" value="false" />
-      <option name="WIDTH" value="400" />
-      <option name="HEIGHT" value="300" />
-      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
-      <option name="VM_PARAMETERS" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
       <method />
     </configuration>
     <configuration default="true" type="Application" factoryName="Application">
@@ -417,31 +364,32 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="1" y="22" width="1918" height="1001" extended-state="0" />
+    <frame x="2" y="101" width="1918" height="1001" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32881355" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.25" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33069083" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
   <component name="Vcs.Log.UiProperties">
@@ -576,6 +524,54 @@
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/data/bdval.xml">
       <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="35460">
+          <caret line="135" column="0" selection-start-line="135" selection-start-column="0" selection-end-line="135" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/bdval-mps.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="225" max-vertical-offset="27165">
+          <caret line="45" column="16" selection-start-line="45" selection-start-column="16" selection-end-line="45" selection-end-column="16" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar:///System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Classes/classes.jar!/java/util/Map.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="90" max-vertical-offset="780">
+          <caret line="6" column="17" selection-start-line="6" selection-start-column="17" selection-end-line="6" selection-end-column="17" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/edu/cornell/med/icb/geo/SectionProperties.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="435" max-vertical-offset="975">
+          <caret line="29" column="46" selection-start-line="29" selection-start-column="46" selection-end-line="29" selection-end-column="46" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/build.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="226" max-vertical-offset="4125">
+          <caret line="37" column="40" selection-start-line="37" selection-start-column="40" selection-end-line="37" selection-end-column="40" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test-src/org/bdval/util/TestShortHash.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="435" max-vertical-offset="990">
+          <caret line="29" column="22" selection-start-line="29" selection-start-column="22" selection-end-line="29" selection-end-column="22" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/bdval.xml">
+      <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="27165">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
@@ -584,12 +580,143 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/data/bdval.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.31990522" vertical-offset="0" max-vertical-offset="27165">
-          <caret line="18" column="0" selection-start-line="18" selection-start-column="0" selection-end-line="18" selection-end-column="0" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="35460">
+          <caret line="135" column="0" selection-start-line="135" selection-start-column="0" selection-end-line="135" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/test-src/org/bdval/util/TestShortHash.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="750">
+          <caret line="29" column="22" selection-start-line="29" selection-start-column="22" selection-end-line="29" selection-end-column="22" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar:///System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Classes/classes.jar!/java/util/Map.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="30" max-vertical-offset="765">
+          <caret line="6" column="17" selection-start-line="6" selection-start-column="17" selection-end-line="6" selection-end-column="17" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/classpath">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-0.5769231" vertical-offset="0" max-vertical-offset="105">
+          <caret line="1" column="19" selection-start-line="1" selection-start-column="19" selection-end-line="1" selection-end-column="19" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/bdval-mps.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="225" max-vertical-offset="27165">
+          <caret line="45" column="16" selection-start-line="45" selection-start-column="16" selection-end-line="45" selection-end-column="16" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/build.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="4125">
+          <caret line="14" column="54" selection-start-line="14" selection-start-column="54" selection-end-line="14" selection-end-column="54" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$PROJECT_DIR$/lib/commons-collections-3.2.1.jar!/org/apache/commons/collections/map/MultiValueMap.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-10.8" vertical-offset="75" max-vertical-offset="1230">
+          <caret line="24" column="3" selection-start-line="22" selection-start-column="3" selection-end-line="24" selection-end-column="3" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/edu/cornell/med/icb/geo/SectionProperties.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.5759717" vertical-offset="64" max-vertical-offset="630">
+          <caret line="46" column="0" selection-start-line="46" selection-start-column="0" selection-end-line="46" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+  </component>
+  <component name="masterDetails">
+    <states>
+      <state key="ArtifactsStructureConfigurable.UI">
+        <settings>
+          <artifact-editor />
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="FacetStructureConfigurable.UI">
+        <settings>
+          <last-edited>No facets are configured</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="GlobalLibrariesConfigurable.UI">
+        <settings>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="JdkListConfigurable.UI">
+        <settings>
+          <last-edited>1.6</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="ModuleStructureConfigurable.UI">
+        <settings>
+          <last-edited>bdval</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="ProjectLibrariesConfigurable.UI">
+        <settings>
+          <last-edited>Rserve</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+    </states>
   </component>
 </project>
 

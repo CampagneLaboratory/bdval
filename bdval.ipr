@@ -1,38 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="AntConfiguration">
-    <defaultAnt bundledAnt="true" />
     <buildFile url="file://$PROJECT_DIR$/build.xml">
-      <additionalClassPath />
-      <antReference projectDefault="true" />
-      <customJdkName value="" />
-      <maximumHeapSize value="128" />
       <maximumStackSize value="32" />
-      <properties />
     </buildFile>
     <buildFile url="file://$PROJECT_DIR$/data/prostate-example.xml">
-      <additionalClassPath />
-      <antReference projectDefault="true" />
-      <customJdkName value="" />
-      <maximumHeapSize value="128" />
       <maximumStackSize value="32" />
-      <properties />
     </buildFile>
     <buildFile url="file://$PROJECT_DIR$/release.xml">
-      <additionalClassPath />
-      <antReference projectDefault="true" />
-      <customJdkName value="" />
-      <maximumHeapSize value="128" />
       <maximumStackSize value="32" />
-      <properties />
     </buildFile>
     <buildFile url="file://$PROJECT_DIR$/data/maqcii-c.xml">
-      <additionalClassPath />
-      <antReference projectDefault="true" />
-      <customJdkName value="" />
-      <maximumHeapSize value="128" />
       <maximumStackSize value="32" />
-      <properties />
     </buildFile>
   </component>
   <component name="BuildJarProjectSettings">
@@ -42,7 +21,7 @@
     <option name="configuration">
       <map>
         <entry key="check-test-classes" value="true" />
-        <entry key="config-file" value="$PROJECT_DIR$/../bdval\testsupport\checkstyle\config\icb_checks.xml" />
+        <entry key="config-file" value="$USER_HOME$/bdval\testsupport\checkstyle\config\icb_checks.xml" />
         <entry key="property.checkstyle.basedir" value="$PROJECT_DIR$/testsupport\checkstyle" />
       </map>
     </option>
@@ -167,13 +146,6 @@
     <entry_points version="2.0" />
   </component>
   <component name="IdProvider" IDEtalkID="55623098D969EB9BDFE831B72B4F208A" />
-  <component name="JavacSettings">
-    <option name="DEBUGGING_INFO" value="true" />
-    <option name="GENERATE_NO_WARNINGS" value="false" />
-    <option name="DEPRECATION" value="true" />
-    <option name="ADDITIONAL_OPTIONS_STRING" value="" />
-    <option name="MAXIMUM_HEAP_SIZE" value="128" />
-  </component>
   <component name="JavadocGenerationManager">
     <option name="OUTPUT_DIRECTORY" />
     <option name="OPTION_SCOPE" value="protected" />
@@ -660,7 +632,7 @@
       </CLASSES>
       <JAVADOC />
       <SOURCES>
-        <root url="file://$PROJECT_DIR$/../RUtils/src" />
+        <root url="file://$USER_HOME$/RUtils/src" />
       </SOURCES>
       <jarDirectory url="file://$PROJECT_DIR$/lib/Rserve" recursive="false" />
     </library>
