@@ -181,6 +181,7 @@
     <macrodef name="execute-all-endpoints" description="Run do-one-splits-all for each target">
         <attribute name="define-splits-only" default="false"/>
         <sequential>
+			<echoproperties/>
             <for param="current-endpoint" delimiter=" " list="${all-endpoints}">
                 <sequential>
                     <if>
@@ -202,19 +203,6 @@
         <sequential>
             <trycatch>
                 <try>
-                    <if>
-                        <equals arg1="${do-specific-gene-lists-only}" arg2="true"/>
-
-                        <then>
-                            <!-- Will process the endpoint specific gene lists (see maqcii-b.properties) -->
-                            <var name="endpoint-specific-genelist-names" value="${@{endpoint-name}.genelists}"/>
-                        </then>
-                        <else>
-                            <!-- Will process all the gene lists. -->
-                            <var name="endpoint-specific-genelist-names"
-                                 value="Merged-ensembl-genbank-refseq"/>
-                        </else>
-                    </if>
 
                     <!-- determine if this endpoint has a floor value -->
                     <var name="floor-param" value=""/>
@@ -323,56 +311,9 @@
                     <istrue value="@{define-splits-only}"/>
                 </not>
                 <then>
-				
-                    <if>
-                        <istrue value="${do.baseline}"/>
-                        <then>
-                            <execute-splits feature-selection-fold="false"
-                                            sequence-file="baseline.sequence"
-                                            endpoint-name="@{endpoint-name}"
-                                            dataset-root="@{dataset-root}"
-                                            floor-param="@{floor-param}"
-                                            array-params="@{array-params}"/>
-                        </then>
-                    </if>
-
-				
-                    <if>
-                        <istrue value="${do.pathways-build-pathway-components}"/>
-                        <then>
-                            <execute-splits feature-selection-fold="true"
-                                            sequence-file="pathways-build-pathway-components-fs=true.sequence"
-                                            endpoint-name="@{endpoint-name}"
-                                            dataset-root="@{dataset-root}"
-                                            floor-param="@{floor-param}"
-                                            array-params="@{array-params}"
-                                            other-options="@{pathway-options} "/>
-
-                            <execute-splits feature-selection-fold="false"
-                                            sequence-file="pathways-build-pathway-components-fs=false.sequence"
-                                            endpoint-name="@{endpoint-name}"
-                                            dataset-root="@{dataset-root}"
-                                            floor-param="@{floor-param}"
-                                            array-params="@{array-params}"
-                                            other-options="@{pathway-options} "/>
-                        </then>
-                    </if>
-
-                    <if>
-                        <istrue value="${do.pathways-coxreg-svmglobal}"/>
-                        <then>
-                            <execute-splits feature-selection-fold="true"
-                                            sequence-file="pathways-coxreg-svmglobal.sequence"
-                                            endpoint-name="@{endpoint-name}"
-                                            dataset-root="@{dataset-root}"
-                                            floor-param="@{floor-param}"
-                                            array-params="@{array-params}"
-                                            other-options="@{pathway-options} --alpha ${coxreg-alpha}  --max-intermediate-features ${max-intermediate-features}"/>
-                        </then>
-                    </if>
 
 					<if>
-						<istrue value="${do.my-execute-splits}"/>
+						<istrue value="${do.mps-execute-splits}"/>
 						<then>
 							<echo message="calling call-execute-splits"/>
 							<call-execute-splits	endpoint-name="@{endpoint-name}"
@@ -770,6 +711,96 @@
         </sequential>
     </macrodef>
 
+    <macrodef name="restat">
+        <attribute name="results-directory"/>
+        <attribute name="model-conditions" default="model-conditions.txt"/>
+        <attribute name="output" default="@{results-directory}/${DSTAMP}-${TSTAMP}-restat-maqcii-submission.txt"/>
+        <attribute name="other-measures" default="bias"/>
+        <sequential>
+
+            <java classname="org.bdval.modelconditions.ProcessModelConditions" dir="${bdval.basedir}"
+                  classpathref="bdval.classpath" fork="true" failonerror="true">
+                <jvmarg value="-ea"/>
+                <jvmarg value="${memory-flag}"/>
+                <sysproperty key="log4j.debug" value="${log4j.debug}"/>
+                <sysproperty key="log4j.configuration" value="file:///${config}/log4j.properties"/>
+                <sysproperty key="RConnectionPool.configuration" value="file:///${config}/RConnectionPool.xml"/>
+                <sysproperty key="pj.nt" value="${num-threads}"/>
+                <arg value="-m"/>
+                <arg value="stats"/>
+                <arg value="--other-measures"/>
+                <arg value="@{other-measures}"/>
+                <arg value="--submission-file"/>
+                <arg value="@{output}"/>
+                <arg value="--model-conditions"/>
+                <arg value="@{model-conditions}"/>
+                <arg line="@{results-directory}"/>
+            </java>
+        </sequential>
+    </macrodef>
+
+    <target name="restat" description="Recalculate statistics for prediction table files in a given directory"
+            depends="prepare-bdval">
+
+        <input addproperty="results-directory"
+               message="Enter the results directories to restat. The directories must contain a predictions directory."/>
+        <input addproperty="model-conditions"
+               message="Enter the name of model conditions file associated with the results."
+               defaultvalue="model-conditions.txt"/>
+        <input addproperty="other-measures"
+               message="Enter the name of additional performance measures to evaluate."
+               defaultvalue="bias"/>
+
+        <echo message="Calculating statistics for results in ${results-directory}"/>
+        <restat results-directory="${results-directory}" model-conditions="${model-conditions}"
+                other-measures="${other-measures}"/>
+    </target>
+
+    <macrodef name="mps-generate-final-models">
+        <attribute name="results-directory"/>
+        <attribute name="model-conditions"/>
+        <!-- By default, generate consensus model for pathway PCA models -->
+        <attribute name="consensus-type" default="pathways:models"/>
+        <sequential>
+            <java classname="org.bdval.GenerateFinalModels" dir="${bdval.basedir}"
+                  classpathref="bdval.classpath" fork="true" failonerror="true">
+                <jvmarg value="-ea"/>
+                <jvmarg value="${memory-flag}"/>
+                <sysproperty key="log4j.debug" value="${log4j.debug}"/>
+                <sysproperty key="log4j.configuration" value="file:///${config}/log4j.properties"/>
+                <sysproperty key="RConnectionPool.configuration" value="file:///${config}/RConnectionPool.xml"/>
+                <sysproperty key="pj.nt" value="${num-threads}"/>
+                <arg value="--model-conditions"/>
+                <arg value="@{model-conditions}"/>
+                <arg value="--results-directory"/>
+                <arg value="@{results-directory}"/>
+                <arg value="--consensus"/>
+                <arg value="@{consensus-type}"/>
+                <arg value="--properties"/>
+                <arg value="${project-property-file}"/>
+            </java>
+        </sequential>
+    </macrodef>
+	
+    <target name="mps-generate-final-models"
+            description="Calculate feature consensus across multiple feature selection strategies and generate models with consensus features on the whole training set."
+            depends="prepare-bdval">
+        <delete file="${statistics-output}"/>
+        <input addproperty="model-conditions" message="Enter the model condition filename."
+               defaultvalue="model-conditions.txt"/>
+        <input addproperty="results-directory"
+               message="Enter the directory where results are stored (features subdirectory must exist in the results directory)."/>
+        <input addproperty="consensus-type" message="Enter the consensus type to use."
+               defaultvalue="pathways:models"/>
+
+        <mps-generate-final-models results-directory="${results-directory}"
+                                   model-conditions="${model-conditions}"
+								   consensus-type="${consensus-type}"/>
+
+
+    </target>
+
+	
 
 
 	<!-- Note: So far haven't used any of the code below-->
@@ -1457,52 +1488,6 @@
 
     </target>
 
-    <macrodef name="restat">
-        <attribute name="results-directory"/>
-        <attribute name="model-conditions" default="model-conditions.txt"/>
-        <attribute name="output" default="@{results-directory}/${DSTAMP}-${TSTAMP}-restat-maqcii-submission.txt"/>
-        <attribute name="other-measures" default="bias"/>
-        <sequential>
-
-            <java classname="org.bdval.modelconditions.ProcessModelConditions" dir="${bdval.basedir}"
-                  classpathref="bdval.classpath" fork="true" failonerror="true">
-                <jvmarg value="-ea"/>
-                <jvmarg value="${memory-flag}"/>
-                <sysproperty key="log4j.debug" value="${log4j.debug}"/>
-                <sysproperty key="log4j.configuration" value="file:///${config}/log4j.properties"/>
-                <sysproperty key="RConnectionPool.configuration" value="file:///${config}/RConnectionPool.xml"/>
-                <sysproperty key="pj.nt" value="${num-threads}"/>
-                <arg value="-m"/>
-                <arg value="stats"/>
-                <arg value="--other-measures"/>
-                <arg value="@{other-measures}"/>
-                <arg value="--submission-file"/>
-                <arg value="@{output}"/>
-                <arg value="--model-conditions"/>
-                <arg value="@{model-conditions}"/>
-                <arg line="@{results-directory}"/>
-            </java>
-        </sequential>
-    </macrodef>
-
-    <target name="restat" description="Recalculate statistics for prediction table files in a given directory"
-            depends="prepare-bdval">
-
-        <input addproperty="results-directory"
-               message="Enter the results directories to restat. The directories must contain a predictions directory."/>
-        <input addproperty="model-conditions"
-               message="Enter the name of model conditions file associated with the results."
-               defaultvalue="model-conditions.txt"/>
-        <input addproperty="other-measures"
-               message="Enter the name of additional performance measures to evaluate."
-               defaultvalue="bias"/>
-
-        <echo message="Calculating statistics for results in ${results-directory}"/>
-        <restat results-directory="${results-directory}" model-conditions="${model-conditions}"
-                other-measures="${other-measures}"/>
-
-
-    </target>
 
     <target name="inner-evaluate-dataset-statistics" depends="prepare-bdval,tag-output-directory"
             description="Evaluate performance statistics on a given dataset">
