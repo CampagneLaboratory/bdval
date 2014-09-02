@@ -272,7 +272,7 @@
                 <include name="${tag}/README-BDVal.txt"/>
                 <include name="${tag}/CHANGES.txt"/>
                 <include name="${tag}/VERSION.txt"/>
-                <include name="${tag}/data/bdval/**"/>
+                <include name="${tag}/data/Prostate/**"/>
                 <include name="${tag}/data/sequences/**"/>
                 <include name="${tag}/data/templates/**"/>
                 <include name="${tag}/data/bdval*.*"/>
@@ -286,7 +286,9 @@
                 <include name="${tag}/config/synthetic-local.properties"/>
                 <include name="${tag}/config/RConnectionPool.xml"/>
                 <include name="${tag}/scripts/**"/>
+                <include name="${tag}/lib/**"/>
                 <exclude name="${tag}/**/*.groovy"/>
+                <exclude name="${tag}/**/*confidential*"/>
             </fileset>
         </zip>
     </target>
