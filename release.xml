@@ -4,12 +4,16 @@
 
     <property name="label" value="release"/>
     <property file="${config}/release.properties"/>
+    <property name="use-git" value="true"/>
+
+    <!-- the default revision uses the current date and time -->
+    <property name="defaultrevision" value="master"/>
 
     <tstamp>
         <format property="exportdate" pattern="yyyyMMddHHmmss"/>
     </tstamp>
 
-	<target name="init" depends="gettag">
+	<target name="init" depends="getrevision,gettag">
 	    <property name="exportdir" value="tmp-${tag}"/>
 		<property name="releasedir" value="release-${tag}"/>
 
@@ -33,15 +37,76 @@
         <echo level="debug" message="tag is ${tag}"/>
     </target>
 
-	<target name="tag" depends="init" unless="nocopy" description="Tag the current trunk release in SVN">
+	<target name="tag-svn" depends="init" unless="use-git" description="Tag the current trunk release in SVN">
         <echo level="info" message="Tagging current directory with ${tag}"/>
     	<svn>
     		<copy message="${tag}" srcUrl="https://${svnhost}/public/svn/icb/trunk/bdval"
     			  destUrl="${tagUrl}"/>
     	</svn>
     </target>
+    <target name="getrevision" unless="revision" description="Get the SVN revision/Git branch to use for the release">
 
-    <target name="export" depends="init" unless="noexport" description="Export a tagged version of the source code">
+        <input message="Enter a revision for the build:"
+               addproperty="revision"
+               defaultvalue="${defaultrevision}"/>
+        <echo level="debug" message="revision is ${revision}"/>
+    </target>
+
+    <target name="tag" depends="tag-git,tag-svn" description="Tag the current release"/>
+
+    <target name="tag-git" if="use-git" depends="init" unless="nocopy"
+            description="Tag the current trunk release in SVN">
+        <echo level="info" message="Tagging current directory with ${tag}"/>
+        <git command="tag">
+            <args>
+                <arg value="${tag}"/>
+            </args>
+        </git>
+
+    </target>
+
+
+    <target name="export" depends="export-git,export-svn" unless="noexport"
+            description="Export a tagged version of the source code"/>
+
+    <target name="export-git" if="use-git" depends="init" unless="noexport"
+            description="Export a tagged version of the source code">
+        <available property="exportdirexists" file="${exportdir}" type="dir"/>
+        <fail if="exportdirexists" message="${basedir}/${exportdir} already exists."/>
+
+        <mkdir dir="${exportdir}/${tag}"/>
+        <echo level="info" message="Exporting using tag: ${tag}"/>
+        <!-- Now copy the modules -->
+        <copy todir="${exportdir}/${tag}/buildsupport">
+            <fileset dir="buildsupport" includes="**/*"/>
+            <fileset dir="buildsupport" excludes=".git"/>
+        </copy>
+        <copy todir="${exportdir}/${tag}/testsupport">
+            <fileset dir="testsupport" includes="**/*"/>
+            <fileset dir="testsupport" excludes=".git"/>
+        </copy>
+
+        <copy todir="${exportdir}/${tag}/src/edu/cornell/med/icb/learning">
+            <fileset dir="src/edu/cornell/med/icb/learning" includes="**/*"/>
+            <fileset dir="src/edu/cornell/med/icb/learning" excludes=".git"/>
+        </copy>
+
+        <copy todir="${exportdir}/${tag}/src/edu/cornell/med/icb/optimization">
+            <fileset dir="src/edu/cornell/med/icb/optimization" includes="**/*"/>
+            <fileset dir="src/edu/cornell/med/icb/optimization" excludes=".git"/>
+        </copy>
+        <copy todir="${exportdir}/${tag}/src/edu/cornell/med/icb/stat">
+            <fileset dir="src/edu/cornell/med/icb/stat" includes="**/*"/>
+            <fileset dir="src/edu/cornell/med/icb/stat" excludes=".git"/>
+        </copy>
+        <!-- get the tagged version from git -->
+        <git-export revision="${revision}" destinationDirectory="${exportdir}/${tag}"/>
+
+        <!-- Create a "version" file which contains the release number -->
+        <writeln file="${exportdir}/${tag}/VERSION.txt" message="${tag}" append="false"/>
+    </target>
+
+    <target name="export-svn" depends="init" unless="use-git" description="Export a tagged version of the source code from SVN">
         <available property="exportdirexists" file="${exportdir}" type="dir"/>
         <fail if="exportdirexists" message="${basedir}/${exportdir} already exists."/>
 
