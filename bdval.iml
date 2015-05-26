@@ -232,7 +232,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/libsvm-3.18.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/libsvm-3.20.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -585,4 +585,3 @@
     </option>
   </component>
 </module>
-
