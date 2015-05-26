@@ -146,6 +146,15 @@ public class BDVModel {
     }
 
     /**
+     * True  when the model is a regression model and predicted label is a continous double.
+     *
+     */
+    public boolean isRegressionModel() {
+        return helper.model.isRegression();
+    }
+
+
+    /**
      * Format types supported.
      */
     protected static enum Format {

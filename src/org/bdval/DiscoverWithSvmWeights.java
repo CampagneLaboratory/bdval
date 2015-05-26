@@ -119,7 +119,7 @@ public class DiscoverWithSvmWeights extends DAVMode {
                                     options, MicroarrayTrainEvaluate.calculateLabelValueGroups(
                                     task));
                     scaleFeatures(options, false, processedTable);
-                    final ClassificationHelper helper = getClassifier(processedTable, MicroarrayTrainEvaluate.calculateLabelValueGroups(task));
+                    final ClassificationHelper helper = getClassifier(processedTable,task);
                     final ClassificationProblem scaledProblem = helper.problem;
                     final Timer timer = new Timer();
                     timer.start();

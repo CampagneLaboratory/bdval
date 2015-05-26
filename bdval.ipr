@@ -146,13 +146,6 @@
     <entry_points version="2.0" />
   </component>
   <component name="IdProvider" IDEtalkID="55623098D969EB9BDFE831B72B4F208A" />
-  <component name="JavacSettings">
-    <option name="DEBUGGING_INFO" value="true" />
-    <option name="GENERATE_NO_WARNINGS" value="false" />
-    <option name="DEPRECATION" value="true" />
-    <option name="ADDITIONAL_OPTIONS_STRING" value="" />
-    <option name="MAXIMUM_HEAP_SIZE" value="128" />
-  </component>
   <component name="JavadocGenerationManager">
     <option name="OUTPUT_DIRECTORY" />
     <option name="OPTION_SCOPE" value="protected" />
@@ -867,4 +860,3 @@
     </option>
   </component>
 </project>
-

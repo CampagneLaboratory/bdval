@@ -1650,6 +1650,65 @@ public class DAVMode extends UseModality<DAVOptions> {
      * Obtain a classifier for training with known labels.
      *
      * @param processedTable
+     * @param task
+     * @return
+     * @throws TypeMismatchException
+     * @throws InvalidColumnException
+     */
+    protected ClassificationHelper getClassifier(final Table processedTable,
+                                                 final ClassificationTask task) throws InvalidColumnException, TypeMismatchException {
+     if (!(task instanceof RegressionTask)) {
+         return getClassifier(processedTable,MicroarrayTrainEvaluate.calculateLabelValueGroups(task));
+     } else{
+         final ClassificationHelper helper = new ClassificationHelper();
+         RegressionTask regTask= (RegressionTask) task;
+         // we need to construct a regression learner:
+         // libSVM:
+// Calculate SumOfSquares sum over all samples x.x:
+         final SumOfSquaresCalculatorRowProcessor calculator =
+                 new SumOfSquaresCalculatorRowProcessor(processedTable,
+                         davOptions.IDENTIFIER_COLUMN_NAME);
+         processedTable.processRows(calculator);
+// use the svmLight default C value, so that results are comparable:
+         final double C =
+                 processedTable.getRowNumber() / calculator.getSumOfSquares();
+         final double gamma = 1d / processedTable.getColumnNumber(); // 1/<number of features> default for libSVM
+         try {
+             final Classifier classifier = (Classifier) davOptions.classiferClass.newInstance();
+
+             final LoadRegressionProblem loader = new LoadRegressionProblem();
+             final ClassificationProblem problem = classifier.newProblem(0);
+             loader.load(problem, processedTable, "ID_REF", regTask.getLabels());
+             helper.problem = problem;
+
+             if (classifier instanceof LibSvmClassifier) {
+                 // set default value of C
+//                 classifier.getParameters().setParameter("machine=nuSVR",1);
+//                 classifier.getParameters().setParameter("machine=EPSILON_SVR",1);
+                 classifier.getParameters().setParameter("C", C);
+                 classifier.getParameters().setParameter("gamma", gamma);
+             }
+             if (davOptions.classifierParameters.length == 1 && davOptions.classifierParameters[0].length() == 0) {
+                 davOptions.classifierParameters = ArrayUtils.EMPTY_STRING_ARRAY;
+             }
+             helper.parseParameters(classifier, davOptions.classifierParameters);
+             helper.classifier = classifier;
+             helper.parameters = classifier.getParameters();
+             return helper;
+         } catch (IllegalAccessException e) {
+             LOG.error("Cannot instantiate classifier.", e);
+         } catch (InstantiationException e) {
+             LOG.error("Cannot instantiate classifier.", e);
+         }
+         assert false : "Could not instantiate classifier";
+         return null;
+
+     }
+    }
+    /**
+     * Obtain a classifier for training with known labels.
+     *
+     * @param processedTable
      * @param labelValueGroups
      * @return
      * @throws TypeMismatchException

@@ -84,7 +84,7 @@ public class Predict extends DAVMode {
     private ObjectSet<String> testSampleIds;
 
     public static final CharSequence[] MEASURES = {
-         "AUC",  "RMSE", "Accuracy", "Specificity", "Sensitivity", "MCC",
+            "AUC", "RMSE", "Accuracy", "Specificity", "Sensitivity", "MCC",
     };
 
     private final MaqciiHelper maqciiHelper = new MaqciiHelper();
@@ -370,8 +370,8 @@ public class Predict extends DAVMode {
 
             if (testSampleIds != null && filteredNumberOfSamples != testSampleIds.size()) {
                 System.err.println(String.format("Error: The number of samples must match after "
-                        + "test set filter. Filtered test set was found to contain "
-                        + "%d, but test set file %s named exactly %d samples.",
+                                + "test set filter. Filtered test set was found to contain "
+                                + "%d, but test set file %s named exactly %d samples.",
                         testSampleIds.size(), testSampleFilename, filteredNumberOfSamples));
                 System.exit(1);
             }
@@ -487,27 +487,28 @@ public class Predict extends DAVMode {
 
             final double[] probabilities = new double[2];
             double decision = model.predict(sampleIndex, probabilities);
+            if (!model.isRegressionModel()) {
+                if (decision != decision) {     //decision is not a number
+                    final double randomdecision = options.randomGenerator.nextDouble();
+                    probabilities[0] = randomdecision;
 
-            if (decision != decision) {     //decision is not a number
-                final double randomdecision = options.randomGenerator.nextDouble();
-                probabilities[0] = randomdecision;
+                    // replace NaN with a random decision centered around 0
+                    probabilities[1] = 1 - probabilities[0];
 
-                // replace NaN with a random decision centered around 0
-                probabilities[1] = 1 - probabilities[0];
-
-                if (probabilities[0] > probabilities[1]) {
-                    decision = -1;
-                } else {
-                    decision = 1;
+                    if (probabilities[0] > probabilities[1]) {
+                        decision = -1;
+                    } else {
+                        decision = 1;
+                    }
                 }
+                assert decision == 1 || decision == -1 : "decision must be binary. Assertion encountered processing model " + modelFilenamePrefix;
             }
-
-            assert decision == 1 || decision == -1 : "decision must be binary. Assertion encountered processing model " + modelFilenamePrefix;
 
             final double probability = Math.max(probabilities[0], probabilities[1]);
             final String[] symbolicClassLabel = model.getSymbolicClassLabel();
 
             if (!printStats) {
+                String labelIndex = (!model.isRegressionModel()) ? symbolicClassLabel[convertDecisionToLabelIndex(decision)] : Double.toString(decision);
                 final PredictedItem predictedItem = new PredictedItem(getSplitId(),
                         getSplitType(),
                         getRepeatId(),
@@ -515,11 +516,11 @@ public class Predict extends DAVMode {
                         sampleIndex,
                         sampleId,
                         decision,
-                        symbolicClassLabel[convertDecisionToLabelIndex(decision)],
+                        labelIndex,
                         probability,
                         convertDecisionToLabelIndex(decision) == 1 ? probability : 1 - probability,    // the model probability that the test instance belongs to class 1
                         trueLabel(sampleId), convertToNumeric(symbolicClassLabel, trueLabel(sampleId)),
-                        trueLabel(sampleId).equals(symbolicClassLabel[convertDecisionToLabelIndex(decision)]) ? "correct" : "incorrect",
+                        trueLabel(sampleId).equals(labelIndex) ? "correct" : "incorrect",
                         model.getNumberOfFeatures());
                 options.output.println(predictedItem.format());
                 options.output.flush();
@@ -550,6 +551,7 @@ public class Predict extends DAVMode {
         } else if (label.equals(symbolicClassLabel[1])) {
             return 1;
         } else {
+           if (model.isRegressionModel()) return Double.parseDouble(label);
             // if true labels were not provided, simply return NaN.
             if (sample2TrueLabelMap == null) {
                 return Double.NaN;

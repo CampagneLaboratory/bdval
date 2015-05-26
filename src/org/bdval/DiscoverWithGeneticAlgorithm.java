@@ -87,6 +87,7 @@ public class DiscoverWithGeneticAlgorithm extends DAVMode {
 
     /**
      * Define command line options for this mode.
+     *
      * @param jsap the JSAP command line parser
      * @throws JSAPException if there is a problem building the options
      */
@@ -297,9 +298,7 @@ public class DiscoverWithGeneticAlgorithm extends DAVMode {
 
                             // FIRST ITERATION
 
-                            final ClassificationHelper helper = getClassifier(processedTable,
-                                    MicroarrayTrainEvaluate.calculateLabelValueGroups(
-                                            task));
+                            final ClassificationHelper helper = getClassifier(processedTable, task);
                             final RandomEngine randomEngine = new MersenneTwister(options.randomSeed);
                             final CrossValidation CV = new CrossValidation(helper.classifier, helper.problem, randomEngine);
                             final boolean useR = optimizationRequiresR();
@@ -348,9 +347,7 @@ public class DiscoverWithGeneticAlgorithm extends DAVMode {
                                                     filterTable(options, processedTableConstant,
                                                             geneListFromSubset);
 
-                                            ClassificationHelper helper = getClassifier(filteredTable,
-                                                    MicroarrayTrainEvaluate.calculateLabelValueGroups(
-                                                            task));
+                                            ClassificationHelper helper = getClassifier(filteredTable, task);
                                             int paramIndex = 0;
                                             for (final String parameterName : getParameterNames(discreteParameters)) {
                                                 helper.parameters.setParameter(parameterName, paramValues[paramIndex++]);

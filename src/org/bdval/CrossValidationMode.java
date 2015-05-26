@@ -189,7 +189,7 @@ public class CrossValidationMode extends DAVMode {
                                           final Class<? extends FeatureScaler> scalerClass)
             throws TypeMismatchException, InvalidColumnException {
         final ClassificationHelper helper =
-                getClassifier(processedTable, MicroarrayTrainEvaluate.calculateLabelValueGroups(task));
+                getClassifier(processedTable, task);
 
         final EvaluationMeasure measure;
         final RandomEngine randomEngine = new MersenneTwister(seed);

@@ -110,6 +110,7 @@ public class WriteModel extends DAVMode {
 
     /**
      * Define command line options for this mode.
+     *
      * @param jsap the JSAP command line parser
      * @throws JSAPException if there is a problem building the options
      */
@@ -166,7 +167,7 @@ public class WriteModel extends DAVMode {
                     if (modelComponentPrefixes != null) {
                         final BDVModel consensusModel =
                                 new ConsensusBDVModel(modelFilePrefix.toString(),
-                                modelComponentPrefixes);
+                                        modelComponentPrefixes);
                         try {
                             consensusModel.load(options);  // load the juror models before save
                         } catch (ClassNotFoundException e) {
@@ -181,8 +182,7 @@ public class WriteModel extends DAVMode {
                                         MicroarrayTrainEvaluate.calculateLabelValueGroups(task));
                         scaleFeatures(options, false, processedTable);
 
-                        final ClassificationHelper helper = getClassifier(processedTable,
-                                MicroarrayTrainEvaluate.calculateLabelValueGroups(task));
+                        final ClassificationHelper helper = getClassifier(processedTable, task);
 
                         if (LOG.isDebugEnabled()) {
                             LOG.debug("Writing model for " + task + " gene list: " + geneList

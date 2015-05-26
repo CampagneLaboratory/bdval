@@ -21,7 +21,6 @@ package edu.cornell.med.icb.geo.tools;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -35,12 +34,12 @@ public class ConditionIdentifiers {
 
     public ConditionIdentifiers() {
         super();
-        conditionToIdentifiers = new Object2ObjectArrayMap<String, Set<String>> ();
+        conditionToIdentifiers = new Object2ObjectArrayMap<String, Set<String>>();
     }
 
     @Override
     public String toString() {
-        return "cids= "+conditionToIdentifiers.toString();
+        return "cids= " + conditionToIdentifiers.toString();
     }
 
     public void addIdentifier(final String condition, final String identifier) {
@@ -57,6 +56,9 @@ public class ConditionIdentifiers {
         return conditionToIdentifiers.containsKey(conditionName.intern());
     }
 
+    /**
+     * Return the set of sample identifiers included in a condition. Sample names for samples annotated with the condition.
+     */
     public Set<String> getLabelGroup(final String conditionName) {
         return conditionToIdentifiers.get(conditionName.intern());
     }
@@ -64,6 +66,7 @@ public class ConditionIdentifiers {
     /**
      * Returns the condition for the specified identifier
      * (example: can be used to retrieve the class from a sample name).
+     *
      * @param identifier the identifier to get the condition for.
      * @return the condition or null if the identifier wasn't found
      */
@@ -78,12 +81,13 @@ public class ConditionIdentifiers {
 
     /**
      * Return the number of samples represented in this cids object.
+     *
      * @return
      */
     public int size() {
-        int size=0;
-        for (Set<String> val: conditionToIdentifiers.values()) {
-            size+=val.size();
+        int size = 0;
+        for (Set<String> val : conditionToIdentifiers.values()) {
+            size += val.size();
         }
         return size;
     }

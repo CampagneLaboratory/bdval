@@ -61,6 +61,7 @@ public class DiscoverWithSvmWeightsIterative extends DiscoverWithSvmWeights {
 
     /**
      * Define command line options for this mode.
+     *
      * @param jsap the JSAP command line parser
      * @throws JSAPException if there is a problem building the options
      */
@@ -109,8 +110,7 @@ public class DiscoverWithSvmWeightsIterative extends DiscoverWithSvmWeights {
 
                         scaleFeatures(options, false, processedTable);
 
-                        final ClassificationHelper helper = getClassifier(processedTable,
-                                MicroarrayTrainEvaluate.calculateLabelValueGroups(task));
+                        final ClassificationHelper helper = getClassifier(processedTable, task);
                         final ClassificationProblem scaledProblem = helper.problem;
                         final Timer timer = new Timer();
                         timer.start();
@@ -138,7 +138,7 @@ public class DiscoverWithSvmWeightsIterative extends DiscoverWithSvmWeights {
                         while (!queue.isEmpty()) {
                             final TranscriptScore probeset = queue.dequeue();
                             final MutableString probesetId =
-                                    options.getProbesetIdentifier( probeset.transcriptIndex);
+                                    options.getProbesetIdentifier(probeset.transcriptIndex);
                             if (reducedNumProbeset <= numProbesets) {
                                 probesetsToOutput.add(probeset);
                             }

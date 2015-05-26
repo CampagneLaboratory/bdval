@@ -23,7 +23,6 @@ import cern.jet.random.engine.RandomEngine;
 import com.martiansoftware.jsap.JSAP;
 import com.martiansoftware.jsap.JSAPException;
 import edu.cornell.med.icb.geo.tools.ClassificationTask;
-import edu.cornell.med.icb.geo.tools.MicroarrayTrainEvaluate;
 import edu.cornell.med.icb.learning.ClassificationHelper;
 import edu.cornell.med.icb.learning.CrossValidation;
 import edu.cornell.med.icb.learning.FeatureScaler;
@@ -40,6 +39,7 @@ import edu.mssm.crover.tables.TypeMismatchException;
 public class LeaveOneOutMode extends CrossValidationMode {
     /**
      * Define command line options for this mode.
+     *
      * @param jsap the JSAP command line parser
      * @throws JSAPException if there is a problem building the options
      */
@@ -55,8 +55,7 @@ public class LeaveOneOutMode extends CrossValidationMode {
                                           final int crossValidationFoldNumber, final int seed,
                                           final Class<? extends FeatureScaler> scalerClass)
             throws TypeMismatchException, InvalidColumnException {
-        final ClassificationHelper helper = getClassifier(processedTable,
-                        MicroarrayTrainEvaluate.calculateLabelValueGroups(task));
+        final ClassificationHelper helper = getClassifier(processedTable, task);
         final RandomEngine randomEngine = new MersenneTwister(seed);
         final CrossValidation crossValidation =
                 new CrossValidation(helper.classifier, helper.problem, randomEngine);

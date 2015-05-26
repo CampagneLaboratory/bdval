@@ -1,0 +1,15 @@
+#ID
+#GB_LIST
+!platform_table_begin
+ID    GB_LIST
+cyl
+disp
+hp
+drat
+wt
+qsec
+vs
+am
+gear
+carb
+!platform_table_end

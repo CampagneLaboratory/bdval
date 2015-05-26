@@ -65,20 +65,18 @@ public class ClassificationTask {
             throw new IllegalArgumentException(
                     "condition name " + getFirstConditionName() + " must be defined.");
         }
-        if (numberOfClasses==2 &&!conditionsIdentifiers.conditionExists(getSecondConditionName())) {
+        if (numberOfClasses == 2 && !conditionsIdentifiers.conditionExists(getSecondConditionName())) {
             throw new IllegalArgumentException(
                     "condition name " + getSecondConditionName() + " must be defined.");
         }
 
     }
+
     int numberOfClasses;
 
     public static ClassificationTask[] parseTaskAndConditions(final Reader taskListReader,
                                                               final Reader conditionIdsReader) {
-        final ConditionIdentifiers conditionIdentifiers = readConditions(conditionIdsReader);
-        if (conditionIdentifiers == null) {
-            throw new IllegalStateException("conditionIndentifier must not be null");
-        }
+        ConditionIdentifiers conditionIdentifiers = null;
         String line;
 
         // read tasks:
@@ -106,8 +104,9 @@ public class ClassificationTask {
                     numberOfClasses = (tokens.length - 2) / 2;
                     task = parseNewTaskFormat(tokens, experimentNameIndex, numberOfClasses);
                 } else if ("regression".equals(tokens[0])) {
-                    //   System.err.println("Error parsing task file: Keyword regression is reserved for future use, but not yet supported.");
-                    throw new UnsupportedOperationException("Error parsing task file: Keyword regression is reserved for future use, but not yet supported.");
+                    String experimentName = tokens[1];
+                    task = new RegressionTask(experimentName);
+                    conditionIdentifiers = RegressionLabels.readLabels(conditionIdsReader);
                 } else {
                     // parse legacy format:
                     experimentNameIndex = 0;
@@ -122,9 +121,11 @@ public class ClassificationTask {
                     task.setConditionName(1, tokens[2]);
                     task.setConditionInstanceNumber(0, Integer.parseInt(tokens[3]));
                     task.setConditionInstanceNumber(1, Integer.parseInt(tokens[4]));
-                    task.numberOfClasses=numberOfClasses;
+                    task.numberOfClasses = numberOfClasses;
                 }
-
+                if (conditionIdentifiers == null) {
+                    conditionIdentifiers = readConditions(conditionIdsReader);
+                }
                 task.setConditionsIdentifiers(conditionIdentifiers);
                 tasks.add(task);
 
@@ -191,7 +192,7 @@ public class ClassificationTask {
         public int numberOfInstances;
     }
 
-    private ConditionIdentifiers conditionsIdentifiers;
+    protected ConditionIdentifiers conditionsIdentifiers;
 
     public String getExperimentDataFilename() {
         return experimentDataFilename;
@@ -216,6 +217,7 @@ public class ClassificationTask {
 
     /**
      * Return an array of all condition names (classes).
+     *
      * @return the condition names.
      */
     public String[] getConditionNames() {
