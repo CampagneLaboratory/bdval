@@ -551,16 +551,22 @@ public class Predict extends DAVMode {
         } else if (label.equals(symbolicClassLabel[1])) {
             return 1;
         } else {
-           if (model.isRegressionModel()) return Double.parseDouble(label);
-            // if true labels were not provided, simply return NaN.
-            if (sample2TrueLabelMap == null) {
-                return Double.NaN;
+            if (model.isRegressionModel()) {
+                try {
+                    return Double.parseDouble(label);
+                } catch (NumberFormatException e) {
+                    return 0;
+                }
             }
-            LOG.fatal("Label is not recognized: " + label);
-            System.exit(10);
-            return -1;
+                // if true labels were not provided, simply return NaN.
+                if (sample2TrueLabelMap == null) {
+                    return Double.NaN;
+                }
+                LOG.fatal("Label is not recognized: " + label);
+                System.exit(10);
+                return -1;
+            }
         }
-    }
 
     protected String trueLabel(final String sampleId) {
         final String label = sample2TrueLabelMap == null ? "unknown" : sample2TrueLabelMap.get(sampleId.intern());
