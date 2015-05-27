@@ -90,6 +90,9 @@ public class ClassificationTask {
                     continue;
                 }
                 final String[] tokens = line.split("[\t]");
+                if (tokens.length<2) {
+                    System.err.println("Suspiscious task line, expecting tab-delimited content: "+line);
+                }
                 final ClassificationTask task;
                 final int experimentNameIndex;
                 final int numberOfClasses;
