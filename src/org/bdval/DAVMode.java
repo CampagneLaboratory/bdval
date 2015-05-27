@@ -205,15 +205,15 @@ public class DAVMode extends UseModality<DAVOptions> {
                 .setShortFlag('g')
                 .setLongFlag("gene-lists")
                 .setHelp("Name of the file that describes the gene lists. "
-                        + "This file is tab delimited, with one line per gene list. "
-                        + "First column is the name of the gene list. "
-                        + "Second column (optional) is the name of the file which describes "
-                        + "the gene list. "
-                        + "If the file has only one column, the name of the gene list must be "
-                        + "full (for the full array). If the name of the gene "
-                        + "list is random, the second field indicates how many random probesets "
-                        + "must be selected, and a third field indicates the random seed to use "
-                        + "for probeset selection."
+                                + "This file is tab delimited, with one line per gene list. "
+                                + "First column is the name of the gene list. "
+                                + "Second column (optional) is the name of the file which describes "
+                                + "the gene list. "
+                                + "If the file has only one column, the name of the gene list must be "
+                                + "full (for the full array). If the name of the gene "
+                                + "list is random, the second field indicates how many random probesets "
+                                + "must be selected, and a third field indicates the random seed to use "
+                                + "for probeset selection."
                 );
         jsap.registerParameter(geneListsFlag);
 
@@ -259,16 +259,16 @@ public class DAVMode extends UseModality<DAVOptions> {
                 .setRequired(false)
                 .setLongFlag("pathways")
                 .setHelp("Filename of the pathway description information. "
-                        + "The pathway description information is a file with one line per "
-                        + "pathway. Each line has two tab delimited field. The first field provides a "
-                        + "pathway identifier. The second field is space delimited. Each token of the " +
-                        " second field is an "
-                        + "(Ensembl) gene ids for gene that belong to the pathway. "
-                        + "When this option is provided, features are aggregated by pathway "
-                        + "and computations are performed in aggregated feature space. "
-                        + "Some aggregation algorithms may generate several aggregated "
-                        + "features per pathway. When this option is active, the "
-                        + "option --gene2probes must be provided on the command line."
+                                + "The pathway description information is a file with one line per "
+                                + "pathway. Each line has two tab delimited field. The first field provides a "
+                                + "pathway identifier. The second field is space delimited. Each token of the " +
+                                " second field is an "
+                                + "(Ensembl) gene ids for gene that belong to the pathway. "
+                                + "When this option is provided, features are aggregated by pathway "
+                                + "and computations are performed in aggregated feature space. "
+                                + "Some aggregation algorithms may generate several aggregated "
+                                + "features per pathway. When this option is active, the "
+                                + "option --gene2probes must be provided on the command line."
                 );
         jsap.registerParameter(pathways);
 
@@ -942,35 +942,7 @@ public class DAVMode extends UseModality<DAVOptions> {
                                                  final SplitPlan splitPlan,
                                                  final int splitId,
                                                  final String splitType) {
-        ConditionIdentifiers conditionsIdentifiers = task.getConditionsIdentifiers();
-        final Set<String> samplesForClass0 =
-                conditionsIdentifiers.getLabelGroup(task.getFirstConditionName());
-
-        ObjectSet<String> splitPlanSamples = splitPlan.getSampleIds(splitId, splitType);
-        samplesForClass0.retainAll(splitPlanSamples);
-        if (samplesForClass0.size() == 0) {
-            throw new IllegalArgumentException("Condition 0 (" + task.getFirstConditionName()
-                    + ") must have some samples.");
-        }
-        final ConditionIdentifiers cids = new ConditionIdentifiers();
-        for (final String negativeSample : samplesForClass0) {
-            cids.addIdentifier(task.getFirstConditionName().intern(), negativeSample);
-        }
-
-        final Set<String> samplesForClass1 = conditionsIdentifiers.getLabelGroup(task.getSecondConditionName());
-        samplesForClass1.retainAll(splitPlanSamples);
-        if (samplesForClass1.size() == 0) {
-            throw new IllegalArgumentException("Condition 1 (" + task.getSecondConditionName()
-                    + ") must have some samples.");
-        }
-
-        for (final String positiveSample : samplesForClass1) {
-            cids.addIdentifier(task.getSecondConditionName().intern(), positiveSample);
-        }
-        task.setConditionsIdentifiers(cids);
-        task.setNumberSamplesFirstCondition(samplesForClass0.size());
-        task.setNumberSamplesSecondCondition(samplesForClass1.size());
-        return task;
+        return task.filterBySplitPlan(splitPlan, splitId, splitType);
     }
 
     public static String makeStatsFileFromGeneListsFile(final GeneList[] geneLists, final String defaultVal) {
@@ -1657,54 +1629,55 @@ public class DAVMode extends UseModality<DAVOptions> {
      */
     protected ClassificationHelper getClassifier(final Table processedTable,
                                                  final ClassificationTask task) throws InvalidColumnException, TypeMismatchException {
-     if (!(task instanceof RegressionTask)) {
-         return getClassifier(processedTable,MicroarrayTrainEvaluate.calculateLabelValueGroups(task));
-     } else{
-         final ClassificationHelper helper = new ClassificationHelper();
-         RegressionTask regTask= (RegressionTask) task;
-         // we need to construct a regression learner:
-         // libSVM:
+        if (!(task instanceof RegressionTask)) {
+            return getClassifier(processedTable, MicroarrayTrainEvaluate.calculateLabelValueGroups(task));
+        } else {
+            final ClassificationHelper helper = new ClassificationHelper();
+            RegressionTask regTask = (RegressionTask) task;
+            // we need to construct a regression learner:
+            // libSVM:
 // Calculate SumOfSquares sum over all samples x.x:
-         final SumOfSquaresCalculatorRowProcessor calculator =
-                 new SumOfSquaresCalculatorRowProcessor(processedTable,
-                         davOptions.IDENTIFIER_COLUMN_NAME);
-         processedTable.processRows(calculator);
+            final SumOfSquaresCalculatorRowProcessor calculator =
+                    new SumOfSquaresCalculatorRowProcessor(processedTable,
+                            davOptions.IDENTIFIER_COLUMN_NAME);
+            processedTable.processRows(calculator);
 // use the svmLight default C value, so that results are comparable:
-         final double C =
-                 processedTable.getRowNumber() / calculator.getSumOfSquares();
-         final double gamma = 1d / processedTable.getColumnNumber(); // 1/<number of features> default for libSVM
-         try {
-             final Classifier classifier = (Classifier) davOptions.classiferClass.newInstance();
+            final double C =
+                    processedTable.getRowNumber() / calculator.getSumOfSquares();
+            final double gamma = 1d / processedTable.getColumnNumber(); // 1/<number of features> default for libSVM
+            try {
+                final Classifier classifier = (Classifier) davOptions.classiferClass.newInstance();
 
-             final LoadRegressionProblem loader = new LoadRegressionProblem();
-             final ClassificationProblem problem = classifier.newProblem(0);
-             loader.load(problem, processedTable, "ID_REF", regTask.getLabels());
-             helper.problem = problem;
+                final LoadRegressionProblem loader = new LoadRegressionProblem();
+                final ClassificationProblem problem = classifier.newProblem(0);
+                loader.load(problem, processedTable, "ID_REF", regTask.getLabels());
+                helper.problem = problem;
 
-             if (classifier instanceof LibSvmClassifier) {
-                 // set default value of C
+                if (classifier instanceof LibSvmClassifier) {
+                    // set default value of C
 //                 classifier.getParameters().setParameter("machine=nuSVR",1);
 //                 classifier.getParameters().setParameter("machine=EPSILON_SVR",1);
-                 classifier.getParameters().setParameter("C", C);
-                 classifier.getParameters().setParameter("gamma", gamma);
-             }
-             if (davOptions.classifierParameters.length == 1 && davOptions.classifierParameters[0].length() == 0) {
-                 davOptions.classifierParameters = ArrayUtils.EMPTY_STRING_ARRAY;
-             }
-             helper.parseParameters(classifier, davOptions.classifierParameters);
-             helper.classifier = classifier;
-             helper.parameters = classifier.getParameters();
-             return helper;
-         } catch (IllegalAccessException e) {
-             LOG.error("Cannot instantiate classifier.", e);
-         } catch (InstantiationException e) {
-             LOG.error("Cannot instantiate classifier.", e);
-         }
-         assert false : "Could not instantiate classifier";
-         return null;
+                    classifier.getParameters().setParameter("C", C);
+                    classifier.getParameters().setParameter("gamma", gamma);
+                }
+                if (davOptions.classifierParameters.length == 1 && davOptions.classifierParameters[0].length() == 0) {
+                    davOptions.classifierParameters = ArrayUtils.EMPTY_STRING_ARRAY;
+                }
+                helper.parseParameters(classifier, davOptions.classifierParameters);
+                helper.classifier = classifier;
+                helper.parameters = classifier.getParameters();
+                return helper;
+            } catch (IllegalAccessException e) {
+                LOG.error("Cannot instantiate classifier.", e);
+            } catch (InstantiationException e) {
+                LOG.error("Cannot instantiate classifier.", e);
+            }
+            assert false : "Could not instantiate classifier";
+            return null;
 
-     }
+        }
     }
+
     /**
      * Obtain a classifier for training with known labels.
      *

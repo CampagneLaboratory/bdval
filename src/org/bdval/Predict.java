@@ -541,6 +541,10 @@ public class Predict extends DAVMode {
 
 
     private double convertToNumeric(final String[] symbolicClassLabel, final String label) {
+
+        if ("unknown".equals(label)) {
+            return Double.NaN;
+        }
         if (LOG.isTraceEnabled()) {
             LOG.trace("Converting Symbolic: " + ArrayUtils.toString(symbolicClassLabel)
                     + " Label: " + label);
@@ -558,15 +562,15 @@ public class Predict extends DAVMode {
                     return 0;
                 }
             }
-                // if true labels were not provided, simply return NaN.
-                if (sample2TrueLabelMap == null) {
-                    return Double.NaN;
-                }
-                LOG.fatal("Label is not recognized: " + label);
-                System.exit(10);
-                return -1;
+            // if true labels were not provided, simply return NaN.
+            if (sample2TrueLabelMap == null) {
+                return Double.NaN;
             }
+            LOG.fatal("Label is not recognized: " + label);
+            System.exit(10);
+            return -1;
         }
+    }
 
     protected String trueLabel(final String sampleId) {
         final String label = sample2TrueLabelMap == null ? "unknown" : sample2TrueLabelMap.get(sampleId.intern());

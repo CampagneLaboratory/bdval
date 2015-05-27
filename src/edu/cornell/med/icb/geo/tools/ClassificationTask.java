@@ -18,9 +18,11 @@
 
 package edu.cornell.med.icb.geo.tools;
 
+import it.unimi.dsi.fastutil.objects.ObjectSet;
 import it.unimi.dsi.lang.MutableString;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.bdval.SplitPlan;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -358,5 +360,38 @@ public class ClassificationTask {
             labelValueGroups.add(labelGroup);
         }
         return labelValueGroups;
+    }
+
+    public ClassificationTask filterBySplitPlan(SplitPlan splitPlan, int splitId, String splitType) {
+        ClassificationTask task=new ClassificationTask();
+        ConditionIdentifiers conditionsIdentifiers = task.getConditionsIdentifiers();
+        final Set<String> samplesForClass0 =
+                conditionsIdentifiers.getLabelGroup(task.getFirstConditionName());
+
+        ObjectSet<String> splitPlanSamples = splitPlan.getSampleIds(splitId, splitType);
+        samplesForClass0.retainAll(splitPlanSamples);
+        if (samplesForClass0.size() == 0) {
+            throw new IllegalArgumentException("Condition 0 (" + task.getFirstConditionName()
+                    + ") must have some samples.");
+        }
+        final ConditionIdentifiers cids = new ConditionIdentifiers();
+        for (final String negativeSample : samplesForClass0) {
+            cids.addIdentifier(task.getFirstConditionName().intern(), negativeSample);
+        }
+
+        final Set<String> samplesForClass1 = conditionsIdentifiers.getLabelGroup(task.getSecondConditionName());
+        samplesForClass1.retainAll(splitPlanSamples);
+        if (samplesForClass1.size() == 0) {
+            throw new IllegalArgumentException("Condition 1 (" + task.getSecondConditionName()
+                    + ") must have some samples.");
+        }
+
+        for (final String positiveSample : samplesForClass1) {
+            cids.addIdentifier(task.getSecondConditionName().intern(), positiveSample);
+        }
+        task.setConditionsIdentifiers(cids);
+        task.setNumberSamplesFirstCondition(samplesForClass0.size());
+        task.setNumberSamplesSecondCondition(samplesForClass1.size());
+        return task;
     }
 }
