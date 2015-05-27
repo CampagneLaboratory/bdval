@@ -310,7 +310,7 @@ public class DiscoverWithGeneticAlgorithm extends DAVMode {
                                 CV.evaluateMeasure(optimizeMeasureName);
                             }
                             //            CV.setScalerClass(PercentileScalingRowProcessor.class);
-                            evalMeasure = CV.crossValidation(foldNumber);
+                            evalMeasure = CV.crossValidation(foldNumber,false);
 
                             System.out.println("Initial " + getPerformanceMeasureName() + " measure: " + getOptimizationMeasure(evalMeasure));
                             numKept = options.trainingPlatform.getProbeIds().size();
@@ -364,7 +364,7 @@ public class DiscoverWithGeneticAlgorithm extends DAVMode {
                                             CV.setScalerClass(options.scalerClass);
                                             CV.evaluateMeasure(optimizeMeasureName);
 
-                                            final EvaluationMeasure eMeasure = CV.crossValidation(foldNumber);
+                                            final EvaluationMeasure eMeasure = CV.crossValidation(foldNumber,false);
 
                                             geneListFromSubset = null;
                                             filteredTable = null;

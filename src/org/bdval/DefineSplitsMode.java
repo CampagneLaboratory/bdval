@@ -18,20 +18,13 @@
 
 package org.bdval;
 
-import com.martiansoftware.jsap.FlaggedOption;
-import com.martiansoftware.jsap.JSAP;
-import com.martiansoftware.jsap.JSAPException;
-import com.martiansoftware.jsap.JSAPResult;
-import com.martiansoftware.jsap.Parameter;
+import com.martiansoftware.jsap.*;
 import edu.cornell.med.icb.geo.tools.ClassificationTask;
 import edu.cornell.med.icb.util.RandomAdapter;
 import it.unimi.dsi.fastutil.doubles.DoubleArraySet;
 import it.unimi.dsi.fastutil.doubles.DoubleSet;
-import it.unimi.dsi.fastutil.ints.IntArrayList;
-import it.unimi.dsi.fastutil.ints.IntArraySet;
-import it.unimi.dsi.fastutil.ints.IntList;
-import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
-import it.unimi.dsi.fastutil.ints.IntSet;
+import it.unimi.dsi.fastutil.ints.*;
+import it.unimi.dsi.fastutil.objects.ObjectAVLTreeSet;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import org.apache.commons.logging.Log;
@@ -39,9 +32,7 @@ import org.apache.commons.logging.LogFactory;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.Collections;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Partition a training set into various splits for training and testing. A typical split design is cross-validation,
@@ -166,9 +157,11 @@ public class DefineSplitsMode extends DAVMode {
         final Set<String> sampleIdsClass0 = task.getConditionsIdentifiers().getLabelGroup(task.getFirstConditionName());
         final Set<String> sampleIdsClass1 = task.getConditionsIdentifiers().getLabelGroup(task.getSecondConditionName());
 
-        final ObjectList<String> allSampleIds = new ObjectArrayList<String>();
+        final SortedSet<String> allSampleIds = new ObjectAVLTreeSet<String>();
         allSampleIds.addAll(sampleIdsClass0);
         allSampleIds.addAll(sampleIdsClass1);
+        final ObjectList<String> allSampleIdsList=new ObjectArrayList<String>();
+        allSampleIdsList.addAll(allSampleIds);
         options.output.println(String.format("# split-id\t repeat-id\tfold-id\tsplit-type\tsample-id\tsample-index\tsample-class-label\tsampleIndex "));
         final int numberOfSamples = allSampleIds.size();
         int splitIndex = 1;
@@ -177,7 +170,7 @@ public class DefineSplitsMode extends DAVMode {
             assert k <= numberOfSamples : "Number of folds must be less or equal to number of training examples.";
 
             final int[] foldIndices = assignFolds(options.crossValidationFoldNumber, numberOfSamples, randomAdapter,
-                    sampleIdsClass1, allSampleIds);
+                    sampleIdsClass1, allSampleIdsList);
             for (int f = 0; f < k; ++f) { // use each fold as test set while the others are the training set:
                 final IntSet trainingSet = new IntArraySet();
                 final IntSet testSet = new IntArraySet();
@@ -206,19 +199,19 @@ public class DefineSplitsMode extends DAVMode {
                 if (createFeatureSelectionFold) {
                     for (final int sampleIndex : featureSelectionSet) {
                         options.output.println(String.format("%d\t%d\t%d\t%s\t%s\t%f\t%d",
-                                splitIndex, r + 1, f + 1, "feature-selection", allSampleIds.get(sampleIndex),
-                                getLabel(sampleIndex, sampleIdsClass1, allSampleIds), sampleIndex));
+                                splitIndex, r + 1, f + 1, "feature-selection", allSampleIdsList.get(sampleIndex),
+                                getLabel(sampleIndex, sampleIdsClass1, allSampleIdsList), sampleIndex));
                     }
                 }
                 for (final int sampleIndex : trainingSet) {
                     options.output.println(String.format("%d\t%d\t%d\t%s\t%s\t%f\t%d",
-                            splitIndex, r + 1, f + 1, "training", allSampleIds.get(sampleIndex),
-                            getLabel(sampleIndex, sampleIdsClass1, allSampleIds), sampleIndex));
+                            splitIndex, r + 1, f + 1, "training", allSampleIdsList.get(sampleIndex),
+                            getLabel(sampleIndex, sampleIdsClass1, allSampleIdsList), sampleIndex));
                 }
                 for (final int sampleIndex : testSet) {
                     options.output.println(String.format("%d\t%d\t%d\t%s\t%s\t%f\t%d",
-                            splitIndex, r + 1, f + 1, "test", allSampleIds.get(sampleIndex),
-                            getLabel(sampleIndex, sampleIdsClass1, allSampleIds), sampleIndex));
+                            splitIndex, r + 1, f + 1, "test", allSampleIdsList.get(sampleIndex),
+                            getLabel(sampleIndex, sampleIdsClass1, allSampleIdsList), sampleIndex));
                 }
                 splitIndex++;
             }

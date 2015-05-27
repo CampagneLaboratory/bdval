@@ -182,8 +182,8 @@ public class RestatMode extends ProcessModelConditionsMode {
 
     private ArrayList<String> extractSeriesModelIds
             (final ProcessModelConditionsOptions
-                    options, final String
-                    seriesID) {
+                     options, final String
+                     seriesID) {
         if (seriesID == null) {
             return new ArrayList<String>();
         }
@@ -222,16 +222,16 @@ public class RestatMode extends ProcessModelConditionsMode {
                 }
                 for (int foldIndex = 0; foldIndex < numberOfFolds; foldIndex++) {
 
-                try{
-                    assert modelAccuracies != null : "model accurary must have been loaded for model id " + modelId;
-                    final double errorOfThisModel = (1.0d - (modelAccuracies[index] / 100d));
-                    final double thetaHatFoldK = (1.0d - (foldMins.get(seriesID)[index] / 100d));
-                    bias += (errorOfThisModel - thetaHatFoldK);
-                    ++index;
+                    try {
+                        assert modelAccuracies != null : "model accurary must have been loaded for model id " + modelId;
+                        final double errorOfThisModel = (1.0d - (modelAccuracies[index] / 100d));
+                        final double thetaHatFoldK = (1.0d - (foldMins.get(seriesID)[index] / 100d));
+                        bias += (errorOfThisModel - thetaHatFoldK);
+                        ++index;
 
-                    LOG.debug("bias total " + bias);
-                } catch(IndexOutOfBoundsException e){
-                       LOG.info("Error in number of model accuracies assessed ", e);
+                        LOG.debug("bias total " + bias);
+                    } catch (IndexOutOfBoundsException e) {
+                        LOG.info("Error in number of model accuracies assessed ", e);
                         //System.exit(10);
                     }
                 }
@@ -345,7 +345,7 @@ public class RestatMode extends ProcessModelConditionsMode {
                     }
                     final EvaluationMeasure allSplitsInARepeatMeasure =
                             CrossValidation.testSetEvaluation(decisions.toDoubleArray(),
-                                    trueLabels.toDoubleArray(), evaluationMeasureNames, true);
+                                    trueLabels.toDoubleArray(), evaluationMeasureNames, true, predictions.isRegressionModel());
 
                     if (survivalFileName != null) {
                         try {
@@ -393,7 +393,7 @@ public class RestatMode extends ProcessModelConditionsMode {
                     }
                     final EvaluationMeasure allSplitsInARepeatMeasure =
                             CrossValidation.testSetEvaluation(decisions.toDoubleArray(),
-                                    trueLabels.toDoubleArray(), evaluationMeasureNames, true);
+                                    trueLabels.toDoubleArray(), evaluationMeasureNames, true,predictions.isRegressionModel());
                     modelAcc.add(allSplitsInARepeatMeasure.getAccuracy());
 
                 }
@@ -410,6 +410,7 @@ public class RestatMode extends ProcessModelConditionsMode {
             final int numberOfRepeats,
             final ObjectSet<CharSequence> evaluationMeasureNames,
             final EvaluationMeasure repeatedEvaluationMeasure) {
+
         for (int repeatId = 1; repeatId <= numberOfRepeats; repeatId++) {
             if (predictions.containsRepeat(repeatId)) {
                 final DoubleList decisions = new DoubleArrayList();
@@ -421,7 +422,7 @@ public class RestatMode extends ProcessModelConditionsMode {
                 sampleIDs.addAll(predictions.getSampleIDsForRepeat(repeatId));
                 final EvaluationMeasure allSplitsInARepeatMeasure =
                         CrossValidation.testSetEvaluation(decisions.toDoubleArray(),
-                                trueLabels.toDoubleArray(), evaluationMeasureNames, true);
+                                trueLabels.toDoubleArray(), evaluationMeasureNames, true, predictions.isRegressionModel());
 
                 if (survivalFileName != null) {
                     try {

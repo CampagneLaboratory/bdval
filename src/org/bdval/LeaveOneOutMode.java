@@ -59,6 +59,6 @@ public class LeaveOneOutMode extends CrossValidationMode {
         final RandomEngine randomEngine = new MersenneTwister(seed);
         final CrossValidation crossValidation =
                 new CrossValidation(helper.classifier, helper.problem, randomEngine);
-        return crossValidation.leaveOneOutEvaluation();
+        return crossValidation.leaveOneOutEvaluation(task.isRegression());
     }
 }

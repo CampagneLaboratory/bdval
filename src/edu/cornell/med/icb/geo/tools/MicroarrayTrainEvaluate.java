@@ -566,7 +566,7 @@ public class MicroarrayTrainEvaluate {
 
             //     TextIO.storeDoubles(weights, new PrintStream("BR-full-weights-libSvm.txt"));
 
-            measure = libSVMWriter.leaveOneOutEvaluation();
+            measure = libSVMWriter.leaveOneOutEvaluation(false);
 
 
         }
@@ -586,7 +586,7 @@ public class MicroarrayTrainEvaluate {
                 } else {
                     libSVMWriter.shuffleLabels();
                     transposed.processRows(libSVMWriter);
-                    shuffleMeasure = libSVMWriter.leaveOneOutEvaluation();
+                    shuffleMeasure = libSVMWriter.leaveOneOutEvaluation(false);
                 }
                 if (shuffleMeasure.getAccuracy() >= measure.getAccuracy()) {
                     countShuffleGE++;

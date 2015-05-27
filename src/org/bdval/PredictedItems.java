@@ -39,9 +39,16 @@ public class PredictedItems extends ObjectArrayList<PredictedItem> {
     private int numberOfRepeats;
     private int numberOfFolds;
 
+    public boolean isRegressionModel() {
+        return isRegressionModel;
+    }
+
+    private boolean isRegressionModel;
+
     public void load(final String filename) throws IOException {
         final TSVReader reader = new TSVReader(new FileReader(filename));
         predictions = new ObjectArrayList<PredictedItem>();
+        isRegressionModel=true;
         while (reader.hasNext()) {
             if (reader.isCommentLine() || reader.isEmptyLine()) {
                 reader.skip();
@@ -63,8 +70,19 @@ public class PredictedItems extends ObjectArrayList<PredictedItem> {
                 item.trueLabel = reader.getString();
                 item.numericTrueLabel = reader.getDouble();
                 item.predictionCorrectIncorrect = reader.getString();
+                boolean canParse=false;
+                try{
+                    double v=Double.parseDouble(item.predictionCorrectIncorrect);
+                    item.delta=v;
+                    canParse=true;
+                }catch (NumberFormatException e) {
+                    canParse=false;
+                    isRegressionModel=false;
+                }
+                isRegressionModel&=canParse;
                 item.modelNumFeatures = reader.getInt();
                 predictions.add(item);
+
             }
         }
 

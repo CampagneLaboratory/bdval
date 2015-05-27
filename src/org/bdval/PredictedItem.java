@@ -90,6 +90,10 @@ public class PredictedItem {
      * The number of features in the model.
      */
     public int modelNumFeatures;
+    /**
+     * Difference between the true label and the value predicted.
+     */
+    public double delta;
 
     public PredictedItem() {
         super();

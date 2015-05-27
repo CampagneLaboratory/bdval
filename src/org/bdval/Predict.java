@@ -407,7 +407,7 @@ public class Predict extends DAVMode {
                     CrossValidation.evaluate(decisionList, trueLabelList, evaluationMeasureNames, measure, "", true);
                 } else {
                     measure = CrossValidation.testSetEvaluation(decisions.toDoubleArray(),
-                            trueLabels.toDoubleArray(), evaluationMeasureNames, true);
+                            trueLabels.toDoubleArray(), evaluationMeasureNames, true, model.isRegressionModel());
                 }
                 final ClassificationTask task = new ClassificationTask();
                 task.setExperimentDataFilename(modelFilenamePrefixNoPath);
@@ -520,7 +520,7 @@ public class Predict extends DAVMode {
                         probability,
                         convertDecisionToLabelIndex(decision) == 1 ? probability : 1 - probability,    // the model probability that the test instance belongs to class 1
                         trueLabel(sampleId), convertToNumeric(symbolicClassLabel, trueLabel(sampleId)),
-                        trueLabel(sampleId).equals(labelIndex) ? "correct" : "incorrect",
+                        getPredictionCorrectIncorrect(model, sampleId, labelIndex, decision, trueLabel(sampleId)),
                         model.getNumberOfFeatures());
                 options.output.println(predictedItem.format());
                 options.output.flush();
@@ -530,6 +530,15 @@ public class Predict extends DAVMode {
                 decisions.add(probability * decision);
                 trueLabels.add(convertToNumeric(symbolicClassLabel, trueLabel(sampleId)));
             }
+        }
+    }
+
+    private String getPredictionCorrectIncorrect(BDVModel model, String id, String sampleId, double decision, String labelAsString) {
+        if (model.isRegressionModel()) {
+            double trueLabel = Double.parseDouble(labelAsString);
+            return Double.toString(decision - trueLabel);
+        } else {
+            return trueLabel(sampleId).equals(labelAsString) ? "correct" : "incorrect";
         }
     }
 

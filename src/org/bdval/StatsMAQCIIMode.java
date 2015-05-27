@@ -57,13 +57,19 @@ import java.util.Map;
  */
 public class StatsMAQCIIMode extends Predict {
 
-    /** The logger. */
+    /**
+     * The logger.
+     */
     private static final Log LOG = LogFactory.getLog(StatsMAQCIIMode.class);
 
-    /** The cornell format input filename. */
+    /**
+     * The cornell format input filename.
+     */
     private String cornellFormatInputFilename;
 
-    /** Helps with writing maqcii files. */
+    /**
+     * Helps with writing maqcii files.
+     */
     private final MaqciiHelper maqciiHelper = new MaqciiHelper();
 
     /**
@@ -71,16 +77,21 @@ public class StatsMAQCIIMode extends Predict {
      */
     private Map<String, String> trueLabelKeyToClassLabelMap;
 
-    /** If we should run in sampleWithReplacement mode. */
+    /**
+     * If we should run in sampleWithReplacement mode.
+     */
     private boolean sampleWithReplacement;
 
-    /** If running in sampleWithReplacement mode, how many iterations? */
+    /**
+     * If running in sampleWithReplacement mode, how many iterations?
+     */
     private int numberOfBootstrapSamples;
 
     /**
      * Interpret the command line arguments.
-     * @param jsap the command line argument interpreter
-     * @param result the result of command line argument parsing
+     *
+     * @param jsap    the command line argument interpreter
+     * @param result  the result of command line argument parsing
      * @param options the DAVOptions - these are where the configuration information goes
      */
     @Override
@@ -96,6 +107,7 @@ public class StatsMAQCIIMode extends Predict {
 
     /**
      * Define command line options for this mode.
+     *
      * @param jsap the JSAP command line parser
      * @throws JSAPException if there is a problem building the options
      */
@@ -152,6 +164,7 @@ public class StatsMAQCIIMode extends Predict {
 
     /**
      * Read the true labels TSV file.
+     *
      * @param filename filename to read
      */
     private static Map<String, String> readTrueLabelFile(final String filename) {
@@ -186,8 +199,26 @@ public class StatsMAQCIIMode extends Predict {
         return trueLabelsMap;
     }
 
+    public boolean allLabelsAreNumbers() {
+        boolean allLabelsAreNumbers = true;
+        for (String value : trueLabelKeyToClassLabelMap.values()) {
+
+            boolean canParse = false;
+            try {
+                double v = Double.parseDouble(value);
+                canParse = true;
+                allLabelsAreNumbers &= canParse;
+            } catch (NumberFormatException e) {
+                canParse = false;
+                allLabelsAreNumbers = false;
+            }
+        }
+        return allLabelsAreNumbers;
+    }
+
     /**
      * Perform the processing of the input file.
+     *
      * @param options the DAVOptions to use with the processing
      */
     @Override
@@ -230,11 +261,11 @@ public class StatsMAQCIIMode extends Predict {
                         sampleID2, organizationCode, datasetCode, endpointCode,
                         maqciiModelID, organizationSpecificModelID, decisionValue,
                         symbolicClassPrediction, threshold);
-
+                line.setRegressionModel(allLabelsAreNumbers());
                 if (!maqciiModelID.equals(lastModelId)) {
                     if (items.size() != 0) {
                         System.out.println("Processing model id " + maqciiModelID);
-                        processPredictedItems(options, items);
+                        processPredictedItems(options, items,allLabelsAreNumbers());
                         items.clear();
                     }
                     lastModelId = maqciiModelID;
@@ -250,11 +281,12 @@ public class StatsMAQCIIMode extends Predict {
 
     /**
      * Process all predicted items for a single endpoint.
+     *
      * @param options the DAVOptions used to process.
-     * @param items the PredctionLine
+     * @param items   the PredctionLine
      */
     private void processPredictedItems(
-            final DAVOptions options, final List<PredictionLine> items) {
+            final DAVOptions options, final List<PredictionLine> items, boolean evalRegression) {
         final ObjectSet<CharSequence> evaluationMeasureNames = new ObjectArraySet<CharSequence>();
         evaluationMeasureNames.addAll(Arrays.asList(MEASURES));
         EvaluationMeasure repeatedEvaluationMeasure = new EvaluationMeasure();
@@ -291,7 +323,7 @@ public class StatsMAQCIIMode extends Predict {
                     repeatedEvaluationMeasure, "", true);
         } else {
             repeatedEvaluationMeasure = CrossValidation.testSetEvaluation(decisions.toDoubleArray(),
-                    trueLabels.toDoubleArray(), evaluationMeasureNames, true);
+                    trueLabels.toDoubleArray(), evaluationMeasureNames, true, evalRegression);
         }
 
         LOG.info(String.format(" %s", repeatedEvaluationMeasure.toString()));
@@ -308,6 +340,7 @@ public class StatsMAQCIIMode extends Predict {
      * Returns the true label as a 0 or a 1 unless the trueLabel was an N/A or NA,
      * then it returns a null. This will use item.datasetCode, item.endpointCode,
      * item.sampleID1, item.sampleID2.
+     *
      * @param item the PredictionLine item to get the true label for
      * @return the true label or null
      */
@@ -338,6 +371,12 @@ public class StatsMAQCIIMode extends Predict {
         final double decisionValue;
         final String symbolicClassPrediction;
         final double threshold;
+
+        public void setRegressionModel(boolean isRegressionModel) {
+            this.isRegressionModel = isRegressionModel;
+        }
+
+        boolean isRegressionModel;
 
         PredictionLine(
                 final String sampleID1, final String sampleID2, final String organizationCode,

@@ -200,7 +200,7 @@ public class CrossValidationMode extends DAVMode {
 
         crossValidation.setScalerClass(scalerClass);
 
-        measure = crossValidation.crossValidation(crossValidationFoldNumber);
+        measure = crossValidation.crossValidation(crossValidationFoldNumber,task.isRegression());
         if (LOG.isDebugEnabled()) {
             LOG.debug("measure: " + measure);
         }

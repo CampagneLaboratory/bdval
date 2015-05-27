@@ -183,6 +183,10 @@ public class ClassificationTask {
         return conditionIdentifiers;
     }
 
+    public boolean isRegression() {
+        return this instanceof RegressionTask;
+    }
+
     /**
      * The condition/class to predict.
      */

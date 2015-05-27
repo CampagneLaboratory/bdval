@@ -32,11 +32,7 @@ import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntArraySet;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.ints.IntSet;
-import libsvm.svm;
-import libsvm.svm_model;
-import libsvm.svm_node;
-import libsvm.svm_parameter;
-import libsvm.svm_problem;
+import libsvm.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.rosuda.REngine.REXP;
@@ -134,7 +130,7 @@ public class LibSVMWriter extends SVMLightWriter {
      *
      * @return
      */
-    public EvaluationMeasure trainEvaluate() {
+    public EvaluationMeasure trainEvaluate(boolean isRegressionModel) {
         assert tableScanned : " Must process rows of input table first.";
         final svm_model trainingModel = svm.svm_train(problem, parameters);
         final ContingencyTable ctable = new ContingencyTable();
@@ -147,7 +143,7 @@ public class LibSVMWriter extends SVMLightWriter {
             ctable.observeDecision(trueLabel, decision);
 
         }
-        ctable.average();
+        ctable.average(isRegressionModel);
         return convertToEvalMeasure(ctable);
     }
 
@@ -156,7 +152,7 @@ public class LibSVMWriter extends SVMLightWriter {
      *
      * @return
      */
-    public EvaluationMeasure leaveOneOutEvaluation() {
+    public EvaluationMeasure leaveOneOutEvaluation(boolean isRegressionModel) {
         assert tableScanned : " Must process rows of input table first.";
         final ContingencyTable ctable = new ContingencyTable();
         final double[] decisionValues = new double[numberOfTrainingExamples];
@@ -172,7 +168,7 @@ public class LibSVMWriter extends SVMLightWriter {
             labels[i] = trueLabel;
             ctable.observeDecision(trueLabel, decision);
         }
-        ctable.average();
+        ctable.average(isRegressionModel);
         final EvaluationMeasure measure = convertToEvalMeasure(ctable);
         measure.setRocAuc(areaUnderRocCurveLOO(decisionValues, labels));
         return measure;
@@ -234,10 +230,10 @@ public class LibSVMWriter extends SVMLightWriter {
      * @param randomEngine Random engine to use when splitting the training set into folds.
      * @return Evaluation measures.
      */
-    public EvaluationMeasure crossValidation(final int k, final RandomEngine randomEngine) {
+    public EvaluationMeasure crossValidation(final int k, final RandomEngine randomEngine, boolean isRegressionModel) {
 
         this.randomAdapter = new RandomAdapter(randomEngine);
-        return this.crossValidation(k);
+        return this.crossValidation(k,isRegressionModel);
     }
 
     /**
@@ -246,7 +242,7 @@ public class LibSVMWriter extends SVMLightWriter {
      * @param k Number of folds for cross validation. Typical values are 5 or 10.
      * @return Evaluation measures.
      */
-    public EvaluationMeasure crossValidation(final int k) {
+    public EvaluationMeasure crossValidation(final int k, boolean isRegressionModel) {
         assert tableScanned : " Must process rows of input table first.";
         assert k <= numberOfTrainingExamples : "Number of folds must be less or equal to number of training examples.";
         final IntList indices = new IntArrayList();
@@ -283,10 +279,10 @@ public class LibSVMWriter extends SVMLightWriter {
                 ctable.observeDecision(trueLabel, decision);
                 ctableMicro.observeDecision(trueLabel, decision);
             }
-            ctableMicro.average();
+            ctableMicro.average(isRegressionModel);
             // System.out.println("microaverage: " + convertToEvalMeasure(ctableMicro));
         }
-        ctable.average();
+        ctable.average(isRegressionModel);
         //      System.out.println("macroaverage: "+convertToEvalMeasure(ctable));
         return convertToEvalMeasure(ctable);
     }

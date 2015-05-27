@@ -59,13 +59,17 @@ public class RegressionTask extends ClassificationTask {
     public ClassificationTask filterBySplitPlan(SplitPlan splitPlan, int splitId, String splitType) {
         RegressionTask task = new RegressionTask(this.getExperimentDataFilename());
 
-        ConditionIdentifiers conditionsIdentifiers = task.getConditionsIdentifiers();
-        Set<String> samplesInSplit = conditionsIdentifiers.getLabelGroup(task.getFirstConditionName());
-        samplesInSplit.addAll(conditionsIdentifiers.getLabelGroup(task.getSecondConditionName()));
+        RegressionLabels labels = getLabels();
+        Set<String> samplesInSplit = labels.getLabelGroup(task.getFirstConditionName());
+
         assert samplesInSplit.size() > 0 : " Samples must remain after filtering for split. No samples left in splitId=" + splitId + " splitType=" + splitType;
-        ConditionIdentifiers newIds = task.getLabels().reduceToSamples(samplesInSplit);
+        ConditionIdentifiers newIds = labels.reduceToSamples(samplesInSplit);
         task.setConditionsIdentifiers(newIds);
         return task;
 
+    }
+
+    public int getNumberSamplesSecondCondition() {
+        return 0;
     }
 }
