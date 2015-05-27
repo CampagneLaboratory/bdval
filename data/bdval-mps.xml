@@ -203,6 +203,19 @@
         <sequential>
             <trycatch>
                 <try>
+                    <if>
+                        <equals arg1="${do-specific-gene-lists-only}" arg2="true"/>
+
+                        <then>
+                            <!-- Will process the endpoint specific gene lists (see maqcii-b.properties) -->
+                            <var name="endpoint-specific-genelist-names" value="${@{endpoint-name}.genelists}"/>
+                        </then>
+                        <else>
+                            <!-- Will process all the gene lists. -->
+                            <var name="endpoint-specific-genelist-names"
+                                 value="Merged-ensembl-genbank-refseq"/>
+                        </else>
+                    </if>
 
                     <!-- determine if this endpoint has a floor value -->
                     <var name="floor-param" value=""/>
@@ -311,6 +324,27 @@
                     <istrue value="@{define-splits-only}"/>
                 </not>
                 <then>
+				
+                    <if>
+                        <istrue value="${do.pathways-build-pathway-components}"/>
+                        <then>
+                            <execute-splits feature-selection-fold="true"
+                                            sequence-file="pathways-build-pathway-components-fs=true.sequence"
+                                            endpoint-name="@{endpoint-name}"
+                                            dataset-root="@{dataset-root}"
+                                            floor-param="@{floor-param}"
+                                            array-params="@{array-params}"
+                                            other-options="@{pathway-options} "/>
+
+                            <execute-splits feature-selection-fold="false"
+                                            sequence-file="pathways-build-pathway-components-fs=false.sequence"
+                                            endpoint-name="@{endpoint-name}"
+                                            dataset-root="@{dataset-root}"
+                                            floor-param="@{floor-param}"
+                                            array-params="@{array-params}"
+                                            other-options="@{pathway-options} "/>
+                        </then>
+                    </if>
 
 					<if>
 						<istrue value="${do.mps-execute-splits}"/>
