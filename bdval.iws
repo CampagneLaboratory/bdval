@@ -2,24 +2,70 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="86f1b0a3-8439-4f28-96e3-8f9acd7038fd" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/Prostate/GSE8402/platforms/GPL5474_family.soft.gz" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/Prostate/GSE8402/norm-data/GSE8402_family.soft.gz" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/Prostate/GSE8402/pathways/GPL5474_gene2probes.txt" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/Prostate/GSE8402/cids/GSE8402-FusionYesNo-TestSplit.cids" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/Prostate/GSE8402/tasks/GSE8402-FusionYesNo-TestSplit.tasks" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/Prostate/GSE8402/cids/GSE8402-FusionYesNo-TrainingSplit.cids" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/Prostate/GSE8402/GSE8402-FusionYesNo-TrainingSplit.properties" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/Prostate/GSE8402/tasks/GSE8402-FusionYesNo-TrainingSplit.tasks" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/Prostate/GSE8402/cids/GSE8402-FusionYesNo-Validation.cids" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/Prostate/GSE8402/tasks/GSE8402-FusionYesNo-Validaton.tasks" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/Prostate/GSE8402/test-sets/GSE8402-FusionYesNo-test-samples.txt" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/Prostate/GSE8402/test-sets/GSE8402-FusionYesNo-validation-samples.txt" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/Prostate/GSE8402/pathways/human-IntAct-KEGG-TEPSS-pathways.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/buildsupport" afterPath="$PROJECT_DIR$/buildsupport" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data/bdval-mps.xml" afterPath="$PROJECT_DIR$/data/bdval-mps.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/edu/cornell/med/icb/geo/tools/RegressionLabels.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/binaryarray/ArrayReader.class" afterPath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/binaryarray/ArrayReader.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/binaryarray/ArrayWriter.class" afterPath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/binaryarray/ArrayWriter.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/org/bdval/BDVModel$1.class" afterPath="$PROJECT_DIR$/classes/org/bdval/BDVModel$1.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/org/bdval/BDVModel$Format.class" afterPath="$PROJECT_DIR$/classes/org/bdval/BDVModel$Format.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/org/bdval/BDVModel$ModelFileExtension.class" afterPath="$PROJECT_DIR$/classes/org/bdval/BDVModel$ModelFileExtension.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/org/bdval/BDVModel.class" afterPath="$PROJECT_DIR$/classes/org/bdval/BDVModel.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/BinaryArray2CountsAdapter.class" afterPath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/BinaryArray2CountsAdapter.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/BinaryArray2PositiveAdapter.class" afterPath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/BinaryArray2PositiveAdapter.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/BinaryArray2TabDelimitedAdapter.class" afterPath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/BinaryArray2TabDelimitedAdapter.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/BinaryArrayProbesetMinNormalizer.class" afterPath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/BinaryArrayProbesetMinNormalizer.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/BinaryArraySingularValueDecompositionAdapter.class" afterPath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/BinaryArraySingularValueDecompositionAdapter.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/edu/cornell/med/icb/learning/ClassificationModel.class" afterPath="$PROJECT_DIR$/classes/edu/cornell/med/icb/learning/ClassificationModel.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/tools/ClassificationTask$ConditionDescriptor.class" afterPath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/tools/ClassificationTask$ConditionDescriptor.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/tools/ClassificationTask.class" afterPath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/tools/ClassificationTask.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/tools/ConditionIdentifiers.class" afterPath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/tools/ConditionIdentifiers.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/edu/cornell/med/icb/learning/ContingencyTable.class" afterPath="$PROJECT_DIR$/classes/edu/cornell/med/icb/learning/ContingencyTable.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/edu/cornell/med/icb/learning/CrossValidation.class" afterPath="$PROJECT_DIR$/classes/edu/cornell/med/icb/learning/CrossValidation.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/org/bdval/CrossValidationMode.class" afterPath="$PROJECT_DIR$/classes/org/bdval/CrossValidationMode.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/org/bdval/DAVMode.class" afterPath="$PROJECT_DIR$/classes/org/bdval/DAVMode.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/org/bdval/DefineSplitsMode.class" afterPath="$PROJECT_DIR$/classes/org/bdval/DefineSplitsMode.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/org/bdval/DiscoverWithGeneticAlgorithm$1.class" afterPath="$PROJECT_DIR$/classes/org/bdval/DiscoverWithGeneticAlgorithm$1.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/org/bdval/DiscoverWithGeneticAlgorithm.class" afterPath="$PROJECT_DIR$/classes/org/bdval/DiscoverWithGeneticAlgorithm.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/org/bdval/DiscoverWithSvmWeights.class" afterPath="$PROJECT_DIR$/classes/org/bdval/DiscoverWithSvmWeights.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/org/bdval/DiscoverWithSvmWeightsIterative.class" afterPath="$PROJECT_DIR$/classes/org/bdval/DiscoverWithSvmWeightsIterative.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/GEOPlatformIndexed.class" afterPath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/GEOPlatformIndexed.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/GenotypeSampleData$1.class" afterPath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/GenotypeSampleData$1.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/GenotypeSampleData$Genotype.class" afterPath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/GenotypeSampleData$Genotype.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/GenotypeSampleData.class" afterPath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/GenotypeSampleData.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/GeoScanListMode.class" afterPath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/GeoScanListMode.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/GeoScanMode.class" afterPath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/GeoScanMode.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/GeoScanSelectedSamplesMode.class" afterPath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/GeoScanSelectedSamplesMode.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/GeoSoftFamilyParser$CurrentSectionType.class" afterPath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/GeoSoftFamilyParser$CurrentSectionType.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/GeoSoftFamilyParser$PositionInInputFile.class" afterPath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/GeoSoftFamilyParser$PositionInInputFile.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/GeoSoftFamilyParser.class" afterPath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/GeoSoftFamilyParser.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/org/bdval/LeaveOneOutMode.class" afterPath="$PROJECT_DIR$/classes/org/bdval/LeaveOneOutMode.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/edu/mssm/crover/tables/writers/LibSVMWriter.class" afterPath="$PROJECT_DIR$/classes/edu/mssm/crover/tables/writers/LibSVMWriter.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/edu/cornell/med/icb/learning/libsvm/LibSvmClassifier.class" afterPath="$PROJECT_DIR$/classes/edu/cornell/med/icb/learning/libsvm/LibSvmClassifier.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/edu/cornell/med/icb/learning/libsvm/LibSvmModel.class" afterPath="$PROJECT_DIR$/classes/edu/cornell/med/icb/learning/libsvm/LibSvmModel.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/edu/cornell/med/icb/learning/libsvm/LibSvmParameters.class" afterPath="$PROJECT_DIR$/classes/edu/cornell/med/icb/learning/libsvm/LibSvmParameters.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/MPSS2BinaryAdapter.class" afterPath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/MPSS2BinaryAdapter.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/tools/MicroarrayTrainEvaluate.class" afterPath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/tools/MicroarrayTrainEvaluate.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/ParseAffymetrixSampleDataCallback.class" afterPath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/ParseAffymetrixSampleDataCallback.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/ParseMPSSSampleData.class" afterPath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/ParseMPSSSampleData.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/org/bdval/Predict.class" afterPath="$PROJECT_DIR$/classes/org/bdval/Predict.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/org/bdval/PredictedItem.class" afterPath="$PROJECT_DIR$/classes/org/bdval/PredictedItem.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/org/bdval/PredictedItems.class" afterPath="$PROJECT_DIR$/classes/org/bdval/PredictedItems.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/QuantileNormalizerPass1Adapter$1.class" afterPath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/QuantileNormalizerPass1Adapter$1.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/QuantileNormalizerPass1Adapter$ProbeSignal.class" afterPath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/QuantileNormalizerPass1Adapter$ProbeSignal.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/QuantileNormalizerPass1Adapter.class" afterPath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/QuantileNormalizerPass1Adapter.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/QuantileNormalizerPass2Adapter$1.class" afterPath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/QuantileNormalizerPass2Adapter$1.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/QuantileNormalizerPass2Adapter.class" afterPath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/QuantileNormalizerPass2Adapter.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/RawSignalAdapter$1.class" afterPath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/RawSignalAdapter$1.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/RawSignalAdapter.class" afterPath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/RawSignalAdapter.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/org/bdval/modelconditions/RestatMode$StatsEvaluationType.class" afterPath="$PROJECT_DIR$/classes/org/bdval/modelconditions/RestatMode$StatsEvaluationType.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/org/bdval/modelconditions/RestatMode.class" afterPath="$PROJECT_DIR$/classes/org/bdval/modelconditions/RestatMode.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/ScanGEOSoftFamily.class" afterPath="$PROJECT_DIR$/classes/edu/cornell/med/icb/geo/ScanGEOSoftFamily.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/org/bdval/StatsMAQCIIMode$PredictionLine.class" afterPath="$PROJECT_DIR$/classes/org/bdval/StatsMAQCIIMode$PredictionLine.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/org/bdval/StatsMAQCIIMode.class" afterPath="$PROJECT_DIR$/classes/org/bdval/StatsMAQCIIMode.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/edu/cornell/med/icb/learning/weka/WekaModel.class" afterPath="$PROJECT_DIR$/classes/edu/cornell/med/icb/learning/weka/WekaModel.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/org/bdval/WriteModel.class" afterPath="$PROJECT_DIR$/classes/org/bdval/WriteModel.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/bdval/PredictedItem.java" afterPath="$PROJECT_DIR$/src/org/bdval/PredictedItem.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bdval.ipr" afterPath="$PROJECT_DIR$/bdval.ipr" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bdval.iws" afterPath="$PROJECT_DIR$/bdval.iws" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build.xml" afterPath="$PROJECT_DIR$/build.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/release.xml" afterPath="$PROJECT_DIR$/release.xml" />
     </list>
     <ignored path="bdval.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -51,34 +97,85 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="SectionProperties.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/edu/cornell/med/icb/geo/SectionProperties.java">
+      <file leaf-file-name="ConvertFromLibSVM.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/test-src/org/bdval/util/ConvertFromLibSVM.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="540" max-vertical-offset="630">
-              <caret line="62" column="0" selection-start-line="62" selection-start-column="0" selection-end-line="62" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="795" max-vertical-offset="2715">
+              <caret line="73" column="36" selection-start-line="73" selection-start-column="36" selection-end-line="73" selection-end-column="36" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="RegressionTask.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/edu/cornell/med/icb/geo/tools/RegressionTask.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1005">
+              <caret line="49" column="46" selection-start-line="49" selection-start-column="46" selection-end-line="49" selection-end-column="46" />
               <folding>
-                <element signature="e#0#1933#0" expanded="false" />
-                <element signature="imports" expanded="false" />
-                <element signature="e#1626#1627#0" expanded="false" />
-                <element signature="e#1697#1698#0" expanded="false" />
-                <element signature="e#1738#1739#0" expanded="false" />
-                <element signature="e#1799#1800#0" expanded="false" />
-                <element signature="e#1856#1857#0" expanded="false" />
-                <element signature="e#1926#1927#0" expanded="false" />
+                <element signature="e#1685#1686#0" expanded="true" />
+                <element signature="e#1759#1760#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="release.xml" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/release.xml">
+      <file leaf-file-name="ClassificationTask.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/edu/cornell/med/icb/geo/tools/ClassificationTask.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.20833333" vertical-offset="580" max-vertical-offset="4515">
-              <caret line="47" column="0" selection-start-line="47" selection-start-column="0" selection-end-line="47" selection-end-column="0" />
-              <folding>
-                <marker date="1432757308000" expanded="true" signature="13891:13987" placeholder="..." />
-                <marker date="1432757308000" expanded="true" signature="13891:13972" placeholder="..." />
-              </folding>
+            <state vertical-scroll-proportion="0.0" vertical-offset="990" max-vertical-offset="5415">
+              <caret line="113" column="51" selection-start-line="113" selection-start-column="51" selection-end-line="113" selection-end-column="51" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="DiscoverWithGeneticAlgorithm.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/org/bdval/DiscoverWithGeneticAlgorithm.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="3760" max-vertical-offset="7665">
+              <caret line="312" column="44" selection-start-line="312" selection-start-column="44" selection-end-line="312" selection-end-column="44" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="RestatMode.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/org/bdval/modelconditions/RestatMode.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="4360" max-vertical-offset="6375">
+              <caret line="346" column="45" selection-start-line="346" selection-start-column="45" selection-end-line="346" selection-end-column="45" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="CrossValidation.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/edu/cornell/med/icb/learning/CrossValidation.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="1525" max-vertical-offset="13080">
+              <caret line="169" column="36" selection-start-line="169" selection-start-column="36" selection-end-line="169" selection-end-column="36" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="PredictedItems.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/org/bdval/PredictedItems.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.33333334" vertical-offset="520" max-vertical-offset="3375">
+              <caret line="75" column="28" selection-start-line="75" selection-start-column="28" selection-end-line="75" selection-end-column="28" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="PredictedItem.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/org/bdval/PredictedItem.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="925" max-vertical-offset="2085">
+              <caret line="93" column="69" selection-start-line="93" selection-start-column="69" selection-end-line="93" selection-end-column="69" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -86,95 +183,18 @@
       <file leaf-file-name="bdval-mps.xml" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/data/bdval-mps.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="285" max-vertical-offset="27450">
+            <state vertical-scroll-proportion="0.0" vertical-offset="17205" max-vertical-offset="27450">
               <caret line="47" column="9" selection-start-line="47" selection-start-column="9" selection-end-line="47" selection-end-column="9" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="baseline.sequence" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/data/sequences/baseline.sequence">
+      <file leaf-file-name="leukemia.properties" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/data/leukemia.properties">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="150" max-vertical-offset="270">
-              <caret line="10" column="10" selection-start-line="10" selection-start-column="10" selection-end-line="10" selection-end-column="10" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="SVMLightDriver.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/edu/cornell/med/icb/learning/tools/svmlight/SVMLightDriver.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="135" max-vertical-offset="2625">
-              <caret line="32" column="13" selection-start-line="32" selection-start-column="13" selection-end-line="32" selection-end-column="13" />
-              <folding>
-                <element signature="e#0#7020#0" expanded="false" />
-                <element signature="imports" expanded="false" />
-                <element signature="e#3762#3763#0" expanded="false" />
-                <element signature="e#3800#3801#0" expanded="false" />
-                <element signature="e#6571#6572#0" expanded="false" />
-                <element signature="e#6642#6643#0" expanded="false" />
-                <element signature="e#6680#6681#0" expanded="false" />
-                <element signature="e#6714#6715#0" expanded="false" />
-                <element signature="e#6774#6775#0" expanded="false" />
-                <element signature="e#6820#6821#0" expanded="false" />
-                <element signature="e#6861#6862#0" expanded="false" />
-                <element signature="e#6898#6899#0" expanded="false" />
-                <element signature="e#6964#6965#0" expanded="false" />
-                <element signature="e#7016#7017#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="LibSvmProblem.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/edu/cornell/med/icb/learning/libsvm/LibSvmProblem.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="555" max-vertical-offset="3810">
-              <caret line="70" column="41" selection-start-line="70" selection-start-column="41" selection-end-line="70" selection-end-column="41" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="bdval_mps.xml" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/data/bdval_mps.xml">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="27165">
-              <caret line="12" column="8" selection-start-line="12" selection-start-column="8" selection-end-line="12" selection-end-column="8" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ClassificationProblem.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/edu/cornell/med/icb/learning/ClassificationProblem.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="255" max-vertical-offset="1755">
-              <caret line="27" column="17" selection-start-line="27" selection-start-column="17" selection-end-line="27" selection-end-column="17" />
-              <folding>
-                <element signature="e#0#4605#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="svm_problem.class" pinned="false" current-in-tab="false">
-        <entry file="jar://$PROJECT_DIR$/lib/libsvm.jar!/libsvm/svm_problem.class">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="90" max-vertical-offset="300">
-              <caret line="10" column="13" selection-start-line="10" selection-start-column="13" selection-end-line="10" selection-end-column="13" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="MultiValueMap.class" pinned="false" current-in-tab="false">
-        <entry file="jar://$PROJECT_DIR$/lib/commons-collections-3.2.1.jar!/org/apache/commons/collections/map/MultiValueMap.class">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="135" max-vertical-offset="3510">
-              <caret line="24" column="0" selection-start-line="22" selection-start-column="3" selection-end-line="24" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="450">
+              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -200,6 +220,8 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/release.xml" />
+        <option value="$PROJECT_DIR$/src/org/bdval/PredictedItems.java" />
+        <option value="$PROJECT_DIR$/src/org/bdval/PredictedItem.java" />
       </list>
     </option>
   </component>
@@ -207,6 +229,7 @@
     <detection-done>true</detection-done>
   </component>
   <component name="ProjectFrameBounds">
+    <option name="x" value="-3" />
     <option name="y" value="23" />
     <option name="width" value="1920" />
     <option name="height" value="1053" />
@@ -237,6 +260,7 @@
       <sortByType />
     </navigator>
     <panes>
+      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -251,7 +275,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="bdval" />
+              <option name="myItemId" value="bdval-2" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -261,11 +285,11 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="bdval" />
+              <option name="myItemId" value="bdval-2" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="lib" />
+              <option name="myItemId" value="test-src" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -275,7 +299,157 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
+              <option name="myItemId" value="bdval-2" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="test-data" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
               <option name="myItemId" value="bdval" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="bdval-2" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="bdval" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="bdval-2" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="edu" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="bdval" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="bdval-2" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="edu" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="icb" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="bdval" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="bdval-2" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="edu" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="icb" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="learning" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="bdval" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="bdval-2" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="edu" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="icb" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="geo" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="bdval" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="bdval-2" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="edu" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="icb" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="geo" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="tools" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="bdval" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="bdval-2" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
@@ -286,7 +460,6 @@
         </subPane>
       </pane>
       <pane id="Scope" />
-      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -300,7 +473,7 @@
     <property name="options.splitter.main.proportions" value="0.3" />
     <property name="options.splitter.details.proportions" value="0.2" />
     <property name="options.searchVisible" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../git/bdval-2" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/test-data/cpusmall/cpusmall.txt" />
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.0" />
     <property name="project.structure.side.proportion" value="0.0" />
@@ -323,8 +496,10 @@
     <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder2" value="2" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth3" value="1060" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder3" value="3" />
+    <property name="recentsLimit" value="5" />
+    <property name="dynamic.classpath" value="false" />
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Application.ConvertFromLibSVM">
     <configuration default="true" type="#org.jetbrains.idea.devkit.run.PluginConfigurationType" factoryName="Plugin">
       <module name="" />
       <option name="VM_PARAMETERS" value="-Xmx512m -Xms256m -XX:MaxPermSize=250m -ea" />
@@ -580,7 +755,31 @@
       <option name="FILTER_LOGCAT_AUTOMATICALLY" value="true" />
       <method />
     </configuration>
-    <list size="0" />
+    <configuration default="false" name="ConvertFromLibSVM" type="Application" factoryName="Application" nameIsGenerated="true">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea">
+        <pattern>
+          <option name="PATTERN" value="org.bdval.util.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="MAIN_CLASS_NAME" value="org.bdval.util.ConvertFromLibSVM" />
+      <option name="VM_PARAMETERS" value="-Xmx1g" />
+      <option name="PROGRAM_PARAMETERS" value="$PROJECT_DIR$/test-data/cpusmall/cpusmall.txt" />
+      <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" value="" />
+      <option name="ENABLE_SWING_INSPECTOR" value="false" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <module name="bdval" />
+      <envs />
+      <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper RunnerId="Run" />
+      <method />
+    </configuration>
+    <list size="1">
+      <item index="0" class="java.lang.String" itemvalue="Application.ConvertFromLibSVM" />
+    </list>
     <configuration name="&lt;template&gt;" type="WebApp" default="true" selected="false">
       <Host>localhost</Host>
       <Port>5050</Port>
@@ -599,6 +798,7 @@
       <workItem from="1409679799346" duration="1309000" />
       <workItem from="1432662413583" duration="358000" />
       <workItem from="1432756799236" duration="818000" />
+      <workItem from="1432759306484" duration="451000" />
     </task>
     <task id="LOCAL-00001" summary="adjust line endings.">
       <created>1409679820870</created>
@@ -616,17 +816,17 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="2485000" />
+    <option name="totallyTimeSpent" value="2936000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="23" width="1920" height="1053" extended-state="6" />
+    <frame x="-3" y="23" width="1920" height="1053" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32977587" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Usages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24973376" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24973376" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32977587" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="IDEtalk Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
@@ -635,24 +835,24 @@
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24973376" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32977587" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Inspector" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="true" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Preview" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Dependencies Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Tool Output" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32977587" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32870865" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.3998935" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32881355" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="FindBugs-IDEA" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
     </layout>
@@ -821,78 +1021,14 @@
     </buildFile>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/edu/cornell/med/icb/geo/SectionProperties.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="540" max-vertical-offset="630">
-          <caret line="62" column="0" selection-start-line="62" selection-start-column="0" selection-end-line="62" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#1933#0" expanded="false" />
-            <element signature="imports" expanded="false" />
-            <element signature="e#1626#1627#0" expanded="false" />
-            <element signature="e#1697#1698#0" expanded="false" />
-            <element signature="e#1738#1739#0" expanded="false" />
-            <element signature="e#1799#1800#0" expanded="false" />
-            <element signature="e#1856#1857#0" expanded="false" />
-            <element signature="e#1926#1927#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/release.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="210" max-vertical-offset="3510">
-          <caret line="174" column="18" selection-start-line="174" selection-start-column="18" selection-end-line="174" selection-end-column="18" />
-          <folding>
-            <marker date="1432757308000" expanded="true" signature="13891:13987" placeholder="..." />
-            <marker date="1432757308000" expanded="true" signature="13891:13972" placeholder="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/bdval-mps.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="420" max-vertical-offset="26940">
-          <caret line="28" column="41" selection-start-line="28" selection-start-column="41" selection-end-line="28" selection-end-column="41" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/sequences/baseline.sequence">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="150" max-vertical-offset="270">
-          <caret line="10" column="10" selection-start-line="10" selection-start-column="10" selection-end-line="10" selection-end-column="10" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/edu/cornell/med/icb/learning/tools/svmlight/SVMLightDriver.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="135" max-vertical-offset="2625">
-          <caret line="32" column="13" selection-start-line="32" selection-start-column="13" selection-end-line="32" selection-end-column="13" />
-          <folding>
-            <element signature="e#0#7020#0" expanded="false" />
-            <element signature="imports" expanded="false" />
-            <element signature="e#3762#3763#0" expanded="false" />
-            <element signature="e#3800#3801#0" expanded="false" />
-            <element signature="e#6571#6572#0" expanded="false" />
-            <element signature="e#6642#6643#0" expanded="false" />
-            <element signature="e#6680#6681#0" expanded="false" />
-            <element signature="e#6714#6715#0" expanded="false" />
-            <element signature="e#6774#6775#0" expanded="false" />
-            <element signature="e#6820#6821#0" expanded="false" />
-            <element signature="e#6861#6862#0" expanded="false" />
-            <element signature="e#6898#6899#0" expanded="false" />
-            <element signature="e#6964#6965#0" expanded="false" />
-            <element signature="e#7016#7017#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/edu/cornell/med/icb/learning/libsvm/LibSvmProblem.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="3810">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+          <folding>
+            <element signature="e#0#10292#0" expanded="false" />
+            <element signature="imports" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -966,10 +1102,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="3510">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <marker date="1432757308000" expanded="true" signature="13891:13987" placeholder="..." />
-            <marker date="1432757308000" expanded="true" signature="13891:13972" placeholder="..." />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -1235,8 +1368,38 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="555" max-vertical-offset="3810">
           <caret line="70" column="41" selection-start-line="70" selection-start-column="41" selection-end-line="70" selection-end-column="41" />
+          <folding>
+            <element signature="e#0#10292#0" expanded="false" />
+            <element signature="imports" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/release.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="580" max-vertical-offset="4515">
+          <caret line="47" column="0" selection-start-line="47" selection-start-column="0" selection-end-line="47" selection-end-column="0" />
           <folding />
         </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test-data/mtcars/mtcars.platform">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="601">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test-data/mtcars/mtcars.tmm">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="571">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+      <provider editor-type-id="com.intellij.database.editor.CsvTableFileEditorProvider">
+        <state />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/data/bdval-mps.xml">
@@ -1247,22 +1410,78 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/data/bdval_mps.xml">
+    <entry file="file://$PROJECT_DIR$/data/leukemia.properties">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="27165">
-          <caret line="12" column="8" selection-start-line="12" selection-start-column="8" selection-end-line="12" selection-end-column="8" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="601">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/release.xml">
+    <entry file="file://$PROJECT_DIR$/test-src/org/bdval/util/ConvertFromLibSVM.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.20833333" vertical-offset="580" max-vertical-offset="4515">
-          <caret line="47" column="0" selection-start-line="47" selection-start-column="0" selection-end-line="47" selection-end-column="0" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="795" max-vertical-offset="2715">
+          <caret line="73" column="36" selection-start-line="73" selection-start-column="36" selection-end-line="73" selection-end-column="36" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/edu/cornell/med/icb/geo/tools/RegressionTask.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1005">
+          <caret line="49" column="46" selection-start-line="49" selection-start-column="46" selection-end-line="49" selection-end-column="46" />
           <folding>
-            <marker date="1432757308000" expanded="true" signature="13891:13987" placeholder="..." />
-            <marker date="1432757308000" expanded="true" signature="13891:13972" placeholder="..." />
+            <element signature="e#1685#1686#0" expanded="true" />
+            <element signature="e#1759#1760#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/edu/cornell/med/icb/geo/tools/ClassificationTask.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="990" max-vertical-offset="5415">
+          <caret line="113" column="51" selection-start-line="113" selection-start-column="51" selection-end-line="113" selection-end-column="51" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/bdval/DiscoverWithGeneticAlgorithm.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="3760" max-vertical-offset="7665">
+          <caret line="312" column="44" selection-start-line="312" selection-start-column="44" selection-end-line="312" selection-end-column="44" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/bdval/modelconditions/RestatMode.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="4360" max-vertical-offset="6375">
+          <caret line="346" column="45" selection-start-line="346" selection-start-column="45" selection-end-line="346" selection-end-column="45" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/edu/cornell/med/icb/learning/CrossValidation.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="1525" max-vertical-offset="13080">
+          <caret line="169" column="36" selection-start-line="169" selection-start-column="36" selection-end-line="169" selection-end-column="36" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/bdval/PredictedItem.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="925" max-vertical-offset="2085">
+          <caret line="93" column="69" selection-start-line="93" selection-start-column="69" selection-end-line="93" selection-end-column="69" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/bdval/PredictedItems.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.33333334" vertical-offset="520" max-vertical-offset="3375">
+          <caret line="75" column="28" selection-start-line="75" selection-start-column="28" selection-end-line="75" selection-end-column="28" />
+          <folding />
         </state>
       </provider>
     </entry>
