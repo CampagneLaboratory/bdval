@@ -145,7 +145,7 @@
             max-intermediate-features: ${max-intermediate-features}
             feature-option: ${feature-option}
 
-            external-CV-repeats: ${external-CV-repeats}
+            external-CV-repeats: ${external-CV-repeats-number}
             external-CV-folds: ${external-CV-folds}
             internal-CV-repeats: ${internal-CV-repeats}
             internal-CV-folds: ${internal-CV-folds}
@@ -370,12 +370,12 @@
         <attribute name="floor-param"/>
         <attribute name="array-params"/>
         <attribute name="feature-selection-fold" description="When true, generate a feature selection fold"/>
-		
+
         <sequential>
             <trycatch>
                 <try>
                     <var name="split-plan-file"
-                         value="@{dataset-root}/splits/@{endpoint-name}-split-plan-fs=@{feature-selection-fold}-CV-${external-CV-folds}-R-${external-CV-repeats}.txt"/>
+                         value="@{dataset-root}/splits/@{endpoint-name}-split-plan-fs=@{feature-selection-fold}-CV-${external-CV-folds}-R-${external-CV-repeats-number}.txt"/>
                     <if>
                         <not>
                             <available file="${split-plan-file}"/>
@@ -391,7 +391,7 @@
                                     output="${split-plan-file}"
                                     floor-param="@{floor-param}"
                                     array-params="@{array-params}"
-                                    other-options="--folds ${external-CV-folds} --cv-repeats ${external-CV-repeats} --gene-list full --overwrite-output true --feature-selection-fold @{feature-selection-fold}"/>
+                                    other-options="--folds ${external-CV-folds} --cv-repeats ${external-CV-repeats-number} --gene-list full --overwrite-output true --feature-selection-fold @{feature-selection-fold}"/>
                         </then>
                     </if>
                 </try>
@@ -548,7 +548,7 @@
             <echo message="Executing splits for sequence @{sequence-file}"/>
 
             <var name="split-plan-file"
-                 value="@{dataset-root}/splits/@{endpoint-name}-split-plan-fs=@{feature-selection-fold}-CV-${external-CV-folds}-R-${external-CV-repeats}.txt"/>
+                 value="@{dataset-root}/splits/@{endpoint-name}-split-plan-fs=@{feature-selection-fold}-CV-${external-CV-folds}-R-${external-CV-repeats-number}.txt"/>
             <var name="cache-dir"
                  value="${cache-dir-location}/cache/fs=@{feature-selection-fold}"/>
             <var name="pathway-components-dir"
@@ -633,6 +633,7 @@
                     <include name="*@{endpoint-name}*.model"/>
                     <include name="weka_*@{endpoint-name}*"/>
                     <include name="@{endpoint-name}-baseline-*"/>
+                    <include name="@{endpoint-name}-*-regression-*"/>
                     <include name="@{endpoint-name}-tune-*"/>
                     <include name="@{endpoint-name}-tuneC-*"/>
                     <include name="@{endpoint-name}-genelists-*"/>
@@ -1247,7 +1248,7 @@
                 <arg value="--folds"/>
                 <arg value="${external-CV-folds}"/>
                 <arg value="--cv-repeats"/>
-                <arg value="${external-CV-repeats}"/>
+                <arg value="${external-CV-repeats-number}"/>
                 <arg value="--properties"/>
                 <arg value="${project-property-file}"/>
             </java>
