@@ -158,6 +158,12 @@ public class DefineSplitsMode extends DAVMode {
         final Set<String> sampleIdsClass1 = task.getConditionsIdentifiers().getLabelGroup(task.getSecondConditionName());
 
         final SortedSet<String> allSampleIds = new ObjectAVLTreeSet<String>();
+        if (task.isRegression()) {
+            System.err.println("Disabling stratification because this task is a regression.");
+            // disable stratification when the task is a regression. There is nothing to stratify for and stratification
+            // will fail.
+            stratification=false;
+        }
         allSampleIds.addAll(sampleIdsClass0);
         allSampleIds.addAll(sampleIdsClass1);
         final ObjectList<String> allSampleIdsList=new ObjectArrayList<String>();
