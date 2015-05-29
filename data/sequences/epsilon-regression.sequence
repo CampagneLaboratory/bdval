@@ -1,4 +1,4 @@
-def label=whole-chip-%model-id%
+def label=epsilon-regression-%model-id%
 def predictions-filename=%dataset-name%-%label%-prediction-table.txt
 def survival=%survival%
 #

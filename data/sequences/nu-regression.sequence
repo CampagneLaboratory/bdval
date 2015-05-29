@@ -1,4 +1,4 @@
-def label=whole-chip-%model-id%
+def label=nu-regression-%model-id%
 def predictions-filename=%dataset-name%-%label%-prediction-table.txt
 def survival=%survival%
 #
@@ -7,5 +7,5 @@ addoption required:split-id:id of split being processed
 addoption required:nu:Nu parameter
 #
 #
--m write-model --classifier-parameters machine=nuSVR --classifier-parameters eps=%nu% --overwrite-output true --gene-list full %other-options% --split-type training --model-prefix libSVM_%dataset-name%-%split-id%-%label%
+-m write-model --classifier-parameters machine=nuSVR --classifier-parameters nu=%nu% --overwrite-output true --gene-list full %other-options% --split-type training --model-prefix libSVM_%dataset-name%-%split-id%-%label%
 -m predict --overwrite-output false --model libSVM_%dataset-name%-%split-id%-%label%.model -o %predictions-filename% %other-options% --split-type test --true-labels %conditions%
