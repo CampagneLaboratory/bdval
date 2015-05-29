@@ -107,7 +107,13 @@ public class GEOPlatform {
         while (!ri.end()) {
             try {
                 final String probesetId = (String) platformFileContent.getValue(probeSetIdColumnIndex, ri);
-                final String genbankAccession = (String) platformFileContent.getValue(genbankColumnIndex, ri);
+
+                String genbankAccession;
+               try {
+                   genbankAccession = (String) platformFileContent.getValue(genbankColumnIndex, ri);
+               } catch (ArrayIndexOutOfBoundsException e) {
+                   genbankAccession="";
+               }
                 probesetId2GenbankList.put(probesetId, genbankAccession);
                 count++;
             } catch (TypeMismatchException e) {
