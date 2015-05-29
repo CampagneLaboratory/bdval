@@ -13,6 +13,8 @@
     <buildFile url="file://$PROJECT_DIR$/data/maqcii-c.xml">
       <maximumStackSize value="32" />
     </buildFile>
+    <buildFile url="file://$PROJECT_DIR$/data/bdval-mps.xml" />
+    <buildFile url="file://$PROJECT_DIR$/data/cpusmall.xml" />
   </component>
   <component name="BuildJarProjectSettings">
     <option name="BUILD_JARS_ON_MAKE" value="false" />

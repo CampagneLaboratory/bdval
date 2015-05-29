@@ -520,7 +520,7 @@ public class Predict extends DAVMode {
                         probability,
                         convertDecisionToLabelIndex(decision) == 1 ? probability : 1 - probability,    // the model probability that the test instance belongs to class 1
                         trueLabel(sampleId), convertToNumeric(symbolicClassLabel, trueLabel(sampleId)),
-                        getPredictionCorrectIncorrect(model, sampleId, labelIndex, decision, trueLabel(sampleId)),
+                        getPredictionCorrectIncorrect(model, sampleId, labelIndex, decision, symbolicClassLabel[0]),
                         model.getNumberOfFeatures());
                 options.output.println(predictedItem.format());
                 options.output.flush();
@@ -533,16 +533,17 @@ public class Predict extends DAVMode {
         }
     }
 
-    private String getPredictionCorrectIncorrect(BDVModel model, String id, String sampleId, double decision, String labelAsString) {
+    private String getPredictionCorrectIncorrect(BDVModel model, String sampleId, String labelIndex, double decision, String labelAsString) {
         if (model.isRegressionModel()) {
             try {
-                double trueLabel = Double.parseDouble(labelAsString);
-                return Double.toString(decision - trueLabel);
+                double predictedValue = decision;
+                double trueLabel = Double.parseDouble(trueLabel(sampleId));
+                return Double.toString(predictedValue - trueLabel);
             } catch (NumberFormatException e) {
                 return "NaN";
             }
         } else {
-            return trueLabel(sampleId).equals(labelAsString) ? "correct" : "incorrect";
+            return trueLabel(sampleId).equals(labelIndex) ? "correct" : "incorrect";
         }
     }
 
