@@ -535,8 +535,12 @@ public class Predict extends DAVMode {
 
     private String getPredictionCorrectIncorrect(BDVModel model, String id, String sampleId, double decision, String labelAsString) {
         if (model.isRegressionModel()) {
-            double trueLabel = Double.parseDouble(labelAsString);
-            return Double.toString(decision - trueLabel);
+            try {
+                double trueLabel = Double.parseDouble(labelAsString);
+                return Double.toString(decision - trueLabel);
+            } catch (NumberFormatException e) {
+                return "NaN";
+            }
         } else {
             return trueLabel(sampleId).equals(labelAsString) ? "correct" : "incorrect";
         }
