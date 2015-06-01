@@ -48,8 +48,10 @@ public class RegressionLabels extends ConditionIdentifiers {
                             + "Line was :" + line);
                     System.exit(1);
                 }
+                if (!"missing".equals(tokens[0])) {
+                    labels.add(tokens[1],Double.parseDouble(tokens[0]));
+                }
                 //   System.out.println("counting: "+tokens[0]+" "+ tokens[1]);
-                labels.add(tokens[1],Double.parseDouble(tokens[0]));
             }
         } catch (IOException e) {
             LOG.error(e);
