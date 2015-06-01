@@ -20,6 +20,7 @@ package org.bdval;
 
 import com.martiansoftware.jsap.*;
 import edu.cornell.med.icb.geo.tools.ClassificationTask;
+import edu.cornell.med.icb.geo.tools.RegressionTask;
 import edu.cornell.med.icb.util.RandomAdapter;
 import it.unimi.dsi.fastutil.doubles.DoubleArraySet;
 import it.unimi.dsi.fastutil.doubles.DoubleSet;
@@ -32,7 +33,10 @@ import org.apache.commons.logging.LogFactory;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.*;
+import java.util.Collections;
+import java.util.Random;
+import java.util.Set;
+import java.util.SortedSet;
 
 /**
  * Partition a training set into various splits for training and testing. A typical split design is cross-validation,
@@ -145,7 +149,7 @@ public class DefineSplitsMode extends DAVMode {
             LOG.info("A fold will be marked for feature selection.");
         }
     }
-
+    ClassificationTask task;
     @Override
     public void process(final DAVOptions options) {
         super.process(options);
@@ -158,7 +162,9 @@ public class DefineSplitsMode extends DAVMode {
         final Set<String> sampleIdsClass1 = task.getConditionsIdentifiers().getLabelGroup(task.getSecondConditionName());
 
         final SortedSet<String> allSampleIds = new ObjectAVLTreeSet<String>();
+        this.task=task;
         if (task.isRegression()) {
+
             System.err.println("Disabling stratification because this task is a regression.");
             // disable stratification when the task is a regression. There is nothing to stratify for and stratification
             // will fail.
@@ -297,6 +303,9 @@ public class DefineSplitsMode extends DAVMode {
     }
 
     private double getLabel(final int sampleIndex, final Set<String> positiveSamples, final ObjectList<String> allSampleIds) {
+        if (this.task.isRegression()) {
+            return ((RegressionTask ) this.task).getLabels().getLabel(allSampleIds.get(sampleIndex));
+        }
         return positiveSamples.contains(allSampleIds.get(sampleIndex)) ? 1 : 0;
     }
 }
